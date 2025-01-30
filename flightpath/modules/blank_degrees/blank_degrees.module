@@ -14,8 +14,6 @@ function blank_degrees_menu() {
     "page_arguments" => array("blank_degrees_select_degree_form"),
     "access_arguments" => array('access_blank_degrees'),
     "page_settings" => array(
-      
-      
       "page_hide_report_error" => TRUE,
       "target" => "_blank",
     ),    
@@ -29,8 +27,6 @@ function blank_degrees_menu() {
     "access_arguments" => array('access_blank_degrees'),    
     "page_settings" => array(
       "display_currently_advising" => TRUE,
-      
-      
       "page_hide_report_error" => TRUE,
       "page_show_title" => TRUE,
       "menu_links" => array(         
