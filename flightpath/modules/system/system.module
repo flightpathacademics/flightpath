@@ -1187,9 +1187,18 @@ function system_school_data_form($school_id = 0) {
     "size" => 20,
     "label" => t("School initials:"),
     "value" => variable_get_for_school("school_initials", "DEMO", $school_id, TRUE),
-    "description" => t("Ex: ULM or BPCC"),    
+    "description" => t("Ex: UFP or BQCC"),    
+  );
+
+  $form["school_name" . $fs] = array(
+    "type" => "textfield",
+    "size" => 20,
+    "label" => t("School name:"),
+    "value" => variable_get_for_school("school_name", "Demo University", $school_id, TRUE),
+    "description" => t("Ex: University of FlightPath"),    
   );
   
+    
                   
   $form["earliest_catalog_year" . $fs] = array(
     "type" => "textfield",

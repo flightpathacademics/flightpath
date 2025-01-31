@@ -1,6 +1,16 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-01-30
+  Small changes to clean up code.
+  
+  Added new "school_name" to per-school settings.  Ex:  University of FlightPath.
+
+  Added new convenience function: fp_url_absolute() for getting full URLs to FP pages.
+  
+  Fixed bug where anonymous users were not getting permissions set correctly.
+  
+
 2024-11-08
   Small change in alerts module to make sure that $content is a valid object before
   working on it.

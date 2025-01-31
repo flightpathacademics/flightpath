@@ -2425,6 +2425,23 @@ function l($text, $path, $query = "", $attributes = array()) {
   return $rtn;
 }
 
+
+
+/**
+ * This convenience function returns the absolute URL to the path requested.
+ * @see fp_url()
+ */
+function fp_url_absolute($path, $query = "") {
+  return base_url() . '/' . fp_url($path, $query, FALSE);
+}
+
+
+
+
+
+
+
+
 /**
  * This function will take a path, ex: "admin/config/module"
  * and a query, ex: "nid=5&whatever=yes"

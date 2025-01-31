@@ -407,8 +407,7 @@ function fp_load_user($user_id) {
     $rtn->name = t("Anonymous");
     $rtn->f_name = '';
     $rtn->l_name = '';
-    $rtn->roles = array(1 => "anonymous user");
-    $rtn->permissions = fp_get_permissions_for_role(1);
+    $rtn->roles = array(1 => "anonymous user");    
     $rtn->email = '';
     $rtn->cwid = '';
     $rtn->school_id = 0;
@@ -416,10 +415,10 @@ function fp_load_user($user_id) {
     $rtn->is_faculty = FALSE;
     $rtn->is_disabled = FALSE;
     $rtn->last_login = 0;
-    $rtn->roles = array();
-    $rtn->permissions = array();
+    $rtn->roles = array();    
     $rtn->settings = array();
-    $rtn->attributes = array();        
+    $rtn->attributes = array();
+    $rtn->permissions = fp_get_permissions_for_role(1);        
     return $rtn;        
   }
   

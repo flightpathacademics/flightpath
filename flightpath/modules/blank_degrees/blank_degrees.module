@@ -321,7 +321,7 @@ function blank_degrees_select_school_form() {
 /**
  * This form lets the user select which degree they wish to view.
  */
-function blank_degrees_select_degree_form() {
+function blank_degrees_select_degree_form($bool_show_change_catalog_year = TRUE) {
   $form = array();
   $m = 0; 
   
@@ -399,11 +399,13 @@ function blank_degrees_select_degree_form() {
       "value" => $blank_catalog_year,
     );
 
-    $form["mark_searching_in_year"] = array(
-      "value" => "<div class='search-degrees-in-catalog-year'>" . t("Searching degrees in %year.", array("%year" => $blank_catalog_year . "-" . ($blank_catalog_year+1))) . "
-                   " . l(t("Change?"), "tools/blank-degrees", "school_id=$school_id") . "</div>",
-      "weight" => 0,
-    );    
+    if ($bool_show_change_catalog_year) {
+      $form["mark_searching_in_year"] = array(
+        "value" => "<div class='search-degrees-in-catalog-year'>" . t("Searching degrees in %year.", array("%year" => $blank_catalog_year . "-" . ($blank_catalog_year+1))) . "
+                     " . l(t("Change?"), "tools/blank-degrees", "school_id=$school_id") . "</div>",
+        "weight" => 0,
+      );    
+    }
     
     $school_id = 0;
     if (isset($_REQUEST['school_id'])) {
@@ -456,6 +458,7 @@ function blank_degrees_select_degree_form() {
       "prefix" => "",
       "value" => t("Continue"),
       "weight" => 100,
+      "spinner" => TRUE,
     );
   }
   
