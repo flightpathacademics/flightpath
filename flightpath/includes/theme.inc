@@ -1318,7 +1318,7 @@ function fp_render_sidebar_left_content($bool_for_hamburger_menu = FALSE) {
       'icon' => 'fa-graduation-cap',
       'desc' => t('My Profile'),
       'class' => 'my-profile',
-      'weight' => 10, 
+      'weight' => 100, 
     );
   }
   $links[] = array(
@@ -1326,42 +1326,42 @@ function fp_render_sidebar_left_content($bool_for_hamburger_menu = FALSE) {
     'icon' => 'fa-calendar',
     'desc' => t('Appointments'),
     'class' => 'appointments',
-    'weight' => 20, 
+    'weight' => 200, 
   );  
   $links[] = array(
     'path' => 'student-search',
     'icon' => 'fa-users',
     'desc' => t('Students'),
     'class' => 'students',
-    'weight' => 30, 
+    'weight' => 300, 
   );  
   $links[] = array(
     'path' => 'tools/course-search',
     'icon' => 'fa-book',
     'desc' => t('Courses'),
     'class' => 'courses',
-    'weight' => 40, 
+    'weight' => 400, 
   );
   $links[] = array(
     'path' => 'tools/blank-degrees',
     'icon' => 'fa-university',
     'desc' => t('Degrees'),
     'class' => 'degrees',
-    'weight' => 50, 
-  );      
+    'weight' => 500, 
+  );
   $links[] = array(
     'path' => 'stats',
     'icon' => 'fa-bar-chart',
     'desc' => t('Analytics'),
     'class' => 'analytics',
-    'weight' => 60, 
+    'weight' => 600, 
   );  
   $links[] = array(
     'path' => 'admin-tools',
     'icon' => 'fa-bolt',
     'desc' => t('Admin Tools'),
     'class' => 'admin-tools',
-    'weight' => 70, 
+    'weight' => 700, 
   );  
     
   if ($bool_for_hamburger_menu) {
@@ -1371,12 +1371,13 @@ function fp_render_sidebar_left_content($bool_for_hamburger_menu = FALSE) {
       'icon' => 'fa-sign-out',
       'desc' => t('Log Out'),
       'class' => 'logout',
-      'weight' => 999, 
+      'weight' => 9999, 
     );
   }
   
   
-  // TODO:  hook to allow other modules to add to this list or modify it.
+  // Call a hook to possibly add more items or modify our list of left sidebar links.
+  invoke_hook("sidebar_left_links_alter", array($bool_for_hamburger_menu, &$links));
    
   
   

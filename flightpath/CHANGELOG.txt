@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-02-01
+  Added new hook to allow modules to add/modify the left sidebar links.
+  
+
 2025-01-30
   Small changes to clean up code.
   

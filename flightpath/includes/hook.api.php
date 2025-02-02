@@ -18,6 +18,28 @@
  
  
 
+ 
+/**
+ * This hook allows a module to modify the links which appear on the left sidebar.
+ */ 
+function hook_sidebar_left_links_alter($bool_for_hamburger_menu, &$links) {
+ 
+ 
+  if (module_enabled('XYZ')) {
+    $links[] = array(
+      'path' => 'tools/xyz',
+      'icon' => 'fa-suitcase',
+      'desc' => t('XYZ'),
+      'class' => 'xyz',
+      'weight' => 550, 
+    );
+  } 
+ 
+  // No need to return anything, $links is passed by reference.
+  
+}
+ 
+ 
   
  
 /**
