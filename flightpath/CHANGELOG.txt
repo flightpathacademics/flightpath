@@ -1,6 +1,18 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-04-21
+  Added new functionality to batch module, so we can easily create files to append data to. This hopefully uses less memory
+  than storing everything in variables. Especially useful for batch operations over large datasets to create CSV files. 
+  
+
+2025-02-24
+  Minor documentation changes to hook.api.php.
+  
+  Added simple caching to databasehandler when looking for student catalog year.  Also removed some extra processing
+  that was left over from a previous version of FP.
+   
+
 2025-02-01
   Added new hook to allow modules to add/modify the left sidebar links.
   

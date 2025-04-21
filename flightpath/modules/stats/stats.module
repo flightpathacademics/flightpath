@@ -209,6 +209,14 @@ function stats_menu() {
     "type" => MENU_TYPE_CALLBACK,
   );
   
+  // Lets the user download a CSV file stored in a FILE, in the files/private directory, with a batch_id.
+  $items["stats/download-csv-from-batch-file/%"] = array(
+    "page_callback" => "stats_download_csv_from_batch_file",
+    "page_arguments" => array(2),
+    "access_arguments" => array("can_access_stats"),
+    "type" => MENU_TYPE_CALLBACK,
+  );
+
   
   
   
@@ -237,6 +245,42 @@ function stats_download_csv_from_batch($batch_id) {
   header('Content-type: text/csv');
   header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
   print $batch["csv"];
+
+  die;    
+  
+}
+
+
+
+
+/**
+ * Lets the user download a CSV file from a completed batch, from a file created during the batch operation.
+ * 
+ *
+ * @param unknown_type $batch_id
+ */
+function stats_download_csv_from_batch_file($batch_id) {
+  
+  $filename = fp_get_machine_readable(strtolower($_REQUEST["filename"]));
+  
+  $batch = batch_get($batch_id);
+
+  watchdog('stats', "download_csv_from_batch_file batch_id:$batch_id, filename:$filename.csv", array());
+
+  // calcuate the full path to the file...
+  $private_path = fp_get_files_path() . "/private";  
+  $batch_id = $batch['batch_id'];
+  $created = $batch['created'];  
+  $filepath = $private_path . '/batch_' . $batch_id . '__' . $created . '.csv.tmp';
+    
+
+  // Give it to the browser...  
+  header('Content-type: text/csv');
+  header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
+  
+  // Read directly from the server...
+  readfile($filepath);
+    
 
   die;    
   

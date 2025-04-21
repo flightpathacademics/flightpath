@@ -106,7 +106,7 @@ function advise_menu() {
     "page_settings" => array (
       "display_currently_advising" => TRUE,
     ),    
-    "weight" => 40,
+    "weight" => 50,
     "type" => MENU_TYPE_TAB,
     "file" => menu_get_module_path("advise") . "/advise.history.inc",
   );

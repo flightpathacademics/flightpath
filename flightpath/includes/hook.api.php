@@ -16,7 +16,32 @@
  */
  
  
+
  
+/**
+ * This hook allows other modules to act when we are using the admin operation
+ * of duplicating an entire catalog year's worth of data.
+ * 
+ * This is called AFTER the core code has run.  
+ * We expect $source_year and $destination_year to be 4-digit years.
+ * Ex:  2021 and 2022. 
+ * 
+ * $form_state is literally the $form_state from the form we submitted to initiate
+ * the admin duplicate year function.  It contains other values which the module may find useful.
+ * Notice that it is passed by reference, so that changes can be made for the benefit of other modules.
+ * 
+ */ 
+function hook_admin_duplicate_year($source_year, $destination_year, &$form_state) {
+    
+  // Delete relevant data with catalog_year = destination_year
+  // ...
+  
+  // Copy relevant data FROM catalog year source_year to destination_year
+  // ...
+  
+} 
+ 
+  
 
  
 /**
@@ -118,28 +143,6 @@ function hook_stats_additional_menublocks() {
 
 
 
-/**
- * This will let us re-arrange or add new elements to the Currently Advising box,
- * which appears at the top of the screen once a student has been selected (or for
- * a student when they log in).
- * 
- * Values are stored as Strings for each element, in the format:
- *     label ~~ value
- * For example:
- *     [0] Name: ~~ John Doe
- *     [1] Degree: ~~ Accounting
- * 
- * NOTE: Because of when this hook is invoked, the fpm() function will not work
- * correctly to debug variables.  Use ppm($var) instead.
- */
- /*   No longer being used.  Replaced by @see hook_alter_student_profile_items
-function z__hook_alter_currently_advising_box(&$display_array) {
-
-  // Add to the end...  
-  $display_array[] = 'Extra: ~~ Values';
-  
-}
-*/
 
 
 
@@ -153,11 +156,40 @@ function z__hook_alter_currently_advising_box(&$display_array) {
  */
 function hook_alter_student_profile_items($bool_mini, &$extra_profile_items) {
   
+  // Option 1
+  
   // Add this item for test scores:  
   $extra_profile_items['right_side'][] = array(
     'label' => 'ACT Score:',
     'content' => '33 (28 E / 35 M)',  
+    'extra_class' => 'optional-css-class',
+    'mobile_content' => 'This is like "content", but is initially hidden via CSS. 
+                         If we are on a mobile display, then "content" is hidden via CSS
+                         and this field is displayed instead.',
   );
+  
+  
+  // Option 2:  You can also make use of fp_push_and_balance_profile_items() as demonstrated below: 
+  global $current_student_id;
+  
+  $user_id = db_get_user_id_from_cwid($current_student_id, 'student');
+  $start_term = trim(user_get_attribute($user_id, 'start_term', ''));
+  
+  if ($start_term) {
+  
+    // Filter through term_description...
+    $disp_term = get_term_description($start_term);
+  
+      
+    $item = array(
+      'label' => 'Candidacy Session:',
+      'content' => $start_term, 
+    );
+    fp_push_and_balance_profile_items($extra_profile_items, array("start_term__value" => $item));
+  
+  }
+  
+  
   
 }
 

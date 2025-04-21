@@ -2695,7 +2695,16 @@ function invoke_hook($hook = "example_hook_here", $params = array()) {
 
 
 
-
+/**
+ * This is a convenience function which simply passes through to fpm(), due entirely because
+ * of typos with fpm().  
+ * 
+ * @see fpm()
+ */
+function dpm($var, $max_levels = 15) {
+  fpm("You typed 'dpm()' instead of 'fpm()'. Make sure to use fpm() next time.");
+  fpm($var, $max_levels);
+}
 
 /**
  * Uses fp_add_message, but in this case, it also adds in the filename and line number

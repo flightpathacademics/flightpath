@@ -217,7 +217,7 @@ function menu_get_items_in_tab_family($tab_family) {
       $rtn[] = $item;
     }    
   }
-    
+
   return $rtn;
 }
 

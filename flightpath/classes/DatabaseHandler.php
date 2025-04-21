@@ -1250,6 +1250,12 @@ $query_and_args
 
 
   function get_student_catalog_year($student_cwid) {
+      
+        
+    if (isset($GLOBALS['db_get_student_catalog_year'][$student_cwid])) {
+      return $GLOBALS['db_get_student_catalog_year'][$student_cwid];
+    }  
+    
         
     $catalog = 0;  
       
@@ -1261,11 +1267,13 @@ $query_and_args
     
     $cur = $this->db_fetch_array($res);
     if ($cur) {
-      $catalog = $cur["catalog_year"];
+      $catalog = intval($cur["catalog_year"]);
     }
     
-    $temp = explode("-", $catalog);
-    return trim($temp[0]);
+    $GLOBALS['db_get_student_catalog_year'][$student_cwid] = $catalog;
+    
+    
+    return $catalog;
   }
 
   

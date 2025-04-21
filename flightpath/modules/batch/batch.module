@@ -141,6 +141,32 @@ function batch_ajax_callback($batch_id) {
 
 
 
+/**
+ * This will append to a file, stored in custom/files/private, which
+ * will use the batch id as its filename.  If the file does not exist, it will be be created.
+ * $batch is the array returned by @see batch_get()
+ * $content is the string contents we wish to add to the file.
+ * $filetype is the ext of the file, which gives us a clue of the file type. 
+ */
+function batch_append_to_batch_file($batch, $content, $filetype = 'csv') {
+  $private_path = fp_get_files_path() . "/private";
+  
+  $batch_id = $batch['batch_id'];
+  $created = $batch['created'];
+  
+  $filename = $private_path . '/batch_' . $batch_id . '__' . $created . '.' . $filetype . '.tmp';
+  
+  if (!file_exists($filename)) {
+    file_put_contents($filename, ''); // Just create the file.
+  }
+  
+  // Now, append to it...
+  file_put_contents($filename, $content, FILE_APPEND);  
+  
+}
+
+
+
 
 
 /**
@@ -269,6 +295,38 @@ function batch_cron() {
 
   $older_than = strtotime("6 HOURS AGO");
   db_query("DELETE FROM batch_queue WHERE created < ? ", $older_than);
+  
+  
+  // Should we check to see if there are any temp files to delete?
+  if (time() > variable_get("batch_check_to_delete_temp_files", 0)) {
+    // Also look for any "batch_" files which are too old.  
+    $private_path = fp_get_files_path() . "/private";
+    
+    $files = scandir($private_path);
+    foreach ($files as $file) {
+      if (str_starts_with($file, "batch_") && str_ends_with($file, ".tmp")) {
+        $temp = explode("__", $file);
+        $temp2 = explode(".", $temp[1]);
+        $ts = intval($temp2[0]);
+        
+        if ($ts > 999) {  // hopefully this is a valid timestamp
+          if ($ts < $older_than) {
+            // Yes, we can delete now.
+            watchdog("batch", "We can delete " . $file, array(), WATCHDOG_DEBUG);
+          }
+        }
+        
+      }
+    } // foreach file
+    
+    
+    // Set a new time to check to delete temp files...
+    variable_set("batch_check_to_delete_temp_files", strtotime("NOW + 8 HOURS"));
+    
+  } // if time > variable_get....
+   
+  
+          
   
 }
 

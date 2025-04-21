@@ -685,7 +685,15 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
   $form_state['duplication']['src_catalog_year'] = $old_year;
   $form_state['duplication']['dest_catalog_year'] = $new_year;
   
-  /////////////////////////////////////////////////////////////////////
+  
+  // TODO: We need to switch to using the Batch API for this.
+  // TODO: Each section should be its own operation.
+  // TODO: Deletion of dest data
+  // TODO: Duplication of Courses, Groups, Degrees, then other modules' hooks
+  
+  
+  
+  /////////////////////  DELETION  ///////////////////////////////////////////
   // We must first begin by deleting any entries for the new_year
   // from our tables.  This is because we may have to run the parser
   // more than once while debugging and such.
@@ -724,7 +732,9 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
   
       
   
-  /////////////////////////////////////////////////////////////////////////
+  
+  
+  /////////////////////// COPY COURSES //////////////////////////////////////////////////
   // Our first step is to copy all of the courses from the old_year to the new_year.  
   $res = db_query("SELECT * FROM draft_courses WHERE `catalog_year`=? ", $old_year);
   while ($cur = db_fetch_array($res))
@@ -750,7 +760,7 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
    
   
     
-  //////////////////////////////////////////////////////////////////////////
+  //////////////////////// COPY GROUPS  ///////////////////////////////////////////////
   //  Now, let's copy over the groups.  
   $group_id_array = array();
   $subgroup_id_array = array();
@@ -827,7 +837,7 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
   
      
   
-  /////////////////////////////////////////////////////////////////////
+  //////////////////////// COPY DEGREES  ///////////////////////////////////////////
   //  Now, on to transfering the degrees.
   //  We will have to use the groupIDArray we constructed earlier, which
   //  looks like $arr[old_id] = new_id.
@@ -911,6 +921,10 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
     
     
   }  
+  
+  
+  // TODO: run other modules' hooks for duplication, again, as one of the batch operations
+  // TODO: hook_admin_duplicate_year($source_year, $destination_year, &$form_state)
   
   
   watchdog("admin", "Duplicated all degree/group/courses data from $old_year to $new_year");

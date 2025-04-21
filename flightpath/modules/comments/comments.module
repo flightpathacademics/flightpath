@@ -18,7 +18,7 @@ function comments_menu() {
     "page_settings" => array (
       "display_currently_advising" => TRUE,
     ),        
-    "weight" => 35,         
+    "weight" => 40,         
   );
 
   $items["comments/save-comment"] = array(
