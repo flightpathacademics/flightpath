@@ -293,8 +293,8 @@ function batch_processing_page($batch_id) {
  */
 function batch_cron() {
 
-  $older_than = strtotime("6 HOURS AGO");
-  db_query("DELETE FROM batch_queue WHERE created < ? ", $older_than);
+  $older_than = strtotime("2 HOURS AGO");
+  db_query("DELETE FROM batch_queue WHERE created <= ? ", $older_than);
   
   
   // Should we check to see if there are any temp files to delete?
@@ -304,15 +304,17 @@ function batch_cron() {
     
     $files = scandir($private_path);
     foreach ($files as $file) {
+      
       if (str_starts_with($file, "batch_") && str_ends_with($file, ".tmp")) {
         $temp = explode("__", $file);
         $temp2 = explode(".", $temp[1]);
         $ts = intval($temp2[0]);
         
         if ($ts > 999) {  // hopefully this is a valid timestamp
-          if ($ts < $older_than) {
+          if ($ts <= $older_than) {
             // Yes, we can delete now.
-            watchdog("batch", "We can delete " . $file, array(), WATCHDOG_DEBUG);
+            watchdog("batch", "Delete old temp file: " . $file, array(), WATCHDOG_DEBUG);
+            unlink($private_path . '/' . $file);
           }
         }
         
@@ -321,7 +323,7 @@ function batch_cron() {
     
     
     // Set a new time to check to delete temp files...
-    variable_set("batch_check_to_delete_temp_files", strtotime("NOW + 8 HOURS"));
+    variable_set("batch_check_to_delete_temp_files", strtotime("NOW + 2 HOURS"));
     
   } // if time > variable_get....
    
