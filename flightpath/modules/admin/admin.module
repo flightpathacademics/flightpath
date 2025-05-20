@@ -632,7 +632,7 @@ function admin_duplicate_year_form() {
     "type" => "submit",
     "value" => t("Submit"),
     "spinner" => TRUE,
-    "description" => t("This action may take <b><u>several moments</u></b> to complete."),
+    "description" => t("This action may take <b><u>several minutes</u></b> to complete."),
     "prefix" => "<hr>",
   );
   

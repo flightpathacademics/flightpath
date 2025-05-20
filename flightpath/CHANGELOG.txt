@@ -7,6 +7,8 @@ FlightPath 7.x Changelog
   to how it uses the batch API. This was necessary for schools with lots of data, to prevent the operation
   from timing out. 
   
+  Adjusted wording for Duplicate form.
+  
 
 2025-05-19
   Made it so that "apply draft changes" occurs in a batch operation, to reduce the chances of something timing out
