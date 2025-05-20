@@ -598,7 +598,7 @@ $query_and_args
 
 
 
-  function duplicate_course_for_year($course = NULL, $catalog_year = 0)
+  function duplicate_course_for_year($course = NULL, $catalog_year = 0, $bool_delete_existing = TRUE)
   {
     // Duplicate the course for the given catalog_year.
     // If it already exists for that catalog_year, delete it from the
@@ -623,14 +623,16 @@ $query_and_args
     }
     
 
-    $res = $this->db_query("DELETE FROM draft_courses 
-                            WHERE
-                            course_id = ? 
-                            AND catalog_year = ? 
-                            AND subject_id = ? 
-                            AND course_num = ?
-                            AND school_id = ? ", $course_id, $catalog_year, $c->subject_id, $c->course_num, $c->school_id);
-
+    if ($bool_delete_existing) {
+      $res = $this->db_query("DELETE FROM draft_courses 
+                              WHERE
+                              course_id = ? 
+                              AND catalog_year = ? 
+                              AND subject_id = ? 
+                              AND course_num = ?
+                              AND school_id = ? ", $course_id, $catalog_year, $c->subject_id, $c->course_num, $c->school_id);
+    }
+    
     $res2 = $this->db_query("INSERT INTO draft_courses(course_id,
                 subject_id, course_num, catalog_year,
                 title, description, min_hours, max_hours,

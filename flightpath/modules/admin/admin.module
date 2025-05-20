@@ -696,7 +696,7 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
     "operation" => array("admin_duplicate_year_perform_batch_operation", array($ops, $old_year, $new_year)),
     "title" => t("Duplicate catalog year"),
     "success_message" => t("Duplication from $old_year to $new_year completed successfully."),
-    "progress_message" => "Working on @current of @total operations...",
+    "progress_message" => "Working on @current of @total operations. This may take some time, do not close this window/tab.",
     "display_percent" => TRUE,
   );
   
@@ -735,7 +735,7 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
   $db = get_global_database_handler();
   
   
-  if ($op_command == 'delete_new_year') {
+  if ($op_command == 'delete_new_year') {    
     /////////////////////  DELETION  ///////////////////////////////////////////
     // We must first begin by deleting any entries for the new_year
     // from our tables.  This is because we may have to run this
@@ -794,7 +794,8 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
       $course->school_id = $db_school_id;
       
       // Now, duplicate it for the new_year.
-      $db->duplicate_course_for_year($course, $new_year);
+      // The FALSE at the end means don't bother deleting any existing course, since we have already done that.
+      $db->duplicate_course_for_year($course, $new_year, FALSE);  
       
       // Store what courses we are working on, for other modules.
       $_SESSION['admin_duplicate_year']['courses'][] = $db_course_id;
