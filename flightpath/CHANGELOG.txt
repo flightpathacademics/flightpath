@@ -1,6 +1,15 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-05-19
+  Made it so that "apply draft changes" occurs in a batch operation, to reduce the chances of something timing out
+  or running out of memory.
+  
+  Added new hook:  hook_admin_duplicate_year, so other modules can act when we perform the duplicate catalog year function.
+  
+  Made it so "Duplicate entire catalog year" is now a batch operation, to reduce chances of something timing out.
+  
+
 2025-04-21
   Added new functionality to batch module, so we can easily create files to append data to. This hopefully uses less memory
   than storing everything in variables. Especially useful for batch operations over large datasets to create CSV files. 

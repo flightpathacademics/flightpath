@@ -662,18 +662,392 @@ function admin_duplicate_year_form_validate($form, &$form_state) {
 }
 
 
+
+
+
+/**
+ * This function will set up a batch operation so we can duplicate an entire year with less chance of time or memory
+ * running out.
+ *
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function admin_duplicate_year_form_submit($form, &$form_state) {
+  
+  
+  
+  $values = $form_state["values"];
+
+  $new_year = $values["destination_year"];
+  $old_year = $values["source_year"];
+  
+  
+  // We are going to keep track of all the operations we need to do in this $ops array.
+  $ops = array();
+  $ops[]['delete_new_year'] = TRUE;
+  $ops[]['copy_courses'] = TRUE;
+  $ops[]['copy_groups'] = TRUE;
+  $ops[]['copy_degrees'] = TRUE;
+  $ops[]['hook_admin_duplicate_year'] = TRUE;
+  
+  
+  // Okay, set up the batch....
+  $batch = array(
+    "operation" => array("admin_duplicate_year_perform_batch_operation", array($ops, $old_year, $new_year)),
+    "title" => t("Duplicate catalog year"),
+    "success_message" => t("Duplication from $old_year to $new_year completed successfully."),
+    "progress_message" => "Working on @current of @total operations...",
+    "display_percent" => TRUE,
+  );
+  
+  
+  // Set the batch...
+  batch_set($batch);
+
+  
+  
+}
+
+
+
+/**
+ * The is the batch operation to duplicate from $old_year to $new_year
+ */
+function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, $new_year) {
+  
+  
+  // if this is our first time through, let's init our values.
+  if (!isset($batch["results"]["total"])) {
+    // Our first time through.  Let's start up.
+    $batch["results"]["total"] = count($ops);
+    $batch["results"]["current"] = 0;
+    $batch["results"]["finished"] = FALSE;
+    
+    unset($_SESSION['admin_duplicate_year']);
+    $_SESSION['admin_duplicate_year'] = array();
+    
+    
+  }
+  
+  
+  $op_command = key($ops[$batch['results']['current']]);
+  $op_val = $ops[$batch['results']['current']][$op_command];
+  $db = get_global_database_handler();
+  
+  
+  if ($op_command == 'delete_new_year') {
+    /////////////////////  DELETION  ///////////////////////////////////////////
+    // We must first begin by deleting any entries for the new_year
+    // from our tables.  This is because we may have to run this
+    // more than once while debugging and such.
+    $res = db_query("DELETE FROM draft_courses WHERE catalog_year = ? ", $new_year);
+    
+    
+    $res = db_query("DELETE FROM draft_degree_tracks WHERE catalog_year = ? ", $new_year);
+    // For degrees, we first need to select all of the new_year degrees.
+    $res = db_query("SELECT * FROM draft_degrees WHERE catalog_year = ? ", $new_year);
+    while ($cur = db_fetch_array($res)) {
+      $res2 = db_query("DELETE FROM draft_degree_requirements WHERE degree_id = ? ", $cur["degree_id"]);
+    }
+    
+    $res = db_query("DELETE FROM draft_degrees WHERE catalog_year = ? ", $new_year);
+    // For groups, begin by selecting all the groups in that year...
+    $res = db_query("SELECT * FROM draft_groups WHERE catalog_year = ? ", $new_year);
+    while ($cur = db_fetch_array($res))
+    {
+      // Now, select all the requirements and see if there are any sub groups...
+      $res2 = db_query("SELECT * FROM draft_group_requirements WHERE group_id = ? ", $cur["group_id"]);
+      while ($cur2 = db_fetch_array($res2))
+      {
+        if ($cur2["child_group_id"] > 0)
+        {
+          // Delete the child group.
+          $res3 = db_query("DELETE FROM draft_group_requirements WHERE group_id = ? ", $cur2["child_group_id"]);
+        }
+      }
+      // Now, delete the original requirement.
+      $res3 = db_query("DELETE FROM draft_group_requirements WHERE group_id = ? ", $cur["group_id"]);
+    }
+    $res = db_query("DELETE FROM draft_groups WHERE catalog_year = ? ", $new_year);
+  
+  } // delete_new_year
+  
+  
+  /////////////
+  /////////////
+  
+  if ($op_command == 'copy_courses') {
+    /////////////////////// COPY COURSES //////////////////////////////////////////////////
+    // Copy all of the courses from the old_year to the new_year.
+    $res = db_query("SELECT * FROM draft_courses WHERE catalog_year = ? ", $old_year);
+    while ($cur = db_fetch_array($res))
+    {
+      extract($cur, 3, "db");
+      
+      $course = new Course($db_course_id, FALSE, $db, FALSE, $old_year);
+      $course->subject_id = $db_subject_id;
+      $course->course_num = $db_course_num;
+      $course->db_exclude = $db_exclude;
+      $course->min_hours = $db_min_hours;
+      $course->max_hours = $db_max_hours;
+      $course->repeat_hours = $db_repeat_hours;
+      $course->school_id = $db_school_id;
+      
+      // Now, duplicate it for the new_year.
+      $db->duplicate_course_for_year($course, $new_year);
+      
+      // Store what courses we are working on, for other modules.
+      $_SESSION['admin_duplicate_year']['courses'][] = $db_course_id;
+      
+    }
+    
+  } // copy_courses
+  
+  
+  //////////////
+  //////////////
+  
+  
+  if ($op_command == 'copy_groups') {
+    //////////////////////// COPY GROUPS  ///////////////////////////////////////////////
+    //  Now, let's copy over the groups.
+    $group_id_array = array();
+    $subgroup_id_array = array();
+    
+    $res = db_query("SELECT * FROM draft_groups WHERE catalog_year = ? ", $old_year);
+    while ($cur = db_fetch_array($res))
+    {
+      extract($cur, 3, "db");
+      // First, let's request a new group ID for this new group.
+      $new_group_id = $db->request_new_group_id();
+      $group_id_array[$db_group_id] = $new_group_id;
+      
+      // Now, let's insert this top-level group back into the table
+      // as the new_year, with the new_group_id.
+      $query = "INSERT INTO draft_groups(`group_id`,`group_name`,
+                `title`,`public_note`,`definition`,`icon_filename`,`catalog_year`,
+                `priority`,`delete_flag`,`data_entry_comment`, `catalog_repeat`,school_id)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ";
+      $res2 = db_query($query, array($new_group_id, $db_group_name, $db_title, $db_public_note,
+                                      $db_definition, $db_icon_filename, $new_year,
+                                      $db_priority, $db_delete_flag, $db_data_entry_comment, 
+                                      $db_catalog_repeat, $db_school_id));
+      
+      // Okay, now we need to go through the requirements for the group, and copy
+      // those over to the new_year.
+      $res3 = db_query("SELECT * FROM draft_group_requirements
+                WHERE group_id = ? ", $db_group_id);
+      while($cur3 = db_fetch_array($res3))
+      {
+        extract($cur3, 3, "db3");
+        
+        $child_group_id = 0;
+        // Was there a child_group (a branch)?  If so, we need to copy that
+        // over too, with a new child_group_id.
+        if ($db3_child_group_id > 0)
+        {
+          // First, create the child group...
+          $new_sub_group_id = $db->request_new_group_id();
+          $subgroup_id_array[$db3_child_group_id] = $new_sub_group_id;
+          $res4 = db_query("SELECT * FROM draft_group_requirements
+                WHERE group_id = ? ", $db3_child_group_id);
+          while($cur4 = db_fetch_array($res4))
+          {
+            extract($cur4, 3, "db4");
+            $res5 = db_query("INSERT INTO draft_group_requirements
+                      (`group_id`,`course_id`,`course_min_grade`,
+                      `course_repeats`,`attributes`,`data_entry_value`)
+                      VALUES (?,?,?,?,?,?) ", array($new_sub_group_id, $db4_course_id,
+                                                    $db4_course_min_grade,$db4_course_repeats,$db4_attributes,
+                                                    $db4_data_entry_value));
+          }
+          
+          // Now, add the replace the db3_child_group_id with this new id
+          // so it will get added as a requirement.
+          $child_group_id = $new_sub_group_id;
+        }
+        
+        // Add the row into the table...
+        $res5 = db_query("INSERT INTO draft_group_requirements
+                  (`group_id`,`course_id`,`course_min_grade`,
+                  `course_repeats`,`attributes`,`data_entry_value`,`child_group_id`)
+                  VALUES (?,?,?,?,?,?,?) ", array($new_group_id, $db3_course_id,
+                                                  $db3_course_min_grade, $db3_course_repeats, $db3_attributes,
+                                                  $db3_data_entry_value, $child_group_id));
+        
+        
+      }
+    }
+    
+    // Store what groups we are working on, for other modules.
+    $_SESSION['admin_duplicate_year']['groups'] = $group_id_array;
+    
+  } // copy_groups
+  
+  ////////////////////////////
+  ////////////////////////////
+  
+
+  if ($op_command == 'copy_degrees') {
+    
+    //////////////////////// COPY DEGREES  ///////////////////////////////////////////
+    //  Now, on to transfering the degrees.
+    //  We will have to use the groupIDArray we constructed earlier, which
+    //  looks like $arr[old_id] = new_id.
+    // Do the tracks first, since they are easier and straight forward...
+    
+    $group_id_array = $_SESSION['admin_duplicate_year']['groups'];  // Load from last time, when we copied groups.
+    
+    $res = db_query("SELECT * FROM draft_degree_tracks WHERE catalog_year = ? ", $old_year);
+    while ($cur = db_fetch_array($res))
+    {
+      extract($cur, 3, "db");
+      
+      $res2 = db_query("INSERT INTO draft_degree_tracks
+              (`catalog_year`,`major_code`,`track_code`,`track_title`,
+              `track_short_title`,`track_description`,school_id)
+              VALUES
+              (?,?,?,?,?,?,?) ", array($new_year,$db_major_code,$db_track_code,$db_track_title,
+                                       $db_track_short_title,$db_track_description,$db_school_id));
+      
+    }
+    
+    // Now, let's do the degrees themselves.
+    $res = db_query("SELECT * FROM draft_degrees WHERE catalog_year = ? ", $old_year);
+    while ($cur = db_fetch_array($res))
+    {
+      extract($cur, 3, "db");
+      
+      $new_degree_id = $db->request_new_degree_id();
+      
+      // Store what degrees we are working on, for other modules.
+      $_SESSION['admin_duplicate_year']['degrees'][] = array(
+        'src' => $db_degree_id,
+        'src_catalog_year' => $old_year,
+        'school_id' => $db_school_id,
+        'dest' => $new_degree_id,
+        'dest_major_code' => $db_major_code,
+        'dest_catalog_year' => $new_year,
+      );
+      
+      // add in the top-level degree to the table.
+      $res2 = db_query("INSERT INTO draft_degrees
+              (degree_id, major_code, degree_type, degree_level, degree_class, title,
+               semester_titles_csv, catalog_year, exclude, public_note,
+               allow_dynamic, advising_weight, override_degree_hours, min_tracks, max_tracks, default_tracks, track_selection_config, school_id)
+               VALUES
+              (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ", array($new_degree_id, $db_major_code, $db_degree_type, $db_degree_level, $db_degree_class, $db_title,
+                        $db_semester_titles_csv, $new_year, $db_exclude, $db_public_note,
+                        $db_allow_dynamic, $db_advising_weight, $db_override_degree_hours, $db_min_tracks, $db_max_tracks, 
+                        $db_default_tracks, $db_track_selection_config, $db_school_id));
+      
+      // now, pull out all of the degree_requirements.
+      $res3 = db_query("SELECT * FROM draft_degree_requirements
+                WHERE degree_id = ? ", array($db_degree_id));
+      while($cur3 = db_fetch_array($res3))
+      {
+        extract($cur3, 3, "db3");
+        // If there is a required group, we must convert it to the
+        // new groupID !
+        $required_group_id = intval($db3_group_id);
+        if ($db3_group_id > 0 && trim($db3_group_id) != "")
+        {
+          $o_group_id = $db3_group_id;
+          $required_group_id = $group_id_array[$db3_group_id];
+          if ($required_group_id < 1 || $required_group_id == "")
+          {
+            //die("could not find new group for $old_year $db3_group_id!  Group id is $required_group_id");
+            fp_add_message(t("Couldn't find the specified group with ID $db3_group_id in catalog year $old_year, required by degree with ID $db_degree_id ($db_major_code).  The group was possibly deleted?
+                            Be aware that any degrees in the new year will be missing this group requirement."), 'error', TRUE);
+          }
+        }
+        
+        
+        $res4 = db_query("INSERT INTO draft_degree_requirements
+                (degree_id, semester_num, group_id, group_requirement_type,
+                group_hours_required, group_min_hours_allowed, group_min_grade, course_id,
+                course_min_grade, course_requirement_type, data_entry_value)
+                VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ", array($new_degree_id, $db3_semester_num, $required_group_id, $db3_group_requirement_type,
+                          $db3_group_hours_required, $db3_group_min_hours_allowed, $db3_group_min_grade, $db3_course_id,
+                          $db3_course_min_grade, $db3_course_requirement_type, $db3_data_entry_value));
+        
+        
+      }      
+      
+    } // while draft_degrees
+    
+  } // copy_degrees
+ 
+  
+  
+  ////////////////////
+  ////////////////////
+  
+
+  // Allows other modules to act.
+  if ($op_command == 'hook_admin_duplicate_year') {
+    invoke_hook('admin_duplicate_year', array($old_year, $new_year));
+  }
+  
+  
+  
+  
+  $batch['results']['current']++;
+  
+  
+  // Have we finished?
+  if ($batch["results"]["current"] >= $batch["results"]["total"]) {
+    $batch["results"]["finished"] = TRUE;
+    
+    
+    watchdog("admin", "Duplicated all degree/group/courses data from $old_year to $new_year");
+    
+    
+    fp_add_message(t("The copy operation is now completed.  You may view the new year
+                    by using the Data Entry links on the admin main menu.  Remember, you must
+                    apply draft changes before they will be visible in FlightPath."));
+    
+    
+  }
+  
+  
+  
+} // admin_duplicate_year_perform_batch_operation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * This function should perform the actual copy of data!
  *
  * @param unknown_type $form
  * @param unknown_type $form_state
  */
-function admin_duplicate_year_form_submit($form, &$form_state) {
+function z__admin_duplicate_year_form_submit($form, &$form_state) {
       
     
   set_time_limit (300);  // Extend time limit since this may take a little while.    
   $values = $form_state["values"];
     
+  
+  // We are going to keep track of all the operations we need to do in this $ops array.
+  $ops = array();
+  
   
   // Check to make sure they entered the transfer passcode correctly.
   $db = get_global_database_handler();    
@@ -1121,7 +1495,7 @@ function admin_apply_draft_changes_form_validate($form, &$form_state) {
 /**
  * Handles the actual moving of draft courses into production.
  */
-function admin_apply_draft_changes_form_submit($form, $form_submit) {
+function z__admin_apply_draft_changes_form_submit($form, $form_submit) {
   $values = $form_submit["values"];
   
   $db = get_global_database_handler();
@@ -1136,7 +1510,7 @@ function admin_apply_draft_changes_form_submit($form, $form_submit) {
   // First, set maintenance mode...
   variable_set("maintenance_mode", TRUE);
   
-  // Okay, so what we gotta do is truncate the production tables,
+  // Okay, so what we gotta do is truncate the draft tables,
   // then copy the draft tables in.
   $table_array = array(
     "courses",
@@ -1220,6 +1594,186 @@ function admin_apply_draft_changes_form_submit($form, $form_submit) {
  
   
 }
+
+
+
+/**
+ * We are going to set up a batch operation for apply draft changes, to reduce the chance of it timing out with large
+ * amounts of data.
+ */
+function admin_apply_draft_changes_form_submit($form, $form_submit) {
+    
+    
+  // We are going to keep track of all the operations we need to do in this $ops array.
+  $ops = array();
+  $ops[]['truncate_prod_and_copy'] = 'courses';
+  $ops[]['truncate_prod_and_copy'] = 'degree_requirements';
+  $ops[]['truncate_prod_and_copy'] = 'degree_tracks';
+  $ops[]['truncate_prod_and_copy'] = 'degrees';
+  $ops[]['truncate_prod_and_copy'] = 'group_requirements';
+  $ops[]['truncate_prod_and_copy'] = 'groups';
+  
+  
+  $ops[]['perform_draft_instructions'] = TRUE;
+   
+  $ops[]['invoke_apply_draft_changes'] = TRUE;
+  
+  $ops[]['rebuild_cache_course_inventory'] = TRUE;
+  
+ 
+  
+  // Okay, set up the batch....
+  $batch = array(
+    "operation" => array("admin_apply_draft_changes_perform_batch_operation", array($ops)),
+    "title" => t("Apply draft changes"),
+    "success_message" => t("Draft changes have been applied successfully."),
+    "progress_message" => "Working on @current of @total operations...",
+    "display_percent" => TRUE,
+  );
+  
+  
+  // Set the batch...
+  batch_set($batch);
+  
+  
+  
+}
+
+
+function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
+  
+  
+  // if this is our first time through, let's init our values.
+  if (!isset($batch["results"]["total"])) {
+    // Our first time through.  Let's start up.
+    $batch["results"]["total"] = count($ops);
+    $batch["results"]["current"] = 0;  
+    $batch["results"]["finished"] = FALSE;    
+    
+    // First, set maintenance mode...
+    variable_set("maintenance_mode", TRUE);
+    
+    
+  }
+  
+  
+  $op_command = key($ops[$batch['results']['current']]);
+  $op_val = $ops[$batch['results']['current']][$op_command];
+  
+
+  
+  if ($op_command == 'truncate_prod_and_copy') {
+    $table_name = $op_val;
+    $draft_table_name = "draft_$table_name";
+    // First, truncate existing...
+    $query = "truncate table `$table_name`";
+    $res = db_query($query);
+    // Now, copy in draft changes...
+    $query = "INSERT INTO `$table_name`
+            SELECT * FROM `$draft_table_name` ";
+    $res = db_query($query);    
+    
+  } // truncate prod and copy
+
+  
+  /////////////
+  /////////////
+  
+  
+  if ($op_command == 'perform_draft_instructions') {
+    
+    $db = get_global_database_handler();
+    // Now, we need to go through the draft_instructions table,
+    // and perform each instruction one at a time.
+    $res = db_query("SELECT * FROM draft_instructions
+            ORDER BY `id` ");
+    while($cur = db_fetch_array($res))
+    {
+      $instruction = trim($cur["instruction"]);
+      
+      $temp = explode(",",$instruction);
+      
+      if (trim($temp[0]) == "update_course_id") {
+        $db->update_course_id(trim($temp[1]), trim($temp[2]), trim($temp[3]));
+      }
+      
+      if (trim($temp[0]) == "update_course_requirement_from_name") {
+        $db->update_course_requirement_from_name(trim($temp[1]), trim($temp[2]), trim($temp[3]), trim($temp[4]));
+      }
+      
+      // TODO:  Maybe invoke another hook here, to let other modules act on the instruction?
+    } // while
+
+    // Once this is done, truncate the draft_instructions table.
+    $res = db_query("TRUNCATE TABLE draft_instructions");
+        
+  } // perform_draft_instructions
+  
+  
+  /////////////////
+  /////////////////
+
+  
+  if ($op_command == 'invoke_apply_draft_changes') {
+    // Invoke a hook to allow other modules to apply_draft_changes as well
+    invoke_hook("apply_draft_changes");    
+  }
+  
+  
+  ///////////////
+  ///////////////
+
+  
+  if ($op_command == 'rebuild_cache_course_inventory') {
+    
+    // Rebuild our course cache file.
+    unset($_SESSION['fp_cache_course_inventory_last_generated']);
+    if (file_exists(fp_get_files_path() . "/cache_data/courses_serialized.info")) {
+      $x = unlink(fp_get_files_path() . "/cache_data/courses_serialized.info");
+      if (!$x) {
+        fpm("Cannot delete cache_data/courses_serialized.info under custom/files.  Permission error or file does not exist?");
+        watchdog("system", "Cannot delete cache_data/courses_serialized.info under custom/files.  Permission error or file does not exist?", array(), WATCHDOG_ERROR);
+      }
+    }
+    variable_set('cache_course_inventory_last_generated', 0);  // reset this so it will be regenerated.
+    
+    // Builds new courses cache file on the hard drive.
+    system_reload_and_cache_course_inventory();
+    
+  } // rebuild cache course inventory
+  
+  
+  
+  
+  
+  
+  $batch['results']['current']++;
+  
+  
+  // Have we finished?
+  if ($batch["results"]["current"] >= $batch["results"]["total"]) {
+    $batch["results"]["finished"] = TRUE;
+
+    
+    // Send emails to notify programmers
+    $notify = variable_get("notify_apply_draft_changes_email_address", "");
+    if ($notify != "") {
+      mail($notify, "FlightPath Apply Draft Changes", "Someone has applied draft changes to FlightPath, which updated degree plans, groups, and courses.");
+    }    
+    fp_add_message(t("Successfully updated the production database with draft changes. Your changes are now live and visible on production for all users."));
+    
+    watchdog("admin", "Draft changes applied.");
+    
+    
+    // Remove maintenance mode...
+    variable_set("maintenance_mode", FALSE);
+    
+  }
+  
+  
+  
+} // admin_apply_draft_changes_perform_batch_operation
+
 
 
 

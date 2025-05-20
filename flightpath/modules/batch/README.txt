@@ -2,7 +2,7 @@ README File for Batch API module
 ================================
 
 For instructions on this module's use (which appeals primarily to developers), search
-FlightPath's documentation: http://getflightpath.com/node/1121
+FlightPath's documentation: https://getflightpath.com/node/1121
 
 
 

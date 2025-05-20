@@ -26,13 +26,17 @@
  * We expect $source_year and $destination_year to be 4-digit years.
  * Ex:  2021 and 2022. 
  * 
- * $form_state is literally the $form_state from the form we submitted to initiate
- * the admin duplicate year function.  It contains other values which the module may find useful.
- * Notice that it is passed by reference, so that changes can be made for the benefit of other modules.
+ * 
+ * $_SESSION['admin_duplicate_year'] will have the courses, groups, and degrees we have worked on as well,
+ * which other modules may find useful, or wish to make changes to.
  * 
  */ 
-function hook_admin_duplicate_year($source_year, $destination_year, &$form_state) {
-    
+function hook_admin_duplicate_year($source_year, $destination_year) {
+ 
+  // $_SESSION['admin_duplicate_year'] will have the courses, groups, and degrees we have worked on as well,
+  // which other modules may find useful, or wish to make changes to.
+  // Ex:  $_SESSION['admin_duplicate_year']['courses'] ... ['groups'] ... ['degrees']
+  
   // Delete relevant data with catalog_year = destination_year
   // ...
   
