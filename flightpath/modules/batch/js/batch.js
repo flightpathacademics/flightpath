@@ -23,9 +23,10 @@ function batchContinueBatch() {
   
   // use "unclean" URLs so that it's compatible with non-Clean URL sites.
   // Contact via Ajax...
-  $.get(basePath + "/index.php?q=batch-ajax-callback/" + batchId, function(data) {
+  var jqxhr = $.get(basePath + "/index.php?q=batch-ajax-callback/" + batchId, function(data) {  
+  
     
-
+    
     // Handle data. 
     if (data.error != null) {
       alert(data.error);
@@ -67,6 +68,11 @@ function batchContinueBatch() {
     
     
     
+  })  
+  .fail(function (data) {
+    alert("Error processing batch. Unable to continue.");
+    console.log(data);
+    return;    
   });
   
   

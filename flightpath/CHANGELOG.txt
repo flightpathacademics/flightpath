@@ -1,6 +1,13 @@
 FlightPath 7.x Changelog
 ========================
 
+
+2025-05-20
+  Made various modifications to the "Duplicate entire year" functionality in admin module, specifically as
+  to how it uses the batch API. This was necessary for schools with lots of data, to prevent the operation
+  from timing out. 
+  
+
 2025-05-19
   Made it so that "apply draft changes" occurs in a batch operation, to reduce the chances of something timing out
   or running out of memory.
@@ -8,6 +15,10 @@ FlightPath 7.x Changelog
   Added new hook:  hook_admin_duplicate_year, so other modules can act when we perform the duplicate catalog year function.
   
   Made it so "Duplicate entire catalog year" is now a batch operation, to reduce chances of something timing out.
+  
+  Fixed typos in batch module.
+  
+  Added a "fail" condition to batch.js, in case the batch op fails to complete it will alert the user.
   
 
 2025-04-21

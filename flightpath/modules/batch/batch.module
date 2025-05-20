@@ -1,7 +1,7 @@
 <?php
 /**
  * The main module file for the Batch module.
- * 
+ *
  * Credit where credit is due:  This module is largely inspired by the excellent Batch processing functionality
  * baked into Drupal (like a lot of FlightPath).
  */
@@ -11,7 +11,7 @@
 
 /**
  * Implementation of hook_menu
- * 
+ *
  */
 function batch_menu() {
   
@@ -34,7 +34,7 @@ function batch_menu() {
     "access_callback" => TRUE,
     "type" => MENU_TYPE_CALLBACK,
   );
-
+  
   
   $items["batch-finished/%"] = array(
     "page_callback" => "batch_finished_page",
@@ -48,7 +48,7 @@ function batch_menu() {
     "page_callback" => "batch_ajax_callback",
     "page_arguments" => array(1),
     "access_callback" => TRUE,
-    "type" => MENU_TYPE_CALLBACK,  
+    "type" => MENU_TYPE_CALLBACK,
   );
   
   
@@ -66,23 +66,23 @@ function batch_menu() {
  * @param unknown_type $batch_id
  */
 function batch_ajax_callback($batch_id) {
-
-  $rtn = array();  
+  
+  $rtn = array();
   
   
   $batch = batch_get($batch_id);
   if ($batch["token"] != batch_get_token()) {
     //  Not allowed!  Bad token.
     header('Content-Type: application/json');
-    print json_encode(array("error" => t("An error has occured-- you are now allowed to run this batch, or the batch does not exist.")));
+    print json_encode(array("error" => t("An error has occured. You are not allowed to run this batch, or the batch does not exist.")));
     exit();
-  }  
+  }
   
   
   ///////////////////////////////////
   // Run the batch operation.
   if (isset($batch["file"]) && $batch["file"] != "") {
-    require_once($batch["file"]);    
+    require_once($batch["file"]);
   }
   $operation_callback = $batch["operation"][0];
   
@@ -90,7 +90,7 @@ function batch_ajax_callback($batch_id) {
   if (!function_exists($operation_callback)) {
     header('Content-Type: application/json');
     print json_encode(array("error" => t("An error has occured: Cannot find operation callback function @function", array("@function" => addslashes($operation_callback)))));
-    exit();    
+    exit();
   }
   
   $operation_args = $batch["operation"][1];
@@ -100,13 +100,13 @@ function batch_ajax_callback($batch_id) {
     $params[] = $val;
   }
   
-  call_user_func_array($operation_callback, $params);       
-
+  call_user_func_array($operation_callback, $params);
+  
   
   
   // Coming out of this, $batch should be modified
   // Save it back to the database.
-  db_query("UPDATE batch_queue 
+  db_query("UPDATE batch_queue
             SET batch_data = ?
             WHERE batch_id = ? ", serialize($batch), $batch_id);
   
@@ -146,7 +146,7 @@ function batch_ajax_callback($batch_id) {
  * will use the batch id as its filename.  If the file does not exist, it will be be created.
  * $batch is the array returned by @see batch_get()
  * $content is the string contents we wish to add to the file.
- * $filetype is the ext of the file, which gives us a clue of the file type. 
+ * $filetype is the ext of the file, which gives us a clue of the file type.
  */
 function batch_append_to_batch_file($batch, $content, $filetype = 'csv') {
   $private_path = fp_get_files_path() . "/private";
@@ -161,7 +161,7 @@ function batch_append_to_batch_file($batch, $content, $filetype = 'csv') {
   }
   
   // Now, append to it...
-  file_put_contents($filename, $content, FILE_APPEND);  
+  file_put_contents($filename, $content, FILE_APPEND);
   
 }
 
@@ -176,9 +176,9 @@ function batch_append_to_batch_file($batch, $content, $filetype = 'csv') {
  */
 function batch_finished_page($batch_id) {
   
-  $batch = batch_get($batch_id);  
+  $batch = batch_get($batch_id);
   if ($batch["token"] != batch_get_token()) {
-  
+    
     return "<p>" . t("Sorry, there is a token mismatch or this batch no longer exists.") . "</p>";
   }
   
@@ -186,7 +186,7 @@ function batch_finished_page($batch_id) {
   // to the form's original destination.
   
   if (isset($batch["file"]) && $batch["file"] != "") {
-    require_once($batch["file"]);    
+    require_once($batch["file"]);
   }
   $finished_callback = $batch["finished_callback"][0];
   $finished_args = array();
@@ -195,12 +195,12 @@ function batch_finished_page($batch_id) {
   }
   
   $params = array();
-
+  
   // If we are NOT going to fp_goto, then add the $batch as the first argument.
   if ($finished_callback != "fp_goto") {
     // Add our $batch to the beginning of the $args array.
     //array_unshift($finished_args, $batch);
-    $params = array (0 => &$batch);    
+    $params = array (0 => &$batch);
   }
   
   foreach ($finished_args as $val) {
@@ -212,7 +212,7 @@ function batch_finished_page($batch_id) {
   }
   
   // Okay, let's call our function:
-  return call_user_func_array($finished_callback, $params);       
+  return call_user_func_array($finished_callback, $params);
   
   
   
@@ -226,7 +226,7 @@ function batch_finished_page($batch_id) {
 
 /**
  * This is the page the user sees while a batch is being processed.
- * 
+ *
  * It will contain all the AJAX and such necessary to begin the batch process.
  *
  * @param unknown_type $batch_id
@@ -234,7 +234,7 @@ function batch_finished_page($batch_id) {
 function batch_processing_page($batch_id) {
   $rtn = "";
   
-  $batch = batch_get($batch_id);  
+  $batch = batch_get($batch_id);
   if ($batch["token"] != batch_get_token()) {
     return "<p>" . t("Sorry, there is a token mismatch or this batch no longer exists.") . "</p>";
   }
@@ -242,24 +242,24 @@ function batch_processing_page($batch_id) {
   
   
   fp_set_title($batch["title"]);
-
-  fp_add_css(fp_get_module_path("batch") . "/css/batch.css"); 
+  
+  fp_add_css(fp_get_module_path("batch") . "/css/batch.css");
   
   // Set up our setting...
   fp_add_js(array("batch_id" => $batch_id), "setting");
   
   // Add our general js file...
-  fp_add_js(fp_get_module_path("batch") . "/js/batch.js"); 
-
-   
+  fp_add_js(fp_get_module_path("batch") . "/js/batch.js");
+  
+  
   
   
   
   $rtn .= "<div class='batch-progress-bar-wrapper'>
-             <div class='batch-progress-bar' id='batch-progress-bar'></div>             
+             <div class='batch-progress-bar' id='batch-progress-bar'></div>
            </div>
            <div id='batch-progress-message'>" . t("Initializing... please wait...") . "</div>
-           
+               
            ";
   
   
@@ -286,20 +286,20 @@ function batch_processing_page($batch_id) {
 
 /**
  * Implementation of hook_cron
- * 
+ *
  * Delete old batches from the batch_queue table.  These would be normal "old" batches we no longer need,
  * or ones that never finished for some reason and are just taking up space.
  *
  */
 function batch_cron() {
-
+  
   $older_than = strtotime("2 HOURS AGO");
   db_query("DELETE FROM batch_queue WHERE created <= ? ", $older_than);
   
   
   // Should we check to see if there are any temp files to delete?
   if (time() > variable_get("batch_check_to_delete_temp_files", 0)) {
-    // Also look for any "batch_" files which are too old.  
+    // Also look for any "batch_" files which are too old.
     $private_path = fp_get_files_path() . "/private";
     
     $files = scandir($private_path);
@@ -326,9 +326,9 @@ function batch_cron() {
     variable_set("batch_check_to_delete_temp_files", strtotime("NOW + 2 HOURS"));
     
   } // if time > variable_get....
-   
   
-          
+  
+  
   
 }
 
@@ -337,15 +337,15 @@ function batch_cron() {
 
 /**
  * Create a new batch process.
- * 
- * 
+ *
+ *
  *
  * @param $batch
  *   This is an array containing everything we need to know about the batch we are creating.
  *   The non-required fields will be substituted with default values if left out.
- * 
+ *
  *    - operation :[REQUIRED] an array containing the callback function to execute plus any arguments.  Ex:  "operation" => array('my_function_to_call', array($arg1, $arg2))
- *    - finished_callback  : an array containing the callback function and args to call once we are finished with the batch.  
+ *    - finished_callback  : an array containing the callback function and args to call once we are finished with the batch.
  *          Ex:  "finished_callback" => array('my_finished_function', array($arg1, $arg2))
  *          Generally, this field is optional.  Since batches are usually set up in a form's submit handler, the default behavior is to go to whatever the form's destination
  *          was.  You can override that here, however.
@@ -355,16 +355,16 @@ function batch_cron() {
  *    - file      : An optional file system path to a file where the batch's operation and/or finished functions reside.  Ex: "file" => menu_get_module_path("my_example") . "/runme.inc"
  *    - success_message : An optional message which will display to the user when the batch is complete.  Ex:  "The process is now complete."
  *    - display_percent : boolean, default FALSE.  If set to TRUE, display percentage value in progress bar.
- * 
- * 
+ *
+ *
  * @return $batch_id - the id from batch_queue table for this batch.
  */
 function batch_set($batch) {
   global $user;
-
-
+  
+  
   if (!isset($batch["title"])) {
-    $batch["title"] = t("Processing Batch...");    
+    $batch["title"] = t("Processing Batch...");
   }
   if (!isset($batch["progress_message"])) {
     $batch["progress_message"] = t("Processed @current out of @total.");
@@ -378,7 +378,7 @@ function batch_set($batch) {
   
   $token = batch_get_token();
   db_query("INSERT INTO batch_queue (token, created, batch_data)
-            VALUES ('?', '?', '?') ", $token, time(), $ser_batch);  
+            VALUES ('?', '?', '?') ", $token, time(), $ser_batch);
   $batch_id = db_insert_id();
   
   // Set a session variable so we are aware of this batch process's existence, so we can call it from system's handle_form_submit if necessary.
@@ -397,7 +397,7 @@ function batch_set($batch) {
  * @param unknown_type $batch_id
  */
 function batch_get($batch_id) {
-  $res = db_query("SELECT * FROM batch_queue 
+  $res = db_query("SELECT * FROM batch_queue
                    WHERE batch_id = ? ", $batch_id);
   $cur = db_fetch_array($res);
   
@@ -425,7 +425,7 @@ function batch_get_token() {
   
   $uid = 0;
   if (isset($user->user_id)) {
-    $uid = $user->user_id;  
+    $uid = $user->user_id;
   }
   
   // Return back md5 of user_id + session_id.
@@ -447,7 +447,7 @@ function batch_perm() {
       "admin_restricted" => TRUE, // means only appears for admin (user_id == 1)
     ),
   );
-
+  
   return $perms;
 }
 
@@ -458,15 +458,15 @@ function batch_perm() {
  * @param unknown_type $batch_id
  */
 function batch_start_batch_from_form_submit($batch_id, $redirect_path = "", $redirect_query = "") {
-    
+  
   // We need to confirm that this user is allowed to access THIS batch.
   $current_user_token = batch_get_token();
   
   
   $batch = batch_get($batch_id);
-    
   
-  if ($batch["token"] == $current_user_token) {  
+  
+  if ($batch["token"] == $current_user_token) {
     // Yes, we can proceed!
     
     // If there isn't a finished_callback set, we will set it using fp_goto() to return to the original form's redirect path and query.

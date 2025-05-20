@@ -3,51 +3,51 @@
 /**
  * @file
  * The administrative configurations for FlightPath.
- * 
- * 
+ *
+ *
  */
 
- 
- 
- 
- 
+
+
+
+
 /**
  * Implementation of hook_menu
- * 
+ *
  */
-function admin_menu() { 
+function admin_menu() {
   $items = array();
-   
-   
+  
+  
   $items["admin-tools"] = array(
-     "title" => "Admin Tools",
-     "page_callback" => "admin_display_tools_screen",
-     "access_arguments" => array("can_access_admin_tools"),
-     "tab_family" => "admin",
-     "page_settings" => array(
-       "page_hide_report_error" => TRUE,
-     ),     
-     "type" => MENU_TYPE_NORMAL_ITEM,
+    "title" => "Admin Tools",
+    "page_callback" => "admin_display_tools_screen",
+    "access_arguments" => array("can_access_admin_tools"),
+    "tab_family" => "admin",
+    "page_settings" => array(
+      "page_hide_report_error" => TRUE,
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
   );
-   
-   
-   
+  
+  
+  
   $items["admin-tools/admin"] = array(
-     "title" => t("FlightPath Admin Console"),
-     "description" => t("This area contains the bulk of settings, degree entry, and other configurations for FlightPath."),
-     "page_callback" => "admin_display_main",
-     "access_arguments" => array("can_access_admin"),
-     "page_settings" => array(
-      "menu_links" => array(         
+    "title" => t("FlightPath Admin Console"),
+    "description" => t("This area contains the bulk of settings, degree entry, and other configurations for FlightPath."),
+    "page_callback" => "admin_display_main",
+    "access_arguments" => array("can_access_admin"),
+    "page_settings" => array(
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Tools",
-          "path" => "admin-tools",          
-        ),        
-      ),  
-      "menu_icon" => fp_get_module_path('system') . "/icons/FlightPath_Academics_plane_only.png",   
-     ),     
-     'weight' => 999,
-     "type" => MENU_TYPE_NORMAL_ITEM,
+          "path" => "admin-tools",
+        ),
+      ),
+      "menu_icon" => fp_get_module_path('system') . "/icons/FlightPath_Academics_plane_only.png",
+    ),
+    'weight' => 999,
+    "type" => MENU_TYPE_NORMAL_ITEM,
   );
   
   $items["admin/config/urgent-message"] = array(
@@ -56,57 +56,57 @@ function admin_menu() {
     "page_callback" => "fp_render_form",
     "page_arguments" => array("admin_urgent_message_form", "system_settings"),
     "access_arguments" => array("can_edit_urgent_message"),
-    "page_settings" => array(      
+    "page_settings" => array(
       "menu_icon" => fp_get_module_path('admin') . "/icons/error.png",
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
-    "type" => MENU_TYPE_NORMAL_ITEM,        
-  );     
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
+  );
   
-
+  
   
   $items["admin/config/watchdog"] = array(
     "title" => "Watchdog (logs)",
     "description" => "View log messages from throughout the system",
-    "page_callback" => "admin_display_watchdog",    
+    "page_callback" => "admin_display_watchdog",
     "access_arguments" => array("display_watchdog"),
     "page_settings" => array(
       
-      "menu_icon" => fp_get_module_path('system') . "/icons/application_view_list.png",            
+      "menu_icon" => fp_get_module_path('system') . "/icons/application_view_list.png",
       "page_show_title" => TRUE,
       
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
-    "type" => MENU_TYPE_NORMAL_ITEM,   
-  );       
-
-
-
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
+  );
+  
+  
+  
   $items["admin/config/watchdog/%"] = array(
-    "title" => "View Watchdog Entry",    
+    "title" => "View Watchdog Entry",
     "page_callback" => "admin_display_watchdog_entry",
-    "page_arguments" => array(3),    
+    "page_arguments" => array(3),
     "access_arguments" => array("display_watchdog"),
     "page_settings" => array(
       
       "page_show_title" => TRUE,
       
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
@@ -117,13 +117,13 @@ function admin_menu() {
           "path" => "admin/config/watchdog",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%&sev_filter=%SEV_FILTER%&page=%PAGE%&type_filter=%TYPE_FILTER%",
         ),
-                
+        
       ),
-    ),    
-    "type" => MENU_TYPE_CALLBACK,   
-  );      
-
-
+    ),
+    "type" => MENU_TYPE_CALLBACK,
+  );
+  
+  
   
   $items["admin/duplicate-year"] = array(
     "title" => "Duplicate entire catalog year",
@@ -134,16 +134,16 @@ function admin_menu() {
       
       
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
-    "tab_parent" => "admin-tools/admin",      
+    "tab_parent" => "admin-tools/admin",
   );
   
   
@@ -157,19 +157,19 @@ function admin_menu() {
       
       
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
-    "tab_parent" => "admin-tools/admin",    
-  );     
+    "tab_parent" => "admin-tools/admin",
+  );
   
-     
+  
   $items["admin/apply-draft-changes"] = array(
     "title" => "Apply draft changes",
     "page_callback" => "fp_render_form",
@@ -179,21 +179,21 @@ function admin_menu() {
       
       
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
-    "tab_parent" => "admin-tools/admin",      
+    "tab_parent" => "admin-tools/admin",
   );
-   
-   ///////////////////////////////////////////////////////
-  ////////////////////// Degree Editing /////////////////// 
-   
+  
+  ///////////////////////////////////////////////////////
+  ////////////////////// Degree Editing ///////////////////
+  
   $items["admin/degrees"] = array(
     "title" => "Degrees",
     "page_callback" => "admin_display_degrees",
@@ -209,11 +209,11 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "file" => menu_get_module_path("admin") . "/admin.degrees.inc",
-    "type" => MENU_TYPE_NORMAL_ITEM,    
+    "type" => MENU_TYPE_NORMAL_ITEM,
   );
-   
+  
   
   $items["admin/degrees/edit-degree/%/%"] = array(
     "title" => "Edit Degree",
@@ -236,10 +236,10 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.degrees.inc",
-    "type" => MENU_TYPE_NORMAL_ITEM,        
-  );     
+    "type" => MENU_TYPE_NORMAL_ITEM,
+  );
   
   
   
@@ -252,11 +252,11 @@ function admin_menu() {
       
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.degrees.inc",
     "type" => MENU_TYPE_CALLBACK,
-  );     
-
+  );
+  
   $items["admin/degrees/popup-add-group2"] = array(
     "title" => "Add Group",
     "page_callback" => "admin_display_degrees_popup_add_group2",
@@ -265,10 +265,10 @@ function admin_menu() {
       
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.degrees.inc",
     "type" => MENU_TYPE_CALLBACK,
-  );     
+  );
   
   
   
@@ -294,10 +294,10 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.degrees.inc",
     "type" => MENU_TYPE_NORMAL_ITEM,
-  );     
+  );
   
   $items["admin/degrees/copy-degree"] = array(
     "title" => "Copy Degree",
@@ -320,16 +320,16 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.degrees.inc",
     "type" => MENU_TYPE_CALLBACK,
-  );     
+  );
   
-
-
-   ///////////////////////////////////////////////////////
-  ////////////////////// Group Editing /////////////////// 
-   
+  
+  
+  ///////////////////////////////////////////////////////
+  ////////////////////// Group Editing ///////////////////
+  
   $items["admin/groups"] = array(
     "title" => "Groups",
     "page_callback" => "admin_display_groups",
@@ -345,11 +345,11 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "file" => menu_get_module_path("admin") . "/admin.groups.inc",
     "type" => MENU_TYPE_NORMAL_ITEM
   );
-
+  
   $items["admin/groups/edit-group"] = array(
     "title" => "Edit Group",
     "page_callback" => "fp_render_form",
@@ -371,12 +371,12 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.groups.inc",
     "type" => MENU_TYPE_NORMAL_ITEM,
-  );     
-     
-     
+  );
+  
+  
   $items["admin/groups/popup-select-icon"] = array(
     "title" => "Select Icon",
     "page_callback" => "admin_display_groups_popup_select_icon",
@@ -385,11 +385,11 @@ function admin_menu() {
       
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.groups.inc",
     "type" => MENU_TYPE_CALLBACK,
-  );     
-     
+  );
+  
   $items["admin/groups/popup-edit-definition"] = array(
     "title" => "Edit Definition",
     "page_callback" => "admin_display_groups_popup_edit_definition",
@@ -398,11 +398,11 @@ function admin_menu() {
       
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.groups.inc",
     "type" => MENU_TYPE_CALLBACK,
-  );     
-
+  );
+  
   $items["admin/groups/popup-show-group-use"] = array(
     "title" => "Group Use",
     "page_callback" => "admin_display_groups_popup_show_group_use",
@@ -411,11 +411,11 @@ function admin_menu() {
       
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.groups.inc",
     "type" => MENU_TYPE_CALLBACK,
-  );     
-
+  );
+  
   $items["admin/groups/process-all-definitions"] = array(
     "title" => "Process all Definitions",
     "page_callback" => "fp_render_form",
@@ -437,12 +437,12 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.groups.inc",
     "type" => MENU_TYPE_NORMAL_ITEM,
-  );     
-          
-     
+  );
+  
+  
   /////////////////////////////////////////////////
   /////////////////// Courses editing ////////////////
   $items["admin/courses"] = array(
@@ -460,11 +460,11 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "file" => menu_get_module_path("admin") . "/admin.courses.inc",
     "type" => MENU_TYPE_NORMAL_ITEM,
-  );  
-     
+  );
+  
   $items["admin/courses/edit-course"] = array(
     "title" => "Edit Course",
     "page_callback" => "fp_render_form",
@@ -486,14 +486,14 @@ function admin_menu() {
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),   
+    ),
     "file" => menu_get_module_path("admin") . "/admin.courses.inc",
     "type" => MENU_TYPE_NORMAL_ITEM,
-  );     
-          
-          
-     
-     
+  );
+  
+  
+  
+  
   return $items;
 }
 
@@ -504,12 +504,12 @@ function admin_menu() {
  * This page displays all the tools that the user has access to use.
  */
 function admin_display_tools_screen() {
-    
+  
   fp_add_css(fp_get_module_path("admin") . '/css/admin.css');
   $rtn = "";
   
   
-  $rtn .= "<div class='display-admin-tools-page'>"; 
+  $rtn .= "<div class='display-admin-tools-page'>";
   
   
   $rtn .= fp_render_menu_block("", "admin-tools");
@@ -540,15 +540,15 @@ function admin_cron() {
   $c = 0;
   if ($check_against > $last_run) {
     
-    $res = db_query("DELETE FROM draft_courses 
+    $res = db_query("DELETE FROM draft_courses
                      WHERE delete_flag = 1 ");
     $c = db_affected_rows($res);
     
     watchdog("admin", "Delete from flagged draft_courses db complete. $c items removed.", array(), WATCHDOG_DEBUG);
-
-
-
-    $res = db_query("SELECT * FROM draft_groups 
+    
+    
+    
+    $res = db_query("SELECT * FROM draft_groups
                      WHERE delete_flag = 1 ");
     while ($cur = db_fetch_object($res)) {
       
@@ -560,7 +560,7 @@ function admin_cron() {
     }
     
     watchdog("admin", "Delete from flagged draft_groups db complete. $c items removed.", array(), WATCHDOG_DEBUG);
-
+    
     variable_set("admin_last_run_delete_flag_removal", time());
     
     
@@ -616,16 +616,16 @@ function admin_duplicate_year_form() {
                         all ready exists in the system, all data for this year will be DELETED.</u></b>
                         If you are copying to '2009-2010' then just enter
                         2009."),
-  );  
+  );
   
- $form["passcode"] = array(
+  $form["passcode"] = array(
     "type" => "password",
     "label" => t("For added security, you must enter the Apply Draft Changes password:"),
     "required" => TRUE,
     "description" => t("This is a password set up in FlightPath's settings, to provide an extra layer
                         of security for this powerful action.  Draft changes will not actually be applied,
                         this is simply used as an added layer of security."),
-        
+    
   );
   
   $form["submit"] = array(
@@ -634,7 +634,7 @@ function admin_duplicate_year_form() {
     "spinner" => TRUE,
     "description" => t("This action may take <b><u>several moments</u></b> to complete."),
     "prefix" => "<hr>",
-  );  
+  );
   
   
   
@@ -646,19 +646,19 @@ function admin_duplicate_year_form() {
 /**
  * Before we duplicate the year, make sure the password is correct.
  */
-function admin_duplicate_year_form_validate($form, &$form_state) {  
-    
+function admin_duplicate_year_form_validate($form, &$form_state) {
+  
   $values = $form_state["values"];
   
   // Check to make sure they entered the transfer passcode correctly.
   if ($values["passcode"] != variable_get("admin_transfer_passcode", sha1(mt_rand()))) {
-
+    
     form_error("passcode", t("Sorry, but the password you entered is not correct.  Check with the FlightPath administrator
                               (or check the admin settings pages) to learn the password."));
     return;
     
   }
-      
+  
 }
 
 
@@ -677,7 +677,7 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
   
   
   $values = $form_state["values"];
-
+  
   $new_year = $values["destination_year"];
   $old_year = $values["source_year"];
   
@@ -685,9 +685,32 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
   // We are going to keep track of all the operations we need to do in this $ops array.
   $ops = array();
   $ops[]['delete_new_year'] = TRUE;
-  $ops[]['copy_courses'] = TRUE;
-  $ops[]['copy_groups'] = TRUE;
-  $ops[]['copy_degrees'] = TRUE;
+  
+  
+  // We need to break up how many courses we copy at a time, so let's query to get a count.
+  $count = db_result(db_query("SELECT COUNT(*) as mycount FROM draft_courses WHERE catalog_year = ? ", array($old_year)));
+  for ($t = 0; $t < $count; $t = $t + 150) {  // 150 is how many to do on each pass.
+    $ops[]['copy_courses'] = $t;
+  }
+  
+  // We need to break up the groups the same way we did the courses...
+  $count = db_result(db_query("SELECT count(*) FROM draft_groups WHERE catalog_year = ? ", array($old_year)));
+  for ($t = 0; $t < $count; $t = $t + 3) {  // 3 is how many to do on each pass, because groups are much more detailed.
+    $ops[]['copy_groups'] = $t;
+  }
+  
+  
+  $ops[]['copy_degree_tracks'] = TRUE;
+  
+  
+  // We also want to break up the degrees for the same reasons as the others.
+  // We need to break up the groups the same way we did the courses...
+  $count = db_result(db_query("SELECT count(*) FROM draft_degrees WHERE catalog_year = ? ", array($old_year)));
+  for ($t = 0; $t < $count; $t = $t + 15) {  // 15 is how many to do on each pass.
+    $ops[]['copy_degrees'] = $t;
+  }
+  
+  
   $ops[]['hook_admin_duplicate_year'] = TRUE;
   
   
@@ -703,7 +726,7 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
   
   // Set the batch...
   batch_set($batch);
-
+  
   
   
 }
@@ -715,6 +738,7 @@ function admin_duplicate_year_form_submit($form, &$form_state) {
  */
 function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, $new_year) {
   
+  set_time_limit (300);  // Extend time limit since this may take a little while.
   
   // if this is our first time through, let's init our values.
   if (!isset($batch["results"]["total"])) {
@@ -726,6 +750,10 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
     unset($_SESSION['admin_duplicate_year']);
     $_SESSION['admin_duplicate_year'] = array();
     
+    $_SESSION['admin_duplicate_year']['courses'] = array();
+    $_SESSION['admin_duplicate_year']['groups'] = array();
+    $_SESSION['admin_duplicate_year']['degrees'] = array();
+    
     
   }
   
@@ -734,8 +762,9 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
   $op_val = $ops[$batch['results']['current']][$op_command];
   $db = get_global_database_handler();
   
+  watchdog('debug', "$op_command");
   
-  if ($op_command == 'delete_new_year') {    
+  if ($op_command == 'delete_new_year') {
     /////////////////////  DELETION  ///////////////////////////////////////////
     // We must first begin by deleting any entries for the new_year
     // from our tables.  This is because we may have to run this
@@ -769,7 +798,7 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
       $res3 = db_query("DELETE FROM draft_group_requirements WHERE group_id = ? ", $cur["group_id"]);
     }
     $res = db_query("DELETE FROM draft_groups WHERE catalog_year = ? ", $new_year);
-  
+    
   } // delete_new_year
   
   
@@ -777,14 +806,21 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
   /////////////
   
   if ($op_command == 'copy_courses') {
+    
+    $start_position = intval($op_val);
+    
     /////////////////////// COPY COURSES //////////////////////////////////////////////////
     // Copy all of the courses from the old_year to the new_year.
-    $res = db_query("SELECT * FROM draft_courses WHERE catalog_year = ? ", $old_year);
+    $res = db_query("SELECT * FROM draft_courses WHERE catalog_year = ?
+                      LIMIT $start_position, 150 ", array($old_year));
     while ($cur = db_fetch_array($res))
     {
       extract($cur, 3, "db");
       
-      $course = new Course($db_course_id, FALSE, $db, FALSE, $old_year);
+      //$course = new Course($db_course_id, FALSE, $db, FALSE, $old_year);
+      
+      $course = new stdClass();
+      $course->course_id = $db_course_id;
       $course->subject_id = $db_subject_id;
       $course->course_num = $db_course_num;
       $course->db_exclude = $db_exclude;
@@ -792,10 +828,16 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
       $course->max_hours = $db_max_hours;
       $course->repeat_hours = $db_repeat_hours;
       $course->school_id = $db_school_id;
+      $course->title = $db_title;
+      $course->description = $db_description;
+      
+      
+      //$course_id, $c->subject_id,$c->course_num,$catalog_year,$c->title,$c->description,$min_hours,$max_hours,
+      //             $c->repeat_hours,$c->db_exclude,$c->school_id)
       
       // Now, duplicate it for the new_year.
       // The FALSE at the end means don't bother deleting any existing course, since we have already done that.
-      $db->duplicate_course_for_year($course, $new_year, FALSE);  
+      $db->duplicate_course_for_year($course, $new_year, FALSE);
       
       // Store what courses we are working on, for other modules.
       $_SESSION['admin_duplicate_year']['courses'][] = $db_course_id;
@@ -815,7 +857,12 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
     $group_id_array = array();
     $subgroup_id_array = array();
     
-    $res = db_query("SELECT * FROM draft_groups WHERE catalog_year = ? ", $old_year);
+    
+    $start_position = intval($op_val);
+    
+    
+    $res = db_query("SELECT * FROM draft_groups WHERE catalog_year = ?
+                        LIMIT $start_position, 3 ", $old_year);
     while ($cur = db_fetch_array($res))
     {
       extract($cur, 3, "db");
@@ -830,9 +877,9 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
                 `priority`,`delete_flag`,`data_entry_comment`, `catalog_repeat`,school_id)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ";
       $res2 = db_query($query, array($new_group_id, $db_group_name, $db_title, $db_public_note,
-                                      $db_definition, $db_icon_filename, $new_year,
-                                      $db_priority, $db_delete_flag, $db_data_entry_comment, 
-                                      $db_catalog_repeat, $db_school_id));
+        $db_definition, $db_icon_filename, $new_year,
+        $db_priority, $db_delete_flag, $db_data_entry_comment,
+        $db_catalog_repeat, $db_school_id));
       
       // Okay, now we need to go through the requirements for the group, and copy
       // those over to the new_year.
@@ -859,8 +906,8 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
                       (`group_id`,`course_id`,`course_min_grade`,
                       `course_repeats`,`attributes`,`data_entry_value`)
                       VALUES (?,?,?,?,?,?) ", array($new_sub_group_id, $db4_course_id,
-                                                    $db4_course_min_grade,$db4_course_repeats,$db4_attributes,
-                                                    $db4_data_entry_value));
+                        $db4_course_min_grade,$db4_course_repeats,$db4_attributes,
+                        $db4_data_entry_value));
           }
           
           // Now, add the replace the db3_child_group_id with this new id
@@ -873,31 +920,23 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
                   (`group_id`,`course_id`,`course_min_grade`,
                   `course_repeats`,`attributes`,`data_entry_value`,`child_group_id`)
                   VALUES (?,?,?,?,?,?,?) ", array($new_group_id, $db3_course_id,
-                                                  $db3_course_min_grade, $db3_course_repeats, $db3_attributes,
-                                                  $db3_data_entry_value, $child_group_id));
+                    $db3_course_min_grade, $db3_course_repeats, $db3_attributes,
+                    $db3_data_entry_value, $child_group_id));
         
         
       }
     }
     
     // Store what groups we are working on, for other modules.
-    $_SESSION['admin_duplicate_year']['groups'] = $group_id_array;
+    $_SESSION['admin_duplicate_year']['groups'] += $group_id_array; // Since we are going in multiple rounds, add to the array.
     
   } // copy_groups
   
   ////////////////////////////
   ////////////////////////////
   
-
-  if ($op_command == 'copy_degrees') {
-    
-    //////////////////////// COPY DEGREES  ///////////////////////////////////////////
-    //  Now, on to transfering the degrees.
-    //  We will have to use the groupIDArray we constructed earlier, which
-    //  looks like $arr[old_id] = new_id.
-    // Do the tracks first, since they are easier and straight forward...
-    
-    $group_id_array = $_SESSION['admin_duplicate_year']['groups'];  // Load from last time, when we copied groups.
+  
+  if ($op_command == 'copy_degree_tracks') {
     
     $res = db_query("SELECT * FROM draft_degree_tracks WHERE catalog_year = ? ", $old_year);
     while ($cur = db_fetch_array($res))
@@ -909,12 +948,33 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
               `track_short_title`,`track_description`,school_id)
               VALUES
               (?,?,?,?,?,?,?) ", array($new_year,$db_major_code,$db_track_code,$db_track_title,
-                                       $db_track_short_title,$db_track_description,$db_school_id));
+                $db_track_short_title,$db_track_description,$db_school_id));
       
     }
     
+  }
+  
+  
+  ////////////////
+  ////////////////
+  
+  
+  if ($op_command == 'copy_degrees') {
+    
+    //////////////////////// COPY DEGREES  ///////////////////////////////////////////
+    //  Now, on to transfering the degrees.
+    //  We will have to use the groupIDArray we constructed earlier, which
+    //  looks like $arr[old_id] = new_id.
+    // Do the tracks first, since they are easier and straight forward...
+    
+    $start_position = intval($op_val);
+    
+    $group_id_array = $_SESSION['admin_duplicate_year']['groups'];  // Load from last time, when we copied groups.
+    
+    
     // Now, let's do the degrees themselves.
-    $res = db_query("SELECT * FROM draft_degrees WHERE catalog_year = ? ", $old_year);
+    $res = db_query("SELECT * FROM draft_degrees WHERE catalog_year = ?
+                        LIMIT $start_position, 15 ", $old_year);
     while ($cur = db_fetch_array($res))
     {
       extract($cur, 3, "db");
@@ -939,9 +999,9 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
                VALUES
               (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ", array($new_degree_id, $db_major_code, $db_degree_type, $db_degree_level, $db_degree_class, $db_title,
-                        $db_semester_titles_csv, $new_year, $db_exclude, $db_public_note,
-                        $db_allow_dynamic, $db_advising_weight, $db_override_degree_hours, $db_min_tracks, $db_max_tracks, 
-                        $db_default_tracks, $db_track_selection_config, $db_school_id));
+                $db_semester_titles_csv, $new_year, $db_exclude, $db_public_note,
+                $db_allow_dynamic, $db_advising_weight, $db_override_degree_hours, $db_min_tracks, $db_max_tracks,
+                $db_default_tracks, $db_track_selection_config, $db_school_id));
       
       // now, pull out all of the degree_requirements.
       $res3 = db_query("SELECT * FROM draft_degree_requirements
@@ -972,22 +1032,22 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
                 VALUES
                 (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ", array($new_degree_id, $db3_semester_num, $required_group_id, $db3_group_requirement_type,
-                          $db3_group_hours_required, $db3_group_min_hours_allowed, $db3_group_min_grade, $db3_course_id,
-                          $db3_course_min_grade, $db3_course_requirement_type, $db3_data_entry_value));
+                  $db3_group_hours_required, $db3_group_min_hours_allowed, $db3_group_min_grade, $db3_course_id,
+                  $db3_course_min_grade, $db3_course_requirement_type, $db3_data_entry_value));
         
         
-      }      
+      }
       
     } // while draft_degrees
     
   } // copy_degrees
- 
+  
   
   
   ////////////////////
   ////////////////////
   
-
+  
   // Allows other modules to act.
   if ($op_command == 'hook_admin_duplicate_year') {
     invoke_hook('admin_duplicate_year', array($old_year, $new_year));
@@ -1040,18 +1100,18 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
  * @param unknown_type $form_state
  */
 function z__admin_duplicate_year_form_submit($form, &$form_state) {
-      
-    
-  set_time_limit (300);  // Extend time limit since this may take a little while.    
+  
+  
+  set_time_limit (300);  // Extend time limit since this may take a little while.
   $values = $form_state["values"];
-    
+  
   
   // We are going to keep track of all the operations we need to do in this $ops array.
   $ops = array();
   
   
   // Check to make sure they entered the transfer passcode correctly.
-  $db = get_global_database_handler();    
+  $db = get_global_database_handler();
   
   // Okay, we made it this far, let's proceed with the copy!
   $new_year = $values["destination_year"];
@@ -1105,17 +1165,17 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
   
   //  Okay, we have deleted any possible old entries for the new year.
   
-      
+  
   
   
   
   /////////////////////// COPY COURSES //////////////////////////////////////////////////
-  // Our first step is to copy all of the courses from the old_year to the new_year.  
+  // Our first step is to copy all of the courses from the old_year to the new_year.
   $res = db_query("SELECT * FROM draft_courses WHERE `catalog_year`=? ", $old_year);
   while ($cur = db_fetch_array($res))
   {
     extract($cur, 3, "db");
-  
+    
     $course = new Course($db_course_id, false, $db, false, $old_year);
     $course->subject_id = $db_subject_id;
     $course->course_num = $db_course_num;
@@ -1124,19 +1184,19 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
     $course->max_hours = $db_max_hours;
     $course->repeat_hours = $db_repeat_hours;
     $course->school_id = $db_school_id;
-        
+    
     // Now, duplicate it for the new_year.
     $db->duplicate_course_for_year($course, $new_year);
-  
-    // Store what courses we are working on, for other modules.
-    $form_state['courses'][] = $db_course_id;  
-  
-  }
-   
-  
     
+    // Store what courses we are working on, for other modules.
+    $form_state['courses'][] = $db_course_id;
+    
+  }
+  
+  
+  
   //////////////////////// COPY GROUPS  ///////////////////////////////////////////////
-  //  Now, let's copy over the groups.  
+  //  Now, let's copy over the groups.
   $group_id_array = array();
   $subgroup_id_array = array();
   
@@ -1147,18 +1207,18 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
     // First, let's request a new group ID for this new group.
     $new_group_id = $db->request_new_group_id();
     $group_id_array[$db_group_id] = $new_group_id;
-  
+    
     //$db_data_entry_comment = mysql_real_escape_string($db_data_entry_comment);
     // Now, let's insert this top-level group back into the table
     // as the new_year, with the new_group_id.
     $query = "INSERT INTO draft_groups(`group_id`,`group_name`,
                 `title`,`public_note`,`definition`,`icon_filename`,`catalog_year`,
                 `priority`,`delete_flag`,`data_entry_comment`, `catalog_repeat`,school_id)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ";   
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ";
     $res2 = db_query($query, $new_group_id,$db_group_name,$db_title,$db_public_note,
-                  $db_definition,$db_icon_filename,$new_year,
-                  $db_priority,$db_delete_flag,$db_data_entry_comment,$db_catalog_repeat,$db_school_id);
-  
+        $db_definition,$db_icon_filename,$new_year,
+        $db_priority,$db_delete_flag,$db_data_entry_comment,$db_catalog_repeat,$db_school_id);
+    
     // Okay, now we need to go through the requirements for the group, and copy
     // those over to the new_year.
     $res3 = db_query("SELECT * FROM draft_group_requirements
@@ -1166,7 +1226,7 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
     while($cur3 = db_fetch_array($res3))
     {
       extract($cur3, 3, "db3");
-  
+      
       $child_group_id = 0;
       // Was there a child_group (a branch)?  If so, we need to copy that
       // over too, with a new child_group_id.
@@ -1184,24 +1244,24 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
                       (`group_id`,`course_id`,`course_min_grade`,
                       `course_repeats`,`attributes`,`data_entry_value`)
                       VALUES (?,?,?,?,?,?) ",
-                      $new_sub_group_id,$db4_course_id,
-                      $db4_course_min_grade,$db4_course_repeats,$db4_attributes,
-                      $db4_data_entry_value);
+              $new_sub_group_id,$db4_course_id,
+              $db4_course_min_grade,$db4_course_repeats,$db4_attributes,
+              $db4_data_entry_value);
         }
         
         // Now, add the replace the db3_child_group_id with this new id
         // so it will get added as a requirement.
         $child_group_id = $new_sub_group_id;
       }
-   
+      
       // Add the row into the table...
       $res5 = db_query("INSERT INTO draft_group_requirements
                   (`group_id`,`course_id`,`course_min_grade`,
                   `course_repeats`,`attributes`,`data_entry_value`,`child_group_id`)
                   VALUES (?,?,?,?,?,?,?) ",
-                    array($new_group_id,$db3_course_id,
-                  $db3_course_min_grade,$db3_course_repeats,$db3_attributes,
-                  $db3_data_entry_value,$child_group_id));
+          array($new_group_id,$db3_course_id,
+            $db3_course_min_grade,$db3_course_repeats,$db3_attributes,
+            $db3_data_entry_value,$child_group_id));
       
       
     }
@@ -1210,7 +1270,7 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
   // Store what groups we are working on, for other modules.
   $form_state['groups'] = $group_id_array;
   
-     
+  
   
   //////////////////////// COPY DEGREES  ///////////////////////////////////////////
   //  Now, on to transfering the degrees.
@@ -1227,8 +1287,8 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
               `track_short_title`,`track_description`,school_id)
               VALUES
               (?,?,?,?,?,?,?) ",
-               $new_year,$db_major_code,$db_track_code,$db_track_title,
-              $db_track_short_title,$db_track_description,$db_school_id);
+        $new_year,$db_major_code,$db_track_code,$db_track_title,
+        $db_track_short_title,$db_track_description,$db_school_id);
     
   }
   // Now, let's do the degrees themselves.
@@ -1257,8 +1317,8 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
                VALUES
               (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ", $new_degree_id,$db_major_code,$db_degree_type, $db_degree_level, $db_degree_class, $db_title,
-               $db_semester_titles_csv, $new_year, $db_exclude, $db_public_note,
-               $db_allow_dynamic, $db_advising_weight, $db_override_degree_hours, $db_min_tracks, $db_max_tracks, $db_default_tracks, $db_track_selection_config,$db_school_id);             
+        $db_semester_titles_csv, $new_year, $db_exclude, $db_public_note,
+        $db_allow_dynamic, $db_advising_weight, $db_override_degree_hours, $db_min_tracks, $db_max_tracks, $db_default_tracks, $db_track_selection_config,$db_school_id);
     
     // now, pull out all of the degree_requirements.
     $res3 = db_query("SELECT * FROM draft_degree_requirements
@@ -1279,7 +1339,7 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
                             Be aware that any degrees in the new year will be missing this group requirement."), 'error');
         }
       }
-       
+      
       
       $res4 = db_query("INSERT INTO draft_degree_requirements
                 (degree_id, semester_num, group_id, group_requirement_type,
@@ -1288,14 +1348,14 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
                 VALUES
                 (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ", $new_degree_id, $db3_semester_num, $required_group_id, $db3_group_requirement_type,
-                $db3_group_hours_required, $db3_group_min_hours_allowed, $db3_group_min_grade, $db3_course_id,
-                $db3_course_min_grade, $db3_course_requirement_type, $db3_data_entry_value);
+          $db3_group_hours_required, $db3_group_min_hours_allowed, $db3_group_min_grade, $db3_course_id,
+          $db3_course_min_grade, $db3_course_requirement_type, $db3_data_entry_value);
       
       
     }
     
     
-  }  
+  }
   
   
   // TODO: run other modules' hooks for duplication, again, as one of the batch operations
@@ -1303,8 +1363,8 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
   
   
   watchdog("admin", "Duplicated all degree/group/courses data from $old_year to $new_year");
-    
-     
+  
+  
   fp_add_message(t("The copy operation is now completed.  You may view the new year
                     by using the Data Entry links on the admin main menu.  Remember, you must
                     apply draft changes before they will be visible in FlightPath."));
@@ -1321,7 +1381,7 @@ function z__admin_duplicate_year_form_submit($form, &$form_state) {
 function admin_advising_settings_form($school_id = 0) {
   $form = array();
   
-    
+  
   $school_id = intval($school_id);
   
   $fs = "";  // The field name suffix.  We will add this to the end of all of our field names.  If this is the default school, leave blank.
@@ -1352,8 +1412,8 @@ function admin_advising_settings_form($school_id = 0) {
                         school data settings page.
                         Separate term id's by commas. Ex: 200940, 200941, 200960. Make sure to enter
                         in the order that they should appear in FlightPath."),
-  );  
-
+  );
+  
   
   $form["advising_term_id" . $fs] = array(
     "type" => "textarea",
@@ -1363,9 +1423,9 @@ function admin_advising_settings_form($school_id = 0) {
     "description" => t("Of the available term ids above, this is the default that FlightPath
                         is set to when an advisor logs in. Ex: 200940.
                         <br><strong>Only enter one Term ID in this box.</strong>"),
-  );  
-
-
+  );
+  
+  
   $form["current_catalog_year" . $fs] = array(
     "type" => "textfield",
     "size" => 10,
@@ -1373,8 +1433,8 @@ function admin_advising_settings_form($school_id = 0) {
     "value" => variable_get_for_school("current_catalog_year", "", $school_id, TRUE),
     "description" => t("This is the year which What If loads degrees from, as well as other important functions.
                         Only change this once you have fully loaded a new catalog year."),
-  );   
-
+  );
+  
   
   $form["current_draft_catalog_year" . $fs] = array(
     "type" => "textfield",
@@ -1386,23 +1446,23 @@ function admin_advising_settings_form($school_id = 0) {
                         You may change this while working on a new catalog.  It will not affect any other
                         users of the system.  While not working on a new catalog, set this
                         to the same as the Current catalog year."),
-  );  
-
+  );
+  
   
   $form["not_released_grades_terms" . $fs] = array(
     "type" => "textarea",
     "rows" => 2,
     "label" => t("NOT released grades terms"),
     "value" => fp_space_csv(variable_get_for_school("not_released_grades_terms", "", $school_id, TRUE)),
-    "description" => t("Enter the term_id's, separated by commas, 
-                        which are NOT released and should NOT be visible to either advisors or students. 
-                        Coures in these terms will only show midterm grades or no grades at all. 
-                        Ex: 201240, 201240:S1") . "<br>" . t("If left blank, grades will be visible to 
+    "description" => t("Enter the term_id's, separated by commas,
+                        which are NOT released and should NOT be visible to either advisors or students.
+                        Coures in these terms will only show midterm grades or no grades at all.
+                        Ex: 201240, 201240:S1") . "<br>" . t("If left blank, grades will be visible to
                         students and advisors as soon as they appear in the database."),
-  );  
-
-
-    
+  );
+  
+  
+  
   
   return $form;
 }
@@ -1413,20 +1473,20 @@ function admin_advising_settings_form($school_id = 0) {
 /**
  * Convienence function to get semester's default regular name.
  */
-function admin_get_semester_name($semester_num) {    
+function admin_get_semester_name($semester_num) {
   
   $semester = new Semester($semester_num);
   $title = $semester->title;
   
-    
+  
   /**
-  $ar = array(t("Freshman Year"), t("Sophomore Year"), t("Junior Year"), t("Senior Year"));
-  $s = $ar[$semester_num];
-  if ($s == "")
-  {
-    $s = t("Year") . " " . ($semester_num + 1);
-  }
-  */
+   $ar = array(t("Freshman Year"), t("Sophomore Year"), t("Junior Year"), t("Senior Year"));
+   $s = $ar[$semester_num];
+   if ($s == "")
+   {
+   $s = t("Year") . " " . ($semester_num + 1);
+   }
+   */
   
   return $title;
 }
@@ -1452,7 +1512,7 @@ function admin_apply_draft_changes_form() {
     "required" => TRUE,
     "description" => t("This is a password set up in FlightPath's System Settings, to provide an extra layer
                         of security for this powerful action."),
-        
+    
   );
   
   $form["submit"] = array(
@@ -1464,7 +1524,7 @@ function admin_apply_draft_changes_form() {
   );
   
   
-    
+  
   return $form;
 }
 
@@ -1475,19 +1535,19 @@ function admin_apply_draft_changes_form() {
 /**
  * Before we apply changes, make sure the password is correct.
  */
-function admin_apply_draft_changes_form_validate($form, &$form_state) {  
-    
+function admin_apply_draft_changes_form_validate($form, &$form_state) {
+  
   $values = $form_state["values"];
   
   // Check to make sure they entered the transfer passcode correctly.
   if ($values["passcode"] != variable_get("admin_transfer_passcode", sha1(mt_rand()))) {
-
+    
     form_error("passcode", t("Sorry, but the password you entered is not correct.  Check with the FlightPath administrator
                               (or check the admin settings pages) to learn the password."));
     return;
     
   }
-      
+  
 }
 
 
@@ -1503,11 +1563,11 @@ function z__admin_apply_draft_changes_form_submit($form, $form_submit) {
   
   $de_catalog_year = admin_get_de_catalog_year();
   
-
+  
   // Keep the script from timing out prematurely...
   set_time_limit(99999);  // around 27 hours (so it runs a really long time).
-       
-
+  
+  
   // First, set maintenance mode...
   variable_set("maintenance_mode", TRUE);
   
@@ -1521,8 +1581,8 @@ function z__admin_apply_draft_changes_form_submit($form, $form_submit) {
     "group_requirements",
     "groups",
   );
-
-
+  
+  
   foreach($table_array as $table_name) {
     $draft_table_name = "draft_$table_name";
     // First, truncate existing...
@@ -1533,8 +1593,8 @@ function z__admin_apply_draft_changes_form_submit($form, $form_submit) {
             SELECT * FROM `$draft_table_name` ";
     $res = db_query($query);
   }
-
-
+  
+  
   $db2 = new DatabaseHandler();
   // Now, we need to go through the draft_instructions table,
   // and perform each instruction one at a time.
@@ -1543,56 +1603,56 @@ function z__admin_apply_draft_changes_form_submit($form, $form_submit) {
   while($cur = db_fetch_array($res))
   {
     $instruction = trim($cur["instruction"]);
-
+    
     $temp = explode(",",$instruction);
-
+    
     if (trim($temp[0]) == "update_course_id") {
       $db2->update_course_id(trim($temp[1]), trim($temp[2]), trim($temp[3]));
     }
-
+    
     if (trim($temp[0]) == "update_course_requirement_from_name") {
       $db2->update_course_requirement_from_name(trim($temp[1]), trim($temp[2]), trim($temp[3]), trim($temp[4]));
     }
     
     // TODO:  Maybe invoke another hook here, to let other modules act on the instruction?
     
-  } 
-
+  }
+  
   // Once this is done, truncate the draft_instructions table.
   $res = db_query("TRUNCATE TABLE draft_instructions");
-
-
+  
+  
   // Invoke a hook to allow other modules to apply_draft_changes as well
   invoke_hook("apply_draft_changes");
-
-
+  
+  
   // Rebuild our course cache file.
   unset($_SESSION['fp_cache_course_inventory_last_generated']);
   if (file_exists(fp_get_files_path() . "/cache_data/courses_serialized.info")) {
     $x = unlink(fp_get_files_path() . "/cache_data/courses_serialized.info");
     if (!$x) {
       fpm("Cannot delete cache_data/courses_serialized.info under custom/files.  Permission error or file does not exist?");
-      watchdog("system", "Cannot delete cache_data/courses_serialized.info under custom/files.  Permission error or file does not exist?", array(), WATCHDOG_ERROR);    
+      watchdog("system", "Cannot delete cache_data/courses_serialized.info under custom/files.  Permission error or file does not exist?", array(), WATCHDOG_ERROR);
     }
   }
   variable_set('cache_course_inventory_last_generated', 0);  // reset this so it will be regenerated.
-    
+  
   // Builds new courses cache file on the hard drive.
   system_reload_and_cache_course_inventory();
-
+  
   // And we are done!  Set maintenance mode back to none
   variable_set("maintenance_mode", FALSE);
-
+  
   // Send emails to notify programmers...
-  $notify = variable_get("notify_apply_draft_changes_email_address", "");  
+  $notify = variable_get("notify_apply_draft_changes_email_address", "");
   if ($notify != "") {
     mail($notify, "FlightPath Apply Draft Changes", "Someone has applied draft changes to FlightPath, which updated degree plans, groups, and courses.");
   }
   
   fp_add_message(t("Successfully updated the production database with draft changes.  Your changes are now live and visible on production for all users."));
-
+  
   watchdog("admin", "Draft changes applied.");
- 
+  
   
 }
 
@@ -1603,8 +1663,8 @@ function z__admin_apply_draft_changes_form_submit($form, $form_submit) {
  * amounts of data.
  */
 function admin_apply_draft_changes_form_submit($form, $form_submit) {
-    
-    
+  
+  
   // We are going to keep track of all the operations we need to do in this $ops array.
   $ops = array();
   $ops[]['truncate_prod_and_copy'] = 'courses';
@@ -1616,12 +1676,12 @@ function admin_apply_draft_changes_form_submit($form, $form_submit) {
   
   
   $ops[]['perform_draft_instructions'] = TRUE;
-   
+  
   $ops[]['invoke_apply_draft_changes'] = TRUE;
   
   $ops[]['rebuild_cache_course_inventory'] = TRUE;
   
- 
+  
   
   // Okay, set up the batch....
   $batch = array(
@@ -1648,8 +1708,8 @@ function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
   if (!isset($batch["results"]["total"])) {
     // Our first time through.  Let's start up.
     $batch["results"]["total"] = count($ops);
-    $batch["results"]["current"] = 0;  
-    $batch["results"]["finished"] = FALSE;    
+    $batch["results"]["current"] = 0;
+    $batch["results"]["finished"] = FALSE;
     
     // First, set maintenance mode...
     variable_set("maintenance_mode", TRUE);
@@ -1661,7 +1721,7 @@ function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
   $op_command = key($ops[$batch['results']['current']]);
   $op_val = $ops[$batch['results']['current']][$op_command];
   
-
+  
   
   if ($op_command == 'truncate_prod_and_copy') {
     $table_name = $op_val;
@@ -1672,10 +1732,10 @@ function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
     // Now, copy in draft changes...
     $query = "INSERT INTO `$table_name`
             SELECT * FROM `$draft_table_name` ";
-    $res = db_query($query);    
+    $res = db_query($query);
     
   } // truncate prod and copy
-
+  
   
   /////////////
   /////////////
@@ -1704,26 +1764,26 @@ function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
       
       // TODO:  Maybe invoke another hook here, to let other modules act on the instruction?
     } // while
-
+    
     // Once this is done, truncate the draft_instructions table.
     $res = db_query("TRUNCATE TABLE draft_instructions");
-        
+    
   } // perform_draft_instructions
   
   
   /////////////////
   /////////////////
-
+  
   
   if ($op_command == 'invoke_apply_draft_changes') {
     // Invoke a hook to allow other modules to apply_draft_changes as well
-    invoke_hook("apply_draft_changes");    
+    invoke_hook("apply_draft_changes");
   }
   
   
   ///////////////
   ///////////////
-
+  
   
   if ($op_command == 'rebuild_cache_course_inventory') {
     
@@ -1754,13 +1814,13 @@ function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
   // Have we finished?
   if ($batch["results"]["current"] >= $batch["results"]["total"]) {
     $batch["results"]["finished"] = TRUE;
-
+    
     
     // Send emails to notify programmers
     $notify = variable_get("notify_apply_draft_changes_email_address", "");
     if ($notify != "") {
       mail($notify, "FlightPath Apply Draft Changes", "Someone has applied draft changes to FlightPath, which updated degree plans, groups, and courses.");
-    }    
+    }
     fp_add_message(t("Successfully updated the production database with draft changes. Your changes are now live and visible on production for all users."));
     
     watchdog("admin", "Draft changes applied.");
@@ -1788,9 +1848,9 @@ function admin_get_de_catalog_year($bool_set_earliest_if_blank = TRUE, $school_i
   $db = get_global_database_handler();
   if ($current_student_id) {
     $school_id = $db->get_school_id_for_student_id($current_student_id);
-  }  
-    
-    
+  }
+  
+  
   $de_catalog_year = @$_REQUEST["de_catalog_year"];
   
   if ($bool_set_earliest_if_blank) {
@@ -1799,7 +1859,7 @@ function admin_get_de_catalog_year($bool_set_earliest_if_blank = TRUE, $school_i
     }
   }
   
-  return $de_catalog_year;  
+  return $de_catalog_year;
 }
 
 
@@ -1808,8 +1868,8 @@ function admin_get_de_catalog_year($bool_set_earliest_if_blank = TRUE, $school_i
  * It will search for and replace replacement patterns which we are aware of it in $str.
  */
 function admin_menu_handle_replacement_pattern($str) {
-      
-  if (!$str) $str = "";  // Compat for PHP 8.2, force it to be a string if it was NULL or FALSE.  
+  
+  if (!$str) $str = "";  // Compat for PHP 8.2, force it to be a string if it was NULL or FALSE.
   
   if (strpos($str, "%DE_CATALOG_YEAR%") !== 0) {
     // It contains this replacement pattern!
@@ -1821,7 +1881,7 @@ function admin_menu_handle_replacement_pattern($str) {
     $sev_filter = (string) @$_GET["sev_filter"];
     $str = str_replace("%SEV_FILTER%", $sev_filter, $str);
   }
-
+  
   if (strpos($str, "%TYPE_FILTER%") !== 0) {
     // It contains this replacement pattern!
     $type_filter = (string) @$_GET["type_filter"];
@@ -1837,7 +1897,7 @@ function admin_menu_handle_replacement_pattern($str) {
     }
     $str = str_replace("%PAGE%", $page, $str);
   }
-    
+  
   
   
   return $str;
@@ -1849,16 +1909,16 @@ function admin_perm() {
     "can_access_admin_tools" => array(
       "title" => t("Access Admin Tools"),
       "description" => t("Allow the user to access the Admin Tools screen."),
-    ),  
+    ),
     "can_access_admin" => array(
       "title" => t("Access administrative console"),
-      "description" => t("This is a powerful permission!  This allows a 
+      "description" => t("This is a powerful permission!  This allows a
                           user to access the 'admin console' for FlightPath."),
     ),
     "can_edit_urgent_message" => array(
       "title" => t("Edit urgent message"),
       "description" => t("The user may edit the 'Urgent Message' which appears at the top of every page, if set."),
-    ),    
+    ),
     "can_access_data_entry" => array(
       "title" => t("Access Data Entry"),
       "description" => t("The user can access (view) the data-entry portion of the admin console. Degree plans, groups, and courses."),
@@ -1874,39 +1934,39 @@ function admin_perm() {
     "can_view_advanced" => array(
       "title" => t("View advanced"),
       "description" => t("The user may see advanced information on-screen, for example, internal ID numbers for degrees and courses."),
-    ),   
+    ),
     "can_apply_draft_changes" => array(
       "title" => t("Apply draft changes"),
       "description" => t("The user may move draft changes into production."),
-    ),   
+    ),
     "can_edit_advising_settings" => array(
       "title" => t("Edit advising settings"),
       "description" => t("The user may edit advising settings, like available term IDs and the current catalog year."),
-    ),   
+    ),
     "display_watchdog" => array(
       "title" => t("View watchdog (log) entries"),
       "description" => t("The user may view the recent watchdog log entries.  This represents a security concern, so give this only to trusted users."),
-    ),   
-
+    ),
     
-            
+    
+    
   );
-} 
- 
+}
 
- 
+
+
 /**
  * Meant to be fed into "fp_system_settings_form()", this function
- * returns an array which will automatically save values to our "variables" table. 
+ * returns an array which will automatically save values to our "variables" table.
  */
 function admin_urgent_message_form() {
   $form = array();
-
+  
   $form["mark_top"] = array(
     "type" => "markup",
-    "value" => "<p>" . t("Any message you enter here will be displayed at the top of every page <b>for all users</b> in the system. 
+    "value" => "<p>" . t("Any message you enter here will be displayed at the top of every page <b>for all users</b> in the system.
                   This is used to alert users that the system is about to be taken offline, or any other urgently-needed information.") . "</p>",
-                  
+    
   );
   
   $form["urgent_msg"] = array(
@@ -1918,11 +1978,11 @@ function admin_urgent_message_form() {
   
   return $form;
 }
- 
-  
 
-  
-  
+
+
+
+
 /**
  * Display the details of a particular watchdog entry, specified by its table id.
  */
@@ -1946,7 +2006,7 @@ function admin_display_watchdog_entry($wid) {
   
   $severity = $severity_array[$cur->severity];
   $when = format_date(convert_time($cur->timestamp), "short");
-    
+  
   // Display
   $rtn .= "
     <br>
@@ -1955,13 +2015,13 @@ function admin_display_watchdog_entry($wid) {
         <label>ID:</label>
         $cur->wid
       </div>
-
+      
       <div class='watchdog-field'>
         <label>Type:</label>
         $cur->type
       </div>
       
-
+      
       <div class='watchdog-field'>
         <label>Time:</label>
         $when ($cur->timestamp)
@@ -1971,7 +2031,7 @@ function admin_display_watchdog_entry($wid) {
         <label>Severity:</label>
         $severity
       </div>
-
+      
       <div class='watchdog-field'>
         <label>User:</label>
         $cur->user_name | id: $cur->user_id | cwid: $cur->cwid | is_student: $cur->is_student | is_faculty: $cur->is_faculty
@@ -1981,17 +2041,17 @@ function admin_display_watchdog_entry($wid) {
         <label>IP:</label>
         $cur->ip
       </div>
-                              
+      
       <div class='watchdog-field'>
         <label>Location:</label>
         " . str_replace("&curren", "&amp;curren", fp_trim($cur->location)) . "
       </div>
-                      
+            
       <div class='watchdog-field'>
         <label>Ref:</label>
         " . str_replace("&curren", "&amp;curren", fp_trim($cur->referer)) . "
       </div>
-
+      
       <hr>
       
       <div class='watchdog-field'>
@@ -2002,19 +2062,19 @@ function admin_display_watchdog_entry($wid) {
       <div class='watchdog-field'>
         <label class='block'>Extra:</label>
         $cur->extra_data
-      </div>      
-                                                            
+      </div>
+      
       
     </div>
   ";
-  
-  
-  
-  
-  return $rtn;
-}  
-  
-  
+        
+        
+        
+        
+        return $rtn;
+}
+
+
 
 
 /**
@@ -2026,7 +2086,7 @@ function z__admin_display_watchdog() {
   fp_add_css(fp_get_module_path("admin") . '/css/admin.css');
   
   $rtn = "";
-
+  
   $rtn .= "<p>View recent watchdog entries</p>";
   
   $severity_array = array(
@@ -2041,7 +2101,7 @@ function z__admin_display_watchdog() {
   
   
   $type_line = $severity_line = $limit_start = "";
-
+  
   @$sev_filter = $_GET["sev_filter"];
   @$type_filter = $_GET["type_filter"];
   @$page = $_GET["page"];
@@ -2053,7 +2113,7 @@ function z__admin_display_watchdog() {
   else {
     $page = 1;
   }
-
+  
   
   
   // Filters:
@@ -2065,18 +2125,18 @@ function z__admin_display_watchdog() {
             Type:
             <select name='type_filter'>
               <option value=''>-Any-</option>";
-  $res = db_query("SELECT distinct(type) as type 
-                   FROM watchdog 
+  $res = db_query("SELECT distinct(type) as type
+                   FROM watchdog
                    ORDER BY type");
   while ($cur = db_fetch_object($res)) {
     $sel = ($type_filter == $cur->type) ? "selected" : "";
     $rtn .= "<option value='$cur->type' $sel>$cur->type</option>";
-  }  
+  }
   
   
   $rtn .= "</select>
             </span>";
-
+  
   
   $rtn .= "
             <span class='severity-filter'>
@@ -2086,9 +2146,9 @@ function z__admin_display_watchdog() {
   foreach ($severity_array as $key => $value) {
     $sel = "";
     if ($sev_filter == $key) $sel = "selected";
-     
+    
     $rtn .= "<option value='$key' $sel>$value</option>";
-  }  
+  }
   
   $rtn .= "</select>
             </span>";
@@ -2103,20 +2163,20 @@ function z__admin_display_watchdog() {
   $rtn .= "</form>";
   
   $params = array();
-
+  
   if (@$_GET["type_filter"] != "") {
     //$type_line = " AND type = '" . mysql_real_escape_string($_GET["type_filter"]) . "' ";
     $type_line = " AND `type` = :type ";
     $params[":type"] = $_GET["type_filter"];
   }
-    
+  
   if (@$_GET["sev_filter"] != "") {
     //$severity_line = " AND severity = '" . mysql_real_escape_string($_GET["sev_filter"]) . "' ";
     $severity_line = " AND severity = :sev ";
-    $params[":sev"] = $_GET["sev_filter"]; 
+    $params[":sev"] = $_GET["sev_filter"];
   }
   
-
+  
   $pol = "even";
   
   $rtn .= "<table class='watchdog-table' cellspacing='0' cellpadding='4'>
@@ -2135,116 +2195,116 @@ function z__admin_display_watchdog() {
                    $severity_line
                    ORDER BY wid DESC
                    ";
-  $res = db_query($query . " LIMIT $limit_start, $results_per_page", $params);
-  while ($cur = db_fetch_object($res)) {
-    $pol = ($pol == "even") ? "odd" : "even";
-    
-    $o_msg = t($cur->message, unserialize($cur->variables));
-    $o_type = $cur->type;
-    
-    // shorten msg if necessary
-    $msg = substr(strip_tags($o_msg), 0, 130);
-    if ($msg != $o_msg) {
-      $msg = trim($msg) . "...";
-    }
-    
-    $type = substr($o_type, 0, 20);
-    if ($type != $o_type) {
-      $type = trim($type) . "...";
-    }
-
-    
-    
-    $severity = $severity_array[$cur->severity];
-    $when = format_date(convert_time($cur->timestamp), "short");
-    
-        
-    $rtn .= "
-              <tr class='row-$pol row-$severity'>                
+                   $res = db_query($query . " LIMIT $limit_start, $results_per_page", $params);
+                   while ($cur = db_fetch_object($res)) {
+                     $pol = ($pol == "even") ? "odd" : "even";
+                     
+                     $o_msg = t($cur->message, unserialize($cur->variables));
+                     $o_type = $cur->type;
+                     
+                     // shorten msg if necessary
+                     $msg = substr(strip_tags($o_msg), 0, 130);
+                     if ($msg != $o_msg) {
+                       $msg = trim($msg) . "...";
+                     }
+                     
+                     $type = substr($o_type, 0, 20);
+                     if ($type != $o_type) {
+                       $type = trim($type) . "...";
+                     }
+                     
+                     
+                     
+                     $severity = $severity_array[$cur->severity];
+                     $when = format_date(convert_time($cur->timestamp), "short");
+                     
+                     
+                     $rtn .= "
+              <tr class='row-$pol row-$severity'>
                 <td valign='top'>" . l($cur->wid, "admin/config/watchdog/$cur->wid", "sev_filter=$sev_filter&type_filter=$type_filter&page=$page") . "</td>
                 <td valign='top'>$when</td>
-                <td valign='top'>$type</td>                
-                <td valign='top'>$msg</td>                
-                <td valign='top'>$severity</td>                
-                <td valign='top'>$cur->user_name</td>                
+                <td valign='top'>$type</td>
+                <td valign='top'>$msg</td>
+                <td valign='top'>$severity</td>
+                <td valign='top'>$cur->user_name</td>
+                
+              </tr>
               
-              </tr>    
-    
             ";
-    
-  } 
-  
-  
-  $rtn .= "</table>";
-  
-  // Now, do the page
-  
-  // Figure out the total number of results
-  $total = db_result(db_query("SELECT count(wid) as count
-                               FROM watchdog WHERE 1 
-                               $type_line 
+                     
+                   }
+                   
+                   
+                   $rtn .= "</table>";
+                   
+                   // Now, do the page
+                   
+                   // Figure out the total number of results
+                   $total = db_result(db_query("SELECT count(wid) as count
+                               FROM watchdog WHERE 1
+                               $type_line
                                $severity_line", $params));
-  
-  
-  // Now, divide by the number of results per page.
-  $pages = ceil($total / $results_per_page);
-
-  $base_query = "sev_filter=$sev_filter&type_filter=$type_filter";
-   
-  $rtn .= "<div class='fp-pager'>";
-  if ($page > 1) {
-    $rtn .= "<span class='pager-link pager-first'>" . l("&laquo; first", "admin/config/watchdog", $base_query . "&page=1") . "</span>";
-    $rtn .= "<span class='pager-link pager-prev'>" . l("&lt; prev", "admin/config/watchdog", $base_query . "&page=" . ($page - 1)) . "</span>";
-  }
-  else {
-    $rtn .= "<span class='pager-link pager-first'>&laquo; first</span>";
-    $rtn .= "<span class='pager-link pager-prev'>&lt; prev</span>";    
-  }
-   
-  // page numbers here
-  // Let's get the previous X page numbers, and next X (if possible)
-  $start_page_num = $page - 5;
-  if ($start_page_num < 1) $start_page_num = 1;
-  $end_page_num = $page + 5;
-  if ($end_page_num > $pages) $end_page_num = $pages;
-  
-  if ($start_page_num > 1) {
-    $rtn .= "<span class='pager-elip'>...</span>";
-  }
-  
-  for ($t = $start_page_num; $t <= $end_page_num; $t++) {
-    if ($page == $t) {
-      // current page
-      $rtn .= "<span class='pager-link pager-number pager-current'>$t</span>";      
-    }
-    else {
-      $rtn .= "<span class='pager-link pager-number'>" . l($t, "admin/config/watchdog", $base_query . "&page=$t") . "</span>";
-    }
-  } 
-
-  
-  if ($end_page_num < $pages) {
-    $rtn .= "<span class='pager-elip'>...</span>";
-  }
-  
-  
-   
-  if ($page < $pages) {
-    $rtn .= "<span class='pager-link pager-next'>" . l("next &gt;", "admin/config/watchdog", $base_query . "&page=" . ($page + 1)) . "</span>";
-    $rtn .= "<span class='pager-link pager-last'>" . l("last &raquo;", "admin/config/watchdog", $base_query . "&page=$pages") . "</span>";
-  }
-  else {
-    $rtn .= "<span class='pager-link pager-next'>next &gt;</span>";
-    $rtn .= "<span class='pager-link pager-last'>last &raquo;</span>";    
-  }
-  
-  $rtn .= "</div>";
-  
-  
-  
-  
-  return $rtn;
-  
+                   
+                   
+                   // Now, divide by the number of results per page.
+                   $pages = ceil($total / $results_per_page);
+                   
+                   $base_query = "sev_filter=$sev_filter&type_filter=$type_filter";
+                   
+                   $rtn .= "<div class='fp-pager'>";
+                   if ($page > 1) {
+                     $rtn .= "<span class='pager-link pager-first'>" . l("&laquo; first", "admin/config/watchdog", $base_query . "&page=1") . "</span>";
+                     $rtn .= "<span class='pager-link pager-prev'>" . l("&lt; prev", "admin/config/watchdog", $base_query . "&page=" . ($page - 1)) . "</span>";
+                   }
+                   else {
+                     $rtn .= "<span class='pager-link pager-first'>&laquo; first</span>";
+                     $rtn .= "<span class='pager-link pager-prev'>&lt; prev</span>";
+                   }
+                   
+                   // page numbers here
+                   // Let's get the previous X page numbers, and next X (if possible)
+                   $start_page_num = $page - 5;
+                   if ($start_page_num < 1) $start_page_num = 1;
+                   $end_page_num = $page + 5;
+                   if ($end_page_num > $pages) $end_page_num = $pages;
+                   
+                   if ($start_page_num > 1) {
+                     $rtn .= "<span class='pager-elip'>...</span>";
+                   }
+                   
+                   for ($t = $start_page_num; $t <= $end_page_num; $t++) {
+                     if ($page == $t) {
+                       // current page
+                       $rtn .= "<span class='pager-link pager-number pager-current'>$t</span>";
+                     }
+                     else {
+                       $rtn .= "<span class='pager-link pager-number'>" . l($t, "admin/config/watchdog", $base_query . "&page=$t") . "</span>";
+                     }
+                   }
+                   
+                   
+                   if ($end_page_num < $pages) {
+                     $rtn .= "<span class='pager-elip'>...</span>";
+                   }
+                   
+                   
+                   
+                   if ($page < $pages) {
+                     $rtn .= "<span class='pager-link pager-next'>" . l("next &gt;", "admin/config/watchdog", $base_query . "&page=" . ($page + 1)) . "</span>";
+                     $rtn .= "<span class='pager-link pager-last'>" . l("last &raquo;", "admin/config/watchdog", $base_query . "&page=$pages") . "</span>";
+                   }
+                   else {
+                     $rtn .= "<span class='pager-link pager-next'>next &gt;</span>";
+                     $rtn .= "<span class='pager-link pager-last'>last &raquo;</span>";
+                   }
+                   
+                   $rtn .= "</div>";
+                   
+                   
+                   
+                   
+                   return $rtn;
+                   
 }
 
 
@@ -2255,7 +2315,7 @@ function admin_display_watchdog() {
   fp_add_css(fp_get_module_path("admin") . '/css/admin.css');
   
   $rtn = "";
-
+  
   $rtn .= "<p>View recent watchdog entries</p>";
   
   $severity_array = array(
@@ -2270,7 +2330,7 @@ function admin_display_watchdog() {
   
   
   $type_line = $severity_line = $limit_start = "";
-
+  
   @$sev_filter = $_GET["sev_filter"];
   @$type_filter = $_GET["type_filter"];
   @$page = intval($_GET["page"]);
@@ -2280,7 +2340,7 @@ function admin_display_watchdog() {
     $limit_start = $results_per_page * ($page - 1);
   }
   
-
+  
   
   
   // Filters:
@@ -2292,18 +2352,18 @@ function admin_display_watchdog() {
             Type:
             <select name='type_filter'>
               <option value=''>-Any-</option>";
-  $res = db_query("SELECT distinct(type) as type 
-                   FROM watchdog 
+  $res = db_query("SELECT distinct(type) as type
+                   FROM watchdog
                    ORDER BY type");
   while ($cur = db_fetch_object($res)) {
     $sel = ($type_filter == $cur->type) ? "selected" : "";
     $rtn .= "<option value='$cur->type' $sel>$cur->type</option>";
-  }  
+  }
   
   
   $rtn .= "</select>
             </span>";
-
+  
   
   $rtn .= "
             <span class='severity-filter'>
@@ -2313,9 +2373,9 @@ function admin_display_watchdog() {
   foreach ($severity_array as $key => $value) {
     $sel = "";
     if ($sev_filter == $key) $sel = "selected";
-     
+    
     $rtn .= "<option value='$key' $sel>$value</option>";
-  }  
+  }
   
   $rtn .= "</select>
             </span>";
@@ -2334,51 +2394,51 @@ function admin_display_watchdog() {
   
   
   $params = array();
-
+  
   if (@$_GET["type_filter"] != "") {
     //$type_line = " AND type = '" . mysql_real_escape_string($_GET["type_filter"]) . "' ";
     $type_line = " AND `type` = :type ";
     $params[":type"] = $_GET["type_filter"];
   }
-    
+  
   if (@$_GET["sev_filter"] != "") {
     //$severity_line = " AND severity = '" . mysql_real_escape_string($_GET["sev_filter"]) . "' ";
     $severity_line = " AND severity = :sev ";
-    $params[":sev"] = $_GET["sev_filter"]; 
+    $params[":sev"] = $_GET["sev_filter"];
   }
   
-
+  
   $pol = "even";
   
   
   $table_headers = array();
-  $table_headers[] = array("label" => "ID", "field" => "wid");  
-  $table_headers[] = array("label" => "When", "field" => "a.timestamp");  
-  $table_headers[] = array("label" => "Type", "field" => "a.type");  
-  $table_headers[] = array("label" => "Msg");  
-  $table_headers[] = array("label" => "Severity", "field" => "a.severity");  
+  $table_headers[] = array("label" => "ID", "field" => "wid");
+  $table_headers[] = array("label" => "When", "field" => "a.timestamp");
+  $table_headers[] = array("label" => "Type", "field" => "a.type");
+  $table_headers[] = array("label" => "Msg");
+  $table_headers[] = array("label" => "Severity", "field" => "a.severity");
   $table_headers[] = array("label" => "User", "field" => "user_name");
-     
-  // Set our initial sort, if none is already set.   
-  theme_table_header_sortable_set_initial_sort("wid", 'DESC');  
+  
+  // Set our initial sort, if none is already set.
+  theme_table_header_sortable_set_initial_sort("wid", 'DESC');
   
   $rtn .= "<table class='watchdog-table' cellspacing='0' cellpadding='4'>";
   // Draw our our table headers, with links....
-  $rtn .= theme_table_header_sortable($table_headers);    
+  $rtn .= theme_table_header_sortable($table_headers);
   
-              
-              
-  // Get our order by clause based on selected table header, if any.    
-  $order_by = theme_table_header_sortable_order_by($table_headers);  
+  
+  
+  // Get our order by clause based on selected table header, if any.
+  $order_by = theme_table_header_sortable_order_by($table_headers);
   $res = pager_query("SELECT * FROM watchdog a
                        WHERE 1
                        $type_line
-                       $severity_line                                                                              
-                       $order_by", $params, 50, 0, "SELECT COUNT(wid) FROM watchdog a 
+                       $severity_line
+                       $order_by", $params, 50, 0, "SELECT COUNT(wid) FROM watchdog a
                                                      WHERE 1
                                                      $type_line
-                                                     $severity_line                                                                              
-                                                     $order_by", $params);      
+                                                     $severity_line
+                                                     $order_by", $params);
   
   
   while ($cur = db_fetch_object($res)) {
@@ -2397,35 +2457,35 @@ function admin_display_watchdog() {
     if ($type != $o_type) {
       $type = trim($type) . "...";
     }
-
+    
     
     
     $severity = $severity_array[$cur->severity];
     $when = format_date(convert_time($cur->timestamp), "short");
     
-        
+    
     $rtn .= "
-              <tr class='row-$pol row-$severity'>                
+              <tr class='row-$pol row-$severity'>
                 <td valign='top'>" . l($cur->wid, "admin/config/watchdog/$cur->wid", "sev_filter=$sev_filter&type_filter=$type_filter&page=$page") . "</td>
                 <td valign='top'>$when</td>
-                <td valign='top'>$type</td>                
-                <td valign='top'>$msg</td>                
-                <td valign='top'>$severity</td>                
-                <td valign='top'>$cur->user_name</td>                
+                <td valign='top'>$type</td>
+                <td valign='top'>$msg</td>
+                <td valign='top'>$severity</td>
+                <td valign='top'>$cur->user_name</td>
+                
+              </tr>
               
-              </tr>    
-    
             ";
     
-  } 
+  }
   
   
   $rtn .= "</table>";
   
   
   
-  // Display the pager that was generated by the pager_query above!  
-  $rtn .= theme_pager(); 
+  // Display the pager that was generated by the pager_query above!
+  $rtn .= theme_pager();
   
   
   
@@ -2449,19 +2509,19 @@ function admin_display_main() {
   $de_catalog_year = admin_get_de_catalog_year(FALSE, 0);
   
   // Has the system cron been run recently?
-  $cron_last_run = variable_get("cron_last_run", 0);     
+  $cron_last_run = variable_get("cron_last_run", 0);
   if ($cron_last_run < strtotime("-7 DAY")) {
     // Warn admin that they need to have cron set up!  It's been over a week!
     fpm(t("Your system's cron process hasn't run in over a week.  In order for FlightPath
             to continue to function properly, a cron process much be configured.
-            You may @run_link or see the @status_link page for instructions.", 
-            array("@status_link" => l(t("System status"), "admin/config/status"),
-                  "@run_link" => l(t("run cron now"), "admin/config/run-cron"))));
+            You may @run_link or see the @status_link page for instructions.",
+        array("@status_link" => l(t("System status"), "admin/config/status"),
+          "@run_link" => l(t("run cron now"), "admin/config/run-cron"))));
   }
   
   
   $rtn = "";
-
+  
   fp_add_css(fp_get_module_path("admin") . "/css/admin.css");
   fp_add_js(fp_get_module_path("admin") . "/js/admin.js");
   
@@ -2472,14 +2532,14 @@ function admin_display_main() {
             </td>
             <td valign='top' class='advising-settings-right'>
               ";
-              
-
+  
+  
   // Advising Settings
   
   
   
   $rtn .= fp_render_section_title("Advising Settings", "admin-advising-settings");
-    
+  
   $defs = array(0 => '');
   if (module_enabled("schools")) {
     $defs = schools_get_school_definitions();
@@ -2487,14 +2547,14 @@ function admin_display_main() {
   
   foreach ($defs as $school_id => $school_name) {
     $rtn .= "<div class='admin-advising-settings'><!--SCHOOL_NAME-->
-               
+        
          <ul>
           <li>" . t("Available terms for advising: %v", array("%v" => fp_space_csv(variable_get_for_school("available_advising_term_ids", "", $school_id)))) . "</li>
-          <li>" . t("Default advising term: %v", array("%v" => fp_space_csv(variable_get_for_school("advising_term_id", "", $school_id)))) . "</li>          
-          <li>" . t("Current catalog year: %v", array("%v" => variable_get_for_school("current_catalog_year", "", $school_id))) . "</li>       
-          <li>" . t("Current draft catalog year: %v", array("%v" => variable_get_for_school("current_draft_catalog_year", "", $school_id))) . "</li>             
-          <li>" . t("Not released grades terms: %v", array("%v" => fp_space_csv(variable_get_for_school("not_released_grades_terms", "", $school_id)))) . "</li>             
-          
+          <li>" . t("Default advising term: %v", array("%v" => fp_space_csv(variable_get_for_school("advising_term_id", "", $school_id)))) . "</li>
+          <li>" . t("Current catalog year: %v", array("%v" => variable_get_for_school("current_catalog_year", "", $school_id))) . "</li>
+          <li>" . t("Current draft catalog year: %v", array("%v" => variable_get_for_school("current_draft_catalog_year", "", $school_id))) . "</li>
+          <li>" . t("Not released grades terms: %v", array("%v" => fp_space_csv(variable_get_for_school("not_released_grades_terms", "", $school_id)))) . "</li>
+              
         </ul>";
     
     $url_suffix = "";
@@ -2505,7 +2565,7 @@ function admin_display_main() {
     if (user_has_permission("can_edit_advising_settings")) {
       $rtn .= l("<i class='fa fa-pencil'></i> " . t("Edit Advising Settings") . "<!--SCHOOL_EDIT_LINK-->", "admin/edit-advising-settings" . $url_suffix);
     }
-  
+    
     if ($school_name) {
       $rtn = str_replace("<!--SCHOOL_NAME-->", "<label>" . $school_name . "</label>", $rtn);
       $rtn = str_replace("<!--SCHOOL_EDIT_LINK-->", t(" for ") . "<em>$school_name</em>", $rtn);
@@ -2516,26 +2576,26 @@ function admin_display_main() {
   } // foreach
   
   
-    
-
-                            
-              
+  
+  
+  
+  
   $rtn .= "</td>
-                        
+      
            </tr>";
   $rtn .= "</table><br>"; // close table
-
-
-  // TODO:  Similar to the advising settings, do we just loop for each school?  
+  
+  
+  // TODO:  Similar to the advising settings, do we just loop for each school?
   $current_catalog_year = variable_get("current_catalog_year", 2006);   // TODO: how to figure out school?
   $earliest_catalog_year = variable_get("earliest_catalog_year", 2006);  // TODO:  how to figure out school?
   
   
   if (user_has_permission("can_access_data_entry")) {
     $rtn .= fp_render_section_title("Degree & Course Management", "degree-course-management");
-   
+    
     $rtn .= "<div class='data-entry-cats'>";
-
+    
     // Have a pulldown here of years, then use javascript to hide/show relavant groups.
     $rtn .= "&nbsp; &nbsp; &nbsp; " . t("Select a catalog year") . ": <select id='data-entry-select-cats' onChange='adminHideDECats();'>";
     $selected_cat = ($de_catalog_year != "") ? $de_catalog_year : $current_catalog_year;
@@ -2545,7 +2605,7 @@ function admin_display_main() {
       $rtn .= "<option value='$t' $sel>$t-" . ($t+1) . "</option>";
     }
     $rtn .= "</select> &nbsp; &nbsp;" . fp_get_js_alert_link(t("Newly duplicated year not showing up?<br><br>Make sure you have the correct 'Current Catalog Year' set under Edit Advising Settings."));
-      
+    
     
     for ($t = $current_catalog_year +1; $t >= $earliest_catalog_year; $t--) {
       $rtn .= "<ul class='data-entry-for-cat data-entry-for-cat-$t'>";
@@ -2554,7 +2614,7 @@ function admin_display_main() {
       $rtn .= "<li>" . l(t("Courses for @year", array("@year" => "$t-" . ($t+1))), "admin/courses", "de_catalog_year=$t") . "</li>";
       $rtn .= "</ul>";
     }
-        
+    
     if (user_has_permission("can_edit_data_entry")) {
       $rtn .= "<b>" . t("Administrator function:") . "</b><ul>
               <li>" . l(t("Duplicate entire year worth of data to new year"), "admin/duplicate-year") . "</li>
@@ -2575,18 +2635,18 @@ function admin_display_main() {
     $rtn .= "<ul class='data-entry-draft-waiting'>
               <li>" . l(t("Apply draft changes"), "admin/apply-draft-changes") . "</li>
            </ul>";
-        
-  }
-
-  
-  
-  
-  
-  
-  
-  
-  
     
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   return $rtn;
 }
 
