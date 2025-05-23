@@ -369,6 +369,7 @@ function content_public_files_form() {
   
   $html = "";
   
+  $pol = "";
   
   $table_headers = array();
   $table_headers[] = array("label" => "Actions");  
@@ -2421,56 +2422,61 @@ function content_cron() {
   // We want to delete any content (and files!) which have been scheduled for deletion.
   // Check to see when the last time we did this.  If less than X number of days, we don't do it.
   $last_run = intval(variable_get("content_last_run_delete_flag_removal", 0));
-  $check_against = strtotime("NOW - 7 DAYS");  // don't run any more often than once every 7 DAYS.
-  $delete_threshold = strtotime("NOW - 7 DAYS");  // delete content older than 7 days.
+  $check_against = strtotime("NOW - 7 DAYS");  // don't run any more often than once every X DAYS.
+  $delete_threshold = strtotime("NOW - 7 DAYS");  // delete content older than X days.
   $c = 0;
   if ($check_against > $last_run) {
     
-    $res = db_query("SELECT * FROM content 
-                     WHERE delete_flag = 1
-                     AND `updated` < ?", array($delete_threshold));
-    while ($cur = db_fetch_object($res)) {
-            
-      $cid = $cur->cid;
-      $type = $cur->type;
-      
-      // Sanitize $type as best we can.  Should be fine coming from database, but just in case.
-      $type = str_replace("`", "", $type);
-      $type = str_replace("'", "", $type);
-      $type = str_replace('"', "", $type);
-      $type = str_replace(' ', "", $type);
-      $type = str_replace('(', "", $type);
-      
-      
-      // First, are there any files associated with this cid we need to delete?
-      $res2 = db_query("SELECT * FROM content_files WHERE cid = ?", array($cid));
-      while ($cur2 = db_fetch_object($res2)) {
-        $fid = $cur2->fid;
-        $full_filename = fp_get_files_path() . '/content_uploads/' . $cur2->filename;
-        if (!unlink($full_filename)) {
-          watchdog("content", "Could not delete $full_filename for content $cid", array(), WATCHDOG_ERROR);
-          fpm("Could not delete $full_filename for content $cid");          
+    $delete_settings = variable_get("delete_flagged_data_from_db", array());
+    if (isset($delete_settings['content'])) {
+    
+      $res = db_query("SELECT * FROM content 
+                       WHERE delete_flag = 1
+                       AND `updated` < ?", array($delete_threshold));
+      while ($cur = db_fetch_object($res)) {
+              
+        $cid = $cur->cid;
+        $type = $cur->type;
+        
+        // Sanitize $type as best we can.  Should be fine coming from database, but just in case.
+        $type = str_replace("`", "", $type);
+        $type = str_replace("'", "", $type);
+        $type = str_replace('"', "", $type);
+        $type = str_replace(' ', "", $type);
+        $type = str_replace('(', "", $type);
+        
+        
+        // First, are there any files associated with this cid we need to delete?
+        $res2 = db_query("SELECT * FROM content_files WHERE cid = ?", array($cid));
+        while ($cur2 = db_fetch_object($res2)) {
+          $fid = $cur2->fid;
+          $full_filename = fp_get_files_path() . '/content_uploads/' . $cur2->filename;
+          if (!unlink($full_filename)) {
+            watchdog("content", "Could not delete $full_filename for content $cid", array(), WATCHDOG_ERROR);
+            fpm("Could not delete $full_filename for content $cid");          
+          }
+          db_query("DELETE FROM content_files WHERE fid = ?", array($fid));
         }
-        db_query("DELETE FROM content_files WHERE fid = ?", array($fid));
-      }
+        
+        // Now, delete the content from the table it belongs to...
+        db_query("DELETE FROM `content__$type` WHERE cid = ?", array($cid));
+        
+        // Delete from content_versions and content_last_access, engagements_tracking
+        db_query("DELETE FROM content_versions WHERE cid = ?", array($cid));
+        db_query("DELETE FROM content_last_access WHERE cid = ?", array($cid));
+        db_query("DELETE FROM engagements_tracking WHERE cid = ?", array($cid));
+        
+        // Lastly, delete from content table itself.
+        db_query("DELETE FROM content WHERE cid = ?", array($cid));
+        watchdog("content", "Deleted from db deleted content $cid", array(), WATCHDOG_DEBUG);
+        $c++;      
+      } // while cur
       
-      // Now, delete the content from the table it belongs to...
-      db_query("DELETE FROM `content__$type` WHERE cid = ?", array($cid));
-      
-      // Delete from content_versions and content_last_access, engagements_tracking
-      db_query("DELETE FROM content_versions WHERE cid = ?", array($cid));
-      db_query("DELETE FROM content_last_access WHERE cid = ?", array($cid));
-      db_query("DELETE FROM engagements_tracking WHERE cid = ?", array($cid));
-      
-      // Lastly, delete from content table itself.
-      db_query("DELETE FROM content WHERE cid = ?", array($cid));
-      watchdog("content", "Deleted from db deleted content $cid", array(), WATCHDOG_DEBUG);
-      $c++;      
-    } // while cur
+      watchdog("content", "Delete from db complete. $c items removed.", array(), WATCHDOG_DEBUG);    
     
-    watchdog("content", "Delete from db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+    } // isset delete content
+
     variable_set("content_last_run_delete_flag_removal", time());
-    
     
   } // check against > last_run, so we should do it.
   

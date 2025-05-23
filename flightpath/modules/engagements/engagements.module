@@ -2340,10 +2340,10 @@ function engagements_sms_get_all_messages()
 
     // Write our data to our sms_history table.
     db_query(
-      "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `from_cwid`, `updated`, `direction`, 
+      "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `to_cwid`, `from_cwid`, `updated`, `direction`, 
                                 `media_filenames`, `date_sent`, price_processed, num_segments)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
-      array($sid, 'call', $body, $from_mobile, $to_mobile, $price, $fp_price, $from_cwid, time(), $direction, '', $date_sent_ts, 1, $duration)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
+      array($sid, 'call', $body, $from_mobile, $to_mobile, $price, $fp_price, $to_cwid, $from_cwid, time(), $direction, '', $date_sent_ts, 1, $duration)
     );
     
     watchdog("engagements_sms", "Documented call to $to_mobile. From record: <pre>" . print_r($record, TRUE) . "</pre>" , array(), WATCHDOG_DEBUG);    
@@ -2668,6 +2668,7 @@ function engagements_imap_get_all_received_messages()
     // might look like:  Richard Peacock <richard.peacock@school.domain.co.com>
     // We will use a regular expression to figure it out.  From: https://stackoverflow.com/questions/33865113/extract-email-address-from-string-php
     $ofrom = $overview->from;
+    $matches = array();
     preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $ofrom, $matches);
     $from_email = $matches[0][0];  // Since this is a FROM email, we assume there's only one sender.
 

@@ -432,6 +432,7 @@ function student_files_handle_delete($student_id, $fid) {
     // We DID delete sucessfully, let's get rid of it from our db table.
     db_query("DELETE FROM student_files WHERE fid = ?", $fid);
     fp_add_message(t("File deleted successfully."));
+    watchdog('student_files', "Student file deleted. student = $student_id, fid = $fid, file name = {$file['filename']}");
   }
    
   // Return to the history page.

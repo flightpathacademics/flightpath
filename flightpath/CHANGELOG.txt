@@ -1,6 +1,15 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-05-23
+  Added new setting to System Settings form (utilized by the advise module, content module, comments, etc.) which lets you selectively delete or NOT delete
+  data (like student substitutions) which have been flagged as "deleted" in the database.  The previous behavior was to
+  delete such data.
+  
+  Added extra watchdog logging to student_files deletion as well as modifications in the audit module.
+  
+  Minor changes to engagements module to stop "notices" from PHP 8. 
+  
 
 2025-05-20
   Made various modifications to the "Duplicate entire year" functionality in admin module, specifically as

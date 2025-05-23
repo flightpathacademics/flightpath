@@ -2585,8 +2585,30 @@ function system_settings_form() {
                         <br>If unsure, set to <em>30 seconds</em>.'),
   );    
   
+    
+  $form["delete_flagged_data_from_db"] = array(
+    "label" => t("Permanently delete the following from the database once it has been flagged for deletion:"),
+    "type" => "checkboxes",
+    'options' => array(
+                    'advising_sessions' => 'Advising sessions',
+                    'advising_comments' => 'Advising comments',
+                    'student_substitutions' => 'Student substitutions',
+                    'student_unassign_group' => 'Student course movements/unassignments',
+                    'student_unassign_transfer_eqv' => 'Student unassignments for transfer course eqvs',
+                    'content' => 'Content items (eg, Pages, Appointments, Alerts, etc.)',
+                  ),
+    "value" => variable_get("delete_flagged_data_from_db", array()),
+    "description" => t('Normally, FlightPath <b>does not</b> actually delete certain "deleted" data, like those listed above. Instead, they are 
+                          flagged as "deleted" and do not display except in database reports. However, by checking the
+                          boxes above, FlightPath will permanently delete such flagged data from the database every so often as part
+                          of routine cleanup operations designed to save space. 
+                          <br>Note: This would make a complete history of 
+                          those actions unrecoverable.
+                          <br><b>If you are unsure what to do, leave all boxes unchecked.</b>'),
+  );
   
-      
+  
+  
       
                   
   return $form;

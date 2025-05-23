@@ -264,47 +264,56 @@ function advise_menu() {
  */
 function advise_cron() {
   
-  // Delete advising data which has been marked with "delete_flag = 1"
-  
+
+  // Only delete if allowed in settings
+  // Delete advising data which has been marked with "delete_flag = 1"  
   $last_run = intval(variable_get("advise_last_run_delete_flag_removal", 0));
-  $check_against = strtotime("NOW - 7 DAYS");  // don't run any more often than once every 7 days.
+  $check_against = strtotime("NOW - 7 DAYS");  // don't run any more often than once every X days.
   $c = 0;
   if ($check_against > $last_run) {
     
-    $res = db_query("SELECT * FROM advising_sessions 
-                     WHERE delete_flag = 1 ");
-    while ($cur = db_fetch_object($res)) {
-            
-      $asid = $cur->advising_session_id;
+    $delete_settings = variable_get("delete_flagged_data_from_db", array());
+    if (isset($delete_settings['advising_sessions'])) {
       
-                  
-      // Delete courses that were part of this advising session.      
-      db_query("DELETE FROM advised_courses WHERE advising_session_id = ?", array($asid));
-      
-      // Lastly, delete from advising_sessions table itself.
-      db_query("DELETE FROM advising_sessions WHERE advising_session_id = ?", array($asid));
-      watchdog("advise", "Deleted from flagged db deleted advising_session_id $asid", array(), WATCHDOG_DEBUG);
-      $c++;      
-    } // while cur
-    
-    watchdog("advise", "Delete from flagged advising sessions db complete. $c items removed.", array(), WATCHDOG_DEBUG);
-    
-    
-    $res = db_query("DELETE FROM student_substitutions WHERE delete_flag = 1");
-    $c = db_affected_rows($res);
-    watchdog("advise", "Delete from flagged student substitutions db complete. $c items removed.", array(), WATCHDOG_DEBUG);
-    
-    $res = db_query("DELETE FROM student_unassign_group WHERE delete_flag = 1");
-    $c = db_affected_rows($res);
-    watchdog("advise", "Delete from flagged student unassign group db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+      $res = db_query("SELECT * FROM advising_sessions 
+                       WHERE delete_flag = 1 ");
+      while ($cur = db_fetch_object($res)) {
+              
+        $asid = $cur->advising_session_id;
         
-    $res = db_query("DELETE FROM student_unassign_transfer_eqv WHERE delete_flag = 1");
-    $c = db_affected_rows($res);
-    watchdog("advise", "Delete from flagged student unassign transfer eqv db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+                    
+        // Delete courses that were part of this advising session.      
+        db_query("DELETE FROM advised_courses WHERE advising_session_id = ?", array($asid));
+        
+        // Lastly, delete from advising_sessions table itself.
+        db_query("DELETE FROM advising_sessions WHERE advising_session_id = ?", array($asid));
+        watchdog("advise", "Deleted from flagged db deleted advising_session_id $asid", array(), WATCHDOG_DEBUG);
+        $c++;      
+      } // while cur    
+      watchdog("advise", "Delete from flagged advising sessions db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+      
+    } // if isset delete advising_sessions
     
+    if (isset($delete_settings['student_substitutions'])) {
+      $res = db_query("DELETE FROM student_substitutions WHERE delete_flag = 1");
+      $c = db_affected_rows($res);
+      watchdog("advise", "Delete from flagged student substitutions db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+    }
+    
+    if (isset($delete_settings['student_unassign_group'])) {
+      $res = db_query("DELETE FROM student_unassign_group WHERE delete_flag = 1");
+      $c = db_affected_rows($res);
+      watchdog("advise", "Delete from flagged student unassign group db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+    }
+    
+    if (isset($delete_settings['student_unassign_transfer_eqv'])) {
+      $res = db_query("DELETE FROM student_unassign_transfer_eqv WHERE delete_flag = 1");
+      $c = db_affected_rows($res);
+      watchdog("advise", "Delete from flagged student unassign transfer eqv db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+    }
+
     
     variable_set("advise_last_run_delete_flag_removal", time());
-    
     
   } // check against > last_run, so we should do it.
   

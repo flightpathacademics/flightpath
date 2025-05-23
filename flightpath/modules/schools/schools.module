@@ -1172,38 +1172,7 @@ function schools_data_form_submit($form, &$form_state) {
       
 
 
-  // This section of code no longer applies.
-/*
-  if ($schools_entity_type == 'course') {
-    // If this is a course, we might have selected the 'all years' option.  If so, we need to
-    // look up all catalog years that this course exists, and set our data for each catalog year.
-    
-    if (@$form_state['values']['all_years']['yes'] == 'yes') {
-      
-      // First, find all catalog years for this course_id.
-      $res = db_query("SELECT distinct(catalog_year) FROM draft_courses WHERE course_id = ?", array($course_id));
-      while($cur = db_fetch_object($res)) {
-       
-        // Delete existing data...
-        db_query("DELETE FROM draft_schools_data
-                    WHERE degree_id = ?
-                    AND group_id = ?
-                    AND course_id = ?
-                    AND catalog_year = ?
-                    ", array($degree_id, $group_id, $course_id, $cur->catalog_year));
-          
-          // Now, insert.
-          db_query("INSERT INTO draft_schools_data
-                    (school_id, degree_id, group_id, course_id, catalog_year)
-                    VALUES (?, ?, ?, ?, ?)", array($school_id, $degree_id, $group_id, $course_id, $cur->catalog_year));
-          
-      } // while
-      
-      
-    } // yes, we selected 'all years'
-    
-  } // if entity_type is course
-*/
+
 
  
 }

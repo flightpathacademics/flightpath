@@ -740,16 +740,17 @@ function audit_hidden_approval_form_submit($form, $form_state) {
   // Okay, let's save the approval status to our table.
   // Begin by deleting what's there for this approval type and student.
   db_query("DELETE FROM audit_approvals 
-            WHERE student_id = '?'
-            AND approval_type = '?' ", $student_id, $approval_type);
+            WHERE student_id = ?
+            AND approval_type = ? ", array($student_id, $approval_type));
   // Now, add our values
   $now = time();
   db_query("INSERT INTO audit_approvals
             (student_id, uid, faculty_id, approval_type, approval_value, posted)
-            VALUES ('?', '?', '?', '?', '?', '?')
-            ", $student_id, $user->id, $faculty_id, $approval_type, $approval_value, $now);
+            VALUES (?, ?, ?, ?, ?, ?)
+            ", array($student_id, $user->id, $faculty_id, $approval_type, $approval_value, $now));
   
   fp_add_message(t("Approval value has been successfully updated for type %title.", array("%type" => $approval_type, "%title" => $approval_type_title)));
+  watchdog('audit', "Approval value updated for student = $student_id, type = $approval_type, new value = $approval_value");
   
   // Also write to our comments table, and include the comment. 
   //$approval_desc = ($approval_value == "no_approve") ? t("Not approved") : t("Approved");

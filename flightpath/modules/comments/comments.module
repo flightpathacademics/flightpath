@@ -75,11 +75,19 @@ function comments_cron() {
   $c = 0;
   if ($check_against > $last_run) {
     
-    $res = db_query("DELETE FROM advising_comments 
-                     WHERE delete_flag = 1 ");
-    $c = db_affected_rows($res);
     
-    watchdog("comments", "Delete from db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+    $delete_settings = variable_get("delete_flagged_data_from_db", array());
+    if (isset($delete_settings['advising_comments'])) {
+    
+      $res = db_query("DELETE FROM advising_comments 
+                       WHERE delete_flag = 1 ");
+      $c = db_affected_rows($res);
+      
+      watchdog("comments", "Delete from db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+      
+    }
+    
+    
     variable_set("comments_last_run_delete_flag_removal", time());
     
     
