@@ -1627,7 +1627,6 @@ function advise_display_view($view = "view") {
      
     if ($view == 'what-if') {
       
-      //$what_if_select = "<span class='what-if-change-settings'>" . l("<i class='fa fa-cog'></i> " . t("Change Settings"), "what-if", "advising_what_if=yes&what_if_major_code=none&what_if_track_code=none&what_if_track_degree_ids=none&current_student_id=$current_student_id") . "</span>";
       
       $tab_array[3]["label"] = "\"What If?\" Mode";
       $tab_array[3]['text'] = "<i class='fa fa-pencil'></i>";
@@ -2221,7 +2220,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   // window open at a time, with multiple students.
   // Therefor, this should never go into the session.
   // Annoyingly, we must pass carry this around on each page in the system.
-  $vars["current_student_id"] = @$_REQUEST["current_student_id"];
+  $vars["current_student_id"] = filter_untrusted_input(@$_REQUEST["current_student_id"]);
   if ($vars["current_student_id"] == "")
   {
     $vars["current_student_id"] = @$_REQUEST["advising_student_id"];
@@ -2232,7 +2231,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   $school_id = db_get_school_id_for_student_id($csid);
   
   // Get the student ID.
-  $vars["advising_student_id"] = @$_REQUEST["advising_student_id"];
+  $vars["advising_student_id"] = filter_untrusted_input(@$_REQUEST["advising_student_id"]);
   if ($vars["advising_student_id"] == "")
   {
     $vars["advising_student_id"] = @$_SESSION["advising_student_id$csid"];
@@ -2244,7 +2243,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
 
 
   // Should we load from the Draft advising session?  or the active?
-  $vars["advising_load_active"] = @$_REQUEST["advising_load_active"];
+  $vars["advising_load_active"] = filter_untrusted_input(@$_REQUEST["advising_load_active"]);
   if ($vars["advising_load_active"] == "")
   { // values will either be "yes" or "" (any other value than "yes" is
     // considered to be negative.
@@ -2254,7 +2253,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   }
 
   // Are we currently in WhatIf mode?
-  @$vars["advising_what_if"] = $_REQUEST["advising_what_if"];  // Get it from the GET or POST.
+  @$vars["advising_what_if"] = filter_untrusted_input(@$_REQUEST["advising_what_if"]);  // Get it from the GET or POST.
   if ($vars["advising_what_if"] == "")
   {
     // Will equal "yes" if we ARE in whatIf mode.
@@ -2273,7 +2272,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
 
 
   // Get the major_code(s).
-  $vars["advising_major_code"] = @$_REQUEST["advising_major_code"];
+  $vars["advising_major_code"] = filter_untrusted_input(@$_REQUEST["advising_major_code"]);
   
   if ($vars["advising_major_code"] == "")
   {
@@ -2291,7 +2290,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   }
 
 
-  $vars["advising_track_degree_ids"] = @$_REQUEST["advising_track_degree_ids"];
+  $vars["advising_track_degree_ids"] = filter_untrusted_input(@$_REQUEST["advising_track_degree_ids"]);
   if ($vars["advising_track_degree_ids"] == "")
   {    
     $vars["advising_track_degree_ids"] = @$_SESSION["advising_track_degree_ids$csid"];
@@ -2321,7 +2320,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   
 
 
-  @$vars["advising_term_id"] = $_REQUEST["advising_term_id"];  // Get it from the GET or POST.
+  @$vars["advising_term_id"] = filter_untrusted_input(@$_REQUEST["advising_term_id"]);  // Get it from the GET or POST.
   if ($vars["advising_term_id"] == "")
   {
     // Set to the default advising term.
@@ -2338,7 +2337,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   }
 
 
-  @$vars["what_if_major_code"] = $_REQUEST["what_if_major_code"];  // Get it from the GET or POST.
+  $vars["what_if_major_code"] = filter_untrusted_input(@$_REQUEST["what_if_major_code"]);  // Get it from the GET or POST.
   if ($vars["what_if_major_code"] == "")
   {
     // Will equal "yes" if we ARE in whatIf mode.
@@ -2351,7 +2350,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   }
 
 
-  @$vars["what_if_catalog_year"] = $_REQUEST["what_if_catalog_year"];  // Get it from the GET or POST.
+  @$vars["what_if_catalog_year"] = filter_untrusted_input(@$_REQUEST["what_if_catalog_year"]);  // Get it from the GET or POST.
   if ($vars["what_if_catalog_year"] == "")
   {
     
@@ -2368,7 +2367,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
 
  
     
-  @$vars["what_if_track_degree_ids"] = $_REQUEST["what_if_track_degree_ids"];  // Get it from the GET or POST.
+  @$vars["what_if_track_degree_ids"] = filter_untrusted_input(@$_REQUEST["what_if_track_degree_ids"]);  // Get it from the GET or POST.
   if ($vars["what_if_track_degree_ids"] == "")
   {
     // Will equal "yes" if we ARE in whatIf mode.
@@ -2409,10 +2408,10 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   $vars["setting_current_draft_catalog_year"] = variable_get_for_school("current_draft_catalog_year",'', $school_id);
 
   // Are we in Print View?
-  @$vars["print_view"] = $_REQUEST["print_view"];
+  @$vars["print_view"] = filter_untrusted_input(@$_REQUEST["print_view"]);
 
   // Should we try to load from the cache?
-  @$vars["load_from_cache"] = $_REQUEST["load_from_cache"];
+  $vars["load_from_cache"] = filter_untrusted_input(@$_REQUEST["load_from_cache"]);
   if ($vars["load_from_cache"] == "")
   {
     // By default, attempt to load from cache.
@@ -2422,7 +2421,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
   // What "view" are we in?  View by Year or by Type?
   // Not the same as printView.  printView should work regardless
   // of our advising_view.
-  @$vars["advising_view"] = $_REQUEST["advising_view"];
+  $vars["advising_view"] = filter_untrusted_input(@$_REQUEST["advising_view"]);
   if ($vars["advising_view"] == "")
   {
     @$vars["advising_view"] = $_SESSION["advising_view$csid"];
@@ -2480,7 +2479,7 @@ function advise_init_advising_variables($bool_ignore_what_if_variables = FALSE) 
  */
 function advise_init() {
   global $current_student_id, $user, $screen, $student, $degree_plan;
-  $current_student_id = @$_REQUEST["current_student_id"];
+  $current_student_id = filter_untrusted_input(@$_REQUEST["current_student_id"]);
     
   // Since this user doesn't have permission to view this student's sessions,
   // he can only view his own.  This is to stop hackers from experimenting with the URL
@@ -2576,9 +2575,9 @@ function advise_init_screen() {
   advise_init_advising_variables();    
 
 
-  $perform_action = trim((string) @$_REQUEST["perform_action"]);
+  $perform_action = trim(filter_untrusted_input(@$_REQUEST["perform_action"]));
 
-  if (@$_REQUEST["clear_session"] == "yes") {
+  if (filter_untrusted_input(@$_REQUEST["clear_session"]) == "yes") {
     //advise_save_advising_variables_to_db();
     // reload our advising vars into the GLOBALS array for easy use later.
     //$GLOBALS["fp_advising"] = advise_load_advising_variables_from_db($current_student_id, $user->id);

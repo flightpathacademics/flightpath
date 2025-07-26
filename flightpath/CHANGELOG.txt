@@ -1,6 +1,26 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-07-26
+  Tweak to style.css so that fpm messages are always left-aligned.
+  
+  Added documentation to hook.api.php
+  
+  Added a new argument in form_error(), that tells FlightPath to stop running other validator functions if the form error is set.  
+  
+  Created new functions in password.inc to check that a password is complex enough, and another to return
+  the complexity rules so we can print them on screen.
+  
+
+2025-07-21
+  Hardening inputs in course_search module (when selecting subject).
+
+  Added function: filter_untrusted_input() to misc.inc. Useful for stripping possible trouble characters
+  from user input.
+  
+  Tidied up code in various spots, hardened inputs as well just to be safe.
+  
+
 2025-05-23
   Added new setting to System Settings form (utilized by the advise module, content module, comments, etc.) which lets you selectively delete or NOT delete
   data (like student substitutions) which have been flagged as "deleted" in the database.  The previous behavior was to

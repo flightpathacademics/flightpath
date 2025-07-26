@@ -659,6 +659,18 @@ function hook_user_login(&$account) {
  
 
 
+/**
+ * Runs AFTER FlightPath has logged out. Allows modules to add additional
+ * functionality.  For example, to go to a special page.
+ */
+function hook_user_logout() {
+  
+  fp_goto("special-post-logout-page");
+  
+}
+
+
+
 
 /**
  * This hook defines available permissions for a module.

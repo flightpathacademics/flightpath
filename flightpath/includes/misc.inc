@@ -1218,6 +1218,33 @@ function filter_markup($str, $type = "basic") {
   
 } 
  
+
+/**
+ * When receiving certain input from the user, filter out potential trouble characters
+ * @param $type   This is the type of input we are expecting. For example, the default is "major_code", which means
+ *                the input should exclude any characters not normally found in a major_code.
+ */
+function filter_untrusted_input($string, $type = 'major_code') {
+  
+  
+  if ($mode == 'major_code') {
+    $string = filter_xss($string, array());
+   
+    $string = str_replace('"', '', $string);
+    $string = str_replace("'", '', $string);
+    $string = str_replace("(", '', $string);
+    $string = str_replace(")", '', $string);
+    $string = str_replace("#", '', $string);
+    $string = str_replace("=", '', $string);
+    $string = str_replace(" ", '', $string);
+    $string = str_replace(";", '', $string);
+   
+  } 
+  
+  return $string;
+} // filter_untrusted_input
+
+
 /**
  * This function is taken almost directly from Drupal 7's core code.  It is used to help us filter out
  * dangerous HTML which the user might type.

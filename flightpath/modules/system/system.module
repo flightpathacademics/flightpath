@@ -2995,7 +2995,14 @@ function system_handle_form_submit() {
     foreach ($validate_handlers as $validate_callback) {         
       if (function_exists($validate_callback)) {
         
-        call_user_func_array($validate_callback, array(&$form, &$form_state));        
+        call_user_func_array($validate_callback, array(&$form, &$form_state));
+        
+        // Should we stop checking the other validator functions?
+        if (isset($GLOBALS['form_error_stop_further_validators']) && $GLOBALS['form_error_stop_further_validators'] === TRUE) {
+          unset($GLOBALS['form_error_stop_further_validators']);
+          break;
+        }
+        
       }
     }
   }
@@ -3011,7 +3018,7 @@ function system_handle_form_submit() {
         variable_set($name, $val);
       }
       
-      fp_add_message("Settings saved successfully.");      
+      fp_add_message(t("Settings saved successfully."));      
       
     }
 

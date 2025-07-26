@@ -1067,10 +1067,7 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
     
     
     
-    //$what_if_select = "<span class='what-if-change-settings'>" . l("<i class='fa fa-cog'></i> " . t("Change Settings"), "what-if", "advising_what_if=yes&what_if_major_code=none&what_if_track_code=none&what_if_track_degree_ids=none&current_student_id=$current_student_id") . "</span>";
-        
-    
-    //$right_side_top = "<h2 class='what-if-notice'>" . t("What If Mode") . "</h2>";
+   
   }
   
 

@@ -455,11 +455,20 @@ function form_basic_validate($form, $form_state) {
 
 /**
  * Register a form_error in the SESSION.
+ * 
+ * If bool_stop_futher_validators is set to TRUE, then (in system_handle_form_submit) we will
+ * not continue with any other form validators which may be present.
+ * 
  */
-function form_error($element_name, $message) {
+function form_error($element_name, $message, $bool_stop_further_validators = FALSE) {
   
   $_SESSION["fp_form_errors"][] = array("name" => $element_name, "msg" => $message);
   fp_add_message($message, "error");
+  
+  if ($bool_stop_further_validators) {
+    $GLOBALS['form_error_stop_further_validators'] = TRUE;
+  }
+  
   
 }
 

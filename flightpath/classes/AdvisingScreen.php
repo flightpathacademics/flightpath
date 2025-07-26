@@ -5000,7 +5000,7 @@ function draw_menu_items($menu_array) {
     }
 
     //$serializedCourse = urlencode(serialize($course));
-    $js_code = "popupDescribeSelected(\"$group_id\",\"$semester_num\",\"$course_id\",\"$subject_id\",\"req_by_degree_id=$req_by_degree_id&group_hours_remaining=$group_hours_remaining&db_group_requirement_id=$db_group_requirement_id&blank_degree_id=$blank_degree_id\");";
+    $js_code = "popupDescribeSelected(\"$group_id\",\"$semester_num\",\"$course_id\",\"$subject_id\",\"req_by_degree_id=$req_by_degree_id&group_hours_remaining=" . filter_untrusted_input($group_hours_remaining) . "&db_group_requirement_id=$db_group_requirement_id&blank_degree_id=$blank_degree_id\");";
 
     /*
     $on_mouse_over = " onmouseover=\"style.backgroundColor='#FFFF99'\"
@@ -6039,7 +6039,7 @@ function draw_menu_items($menu_array) {
         $blank_degree_id = $this->degree_plan->degree_id;
       }
       $back_link = "<span class=' '>
-            <a href='" . fp_url("advise/popup-group-select", "window_mode=popup&group_id=$group->group_id&semester_num=$display_semesterNum&group_hours_remaining=$group_hours_remaining&current_student_id=$csid&blank_degree_id=$blank_degree_id") . "' 
+            <a href='" . fp_url("advise/popup-group-select", "window_mode=popup&group_id=$group->group_id&semester_num=$display_semesterNum&group_hours_remaining=" . filter_untrusted_input($group_hours_remaining) . "&current_student_id=$csid&blank_degree_id=$blank_degree_id") . "' 
             class='nounderline'>&laquo; " . t("return to subject selection") . "</a></span>";
       $pC = str_replace("<!--MSG2-->",$back_link,$pC);
     }

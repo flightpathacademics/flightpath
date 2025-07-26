@@ -327,6 +327,64 @@ function user_check_password($password, $stored_hash) {
   return ($hash && $stored_hash == $hash);
 }
 
+
+
+
+/**
+ * This function checks a plain text password to make sure it meets our minimum complexity requirements.
+ * 
+ * Complexity requirement is based on NIST minimum requirements, which stresses length over arbitrarily
+ * complicated rules. This is why our complexity rules are faily basic.
+ * 
+ * Returns TRUE if password satisfies complexity.
+ * 
+ * Returns FALSE if it does not.
+ * 
+ */
+function password_validate_complexity($plain_text_password) {
+  
+  
+  // At least 1 text character
+  // At least 1 non-character number
+  // At least 12 characters in length
+  // No digit or text character can appear more than twice in a row.
+  
+  $pattern = '/^(?=.*\D)(?=.*\d)(?!.*(.)\1\1).{12,}$/';
+  return preg_match($pattern, $plain_text_password);
+  
+}
+
+/**
+ * Returns a list of complexity rules as either HTML (default) or an array.
+ * @param boolean $bool_return_array
+ */
+function password_get_complexity_rules($bool_return_array = FALSE) {
+  $html = "";
+  $arr = array();
+  
+  $arr[] = t("Must be at least 12 characters long");
+  $arr[] = t("Must contain at least one number");
+  $arr[] = t("Must contain at least one letter or symbol");
+  $arr[] = t("Cannot contain the same character more than twice in a row");
+  
+  
+  $html .= "<ul class='password-complexity-rules'>";
+  foreach ($arr as $r) {
+    $html .= "<li>$r</li>";
+  }
+  $html .= "</ul>";
+  
+  if ($bool_return_array) return $arr;
+  
+  return $html;
+  
+}
+
+
+
+
+
+
 /**
  * NOTE:  This function is from Drupal 7, but at the moment is not being used by FlightPath.
  * 

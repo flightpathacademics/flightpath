@@ -208,7 +208,7 @@ function student_search_student_select_switchboard() {
     if (@$_REQUEST['what_if_major_code'] != "") {
       $path = "what-if";
       //&what_if_major_code=$what_if_major_code&what_if_track_code=$what_if_track_code&what_if_catalog_year=$what_if_catalog_year
-      $query = "what_if_major_code=" . $_REQUEST['what_if_major_code'] . "&what_if_track_code=" . $_REQUEST['what_if_track_code'] . "&what_if_catalog_year=" . $_REQUEST['what_if_catalog_year'];
+      $query = "what_if_major_code=" . filter_untrusted_input(@$_REQUEST['what_if_major_code']) . "&what_if_track_code=" . filter_untrusted_input(@$_REQUEST['what_if_track_code']) . "&what_if_catalog_year=" . filter_untrusted_input(@$_REQUEST['what_if_catalog_year']);
     }
     fp_goto($path, $query);
   }
