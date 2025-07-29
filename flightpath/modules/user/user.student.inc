@@ -1149,9 +1149,10 @@ function user_edit_student_user_form_validate($form, $form_state) {
   $values = $form_state["values"];
   
   // If a password was given, make sure it is appropriate.
+  // TODO: Make sure it conforms to our complexity
   if (trim($values["new_password"]) != "") {
-    if (strlen(trim($values["new_password"])) < 5) {
-      form_error("new_password", t("Please enter a password that is at least 5 characters long."));
+    if (strlen(trim($values["new_password"])) < 8) {
+      form_error("new_password", t("Please enter a password that is at least 8 characters long."));
       return;
     }
   }

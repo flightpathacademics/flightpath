@@ -997,9 +997,16 @@ function user_user_settings_form() {
       );
       $form['new_password2'] = array(
         'label' => t("New password (re-enter)"),
-        'type' => 'password',   
-        'suffix' => '<hr>',   
+        'type' => 'password',
       );
+      
+      $form['mark_pass'] = [
+        'type' => 'markup',
+        'value' => '<p>' . t('Passwords must contain the following:') . password_get_complexity_rules(FALSE) . '</p><hr>',        
+      ];
+      
+      // TODO: Display rules for password complexity (see forgot_password module)
+      
     }
     else if (isset($_SESSION['fp_logged_in_external']) && $_SESSION['fp_logged_in_external'] === TRUE) {
       $form['mark_external_login'] = array(
@@ -1132,6 +1139,9 @@ function user_user_settings_form_validate($form, $form_state) {
       form_error('new_password1', t("Sorry, the passwords you entered do not match.  Please check your spelling and try again."));
       return;
     }
+    
+    // TODO: Make sure the password conforms to our complexity
+    
     
     // Did we get the current password right?
     $res = db_query("SELECT * FROM users WHERE user_id = ? ", $user->id); 
@@ -2180,9 +2190,11 @@ function user_edit_user_form_validate($form, $form_state) {
   $values = $form_state["values"];
   
   // If a password was given, make sure it is appropriate.
+
+  // TODO: Make sure password conforms to our complexity requirements
   if (trim($values["new_password"]) != "") {
-    if (strlen(trim($values["new_password"])) < 5) {
-      form_error("new_password", t("Please enter a password that is at least 5 characters long."));
+    if (strlen(trim($values["new_password"])) < 8) {
+      form_error("new_password", t("Please enter a password that is at least 8 characters long."));
       return;
     }
   }

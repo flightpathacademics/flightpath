@@ -1,6 +1,12 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-07-28
+  Modifications to ensure that if a password is entered, it is trimmed of preceeding or trailing whitespace before being saved.
+  
+  Modifications to display password complexity requirements.  Added comments for future revisions.
+  
+
 2025-07-26
   Tweak to style.css so that fpm messages are always left-aligned.
   

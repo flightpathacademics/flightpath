@@ -369,6 +369,25 @@ function fp_render_form($callback, $form_type = "") {
   $rtn .= "<input type='hidden' name='default_redirect_query' value='$default_query'>";
   $rtn .= "<input type='hidden' name='current_student_id' value='$current_student_id'>";
   
+  /* // Note: This bit doesn't make a difference right now, because it's only in the "render_form" function.
+   * // All of these values need to be in the "get_form" function, in order for them to be detected if someone tries
+   * // to change them.
+  // Instead of using hidden input types (which can be modified by malicious actors),
+  // we will use "values" added to the form itself.
+  $form['callback'] = ['type' => 'value', 'value' => $callback];
+  $form['form_token'] = ['type' => 'value', 'value' => $form_token];
+  $form['form_type'] = ['type' => 'value', 'value' => $form_type];
+  $form['form_path'] = ['type' => 'value', 'value' => $form_path];
+  $form['form_q_64'] = ['type' => 'value', 'value' => $form_q_64];
+  $form['form_params'] = ['type' => 'value', 'value' => $form_params];
+  $form['form_include'] = ['type' => 'value', 'value' => $form_include];
+  $form['default_redirect_path'] = ['type' => 'value', 'value' => $default_path];
+  $form['default_redirect_query'] = ['type' => 'value', 'value' => $default_query];
+  $form['current_student_id'] = ['type' => 'value', 'value' => $current_student_id];
+  */
+  
+  
+  
   $use_callback = "";
   if (form_has_errors()) {
     // We will only pull previous POST's values if there are errors on the form.
@@ -425,8 +444,6 @@ function form_basic_validate($form, $form_state) {
         if ($label == "") $label = $name;
         form_error($name, t("You must enter a value for <b>%element_label</b>.", array("%element_label" => $label)));
       }
-      
-      
     } // if is_array element and required
     
     if (is_array($element) && isset($element['type']) && $element['type'] == 'value') {
@@ -437,8 +454,7 @@ function form_basic_validate($form, $form_state) {
       if ($should_be_value !== $found_value) {
         form_error('', t("Invalid value found in form, possible hacking attempt or bug.  This incident has been logged.", array("%element_label" => $label)));
         watchdog('system', "Invalid value found in form, possible hacking attempt or bug.  Should be value: '$should_be_value', Found value: '$found_value' ", array(), WATCHDOG_ERROR);
-      }
-      
+      }      
       
     } // if element is of type "value"
     
@@ -622,7 +638,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   
   
   
-  if ($type != "markup" && $type != "markup_no_wrappers") {
+  if ($type != "markup" && $type != "markup_no_wrappers" && $type != 'value') {
     $rtn .= "<div id='element-wrapper-$cssname' class='form-element element-type-$type $extra_wrapper_class'>";
   }
 
@@ -631,7 +647,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   }
 
 
-  if ($type != "markup" && $type != "markup_no_wrappers") {
+  if ($type != "markup" && $type != "markup_no_wrappers" && $type != 'value') {
     $rtn .= "<div id='element-inner-wrapper-$cssname' class='form-element element-type-$type $element_error_css'>";
   }
 
@@ -679,7 +695,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     
     $rtn .= $value; // plain value, no wrapper divs at all.
   }
-  else if ($type != "hidden" && $type != "checkbox") {
+  else if ($type != "hidden" && $type != 'value' && $type != "checkbox") {
     $rtn .= "<label>$ast$label$popup_help_link</label>";
   }
 
@@ -718,7 +734,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   if ($type == "hidden" || $type == "value") {
     if (!$value) $value = '';  // Force it to be a string  
     $value = htmlentities($value, ENT_QUOTES);    
-    $rtn .= "<input type='hidden' name='$name' id='element-$cssname' value='$value'>";
+    $rtn .= "<input type='hidden' name='$name' id='element-$cssname' value='$value' data-type='$type'>";
   }
   
 
@@ -869,7 +885,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     $rtn .= "<div class='form-element-description'>$description</div>";
   }
 
-  if ($type != "markup" && $type != 'markup_no_wrappers') {
+  if ($type != "markup" && $type != 'markup_no_wrappers' && $type != 'value') {
     $rtn .= "</div>";  // close the inner wrapper
   }
 
@@ -879,7 +895,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     $rtn .= $suffix;
   }
 
-  if ($type != "markup" && $type != 'markup_no_wrappers') {
+  if ($type != "markup" && $type != 'markup_no_wrappers' && $type != 'value') {
     $rtn .= "</div>";  // close the over-all wrapper
   }
 

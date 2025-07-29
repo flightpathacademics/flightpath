@@ -2895,7 +2895,7 @@ function system_handle_form_submit() {
       if (@$element["type"] != "" && @$element["type"] != "markup" && @$element["type"] != "markup_no_wrappers") {
         $values[$name] = @$_POST[$name];
         
-        // Save to save_values, too, if this is not a password field.
+        // Save to safe_values, too, if this is not a password field.
         if (@$element["type"] != "password") {
           $safe_values[$name] = @$_POST[$name];
         }
@@ -2911,9 +2911,7 @@ function system_handle_form_submit() {
             $values[$name] = FALSE;
           }        
         }
-        
-        
-                
+                       
       }
       // Do we need to alter the value from the POST?
       
@@ -3744,8 +3742,10 @@ function system_login_form_submit($form, &$form_state) {
     
     user_set_attribute($user_id, "mfa_validation_code", $mfa_code);
     
+    $system_name = variable_get('system_name', 'FlightPath');
+            
     // Send validation code to email.    
-    notify_by_mail($email, "FlightPath - Validation Code", t("Your multi-factor validation code is: <strong>@code</strong>
+    notify_by_mail($email, "$system_name - Validation Code", t("Your multi-factor validation code is: <strong>@code</strong>
                                                               \n\n<br><br>This code will remain valid for approximately one hour.", array("@code" => $mfa_code)));
         
     fp_goto("mfa-login");  
