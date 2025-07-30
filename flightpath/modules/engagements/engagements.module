@@ -2188,111 +2188,116 @@ function engagements_sms_get_all_messages()
                                                             // (in case it's close to ***midnight***) 
                                                             // to make sure we don't miss anything.  The idea being that we have a cron 
                                                             // running frequently enough that this gives us lots of chances to retrieve information.
-                                                              
-  $messages = $client->messages->read(array('dateSentAfter' => $check_since));
-  foreach ($messages as $record) {
-    //fpm(ppm($record, TRUE)); 
-    //    fpm($record->status);
 
-    //watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Reviewing message: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
-
-    $status = strtolower(trim($record->status));     
-    $error_message = $record->errorMessage;
-    $error_code = intval($record->errorCode);
-    
-    if ($error_code == 12100 || $error_code == 11200) {
-      // We don't care about these code, as they appear on EVERY message.
-      $error_code = NULL;
-      $status = NULL;
-    }
-    
-    $friendly_error_message = '';
-    if ($error_code) {
-      $friendly_error_message = @$error_codes[$error_code];
-    }
-    $message_sid = $record->sid;
-
-    $vars['MessageSid'] = $message_sid;
-
-    // Should we update any details about this message? Price, errors, etc?
-    $test = engagements_get_sms_from_history($message_sid);
-    if ($test && (floatval($record->price) != floatval($test['sw_price']) || $error_code != $test['err_code'])) {
+  $messages = NULL;
+  try {
+    $messages = $client->messages->read(array('dateSentAfter' => $check_since));
+  } catch (Exception $ex) {}
+  
+  if ($messages) {
+    foreach ($messages as $record) {
+      //fpm(ppm($record, TRUE)); 
+      //    fpm($record->status);
+  
+      //watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Reviewing message: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
+  
+      $status = strtolower(trim($record->status));     
+      $error_message = $record->errorMessage;
+      $error_code = intval($record->errorCode);
       
-      // update prices
-      $price = $record->price;
-      //$fp_price = engagements_get_fp_price($price, $test['direction'], intval($test['num_segments']));
-      $fp_price = 0;  // no longer using this field.
-
-      watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Updating sms_history table
-                                        from record: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG); 
+      if ($error_code == 12100 || $error_code == 11200) {
+        // We don't care about these code, as they appear on EVERY message.
+        $error_code = NULL;
+        $status = NULL;
+      }
       
-      db_query("UPDATE sms_history
-                SET sw_price = ?, fp_price = ?, price_processed = 1, delivery_status = ?, err_code = ?, err_message = ?, err_friendly_message = ?
-                WHERE mid = ?", array($price, $fp_price, $status, $error_code, $error_message, $friendly_error_message, $test['mid']));
-      
-      // Meaning, we already have this one saved, and now that we've updated it, we can continue.
-      continue;
-    } // if test and we have things to update
-    else if ($test) {
-      // meaning, we already have this one saved.  Skip it.  
-      continue;
-    }
-
-    $from_mobile = engagements_convert_to_valid_phone_number($record->from);
-    $to_mobile = engagements_convert_to_valid_phone_number($record->to);
-
-    $body = $record->body;
-
-    $date_sent = $record->dateSent;  // this is a Datetime object
-    $date_sent_ts = strtotime($date_sent->format("Y-m-d H:i:s"));
-
-    $direction = $record->direction;
-    $num_segments = intval($record->numSegments);
-
-
-    $vars['From'] = $from_mobile;
-    $vars['To'] = $to_mobile;
-    $vars['Body'] = $body;
-    $vars['date_sent_ts'] = $date_sent_ts;
-    $vars['direction'] = $direction;
-    $vars['NumSegements'] = $num_segments;
-    $vars['delivery_status'] = $status;
-    $vars['err_code'] = $error_code;
-    $vars['err_message'] = $error_message;
-    $vars['err_friendly_message'] = $friendly_error_message;
-
-    $vars['NumMedia'] = 0;
-
-    // Is there media?
-    if (intval($record->numMedia) > 0) {
-
-      $vars['NumMedia'] = intval($record->numMedia);
-
-      // List all media for this message.
-      $allmedia = $client->messages($message_sid)->media->read();
-      $c = 0;
-      foreach ($allmedia as $mitem) {
-
-        $media_sid = $mitem->sid;
-        $content_type = $mitem->contentType;
-
-        $vars['MediaContentType' . $c] = $content_type;
-        $vars['MediaUrl' . $c] = "https://$space_url/api/laml/2010-04-01/Accounts/$project_id/Messages/$message_sid/Media/$media_sid";
-
-
-        $c++;
-      } // foreach media
-
-
-    } // there was media!
-
-
-    watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Sending to engagements_handle_incoming_sms: <pre>" . print_r($vars, TRUE) . "</pre>", array(), WATCHDOG_DEBUG); 
-
-    // Save this message using our "handle_incoming_sms" function.
-    engagements_handle_incoming_sms($vars);
-  } // foreach messages
-
+      $friendly_error_message = '';
+      if ($error_code) {
+        $friendly_error_message = @$error_codes[$error_code];
+      }
+      $message_sid = $record->sid;
+  
+      $vars['MessageSid'] = $message_sid;
+  
+      // Should we update any details about this message? Price, errors, etc?
+      $test = engagements_get_sms_from_history($message_sid);
+      if ($test && (floatval($record->price) != floatval($test['sw_price']) || $error_code != $test['err_code'])) {
+        
+        // update prices
+        $price = $record->price;
+        //$fp_price = engagements_get_fp_price($price, $test['direction'], intval($test['num_segments']));
+        $fp_price = 0;  // no longer using this field.
+  
+        watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Updating sms_history table
+                                          from record: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG); 
+        
+        db_query("UPDATE sms_history
+                  SET sw_price = ?, fp_price = ?, price_processed = 1, delivery_status = ?, err_code = ?, err_message = ?, err_friendly_message = ?
+                  WHERE mid = ?", array($price, $fp_price, $status, $error_code, $error_message, $friendly_error_message, $test['mid']));
+        
+        // Meaning, we already have this one saved, and now that we've updated it, we can continue.
+        continue;
+      } // if test and we have things to update
+      else if ($test) {
+        // meaning, we already have this one saved.  Skip it.  
+        continue;
+      }
+  
+      $from_mobile = engagements_convert_to_valid_phone_number($record->from);
+      $to_mobile = engagements_convert_to_valid_phone_number($record->to);
+  
+      $body = $record->body;
+  
+      $date_sent = $record->dateSent;  // this is a Datetime object
+      $date_sent_ts = strtotime($date_sent->format("Y-m-d H:i:s"));
+  
+      $direction = $record->direction;
+      $num_segments = intval($record->numSegments);
+  
+  
+      $vars['From'] = $from_mobile;
+      $vars['To'] = $to_mobile;
+      $vars['Body'] = $body;
+      $vars['date_sent_ts'] = $date_sent_ts;
+      $vars['direction'] = $direction;
+      $vars['NumSegements'] = $num_segments;
+      $vars['delivery_status'] = $status;
+      $vars['err_code'] = $error_code;
+      $vars['err_message'] = $error_message;
+      $vars['err_friendly_message'] = $friendly_error_message;
+  
+      $vars['NumMedia'] = 0;
+  
+      // Is there media?
+      if (intval($record->numMedia) > 0) {
+  
+        $vars['NumMedia'] = intval($record->numMedia);
+  
+        // List all media for this message.
+        $allmedia = $client->messages($message_sid)->media->read();
+        $c = 0;
+        foreach ($allmedia as $mitem) {
+  
+          $media_sid = $mitem->sid;
+          $content_type = $mitem->contentType;
+  
+          $vars['MediaContentType' . $c] = $content_type;
+          $vars['MediaUrl' . $c] = "https://$space_url/api/laml/2010-04-01/Accounts/$project_id/Messages/$message_sid/Media/$media_sid";
+  
+  
+          $c++;
+        } // foreach media
+  
+  
+      } // there was media!
+  
+  
+      watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Sending to engagements_handle_incoming_sms: <pre>" . print_r($vars, TRUE) . "</pre>", array(), WATCHDOG_DEBUG); 
+  
+      // Save this message using our "handle_incoming_sms" function.
+      engagements_handle_incoming_sms($vars);
+    } // foreach messages
+  } // If messages
 
   //////////////////////////////////////////////////////////////
 
@@ -2300,56 +2305,60 @@ function engagements_sms_get_all_messages()
   $body = "";
   
   // Now, we also want to get a list of all calls and their prices too.
-  $calls = $client->calls->read(array('startTimeAfter' => $check_since));
- 
-  foreach ($calls as $record) {
-
-    //watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Reviewing CALL: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
-
-    $sid = $record->sid;
-
-    // Do we already have this in our table?  If so, skip.
-    $test = engagements_get_sms_from_history($sid);
-    if ($test) continue;  // We've already recorded this, so skip.
-
-    $date_sent = $record->startTime;  // this is a Datetime object
-    $date_sent_ts = strtotime($date_sent->format("Y-m-d H:i:s"));
-
-
-    $to_mobile = engagements_convert_to_valid_phone_number($record->to);
-    $from_mobile = engagements_convert_to_valid_phone_number($record->from);
-
-    // Figure out what user this came from/to!
-    $from_cwid = "";
-    $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($from_mobile)));
-    if ($user_id) {
-      $from_cwid = db_get_cwid_from_user_id($user_id);
-    }
-
-    $to_cwid = "";
-    $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($to_mobile)));
-    if ($user_id) {
-      $to_cwid = db_get_cwid_from_user_id($user_id);
-    }
-
-    $duration = $record->duration;
-    $direction = $record->direction;
-    $price = $record->price;
-    $fp_price = engagements_get_fp_price($price, $direction, 1, 'call');
-
-
-    // Write our data to our sms_history table.
-    db_query(
-      "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `to_cwid`, `from_cwid`, `updated`, `direction`, 
-                                `media_filenames`, `date_sent`, price_processed, num_segments)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
-      array($sid, 'call', $body, $from_mobile, $to_mobile, $price, $fp_price, $to_cwid, $from_cwid, time(), $direction, '', $date_sent_ts, 1, $duration)
-    );
-    
-    watchdog("engagements_sms", "Documented call to $to_mobile. From record: <pre>" . print_r($record, TRUE) . "</pre>" , array(), WATCHDOG_DEBUG);    
-    
-  }  //foreach calls as record 
-
+  $calls = NULL;
+  try {
+    $calls = $client->calls->read(array('startTimeAfter' => $check_since));
+  } catch (Exception $ex){}
+  
+  if ($calls) {
+    foreach ($calls as $record) {
+  
+      //watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Reviewing CALL: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
+  
+      $sid = $record->sid;
+  
+      // Do we already have this in our table?  If so, skip.
+      $test = engagements_get_sms_from_history($sid);
+      if ($test) continue;  // We've already recorded this, so skip.
+  
+      $date_sent = $record->startTime;  // this is a Datetime object
+      $date_sent_ts = strtotime($date_sent->format("Y-m-d H:i:s"));
+  
+  
+      $to_mobile = engagements_convert_to_valid_phone_number($record->to);
+      $from_mobile = engagements_convert_to_valid_phone_number($record->from);
+  
+      // Figure out what user this came from/to!
+      $from_cwid = "";
+      $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($from_mobile)));
+      if ($user_id) {
+        $from_cwid = db_get_cwid_from_user_id($user_id);
+      }
+  
+      $to_cwid = "";
+      $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($to_mobile)));
+      if ($user_id) {
+        $to_cwid = db_get_cwid_from_user_id($user_id);
+      }
+  
+      $duration = $record->duration;
+      $direction = $record->direction;
+      $price = $record->price;
+      $fp_price = engagements_get_fp_price($price, $direction, 1, 'call');
+  
+  
+      // Write our data to our sms_history table.
+      db_query(
+        "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `to_cwid`, `from_cwid`, `updated`, `direction`, 
+                                  `media_filenames`, `date_sent`, price_processed, num_segments)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
+        array($sid, 'call', $body, $from_mobile, $to_mobile, $price, $fp_price, $to_cwid, $from_cwid, time(), $direction, '', $date_sent_ts, 1, $duration)
+      );
+      
+      watchdog("engagements_sms", "Documented call to $to_mobile. From record: <pre>" . print_r($record, TRUE) . "</pre>" , array(), WATCHDOG_DEBUG);    
+      
+    }  //foreach calls as record 
+  } // if calls
 
 
 

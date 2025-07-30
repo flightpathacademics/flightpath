@@ -1,6 +1,12 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-07-29
+  Added a try/catch around a call to the Twilio API in the engagements module.
+  
+  Added some code to fix a deprecated message when setting password.
+  
+
 2025-07-28
   Modifications to ensure that if a password is entered, it is trimmed of preceeding or trailing whitespace before being saved.
   
