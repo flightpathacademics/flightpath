@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-07-30
+  Added use of random_bytes() function (from PHP 7+) if available, when creating a new password hash.
+
+
 2025-07-29
   Added a try/catch around a call to the Twilio API in the engagements module.
   

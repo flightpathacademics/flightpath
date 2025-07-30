@@ -121,14 +121,21 @@ function _password_generate_salt($count_log2) {
 }
 
 function fp_random_bytes($count) {
-  // $random_state does not use drupal_static as it stores random bytes.
+
+  if (function_exists('random_bytes')) {
+    try {
+      return random_bytes($count);
+    } catch (Exception $e) {
+      // An appropriate source of randomness could not be found. Fall back to a
+      // less secure implementation.
+    }
+  }
+  
   static $random_state, $bytes, $has_openssl;
 
-  $missing_bytes = 0;
   
-  if ($bytes) {
-    $missing_bytes = $count - strlen($bytes);
-  }
+  $missing_bytes = $count - strlen((string) $bytes);
+  
   
   if ($missing_bytes > 0) {
     // PHP versions prior 5.3.4 experienced openssl_random_pseudo_bytes()
@@ -249,7 +256,7 @@ function _password_crypt($algo, $password, $setting) {
 
   // Convert the base 2 logarithm into an integer.
   $count = 1 << $count_log2;
-
+  
   // We rely on the hash() function being available in PHP 5.2+.
   $hash = hash($algo, $salt . $password, TRUE);
   do {
