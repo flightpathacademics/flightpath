@@ -1227,7 +1227,7 @@ function filter_markup($str, $type = "basic") {
 function filter_untrusted_input($string, $type = 'major_code') {
   
   
-  if ($mode == 'major_code') {
+  if ($type == 'major_code') {
     $string = filter_xss($string, array());
    
     $string = str_replace('"', '', $string);
