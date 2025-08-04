@@ -51,6 +51,12 @@ function engagements_menu()
   );
 
 
+  $items['engagements-handle-incoming-aws-email'] = array(
+    'page_callback' => 'engagements_handle_incoming_aws_email',
+    'access_callback' => TRUE,
+    'type' => MENU_TYPE_CALLBACK,
+  );
+  
 
 
 
@@ -144,6 +150,50 @@ function engagements_menu()
 
   return $items;
 }
+
+
+
+
+
+function engagements_handle_incoming_aws_email() {
+  
+  $sns = @json_decode(@file_get_contents("php://input"), TRUE);
+  
+  if (!$sns) die();
+  
+  
+  
+  
+  $source_arn = "";
+  $to_email = "";
+  $event_type = "";
+  
+  if (isset($sns['bounce']) && $sns['bounce']['bounceType'] == 'Permanent') {
+    $event_type = "bounce";
+    $to_email = $sns['mail']['destination'][0];
+    $source_arn = $sns['mail']['sourceArn'];
+  } // sns permanent bounce has occured.
+  
+  if (isset($sns['complaint']) && isset($sns['complaint']['complainedRecipients'])) {
+    $event_type = "complaint";
+    $to_email = $sns['mail']['destination'][0];
+    $source_arn = $sns['mail']['sourceArn'];
+  } // sns complaint (spam mark by recipient) has occured.
+  
+  
+  // TODO: verify by looking at the source_arn and make sure its mine.  Not the most fool-proof way to do it, but eh, who cares.
+  
+  
+  
+  
+  watchdog('debug_aws', "Type: $event_type<br>to_email $to_email<br>srcarn: $source_arn<br>
+                          <pre>" . print_r($sns, TRUE) . '</pre>');
+  
+  
+  
+  
+} // engagements_handle_incoming_aws_email
+
 
 
 
@@ -288,11 +338,8 @@ function engagements_handle_incoming_mailgun_email() {
     
   $external_msg_id = hash('sha256', $sender . $subject . $date . $recipient . $body . $body_html . $body_plain . $body_stripped_text . $content_id_map);  
   
-  // TODO: Correctly handle receiving an email (and files).  See _imap_get_all_received_messages.
-    
-    
   
-  // TODO: Create the email entry in FlightPath:
+  // Create the email entry in FlightPath:
   
     // Match the sender's email to a student.
     $student_user_id = db_get_user_id_from_email($sender, 'student');
@@ -305,7 +352,7 @@ function engagements_handle_incoming_mailgun_email() {
       $student_cwid = $account->cwid;
 
       // TODO: If another engagement with external_msg_id exists, then load that instead of
-      // TODO: creating a new one.
+      // TODO: creating a new one.  ((Is this necessary?))
       $content = new stdClass();
       $content->type = 'engagement';
       $content->cid = "new";
@@ -326,8 +373,7 @@ function engagements_handle_incoming_mailgun_email() {
       content_save($content);
       $cid = $content->cid;  // We need the cid to already be created in order to save attachments
 
-      //$attachments = _engagements_imap_get_attachments($mbox, $msgno, fp_get_machine_readable($from_email), $cid);
-      // TODO: add attachments
+      // add attachments
       $attachments = array();
       if ($content_id_map) {
         $map = json_decode($content_id_map, TRUE);
@@ -3764,7 +3810,7 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
     else {
       // We can NOT receive messages.
       $msg .= "<br><br>----<br>Please do not respond to this email, as it is not monitored.";
-      $msg .= "<br>You are receiving this message because you are a user with $initials. You may adjust communication settings by contacting your institution.";
+      $msg .= "<br><br>You are receiving this message because you are a user with $initials. You may adjust communication settings by contacting your institution.";
     }
     
     $msg .= "\n\n<img src='$tracking_img_url'>";

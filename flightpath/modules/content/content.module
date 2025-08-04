@@ -1007,7 +1007,7 @@ function content_edit_content_form($type = "", $cid = "") {
       display_not_found();
       return;
     }
-    fp_set_title(t("Editing") . " " . $content->title . "");
+    fp_set_title(t("Editing") . " <em>" . $content->title . "</em>");
     // Re-set $type, just in case the user put the wrong type in the
     // URL
     $type = $content->type;
@@ -1052,12 +1052,16 @@ function content_edit_content_form($type = "", $cid = "") {
   );
   
   // Are there any special settings for the title?
-  if (isset($types[$type]['settings']) && isset($types[$type]['settings']['title'])) {
+  if (isset($types[$type]['settings']) && isset($types[$type]['settings']['title'])) {    
     if (is_array($types[$type]['settings']['title'])) {
       // Use array_merge to just override with whatever we have in our settings for the title.
       $form['title'] = array_merge($form['title'], $types[$type]['settings']['title']);
-
-      if (isset($form['title']['auto']) && $form['title']['auto'] == TRUE) {
+      
+      //$form['title']['value'] = $content->title;  // Add this back in, in case it was erased.
+      
+      
+      
+      if (isset($form['title']['auto']) && $form['title']['auto'] == TRUE) {        
         // We will set the form to an automatic title, and hide.
         $form['title']['value'] = $type . ' content saved on ' . format_date(convert_time(time()));
         $form['title']['type'] = 'hidden';
@@ -1108,7 +1112,7 @@ function content_edit_content_form($type = "", $cid = "") {
     );
     
   }
-    
+  
   
   // Are there extra fields?  If so, add their values in as well.
   if (is_array($types[$type]['fields'])) {
@@ -1312,8 +1316,7 @@ function content_edit_content_form($type = "", $cid = "") {
       );
     }
   }
-
-
+  
   watchdog('content', "edit_content_form cid:$cid, type:$type", array(), WATCHDOG_DEBUG);
   
   

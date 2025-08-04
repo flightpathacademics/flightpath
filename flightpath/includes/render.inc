@@ -518,7 +518,6 @@ function form_has_errors() {
  */
 function fp_render_element($name, $element, $use_session_submission_values_for_callback = "") {
   $rtn = "";
-
   $type = @$element["type"]; 
   if ($type == "") $type = "markup_no_wrappers"; 
    
@@ -634,7 +633,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   
 
 
-
+  
   
   
   
@@ -719,6 +718,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
  
   if ($type == "textfield" || $type == "text" || $type == "search" || $type == "password" || $type == 'datetime-local' || $type == 'time' || $type == 'date') {
     if ($type == "textfield") $type = "text";
+            
     $size = (isset($element["size"])) ? $element["size"] : "60";
     $maxlength = (isset($element["maxlength"])) ? $element["maxlength"] : "255";
         
@@ -728,6 +728,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     }  
         
     $value = htmlentities((string) $value, ENT_QUOTES);        
+    
     $rtn .= "<input type='$type' name='$name' id='element-$cssname' size='$size' maxlength='$maxlength' value='$value' $attributes>";
   }
   
