@@ -1165,9 +1165,6 @@ function engagements_mass_sms_perform_batch_operation(&$batch, $recipients, $mes
 
 
 
-// TODO: change to generic "receive email" form?  Use fieldsets?
-// TODO: For one thing, check off that we are using mailgun for receipt of email if that's what we are doing.  Other
-// TODO: settings might be needed later on.
 /**
  * Configure the email (reception) settings used by Engagements
  */
@@ -1200,6 +1197,7 @@ function engagements_email_settings_form()
     'options' => array('none' => 'None', 'mailgun' => 'MailGun Webhook/Route', 'imap' => 'IMAP'),
     'value' => variable_get('engagements_receive_email_method', 'none'),
     'required' => TRUE,
+    'hide_please_select' => TRUE,
     'description' => t("What method will FlightPath use to <b>receive</b> emails?  If unsure, or
                           if you do not wish to receive emails in FlightPath, select None."),
   );
@@ -3734,8 +3732,7 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
   $faculty_id = $values['faculty_id'];
   $faculty_name = $db->get_faculty_name($faculty_id);
 
-  $initials = variable_get("school_initials", "DEMO");
-
+  
   $initials = variable_get_for_school("school_initials", "DEMO", db_get_school_id_for_student_id($student_id));
 
   // get the "from_number"
@@ -3758,9 +3755,18 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
     // We will use that to tell how many times the message gets opened.
     $tracking_img_url = engagements_create_new_tracking_img_url($cid);
 
-
-    $msg .= "<br><br>----<br>You may respond directly to this email.  It will be stored with FlightPath for $faculty_name to then review.";
-
+                      
+    $receive_method = variable_get('engagements_receive_email_method', 'none');    
+    // Only display this if we have the ability to receive emails turned on!!
+    if ($receive_method != 'none' && $receive_method != '') {
+      $msg .= "<br><br>----<br>You may respond directly to this email.  It will be stored with FlightPath for $faculty_name to then review.";
+    } 
+    else {
+      // We can NOT receive messages.
+      $msg .= "<br><br>----<br>Please do not respond to this email, as it is not monitored.";
+      $msg .= "<br>You are receiving this message because you are a user with $initials. You may adjust communication settings by contacting your institution.";
+    }
+    
     $msg .= "\n\n<img src='$tracking_img_url'>";
 
 
