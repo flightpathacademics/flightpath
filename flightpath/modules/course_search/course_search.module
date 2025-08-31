@@ -591,12 +591,12 @@ function course_search_display_courses() {
             // subtracted by 1, or modified at all?  This is the case at ULM for fall.
             // Ex:  201340  is Fall of *2012*, not 2013.
             // We can tell this because the term structure (from admin settings)            
-            //fpm($term_structures);
-            if (strtoupper($term_structures[$x]["disp_adjust"]) == "[Y-1]" || strtoupper($term_structures[$x]["disp_adjust"]) == "[Y4-1]") {
+            
+            if (strtoupper(@$term_structures[$x]["disp_adjust"] ?? '') == "[Y-1]" || strtoupper(@$term_structures[$x]["disp_adjust"] ?? '') == "[Y4-1]") {
               // It is subtracted by one.  So the year for "XYZ of 2016" is actually recorded as 2017xyz                
               $the_term_id = ($t + 1) . $x;
             }            
-            if (strtoupper($term_structures[$x]["disp_adjust"]) == "[Y+1]" || strtoupper($term_structures[$x]["disp_adjust"]) == "[Y4+1]") {
+            if (strtoupper(@$term_structures[$x]["disp_adjust"] ?? '') == "[Y+1]" || strtoupper(@$term_structures[$x]["disp_adjust"] ?? '') == "[Y4+1]") {
               // It is added by one.  So the year for "XYZ of 2016" is actually recorded as 2015xyz                              
               $the_term_id = ($t - 1) . $x;
             }

@@ -162,7 +162,21 @@
        $FillColor = $this->allocateColor($this->Picture,$R,$G,$B,$Alpha);
 
        if ( count($Points) >= 6 )
-        { ImageFilledPolygon($this->Picture,$Points,count($Points)/2,$FillColor); }
+        { 
+          
+          if (version_compare(phpversion(), "8.1.0", ">=")) {
+            
+            ImageFilledPolygon($this->Picture,$Points,$FillColor);
+            
+          } else {
+            
+            ImageFilledPolygon($this->Picture,$Points,count($Points)/2,$FillColor);
+            
+          }
+          
+          
+          
+        }
       }
 
      if ( !$NoBorder )
@@ -1201,7 +1215,7 @@
      if ( $Alpha > 100) { $Alpha = 100; }
 
      $Alpha = $this->convertAlpha($Alpha);
-     return(imagecolorallocatealpha($Picture,$R,$G,$B,$Alpha));
+     return(imagecolorallocatealpha($Picture,(int) $R,(int) $G,(int) $B,(int) $Alpha));
     }
 
    /* Load a PNG file and draw it over the chart */

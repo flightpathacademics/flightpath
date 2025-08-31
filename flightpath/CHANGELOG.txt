@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-08-31
+  Made modifications to make more compatible with PHP 8.3.
+
+
 2025-08-04
   If we lack the ability to receive emails, then the engagements module displays a different message when you send
   an email to a student.

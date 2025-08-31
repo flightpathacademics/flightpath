@@ -91,7 +91,6 @@ if (@$_GET['radius'] != "") {
 }
 
 
-
 $chart->draw2DPie(38, 38, array("Radius" => $radius, "Border" => TRUE));
 
 

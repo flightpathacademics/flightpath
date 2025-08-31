@@ -448,7 +448,7 @@ function calendar_confirm_cancel_appointment_form($cid) {
   // We want to redirect correctly based on this type's options....
   // Are there any special settings for the title?
   if (isset($types[$type]['settings'])) {    
-    if (is_array($types[$type]['settings']['#redirect'])) {      
+    if (is_array(@$types[$type]['settings']['#redirect'])) {      
       $form['#redirect'] = $types[$type]['settings']['#redirect'];
     }
   }
@@ -524,8 +524,9 @@ function calendar_confirm_cancel_appointment_form_submit(&$form, &$form_state) {
     $user_name = fp_get_faculty_name($user->cwid);
   }
   
-  if (isset($form['#redirect'])) {
-    fp_add_message(t("The appointment was cancelled."));  
+  if (isset($form['#redirect'])) {    
+    fp_add_message(t("The appointment was cancelled."));
+    if (!isset($form['#redirect']['query'])) $form['#redirect']['query'] = '';
     $form['#redirect']['query'] .= "&cancel=yes";
   }
   else {

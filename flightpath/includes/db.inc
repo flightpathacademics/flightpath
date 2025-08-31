@@ -219,7 +219,7 @@ function pager_query($query, $args = array(), $limit = 10, $element = 0, $count_
 /**
  * Adds a simple LIMIT statement to a query.  Adapted from Drupal 6: https://api.drupal.org/api/drupal/includes%21database.mysql.inc/function/db_query_range/6.x
  */ 
-function db_query_range($query, $args = array(), $from, $count = 10) {
+function db_query_range($query, $args = array(), $from = 0, $count = 10) {
 
   $query .= ' LIMIT ' . (int) $from . ', ' . (int) $count;
    

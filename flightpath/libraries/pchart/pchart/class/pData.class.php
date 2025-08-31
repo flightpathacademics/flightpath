@@ -50,7 +50,8 @@
  define("VOID"                  	, 0.123456789);
 
  /* Euro symbol for GD fonts */
- define("EURO_SYMBOL"			, utf8_encode("&#8364;"));
+ //define("EURO_SYMBOL"			, utf8_encode("&#8364;"));
+ define("EURO_SYMBOL"			, "&#8364;");
 
  /* pData class definition */
  class pData

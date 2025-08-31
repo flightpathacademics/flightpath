@@ -75,8 +75,9 @@ function stats_report_major_students_progress_form() {
   $last_timestamp = @$_SESSION["stats_report_major_students_progress"][$school_id]["last_timestamp"];
   $last_batch_id = @$_SESSION["stats_report_major_students_progress"][$school_id]["last_batch_id"];
 
-  $html = $m = "";
-
+  $html = "";
+  $m = 0;
+  
   if (time() < $last_timestamp + (60 * 60)) {
     
     $html .= "<hr><p>" . t("Last CSV report was generated for @major on @time.  It will remain for 1 hour.", array("@major" => $last_major, "@time" => format_date(convert_time($last_timestamp)))) . "</p>";
