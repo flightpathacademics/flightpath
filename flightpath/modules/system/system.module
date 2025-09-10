@@ -1977,7 +1977,7 @@ function system_school_data_form_validate($form, &$form_state) {
     $temp = explode("~", $line);
     
     db_query("INSERT INTO subjects (subject_id, college, title, school_id)
-              VALUES (?, ?, ?, ?) ", strtoupper(trim($temp[0])), strtoupper(trim($temp[1])), trim($temp[2]), $school_id);
+              VALUES (?, ?, ?, ?) ", strtoupper(trim($temp[0] ?? '')), strtoupper(trim($temp[1] ?? '')), trim($temp[2] ?? ''), $school_id);
     
   } 
   // Remove the data from our form_state, so it isn't saved twice
@@ -1994,7 +1994,7 @@ function system_school_data_form_validate($form, &$form_state) {
     $temp = explode("~", $line);
     
     db_query("INSERT INTO colleges (college_code, title, school_id)
-              VALUES (?, ?, ?) ", strtoupper(trim($temp[0])), trim($temp[1]), $school_id);
+              VALUES (?, ?, ?) ", strtoupper(trim($temp[0] ?? '')), trim($temp[1] ?? ''), $school_id);
     
   }  
   // Remove the data from our form_state, so it isn't saved twice
@@ -2011,7 +2011,7 @@ function system_school_data_form_validate($form, &$form_state) {
     $temp = explode("~", $line);
     
     db_query("INSERT INTO degree_college (major_code, college_code, school_id)
-              VALUES (?, ?, ?) ", strtoupper(trim($temp[0])), strtoupper(trim($temp[1])), $school_id);
+              VALUES (?, ?, ?) ", strtoupper(trim($temp[0] ?? '')), strtoupper(trim($temp[1] ?? '')), $school_id);
     
   }  
   // Remove the data from our form_state, so it isn't saved twice

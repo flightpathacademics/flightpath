@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-09-10
+  Minor changes for PHP 8.3.
+  
+
 2025-08-31
   Made modifications to make more compatible with PHP 8.3.
 
