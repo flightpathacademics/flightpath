@@ -299,9 +299,15 @@
   .page--login #page-login-user-form {
     float: left;
     width: 100%;  
-    text-align: center; 
-    
+    text-align: center;    
   }
+  
+  .page--login #page-login-user-form .login-content-div {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
   
   .page--login #page-login-page__wallpaper {
     display: none;       

@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-09-18
+  Minor change to login page CSS for mobile screens
+  
+
 2025-09-10
   Minor changes for PHP 8.3.
   
