@@ -1,6 +1,19 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-11-13
+  Minor changes for PHP 8.3.
+  
+  If term structures not set up yet, does not produce a warning.
+  
+
+2025-10-13
+  Minor changes for PHP 8.3 and to fix warnings.
+  
+  Removed unnecessary array_get() function from misc.php. It duplicated the functionality of the ??
+  operator in PHP 7.0, which is a minimum requirement for FlightPath.
+  
+
 2025-09-18
   Minor change to login page CSS for mobile screens
   

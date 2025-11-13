@@ -33,17 +33,6 @@ function friendly_timezone($str) {
 
 
 
-/**
- * Convenience function for getting an array value by the specified key,
- * or, return $default_val (default empty string) if it doesn't exist.
- * Meant to be similar to the @see variable_get() functionality.
- */
-function array_get($arr, $key, $default_val = "") {
-  
-  if (isset($arr[$key])) return $arr[$key];
-  
-  return $default_val;
-}
 
 
 
@@ -1621,27 +1610,29 @@ function fp_get_degree_classification_details($degree_class = "MAJOR", $bool_ret
 function get_term_structures($school_id = 0) {
   $rtn = array();
 
-  $temp = variable_get_for_school("term_id_structure", "", $school_id);
+  $temp = trim(variable_get_for_school("term_id_structure", "", $school_id));
+  if ($temp == '') return array();  // return an empty array, as this isn't filled out yet.
+  
   $structures = explode("\n", $temp);
-    
+  
   foreach ($structures as $structure) {      
     $tokens = explode(",", $structure);
-    $term_def = trim($tokens[0]);
+    $term_def = trim($tokens[0] ?? '');
     
     // Get rid of the replacement pattern.
     // Looks like:  [Y4]40.  We want the 40.
     // Simply explode on "]"
     $temp = explode("]", $term_def);
     
-    $term_suffix = trim($temp[1]);
+    $term_suffix = trim($temp[1] ?? '');
     
     $rtn[$term_suffix] = array(
       "term_suffix" => $term_suffix,
       "term_def" => $term_def,
-      "short" => fp_trim(@$tokens[1]),      
-      "full" => fp_trim(@$tokens[2]),
-      "abbr" => fp_trim(@$tokens[3]),
-      "disp_adjust" => fp_trim(@$tokens[4]),
+      "short" => trim($tokens[1] ?? ''),      
+      "full" => trim($tokens[2] ?? ''),
+      "abbr" => trim($tokens[3] ?? ''),
+      "disp_adjust" => trim($tokens[4] ?? ''),
     );
   
   }

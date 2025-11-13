@@ -3,8 +3,7 @@
 
 class DatabaseHandler extends stdClass
 {
-  //
-  public $dbc;   // OLD.  DEPRECATED
+    
   public $pdo;
   
   
@@ -23,33 +22,8 @@ class DatabaseHandler extends stdClass
     
     $this->pdo = $GLOBALS['pdo'];  // set in our settings.php file.
     
-    /*
-     // Connection by IP address is fastest, so let's always try to do that.
-     // It can be time-consuming to convert our hostname to IP address.  Cache it in our SESSION
-     if (isset($_SESSION["fp_db_host_ip"])) {
-     $db_host_ip = $_SESSION["fp_db_host_ip"];
-     if (!$db_host_ip) $db_host_ip = $db_host;
-     }
-     else {
-     // Convert our db_host into an IP address, then save to simple SESSION cache.
-     $db_host_ip = trim(gethostbyname($db_host));
-     if (!$db_host_ip) $db_host_ip = $db_host;
-     $_SESSION["fp_db_host_ip"] = $db_host_ip;
-     }
-     
-     // Connect using PDO
-     if (!$this->pdo) {
-     $this->pdo = new PDO("mysql:host=$db_host_ip;port=$db_port;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass,
-     array(
-     PDO::MYSQL_ATTR_LOCAL_INFILE => TRUE,
-     ));
-     // Set our error handling...  (using "silent" so I can catch errors in try/catch and display them, email, etc, if wanted.)
-     $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-     
-     
-     
-     }
-     */
+    ///////////////////  NOTE /////////////////////
+    // The actual PDO connection happens in custom/settings.php.
     
   }
   
@@ -224,19 +198,6 @@ class DatabaseHandler extends stdClass
       $this->db_error($ex);
     }
     
-    /*
-     $result = mysql_query($sql_query, $this->dbc);
-     if ($result)
-     {
-     return $result;
-     } else {
-     // Meaning, the query failed...
-     // Do nothing.  Do not attempt to log anything, as that could cause an infinite loop.
-     
-     // Display the error on screen
-     $this->db_error();
-     }
-     **/
     
   } // db_query
   

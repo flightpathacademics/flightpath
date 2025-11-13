@@ -276,7 +276,7 @@ function student_search_settings_form() {
 function student_search_subtab_switchboard() {
   
   //$last_tab = $_SESSION["student_search_last_tab"];
-  $last_tab = array_get($_SESSION, "student_search_last_tab");
+  $last_tab = $_SESSION["student_search_last_tab"] ?? '';
   
   if ($last_tab == "") {
     $last_tab = 'search';

@@ -1532,7 +1532,8 @@ class FlightPath extends stdClass
         if (isset($tt[1])) $degree_id = $tt[1];
       }
 
-      $advising_session_id = $advising_session_id_array[$advised_term_id];
+      // There is a possibility that the advised_term_id value doesn't exist in the array, so coalesce to '' if so.
+      $advising_session_id = $advising_session_id_array[$advised_term_id] ?? '';
 
       $new_course = new Course($course_id);
       $new_course->load_descriptive_data();
@@ -1584,13 +1585,16 @@ class FlightPath extends stdClass
 
       // Okay, write it to the table...
       $result = $db->db_query("INSERT INTO advised_courses
-                  (`advising_session_id`,`course_id`,
-                  `entry_value`,`semester_num`,
-                    `group_id`,`var_hours`,`term_id`, `degree_id`)
+                  ( advising_session_id, course_id, entry_value, semester_num,
+                    group_id, var_hours, term_id, degree_id)
                   VALUES
-                  ('?','?','?','?','?','?','?','?')
-                  ", $advising_session_id, $course_id, $entry_value, $semester_num, $group_id, $var_hours, $advised_term_id, $degree_id);
+                  (?,?,?,?,?,?,?,?)
+                  ", array($advising_session_id, $course_id, $entry_value, $semester_num, $group_id, $var_hours, $advised_term_id, $degree_id));
 
+      if (!isset($advising_session_id_array_count[$advised_term_id])) {
+        $advising_session_id_array_count[$advised_term_id] = 0;
+      }
+      
       $advising_session_id_array_count[$advised_term_id]++;
 
     }
