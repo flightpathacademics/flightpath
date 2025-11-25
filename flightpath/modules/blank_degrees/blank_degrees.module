@@ -96,14 +96,14 @@ function blank_degrees_prereqs_get_prereq_warnings_for_course(&$rtn, $course, $s
 function blank_degrees_display_blank_degree() {
   global $screen, $student, $fp;
   
-  $blank_degree_id = $_REQUEST["blank_degree_id"];
-  $blank_catalog_year = $_REQUEST["blank_catalog_year"];
+  $blank_degree_id = $_REQUEST["blank_degree_id"] ?? '';
+  $blank_catalog_year = $_REQUEST["blank_catalog_year"] ?? '';
   $school_id = 0;
   if (isset($_REQUEST['school_id'])) {
-    $school_id = intval($_REQUEST['school_id']);
+    $school_id = intval($_REQUEST['school_id'] ?? 0);
   }  
-  @$blank_print = $_REQUEST["blank_print"];
-  @$blank_view = $_REQUEST["blank_view"];
+  $blank_print = $_REQUEST["blank_print"] ?? '';
+  $blank_view = $_REQUEST["blank_view"] ?? '';
     
   // If we used the word "current" for catalog_year, then find out what the current is.
   if (strtolower($blank_catalog_year) == "current") {
@@ -481,19 +481,19 @@ function blank_degrees_select_degree_form_submit($form, $form_state) {
   
     
   
-  $school_id = intval($form_state['values']['school_id']);
+  $school_id = intval($form_state['values']['school_id'] ?? 0);
   
   // If all the user did was select catalog year, we need to redirect
   // back to the form with blank_catalog_year set.
-  if ($form_state["values"]["blank_degree_id"] == "" && $form_state["values"]["blank_catalog_year"] != "") {
+  if (($form_state["values"]["blank_degree_id"] ?? '') == "" && ($form_state["values"]["blank_catalog_year"] ?? '') != "") {
     // Go to degree selection.
     fp_goto("tools/blank-degrees", "blank_catalog_year=" . $form_state["values"]["blank_catalog_year"] . "&school_id=$school_id");
     return;
   }
-  else if ($form_state["values"]["blank_degree_id"] != "" && $form_state["values"]["blank_catalog_year"] != ""){
+  else if (($form_state["values"]["blank_degree_id"] ?? '') != "" && ($form_state["values"]["blank_catalog_year"] ?? '') != ""){
     // Send them to the blank degree page
     
-    fp_goto("blank-degrees/display", "blank_degree_id=" . $form_state["values"]["blank_degree_id"] . "&blank_catalog_year=" . $form_state["values"]["blank_catalog_year"] . "&school_id=$school_id");  
+    fp_goto("blank-degrees/display", "blank_degree_id=" . ($form_state["values"]["blank_degree_id"] ?? '') . "&blank_catalog_year=" . ($form_state["values"]["blank_catalog_year"] ?? '') . "&school_id=$school_id");  
     return;
   }
   
