@@ -635,7 +635,7 @@ function system_ban_ip_settings_form() {
   
   $form = array();
   
-  $ban_ip_file_path = fp_get_files_path() . '/private/ban_ips.txt';
+  $ban_ip_file_path = fp_get_files_path() . '/private/ban_ips.info';
   
   $form['mark_top'] = array(
     'type' => 'markup',
@@ -643,11 +643,26 @@ function system_ban_ip_settings_form() {
                    IP addresses you wish to ban, as well as rules for automatically banning IP addresses.') . "</p>
                 <p><strong>" . t("Ban IP file path:") . "</strong> $ban_ip_file_path</b> 
                 <br><br>
-                  <em>" . t("It is assumed your private directory is writable by the web server, but the .htaccess 
+                  <em>" . t("It is assumed your private directory is writable by the web server, and the .htaccess 
                               file within prevents web visitors from viewing files.") . "</em>
-                        
+                </p>
+                <p>
+                  Changes you must make in your Apache server config file (NOT .htaccess) in order for this functionality to work.
+                  <br>Within the <b>VirtualHost</b>, add the following:<br>
+                  <textarea readonly=readonly rows='12' cols='200'>
+RewriteEngine On
+
+# Map name 'blockedlist' to the text file
+RewriteMap blockedlist txt:$ban_ip_file_path
+
+# If the IP lookup returns 1, block it
+RewriteCond \${blockedlist:%{REMOTE_ADDR}|0} =1
+RewriteRule ^ - [F] 
+                  </textarea><br>Be sure to restart Apache once this change is in place, and ensure evertyhing still works correctly.
                 </p>",
   );
+  
+  
   
   
   
@@ -2415,20 +2430,6 @@ function system_settings_form() {
   );
 
 
-  $form["private_files_directory"] = array(
-    "type" => "textfield",
-    "label" => t("Private files directory name"),
-    "value" => variable_get("private_files_directory", "private"),
-    "description" => t("This is a directory within custom/files which sensitive or otherwise \"private\" files
-                        will be placed by the system.  It will not be accessible to the web via a .htaccess file.
-                        <br>If the directory doesn't already exist, one will be created.
-                        <br><b>Do not</b> enter a preceeding or trailing slash, nor any nested directories.</b>
-                        <br>
-                        &nbsp; &nbsp; Ex: &nbsp;&nbsp; private"),
-  );
-
-
-    
   $form["admin_transfer_passcode"] = array(
     "type" => "textfield",
     "label" => t("Admin Apply Draft password:"),
@@ -2686,38 +2687,8 @@ function system_settings_form() {
  * Extra validate handler for our system settings form.
  */
 function system_settings_form_validate($form, &$form_state) {
-  
-  // We are going to check the "private_files_directory", to make sure it is set up correctly.  
-  $d = trim($form_state['values']['private_files_directory']);
-  $d = str_replace('\\', '', $d);
-  $d = str_replace('/', '', $d);
-  $d = str_replace('-', '', $d);
-  $d = fp_get_machine_readable($d);
-  if (!$d || $d == '') {
-    $d = "private";
-  }
-  
-  $form_state['values']['private_files_directory'] = $d;
-      
-  // $d should now contain the name of the private directory.  Let's see if it's created.  If not, do so, and add
-  // a private .htaccess file.
-  if (!is_dir(fp_get_files_path() . "/" . $d)) {
-    $x = mkdir(fp_get_files_path() . "/" . $d);
-    if (!$x) {
-      form_error('private_files_directory', t("Unable to create the Private Files Directory.  Possibly a permissions issue.
-                  Please make sure that custom/files is writable. Ex: chmod -R 777 files"));
-      return;
-    }
 
-    $x = file_put_contents(fp_get_files_path() . "/$d/.htaccess", system_get_private_htaccess());  
-
-    if (!$x) {
-      form_error('private_files_directory', t("Unable to add a secure .htaccess file to the Private Files Directory. Possibly a permissions issue.
-                  Please make sure that custom/files is writable. Ex: chmod -R 777 files"));
-      return;
-    }
-
-  }  
+  // Nothing here at the moment.
   
 }
 
@@ -2824,7 +2795,7 @@ function system_cron() {
   if ($tomail != "") {
         
     // We should add this to our "to email" file, which will get emailed to this mail address later on.
-    $error_files_dir = fp_get_files_path() . "/" . variable_get("private_files_directory", "private");
+    $error_files_dir = fp_get_files_path() . "/private";
     
     // Make sure our log file exists
     if (file_exists($error_files_dir . '/fp_php_errors_to_email_log.txt')) {

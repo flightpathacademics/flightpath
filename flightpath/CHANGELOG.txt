@@ -6,6 +6,9 @@ FlightPath 7.x Changelog
   
   Fixing bug in cron.php which allowed it to run w/o the proper token provided.
   
+  Hard-coding (and modifying repo) so that /custom/files/private and its .htaccess file is
+  included by default, since other modules assume it to be there.
+
 
 2025-11-20
   Minor changes for PHP 8.3.
