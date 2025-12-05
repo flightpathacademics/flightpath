@@ -12,7 +12,6 @@
 // Load all of the classes, as well as the custom classes.
 require_once("classes/all_classes.php");
   
-
 // Make sure our cookies are the most secure possible:
 ini_set('session.cookie_httponly', 'On');
 if( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443 ){
@@ -30,7 +29,7 @@ if (@$_GET['fp_session_str'] != '') {
   // and not a hacker trying to imitate a known user's session_id.
   
   require_once("includes/misc.inc"); // Bring in the functions we need so we can validate the fp_session_str
-      
+  
   // We will validate now and retrieve the PHP session_id from it, or FALSE.
   $session_id = fp_get_session_id_from_str($_GET['fp_session_str']);
   if ($session_id) {

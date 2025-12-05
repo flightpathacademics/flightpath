@@ -2118,8 +2118,14 @@ function fp_get_module_path($module, $bool_include_file_system_path = FALSE, $bo
  * Convenience function to return the /files system path.  Does NOT end with a trailing slash.
  *
  */
-function fp_get_files_path() {
-  return $GLOBALS["fp_system_settings"]["file_system_path"] . "/custom/files";
+function fp_get_files_path($bool_private = FALSE) {
+  $p = $GLOBALS["fp_system_settings"]["file_system_path"] . "/custom/files";
+  
+  if ($bool_private) {
+    $p .= "/" . variable_get("private_files_directory", "private");
+  }
+  
+  return $p;
 }
 
 

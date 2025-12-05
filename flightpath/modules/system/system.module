@@ -65,12 +65,21 @@ function system_perm() {
                         Useful for developers."),
       "admin_restricted" => TRUE, // means only appears for admin (user_id == 1)                        
     ),
+
+    
+    "administer_ban_ip_settings" => array(
+      "title" => t("Administer the ban IP settings"),
+      "description" => t("The user may administer the settings related to when an IP address gets banned from the system."),
+      "admin_restricted" => TRUE, // means only appears for admin (user_id == 1)
+    ),
+    
+    
     
     "view_system_status" => array(
       "title" => t("View system status"),
       "description" => t("The user may view the update status and other requirements of the system."),
     ),
-    
+        
     "execute_php" => array(
       "title" => t("Execute PHP code"),
       "description" => t("WARNING: This is a very VERY powerful and DANGEROUS permission.  Only give it to
@@ -395,7 +404,30 @@ function system_menu() {
     "type" => MENU_TYPE_NORMAL_ITEM,
   );    
 
-
+  //administer_ban_ip_settings
+  $items["admin/config/ban-ip"] = array(
+    "title" => "Ban IP settings",
+    "description" => "Configure settings for how FlightPath bans IP addresses.",
+    "page_callback" => "fp_render_form",
+    "page_arguments" => array("system_ban_ip_settings_form", "system_settings"),
+    "access_arguments" => array("administer_ban_ip_settings"),
+    "page_settings" => array(
+      "page_hide_report_error" => TRUE,
+      "menu_icon" => fp_get_module_path('system') . "/icons/server_edit.png",
+      "menu_links" => array(
+        0 => array(
+          "text" => "Admin Console",
+          "path" => "admin-tools/admin",
+          "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
+        ),
+      ),
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
+    "tab_parent" => "admin-tools/admin",
+  );
+  
+  
+  
 
   $items["system/uninstall-module"] = array(
     "page_callback" => "system_handle_uninstall_module",
@@ -591,6 +623,40 @@ function system_menu() {
            
   return $items;
 }
+
+
+
+
+/**
+ * This form allows the user (an administrator) to configure how
+ * FlightPath bans IP addresses.
+ */
+function system_ban_ip_settings_form() {
+  
+  $form = array();
+  
+  $ban_ip_file_path = fp_get_files_path() . '/private/ban_ips.txt';
+  
+  $form['mark_top'] = array(
+    'type' => 'markup',
+    'value' => "<p>". t('FlightPath is able to ban visitors by their IP addresses. Use this form to configure which
+                   IP addresses you wish to ban, as well as rules for automatically banning IP addresses.') . "</p>
+                <p><strong>" . t("Ban IP file path:") . "</strong> $ban_ip_file_path</b> 
+                <br><br>
+                  <em>" . t("It is assumed your private directory is writable by the web server, but the .htaccess 
+                              file within prevents web visitors from viewing files.") . "</em>
+                        
+                </p>",
+  );
+  
+  
+  
+  
+  
+  return $form;
+  
+} // system_ban_ip_settings_form
+
 
 
 
