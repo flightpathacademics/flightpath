@@ -751,7 +751,7 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
     //$c = str_replace("\r\n", "\n", $c);
     $c = str_replace("  ", '', $c);
     $c = str_replace(" \n", "", $c);
-    $c = str_replace("\n\n", '', $c);    
+    $c = str_replace("\n\n", '\n', $c);    
     $c = trim($c);
     
     
