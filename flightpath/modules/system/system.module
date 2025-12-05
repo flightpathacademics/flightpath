@@ -637,19 +637,22 @@ function system_ban_ip_settings_form() {
   
   $ban_ip_file_path = fp_get_files_path() . '/private/ban_ips.info';
   
+  $contents = 'File not found. Save form to create file.';
+  if (file_exists($ban_ip_file_path)) {
+    $contents = file_get_contents($ban_ip_file_path);
+  }
   $form['mark_top'] = array(
     'type' => 'markup',
     'value' => "<p>". t('FlightPath is able to ban visitors by their IP addresses. Use this form to configure which
                    IP addresses you wish to ban, as well as rules for automatically banning IP addresses.') . "</p>
                 <p><strong>" . t("Ban IP file path:") . "</strong> $ban_ip_file_path</b> 
-                <br><br>
-                  <em>" . t("It is assumed your private directory is writable by the web server, and the .htaccess 
-                              file within prevents web visitors from viewing files.") . "</em>
-                </p>
-                <p>
-                  Changes you must make in your Apache server config file (NOT .htaccess) in order for this functionality to work.
-                  <br>Within the <b>VirtualHost</b>, add the following:<br>
-                  <textarea readonly=readonly rows='12' cols='200'>
+                
+                  " . fp_render_c_fieldset("<textarea class='readonly' readonly=readonly rows='10' cols='80'>$contents</textarea>", "Current contents of Ban IP file", TRUE) . "
+                                  
+                
+                
+                  " . fp_render_c_fieldset("Within the <b>VirtualHost</b>, add the following:<br>
+                  <textarea class='readonly' readonly=readonly rows='12' cols='200'>
 RewriteEngine On
 
 # Map name 'blockedlist' to the text file
@@ -659,8 +662,10 @@ RewriteMap blockedlist txt:$ban_ip_file_path
 RewriteCond \${blockedlist:%{REMOTE_ADDR}|0} =1
 RewriteRule ^ - [F] 
                   </textarea><br>Be sure to restart Apache once this change is in place, and ensure evertyhing still works correctly.
+", "Changes you must make in your Apache server config file (NOT .htaccess) in order for this functionality to work", TRUE) . "
+                  
                 </p>
-                <p><b>You must save this form before making any changes to Apache.</b></p>",
+                <p><b>You must save this form (which creates the ban_ips.info file) <em>before</em> making any changes to Apache.</b></p>",
   );
   
   
@@ -669,6 +674,39 @@ RewriteRule ^ - [F]
     'type' => 'value',
     'value' => $ban_ip_file_path,
   );
+  
+  
+  
+  
+  
+  
+  
+  $options = array('never' => 'Never (permanently ban IP addresses)');
+  for ($t = 2; $t <= 100; $t = $t + 2) {
+    $options["$t WEEKS"] = "$t weeks";
+  }
+  
+  
+  
+  $form['system_manually_add_ip'] = array(
+    'label' => t('Manually add an IP address to the ban list:'),
+    'type' => 'text',    
+  );
+  
+  
+  
+  
+  $form['system_ban_ip_expire'] = array(
+    'label' => t('How long to wait until we remove a banned IP address?'),
+    'type' => 'select',
+    'hide_please_select' => 'TRUE',
+    'options' => $options,
+    'value' => variable_get('system_ban_ip_expire', 'never'),
+  );
+  
+    
+  
+  
   
   
   
@@ -684,15 +722,53 @@ function system_ban_ip_settings_form_validate($form, &$form_state) {
   $p = $form_state['values']['ban_ip_file_path'];
   
   if (!file_exists($p)) {
-    $res = file_put_contents($p, '# Ip addresses should appear one per line, as IP=1');
+    $res = file_put_contents($p, "# IP addresses should appear one per line, as IP=1 \n");
     if ($res === FALSE) {
       form_error('', t("Unable to create ban ip file: %p. Make sure the directory is writable by the web server. This 
                         file must be in place before making changes to Apache.", array('%p' => $p)));
     }
   }
   
+  $manual_ip = $form_state['values']['system_manually_add_ip'] ?? '';
+  if ($manual_ip != '' && !filter_var($manual_ip, FILTER_VALIDATE_IP)) {
+    form_error('system_manually_add_ip', t('Sorry, the IP address you entered does not appear to be valid. Please try again.'));
+  }
+  
   
 }
+
+
+
+function system_ban_ip_settings_form_submit($form, &$form_state) {
+  $manual_ip = trim($form_state['values']['system_manually_add_ip'] ?? '');
+  $ban_file = $form_state['values']['ban_ip_file_path'];
+  
+  if ($manual_ip != '') {
+    
+    // Erase it from the ban_file if its already there    
+    $c = file_get_contents($ban_file);
+    $c = str_replace("$manual_ip=1", '', $c);
+    //$c = str_replace("\r\n", "\n", $c);
+    $c = str_replace("  ", '', $c);
+    $c = str_replace(" \n", "", $c);
+    $c = str_replace("\n\n", '', $c);    
+    $c = trim($c);
+    
+    
+    // Put into our file
+    file_put_contents($ban_file, "$c\n$manual_ip=1");
+    
+        
+    
+    // Also put in our table with current timestamp, so cron can expire it later.
+    db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($manual_ip));
+    
+    db_query("INSERT INTO banned_ips (ip_address, posted_ts) VALUES (?, ?)", array($manual_ip, time()));
+        
+  }
+  
+}
+
 
 
 

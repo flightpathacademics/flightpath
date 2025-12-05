@@ -1039,6 +1039,7 @@ label {
 }
 
 .element-type-textfield input,
+.element-type-text input,
 .element-type-password input,
 .element-type-datetime-local input,
 .element-type-time input,

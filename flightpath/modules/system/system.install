@@ -101,6 +101,16 @@ function system_enable() {
 
 function system_update($old_schema, $new_schema) {
   
+  if (intval($new_schema) == 2) {
+    
+    db_query("CREATE TABLE `banned_ips` (
+              `ip_address` varchar(255) NOT NULL,
+              `posted_ts` bigint(255) unsigned DEFAULT NULL,
+              PRIMARY KEY (`ip_address`),
+              KEY `posted_ts` (`posted_ts`)
+              )");
+    
+  }
   
       
 } // update
@@ -213,20 +223,20 @@ CREATE TABLE `advisor_student` (
 db_query($q);
 
 
-/*
+
+
+
+
+
+
 $q = "
-CREATE TABLE `blocks` (
-  `bid` int(10) unsigned   AUTO_INCREMENT,
-  `section` varchar(255)   DEFAULT '',
-  `region` varchar(255)   DEFAULT '',
-  `module` varchar(255)   DEFAULT '',
-  `delta` varchar(255)   DEFAULT '',
-  `weight` int(11)   DEFAULT '0',
-  PRIMARY KEY (`bid`)
+CREATE TABLE `banned_ips` (
+  `ip_address` varchar(255) NOT NULL,
+  `posted_ts` bigint(255) unsigned DEFAULT NULL,
+  PRIMARY KEY (`ip_address`),
+  KEY `posted_ts` (`posted_ts`)
 ); ";
 db_query($q);
- * 
- */
  
  
 $q = "
