@@ -684,7 +684,7 @@ function system_ban_ip_settings_form_validate($form, &$form_state) {
   $p = $form_state['values']['ban_ip_file_path'];
   
   if (!file_exists($p)) {
-    $res = file_put_contents($p, '');
+    $res = file_put_contents($p, '# Ip addresses should appear one per line, as IP=1');
     if ($res === FALSE) {
       form_error('', t("Unable to create ban ip file: %p. Make sure the directory is writable by the web server. This 
                         file must be in place before making changes to Apache.", array('%p' => $p)));
