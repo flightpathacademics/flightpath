@@ -12,19 +12,17 @@
  * in your /custom/settings.php file.
  */
 
+
+$token = (string) trim($_REQUEST["t"] ?? '');
+if ($token == '' || $token != @$GLOBALS["fp_system_settings"]["cron_security_token"]) {  
+  die("Sorry, cron security token does not match this site's settings.");
+}
+
 // Keep the script from timing out prematurely...
 set_time_limit(99999);  // around 27 hours.
   
 require_once("bootstrap.inc");
 
-//$GLOBALS["fp_die_mysql_errors"] = TRUE;
-//menu_rebuild_cache();
-
-$token = @$_REQUEST["t"];
-if ($token && $token != '' && $token != @$GLOBALS["fp_system_settings"]["cron_security_token"]) {
-  die("Sorry, cron security token does not match. View this file's
-      source code for instructions on setting up your site's cron.");
-}
 
 watchdog("cron", "Cron run started", array(), WATCHDOG_DEBUG);
 invoke_hook("cron");

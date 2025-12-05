@@ -1,6 +1,12 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-12-05
+  Hardening certain URL paths.
+  
+  Fixing bug in cron.php which allowed it to run w/o the proper token provided.
+  
+
 2025-11-20
   Minor changes for PHP 8.3.
    
