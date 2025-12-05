@@ -756,7 +756,7 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
     
     
     // Put into our file
-    file_put_contents($ban_file, "$c\n$manual_ip=1");
+    file_put_contents($ban_file, "$c\n$manual_ip=1\n");
     
         
     
