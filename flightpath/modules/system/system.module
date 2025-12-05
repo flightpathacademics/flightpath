@@ -659,18 +659,40 @@ RewriteMap blockedlist txt:$ban_ip_file_path
 RewriteCond \${blockedlist:%{REMOTE_ADDR}|0} =1
 RewriteRule ^ - [F] 
                   </textarea><br>Be sure to restart Apache once this change is in place, and ensure evertyhing still works correctly.
-                </p>",
+                </p>
+                <p><b>You must save this form before making any changes to Apache.</b></p>",
   );
   
   
   
-  
+  $form['ban_ip_file_path'] = array(
+    'type' => 'value',
+    'value' => $ban_ip_file_path,
+  );
   
   
   
   return $form;
   
 } // system_ban_ip_settings_form
+
+
+function system_ban_ip_settings_form_validate($form, &$form_state) {
+
+  // Make sure our ban_ips.info file exists!
+  
+  $p = $form_state['values']['ban_ip_file_path'];
+  
+  if (!file_exists($p)) {
+    $res = file_put_contents($p, '');
+    if ($res === FALSE) {
+      form_error('', t("Unable to create ban ip file: %p. Make sure the directory is writable by the web server. This 
+                        file must be in place before making changes to Apache.", array('%p' => $p)));
+    }
+  }
+  
+  
+}
 
 
 
