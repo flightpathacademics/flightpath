@@ -47,7 +47,7 @@ While the open-source project is now contributed to by a community of developers
 the original ULM development team from 2006 were as follows:
 
 Richard Peacock - Primary developer; Joe Mansour - Mainframe/Banner coordinator; Joann Perrer - Degree and course data coordinator;
-Paul Gullette - Theme developer for FP 1x-4x; Rob Glaze - Graphic designer of "featuer" logo
+Paul Gullette - Theme developer for FP 1x-4x; Rob Glaze - Graphic designer of "feather" logo
 
 Some icons used by FlightPath are part of the Silk icon set, created by Mark James, 
 and licensed under the Creative Commons Attribution 2.5 License.
