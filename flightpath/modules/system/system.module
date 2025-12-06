@@ -644,19 +644,20 @@ function system_ban_ip_settings_form() {
   $form['mark_top'] = array(
     'type' => 'markup',
     'value' => "<p>". t('FlightPath is able to ban visitors by their IP addresses. Use this form to configure which
-                   IP addresses you wish to ban, as well as rules for automatically banning IP addresses.') . "</p>
-                <p><strong>" . t("Ban IP file path:") . "</strong> $ban_ip_file_path</b> 
-                
-                  " . fp_render_c_fieldset("<textarea class='readonly' readonly=readonly rows='10' cols='80'>$contents</textarea>", "Current contents of Ban IP file", TRUE) . "
+                   IP addresses you wish to ban.') . "</p>
+                <p>                
+                  " . fp_render_c_fieldset("<strong>" . t("Ban IP file path:") . "</strong> $ban_ip_file_path</b>
+                                            <br><textarea class='readonly' readonly=readonly rows='10' cols='80'>$contents</textarea>
+                                            ", "Current contents of Ban IP file", TRUE) . "
                                   
                 
                 
                   " . fp_render_c_fieldset("
-                  <textarea class='readonly' readonly=readonly rows='12' cols='120'>
-sudo apt install php8.2-apcu   (or use whatever version of PHP you are using. Ex: 8.3, 8.1, etc.)
-sudo systemctl restart apache2
-                  </textarea><br>Be sure to restart Apache once this change is in place, and ensure evertyhing still works correctly.
-                ", "Install the PHP APCu package for best performance (see Ubuntu instructions)", TRUE) . "
+                  <code>
+                    sudo apt install php8.2-apcu   (or use whichever version of PHP you are using. Ex: 8.3, 8.1, etc.)
+                    <br>sudo systemctl restart apache2
+                  </code><br><br>Be sure to restart Apache once this change is in place, and ensure evertyhing still works correctly.
+                ", "Install the PHP APCu package for best performance (see Debian/Ubuntu instructions)", TRUE) . "
                   
                 </p>
                 <p><b>You must save this form to create the banned_ips.txt file.</b></p>",
@@ -668,28 +669,29 @@ sudo systemctl restart apache2
     'type' => 'value',
     'value' => $ban_ip_file_path,
   );
-  
-  
-  
-  
-  
-  
-  
-  $options = array('never' => 'Never (permanently ban IP addresses)');
-  //for ($t = 2; $t <= 100; $t = $t + 2) {
-  //  $options["$t WEEKS"] = "$t weeks";
-  //}
-  
-  
+
   
   $form['system_manually_add_ip'] = array(
     'label' => t('Manually add an IP address to the ban list:'),
-    'type' => 'text',    
-    'description' => 'Note: it takes several minutes to load recently banned IPs into the cache.',
+    'type' => 'text',
+    'description' => 'Note: it may take several minutes to load recently banned IPs into the cache.',
   );
   
   
   
+  $options = array('never' => 'Never (permanently ban IP addresses)');
+  $options["1 HOUR"] = "1 hour";
+  for ($t = 2; $t <= 22; $t = $t + 2) {
+    $options["$t HOURS"] = "$t hours";
+  }
+  $options["1 DAY"] = "1 day";
+  for ($t = 2; $t <= 6; $t = $t + 1) {
+    $options["$t DAYS"] = "$t days";
+  }
+  $options["1 WEEK"] = "1 week";
+  for ($t = 2; $t <= 100; $t = $t + 2) {
+    $options["$t WEEKS"] = "$t weeks";
+  }
   
   $form['system_ban_ip_expire'] = array(
     'label' => t('How long to wait until we remove a banned IP address?'),
@@ -2894,8 +2896,7 @@ function system_cron() {
   
   
   // Should we email someone of php errors?
-  $tomail = trim(variable_get("notify_php_error_email_address", ""));
-    
+  $tomail = trim(variable_get("notify_php_error_email_address", ""));    
   if ($tomail != "") {
         
     // We should add this to our "to email" file, which will get emailed to this mail address later on.
@@ -2913,15 +2914,40 @@ function system_cron() {
         file_put_contents($error_files_dir . '/fp_php_errors_to_email_log.txt', '');
       }
       
-    }
-    
-
-        
-    
+    }    
   }
   
-  
-  // TODO: Expire banned ips, if any exist.
+  ////////////
+  // Remove expired banned ips, if any exist.
+  $ban_expire = variable_get('system_ban_ip_expire', 'never');
+  if ($ban_expire != 'never') {    
+    $ban_ip_file_path = fp_get_files_path() . '/private/banned_ips.txt';
+    if (file_exists($ban_ip_file_path)) {
+      $max_timestamp = strtotime("NOW - $ban_expire");
+      $res = db_query("SELECT * FROM banned_ips WHERE posted_ts < ?", array($max_timestamp));
+      while ($cur = db_fetch_object($res)) {
+        
+        $ip = $cur->ip_address;
+        // Erase this ip address from our ban file.
+        $c = file_get_contents($ban_ip_file_path);
+        $c = str_replace("$ip", '', $c);
+        $c = str_replace("  ", '', $c);
+        $c = str_replace(" \n", "", $c);
+        $c = str_replace("\n\n", "", $c);
+        $c = trim($c);
+        
+        // Write back into our file
+        $respc = file_put_contents($ban_ip_file_path, $c);      
+        if ($respc === FALSE) {
+          watchdog("system", "Unable to write to the ban ip file $ban_ip_file_path. Trying to remove $ip. File permission issue?", array(), WATCHDOG_ERROR);        
+        }
+        
+        // remove from table
+        db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($ip));
+        
+      } // while cur
+    } // if file exists
+  } // ban_expire != 'never'
   
   
   

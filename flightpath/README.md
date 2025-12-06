@@ -1,7 +1,7 @@
 FlightPath - Academic Advising and Student Success
 ===================================================
 
-----------------------
+
 Professional hosting and support
 ----------------------
 
@@ -11,9 +11,9 @@ exclusive features for FlightPath not found in this community edition.
 Visit https://flightpathacademics.com for more information.
 
 
-----------------------
+
 Important Notice
-----------------------
+-------------------
 
 Please read the COPYRIGHT.txt and LICENSE.txt files for
 important information as to what you may and may not do with
@@ -25,32 +25,29 @@ explained within in regards to FlightPath and any related modules,
 documentation, etc.
 
 
-----------------------
+
 Problems with Installation?
-----------------------
+--------------------
 See: https://getflightpath.com/node/6
 
 
-----------------------
-A brief history, and Credits
-----------------------
 
-FlightPath was originally created by the University of Louisiana at Monroe
-(http://www.ulm.edu) in 2006, and has been in continuous use
-and development ever since.
+A Brief History, and Credits
+--------------------
 
-The decision to release the code as open source (GNU GPLv3) occured in 2011.
+FlightPath was originally created at the University of Louisiana at Monroe
+(http://www.ulm.edu) in 2006, and has been in continuous development ever since.
+
+The decision to release the code as open source occured in 2011
+with the full support of ULM President Nick Bruno and ULM Provost Stephen Richters.
+The 3.x version was submitted to the Library of Congress Nov 10, 2011, explicitly
+describing FlightPath as open source under the GNU GPL Version 3.
 
 While the open-source project is now contributed to by a community of developers,
 the original ULM development team from 2006 were as follows:
 
-Richard Peacock - Primary developer
-Joe Mansour - Mainframe/Banner coordinator
-Joann Perrer - Degree and course data coordinator
-
-The "classic" theme, seen in FlightPath 1x - 4x, was created by 
-Paul Gullette, with the original "feather" banner graphic designed 
-by Rob Glaze.
+Richard Peacock - Primary developer; Joe Mansour - Mainframe/Banner coordinator; Joann Perrer - Degree and course data coordinator;
+Paul Gullette - Theme developer for FP 1x-4x; Rob Glaze - Graphic designer of "featuer" logo
 
 Some icons used by FlightPath are part of the Silk icon set, created by Mark James, 
 and licensed under the Creative Commons Attribution 2.5 License.

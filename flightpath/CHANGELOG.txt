@@ -1,6 +1,14 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-12-06
+  Converted README.txt to README.md, updated some of the information as well.
+
+  Updated language in system.module re: banned ips
+  
+  Implemented removing "expired" IP bans on cron (in system.module)
+
+
 2025-12-05
   Hardening certain URL paths.
   
