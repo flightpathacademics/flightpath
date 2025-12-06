@@ -676,9 +676,9 @@ sudo systemctl restart apache2
   
   
   $options = array('never' => 'Never (permanently ban IP addresses)');
-  for ($t = 2; $t <= 100; $t = $t + 2) {
-    $options["$t WEEKS"] = "$t weeks";
-  }
+  //for ($t = 2; $t <= 100; $t = $t + 2) {
+  //  $options["$t WEEKS"] = "$t weeks";
+  //}
   
   
   
@@ -752,8 +752,17 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
     
     // Put into our file
     $res = file_put_contents($ban_file, "$c\n$manual_ip");
+
     if ($res === FALSE) {
       fp_add_message("Unable to write to the ban ip file. File permission issue?", 'error');
+    }
+        
+    // Add to our apcu cache, if installed.
+    if (function_exists('acpu_store')) {
+      $lines = file($ban_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+      $lines = array_map('trim', $lines);
+      $blocked_ips_assoc = array_flip($lines);
+      apcu_store('banned_ips', $blocked_ips_assoc, 120); // cache X seconds
     }
         
     
@@ -2910,6 +2919,10 @@ function system_cron() {
         
     
   }
+  
+  
+  // TODO: Expire banned ips, if any exist.
+  
   
   
   
