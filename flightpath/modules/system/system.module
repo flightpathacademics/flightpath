@@ -635,7 +635,7 @@ function system_ban_ip_settings_form() {
   
   $form = array();
   
-  $ban_ip_file_path = fp_get_files_path() . '/private/ban_ips.info';
+  $ban_ip_file_path = fp_get_files_path() . '/private/banned_ips.txt';
   
   $contents = 'File not found. Save form to create file.';
   if (file_exists($ban_ip_file_path)) {
@@ -651,21 +651,15 @@ function system_ban_ip_settings_form() {
                                   
                 
                 
-                  " . fp_render_c_fieldset("Within the <b>VirtualHost</b>, add the following:<br>
-                  <textarea class='readonly' readonly=readonly rows='12' cols='200'>
-RewriteEngine On
-
-# Map name 'blockedlist' to the text file
-RewriteMap blockedlist txt:$ban_ip_file_path
-
-# If the IP lookup returns 1, block it
-RewriteCond \${blockedlist:%{REMOTE_ADDR}|0} =1
-RewriteRule ^ - [F] 
+                  " . fp_render_c_fieldset("
+                  <textarea class='readonly' readonly=readonly rows='12' cols='120'>
+sudo apt install php8.2-apcu   (or use whatever version of PHP you are using. Ex: 8.3, 8.1, etc.)
+sudo systemctl restart apache2
                   </textarea><br>Be sure to restart Apache once this change is in place, and ensure evertyhing still works correctly.
-", "Changes you must make in your Apache server config file (NOT .htaccess) in order for this functionality to work", TRUE) . "
+                ", "Install the PHP APCu package for best performance (see Ubuntu instructions)", TRUE) . "
                   
                 </p>
-                <p><b>You must save this form (which creates the ban_ips.info file) <em>before</em> making any changes to Apache.</b></p>",
+                <p><b>You must save this form to create the banned_ips.txt file.</b></p>",
   );
   
   
@@ -691,6 +685,7 @@ RewriteRule ^ - [F]
   $form['system_manually_add_ip'] = array(
     'label' => t('Manually add an IP address to the ban list:'),
     'type' => 'text',    
+    'description' => 'Note: it takes several minutes to load recently banned IPs into the cache.',
   );
   
   
@@ -747,7 +742,7 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
     
     // Erase it from the ban_file if its already there    
     $c = file_get_contents($ban_file);
-    $c = str_replace("$manual_ip=1", '', $c);
+    $c = str_replace("$manual_ip", '', $c);
     //$c = str_replace("\r\n", "\n", $c);
     $c = str_replace("  ", '', $c);
     $c = str_replace(" \n", "", $c);
@@ -756,8 +751,10 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
     
     
     // Put into our file
-    file_put_contents($ban_file, "$c\n$manual_ip=1");
-    
+    $res = file_put_contents($ban_file, "$c\n$manual_ip");
+    if ($res === FALSE) {
+      fp_add_message("Unable to write to the ban ip file. File permission issue?", 'error');
+    }
         
     
     // Also put in our table with current timestamp, so cron can expire it later.

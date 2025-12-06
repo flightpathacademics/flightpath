@@ -9,6 +9,8 @@ FlightPath 7.x Changelog
   Hard-coding (and modifying repo) so that /custom/files/private and its .htaccess file is
   included by default, since other modules assume it to be there.
 
+  Added IP-banning functionality. 
+
 
 2025-11-20
   Minor changes for PHP 8.3.
