@@ -3,7 +3,7 @@ FlightPath - Academic Advising and Student Success
 
 
 Professional hosting and support
-----------------------
+--------------------------------
 
 FlightPath Academics offers professional hosting and support, as well as
 exclusive features for FlightPath not found in this community edition.

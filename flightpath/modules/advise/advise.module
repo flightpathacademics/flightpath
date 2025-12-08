@@ -159,7 +159,7 @@ function advise_menu() {
   $items["advise/popup-course-description"] = array(
     "title" => "Description",
     "page_callback" => "advise_display_popup_course_description",
-    "access_arguments" => "access_course_search",
+    "access_arguments" => "view_degree_plan_course_descriptions",
     "page_settings" => array(
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,
@@ -183,7 +183,7 @@ function advise_menu() {
   $items["advise/popup-group-select"] = array(
     "title" => "Select",
     "page_callback" => "advise_display_popup_group_select",
-    "access_arguments" => "access_course_search",
+    "access_arguments" => "view_degree_plan_course_descriptions",
     "page_settings" => array(
       "page_is_popup" => TRUE,
       "page_hide_report_error" => TRUE,

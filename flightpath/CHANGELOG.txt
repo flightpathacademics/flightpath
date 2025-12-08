@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-12-08
+  Added new permission to advise module: view_degree_plan_course_descriptions.  This must be enabled 
+  for the popup dialogs in a degree to show a description.
+
+
 2025-12-06
   Converted README.txt to README.md, updated some of the information as well.
 
