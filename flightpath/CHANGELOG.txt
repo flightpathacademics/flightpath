@@ -4,6 +4,11 @@ FlightPath 7.x Changelog
 2025-12-08
   Added new permission to advise module: view_degree_plan_course_descriptions.  This must be enabled 
   for the popup dialogs in a degree to show a description.
+  
+  Modified system.install to grant permission view_degree_plan_course_descriptions to authenticated users
+  on first install, and when updating from previous version.
+
+  Fixed permission bug introduced with last version.
 
 
 2025-12-06

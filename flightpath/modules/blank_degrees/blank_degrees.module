@@ -278,7 +278,8 @@ function blank_degrees_perm() {
   return array(
       'access_blank_degrees' => array(
         'title' => t('Access blank degrees'),
-        'description' => t('This permission allows the user to view the blank degrees.'),
+        'description' => t('This permission allows the user to view the blank degrees. 
+                            <strong>IMPORTANT:</strong> Make sure to also enable the "View degree plan course descriptions" permission under the Advise module.'),
       ),
       "blank_degrees_view_url_options" => array(
                   "title" => t("View URL options"),

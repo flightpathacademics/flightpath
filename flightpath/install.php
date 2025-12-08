@@ -111,25 +111,25 @@ function install_perform_install() {
   $admin_name = trim($_POST["admin_name"]);
   $admin_email = trim($_POST["admin_email"]);
 
-  if (strlen($admin_name) < 3) {
-    return install_display_db_form("<font color='red'>" . st("Please select another
+  if (strlen($admin_name) < 4) {
+    return install_display_db_form("<div style='color:red;'>" . st("Please select another
                                                             username for Admin (ex: admin)
-                                                            which is at least 3 characters long.") . "</font>");    
+                                                            which is at least 4 characters long.") . "</div>");    
   }  
 
-  if (strlen($admin_pass) < 5) {
-    return install_display_db_form("<font color='red'>" . st("Admin password must be at least 5 characters long.") . "</font>");    
+  if (strlen($admin_pass) < 8) {
+    return install_display_db_form("<div style='color:red;'>" . st("Admin password must be at least 8 characters long.") . "</div>");    
   }  
   
   if ($admin_pass != $admin_pass2) {
-    return install_display_db_form("<font color='red'>" . st("You must enter the same Admin password for both the
+    return install_display_db_form("<div style='color:red;'>" . st("You must enter the same Admin password for both the
                                                                 'Admin Password' field and the 'Re-enter Password'
-                                                                field.") . "</font>");    
+                                                                field.") . "</div>");    
   }  
   
   if (!filter_var($admin_email, FILTER_VALIDATE_EMAIL)) {
     // invalid emailaddress
-    return install_display_db_form("<font color='red'>" . st("You must enter a valid email address for the admin user.") . "</font>");    
+    return install_display_db_form("<div style='color:red;'>" . st("You must enter a valid email address for the admin user.") . "</div>");    
         
   }
     

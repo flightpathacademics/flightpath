@@ -1405,7 +1405,7 @@ function advise_display_popup_course_description() {
  */
 function advise_perm() {
   $perms = array();
-  
+
   $perms["view_any_advising_session"] = array(
     "title" => t("View any advising session"),
     "description" => t("The user is allowed to view any advising sessions for any user.
@@ -1424,6 +1424,15 @@ function advise_perm() {
     "description" => t("The user is allowed to view their own advising sessions.
                         For example, the user is a student."),
   );
+  
+  
+  $perms['view_degree_plan_course_descriptions'] = array(
+    "title" => t("View degree plan course descriptions"),
+    "description" => t("The user is viewing a degree plan, and is allowed to view the course descriptions.
+                      <strong>Required</strong> for any user who needs to advise or view a degree plan,
+                        including students. Recommended to give to all authenticated users."),
+  );
+  
   
   
   $perms["can_delete_own_advising_session_3_months"] = array(
@@ -1453,13 +1462,6 @@ function advise_perm() {
     "description" => t("The user toggle 'draft' mode, so they can view draft degree plans
                         in FlightPath."),
   );
-
-  
-  $perms['view_degree_plan_course_descriptions'] = array(
-    "title" => t("View degree plan course descriptions"),
-    "description" => t("The user is viewing a degree plan, and is allowed to view the course descriptions."),
-  );
-  
   
   
   return $perms;

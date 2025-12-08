@@ -82,7 +82,9 @@ function system_enable() {
   db_query("INSERT INTO role_permissions (rid, perm)
             VALUES 
               (2, 'access_logged_in_content'),
-              (2, 'view_comments') ");
+              (2, 'view_comments'), 
+              (2, 'view_degree_plan_course_descriptions')
+          ");
 
   
   // Add some default variable values, to make things a little easier on first-run.
@@ -101,7 +103,7 @@ function system_enable() {
 
 function system_update($old_schema, $new_schema) {
   
-  if (intval($new_schema) == 2) {
+  if (intval($old_schema) < 2) {
     
     db_query("CREATE TABLE `banned_ips` (
               `ip_address` varchar(255) NOT NULL,
@@ -111,8 +113,20 @@ function system_update($old_schema, $new_schema) {
               )");
     
   }
+
+   
+  if (intval($old_schema) < 3) {
+    
+    // We want to enable a new permission for authenticated users.
+    
+    // Delete first in case its already been enabled.
+    db_query("DELETE from role_permissions WHERE rid = 2 AND perm = 'view_degree_plan_course_descriptions' ");
+    
+    db_query("INSERT INTO role_permissions (rid, perm)
+                VALUES (2, 'view_degree_plan_course_descriptions')");
+    
+  }
   
-      
 } // update
 
 
