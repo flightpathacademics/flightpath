@@ -64,7 +64,7 @@ class Group extends stdClass
 
 		
 		$this->db = $db;
-		if ($db == NULL || !is_object($db) || !is_resource($db->dbc)) {		  
+		if ($db == NULL || !is_object($db) || !is_resource($db->pdo)) {		  
 			$this->db = get_global_database_handler();			
 		}
 
