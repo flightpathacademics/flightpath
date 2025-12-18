@@ -345,11 +345,11 @@ $system_settings["base_path"] = "%BASE_PATH%";
 ////////////////////////////////////
 // *** Database-related settings ***
 ////////////////////////////////////
-$system_settings["db_host"] = "%DB_HOST%"; // domain/ip address of the mysql host. ex: localhost, or 10.10.1.1, or db.example.com
-$system_settings["db_port"] = "%DB_PORT%"; // default for mysql/mariadb is 3306 
-$system_settings["db_name"] = "%DB_NAME%"; // Name of the actual database where flightpath\'s tables are located.
-$system_settings["db_user"] = "%DB_USER%"; 
-$system_settings["db_pass"] = "%DB_PASS%";
+$db_host = "%DB_HOST%"; // domain/ip address of the mysql host. ex: localhost, or 10.10.1.1, or db.example.com
+$db_port = "%DB_PORT%"; // default for mysql/mariadb is 3306 
+$db_name = "%DB_NAME%"; // Name of the actual database where flightpath\'s tables are located.
+$db_user = "%DB_USER%"; 
+$db_pass = "%DB_PASS%";
 
 
 ////////////////////////////////////
@@ -422,17 +422,23 @@ $GLOBALS["encryption_key_string"] = "%ENCRYPTION_KEY_STRING%";
 // This will load the contents of the variables
 // table into the $system_settings variable.  These are extra settings
 // which were set via the web, usually in the Admin Console.
-$db_host = $system_settings["db_host"];
-$db_port = $system_settings["db_port"];
-$db_user = $system_settings["db_user"];
-$db_pass = $system_settings["db_pass"];
-$db_name = $system_settings["db_name"];
+
+
+// Have the database credentials changed since the last time we connected? If so, we need to unset parts of the SESSION
+// and start over.  (It means the developer has moved the database or changed the port, etc.)
+
+$db_fingerprint = sha1($db_host . $db_port . $db_user . $db_pass . $db_name);
+if (isset($_SESSION["fp_db_fingerprint"]) && $_SESSION["fp_db_fingerprint"] !== $db_fingerprint) {
+  unset($_SESSION["fp_db_host_ip"]);
+}
+$_SESSION["fp_db_fingerprint"] = $db_fingerprint;
+
+
 
 // Connection by IP address is fastest, so let\'s always try to do that.
 // It can be time-consuming to convert our hostname to IP address.  Cache it in our SESSION
 if (isset($_SESSION["fp_db_host_ip"])) {
-  $db_host_ip = $_SESSION["fp_db_host_ip"];
-  if (!$db_host_ip) $db_host_ip = $db_host;
+  $db_host_ip = $_SESSION["fp_db_host_ip"];  
 }
 else {
   // Convert our db_host into an IP address, then save to simple SESSION cache.

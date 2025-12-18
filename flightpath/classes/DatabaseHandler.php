@@ -10,16 +10,6 @@ class DatabaseHandler extends stdClass
   function __construct()
   {
     
-    $db_host = @$GLOBALS["fp_system_settings"]["db_host"];
-    $db_port = @$GLOBALS["fp_system_settings"]["db_port"];
-    $db_user = @$GLOBALS["fp_system_settings"]["db_user"];
-    $db_pass = @$GLOBALS["fp_system_settings"]["db_pass"];
-    $db_name = @$GLOBALS["fp_system_settings"]["db_name"];
-    
-    if ($db_host == "") return;  // some problem, do not proceed with the attempt to construct.
-    
-    $db_host_ip = $db_host;  // set as same as db_host for now.
-    
     $this->pdo = $GLOBALS['pdo'];  // set in our settings.php file.
     
     ///////////////////  NOTE /////////////////////

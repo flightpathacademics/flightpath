@@ -1,6 +1,15 @@
 FlightPath 7.x Changelog
 ========================
 
+2025-12-09
+  Modified the installation script so that the settings.php file stores less information about the database
+  connection in the GLOBALS array.
+  
+  Modification also makes it so if the user changes db connection information in settings.php (eg, the db_host),
+  it will respond accordingly.  Previously the db_host was stored in a session variable, causing the user to need
+  to log out to see changes.
+
+
 2025-12-08
   Added new permission to advise module: view_degree_plan_course_descriptions.  This must be enabled 
   for the popup dialogs in a degree to show a description.

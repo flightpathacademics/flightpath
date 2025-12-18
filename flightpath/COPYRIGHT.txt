@@ -1,7 +1,7 @@
 ====================================
 Copyright Information for FlightPath 
 ====================================
-Last updated: 10/7/2020
+Last updated: 10/7/2020 
   
 All FlightPath code is Copyright 2006 - Present by the original authors.
 
