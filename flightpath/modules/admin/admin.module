@@ -2510,7 +2510,7 @@ function admin_display_main() {
   
   // Has the system cron been run recently?
   $cron_last_run = variable_get("cron_last_run", 0);
-  if ($cron_last_run < strtotime("-7 DAY")) {
+  if ($cron_last_run < strtotime("NOW -7 DAYS")) {
     // Warn admin that they need to have cron set up!  It's been over a week!
     fpm(t("Your system's cron process hasn't run in over a week.  In order for FlightPath
             to continue to function properly, a cron process much be configured.
