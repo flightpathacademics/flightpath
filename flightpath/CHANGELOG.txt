@@ -4,6 +4,9 @@ FlightPath 7.x Changelog
 2026-01-01
   Fixed bug in cron.php which was causing it to not run correctly.
   
+  Added IP blocking and extra logging to cron.php, so we can see if a bot is repeatedly trying
+  to access cron.php (and potentially block their IP).
+  
 
 2025-12-09
   Modified the installation script so that the settings.php file stores less information about the database
