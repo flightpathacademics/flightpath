@@ -7,6 +7,8 @@ FlightPath 7.x Changelog
   Added IP blocking and extra logging to cron.php, so we can see if a bot is repeatedly trying
   to access cron.php (and potentially block their IP).
   
+  Minor tweaks to stop warnings/notices in PHP 8.
+  
 
 2025-12-09
   Modified the installation script so that the settings.php file stores less information about the database

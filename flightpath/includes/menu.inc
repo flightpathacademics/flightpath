@@ -249,10 +249,10 @@ function menu_get_item($path) {
     }
   }
   
-  $menu_items = $GLOBALS["fp_menu_items"];
+  $menu_items = $GLOBALS["fp_menu_items"] ?? NULL;
   
   // Okay, first things first, does the path *exactly* match anything in our GLOBALS array?
-  if (in_array($path, $menu_items)) {    
+  if (is_array($menu_items) && in_array($path, $menu_items)) {    
     return menu_get_menu_router_item_from_db($path);
   }
   
@@ -325,7 +325,7 @@ function menu_get_menu_router_item_from_db($path) {
   $res = db_query("SELECT * FROM menu_router WHERE path = ?", array($path));
   $cur = db_fetch_array($res);
 
-  if ($cur["path"] != $path) {
+  if (!$cur || (($cur["path"] ?? '') != $path)) {
     // It was not found!
     return NULL;
   }  
