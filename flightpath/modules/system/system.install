@@ -127,6 +127,17 @@ function system_update($old_schema, $new_schema) {
     
   }
   
+  
+  
+  if (intval($old_schema) < 4) {
+    
+    // Expand the number of chars cumulative hours can be.
+    
+    db_query("ALTER TABLE students
+              MODIFY cumulative_hours VARCHAR(8)");
+  }
+  
+  
 } // update
 
 
@@ -807,7 +818,7 @@ db_query($q);
 $q = "
 CREATE TABLE `students` (
   `cwid` varchar(30) NOT NULL DEFAULT '',
-  `cumulative_hours` varchar(5) DEFAULT '',
+  `cumulative_hours` varchar(8) DEFAULT '',
   `gpa` varchar(5) DEFAULT '',
   `rank_code` varchar(5) DEFAULT '',
   `catalog_year` int(11) DEFAULT 2006,
