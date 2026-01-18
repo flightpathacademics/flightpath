@@ -1,0 +1,3 @@
+name = Advise
+description = This is the primary advising module, which displays degree plans as well as What If mode.
+core = 7.x

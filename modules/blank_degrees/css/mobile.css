@@ -1,0 +1,16 @@
+.course-search-course-extra {
+    display: none;
+  }
+  
+  .degree-search-degree-row {
+    margin: 0;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #ccc;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2em;
+    
+  } 

@@ -1,0 +1,166 @@
+/**
+ *   @file
+ * CSS file for the advise module.  Added to pages having to do with advising.
+ */
+
+
+
+/**
+ *   A group select row for a group with min hours,
+ * where the min hours have been completed.  So, make it not show up.
+ */
+.group-select-min-hours-fulfilled {
+  display: none;
+}
+
+
+.group-public-note {
+  border:1px solid orange;
+  padding: 5px;
+  margin: 10px;  
+}
+
+.group-attr-hidden {
+  display: none;
+}
+
+.group-attr-recommended {
+  font-weight: bold;
+}
+
+
+.c-fieldset { 
+  margin-top: 10px;
+}
+
+
+.advise-type-view-sem-title {
+  font-weight: bold;
+}
+
+/**
+ *   The track selection popup....
+ */
+
+.advise-select-track-min-max {
+  font-size: 10pt;
+}
+
+
+.advise-track-options-region {
+  padding-left: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.advise-select-degree-title {
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.advise-select-class-title {
+  font-style: italic;
+}
+
+
+.track-option {
+  padding-bottom: 15px;
+}
+
+.track-option .track-title {
+  font-size: 0.95em;
+}
+
+.track-option .track-description {
+  font-size: 0.85em;
+  padding-left: 35px;
+}
+
+.advise-select-track-default-track .track-title {
+  font-weight: bold;
+}
+
+.advise-select-track-default-track .track-title .track-default-track {
+  padding-left: 20px;
+  color: #ccc;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.popup-description-section {
+  font-size: 10pt;
+  /* padding-top: 10px; */
+}
+
+.degree-class-is-locked {
+  color: #888;
+}
+.track-class-is-locked-msg {
+  font-size: 0.85em;
+  padding: 5px;
+  border: 1px solid orange;
+  background-color: #FFFACD; /* lemonchiffon */
+  color: #333;
+  margin-left: 10px;
+  margin-right:10px;
+  
+}
+
+/* what if selection screen */
+.what-if-selection-track-desc {
+  font-size: 11pt;
+  padding-left: 40px;
+  padding-bottom: 10px;
+}
+
+/* Footnotes */
+.advise-footnote {
+  padding-left: 20px;
+  padding-bottom: 4px;
+  /* create "outdent" effect... */
+  text-indent: -18px;
+  margin-left: 18px;  
+}
+
+
+.advising-summary-group-link {
+  padding-left: 20px;
+}
+
+
+/* Subs popup */
+.advise-substitute-popup-transfer-course-title td {
+  font-size: 0.9em;
+  padding-left: 80px;
+  font-style: italic;
+  color: #777;
+}
+
+.history-summary-divider {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border-bottom: 2px dashed #333;
+}
+
+
+
+
+___advising_history{}
+
+
+.delete-adv-wrapper {
+  display: inline-block;    
+}
+
+div.advhist-row {
+  display: inline-block;
+  width: calc(100% - 100px);
+}
+
+
+
+
+
+
+
+
