@@ -2961,8 +2961,11 @@ function system_cron() {
  */
 function system_handle_form_submit() {
     
-  $callback = @$_REQUEST["callback"];  
-  $form_type = @$_REQUEST["form_type"];
+  $callback = $_REQUEST["callback"] ?? '';  
+  $form_type = $_REQUEST["form_type"] ?? '';
+  
+  if (!is_string($callback)) $callback = '';
+  if (!is_string($form_type)) $form_type = '';
   
   watchdog('system', "handle_form_submit callback:$callback, form_type:$form_type", array());
     
@@ -4744,7 +4747,8 @@ function system_init() {
   // Since current_student_id is coming from the REQUEST, sanitize it.
   //$current_student_id = "";
   
-  $current_student_id = (string) @$_REQUEST['current_student_id'];
+  $current_student_id = (string) ($_REQUEST['current_student_id'] ?? '');
+  if (!is_string($current_student_id)) $current_student_id = '';
   $current_student_id = str_replace("'", "", $current_student_id);  // remove single quotes
   $current_student_id = str_replace('"', "", $current_student_id);  // remove back quotes
   $current_student_id = str_replace(';', "", $current_student_id);  // remove semicolons

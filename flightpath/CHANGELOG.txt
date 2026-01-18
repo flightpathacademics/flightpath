@@ -1,6 +1,12 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-01-17
+  Cleaned up code, added protections against warnings in PHP 8.3.
+  
+  Altered system.install so that student table's `gpa` is varchar(8) instead of 5.
+  
+
 2026-01-01
   Fixed bug in cron.php which was causing it to not run correctly.
   
