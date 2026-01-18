@@ -1,19 +1,17 @@
-FlightPath - Academic Advising and Student Success
-===================================================
+# FlightPath - Academic Advising and Student Success
 
 
-Professional hosting and support
---------------------------------
+
+## Professional hosting and support
 
 FlightPath Academics offers professional hosting and support, as well as
 exclusive features for FlightPath not found in this community edition.
 
-Visit https://flightpathacademics.com for more information.
+Visit https://flightpathacademics.com for more information. 
 
 
 
-Important Notice
--------------------
+## Important Notice
 
 Please read the COPYRIGHT.txt and LICENSE.txt files for
 important information as to what you may and may not do with
@@ -26,14 +24,13 @@ documentation, etc.
 
 
 
-Problems with Installation?
---------------------
+## Problems with Installation?
+
 See: https://getflightpath.com/node/6
 
 
 
-A Brief History, and Credits
---------------------
+## A Brief History, and Credits
 
 FlightPath was originally created at the University of Louisiana at Monroe
 (http://www.ulm.edu) in 2006, and has been in continuous development ever since.
@@ -49,6 +46,7 @@ the original ULM development team from 2006 were as follows:
 Richard Peacock - Primary developer; Joe Mansour - Mainframe/Banner coordinator; Joann Perrer - Degree and course data coordinator;
 Paul Gullette - Theme developer for FP 1x-4x; Rob Glaze - Graphic designer of "feather" logo
 
-Some icons used by FlightPath are part of the Silk icon set, created by Mark James, 
+Some icons used by FlightPath are part of the Silk icon set, created by Mark James,
 and licensed under the Creative Commons Attribution 2.5 License.
 For more details: https://github.com/markjames/famfamfam-silk-icons
+
