@@ -4,7 +4,7 @@ custom/*
 .project
 .buildpath
 
-#Re-include specific subdirs
+#Re-include specific files so subdirs are created.
 !custom/files/README.txt
 !custom/modules/README.txt
 !custom/themes/README.txt
