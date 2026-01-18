@@ -1,0 +1,38 @@
+
+.course-search-course-extra {
+  display: none;
+}
+
+.course-search-course-block, .course-search-subject-select-line {
+  margin: 0;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #ccc;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.course-search-course-title-row {
+  font-weight: normal;
+  font-size: 1em;  
+}
+
+
+.course-search-course-name, .course-search-subject-select-line {
+  display: block;
+  color: black;
+  font-weight: bold;
+  font-size: 1.5em;
+} 
+.course-search-course-title {
+  font-weight: normal;
+}
+
+.course-search-course-description {
+  padding-top: 5px;
+}  
+
+.course-search-sample-syllabus {
+  margin-top: 10px;
+}
+  

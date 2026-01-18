@@ -1,0 +1,9 @@
+custom/*
+!custom/files/README.txt
+!custom/modules/README.txt
+!custom/routines/README.txt
+.vscode/*
+.settings/*
+.project
+.buildpath
+

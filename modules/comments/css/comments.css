@@ -1,0 +1,54 @@
+/* Styles for the comments module */
+
+#comments-comment-textarea {
+  width: 100%;
+  height: 100px;
+}
+
+.comments-visible-input-row {
+  font-size: 0.8em;
+}
+
+.comments-copy-paste-help {
+  font-size: 0.7em;
+}
+
+.comments-comment-buttons {
+  text-align: right;
+
+} 
+
+.fp-form-comments_comment_form .form-radios-type div, 
+.fp-form-comments_comment_form .form-radios-type label {
+  font-size: 10pt;
+  display: inline;
+}
+
+.comment-comment {
+  margin-bottom: 40px;
+  font-size: 0.9em;
+}
+
+.comment-comment .comment-by-line {
+  float: left;  
+}
+
+.comment-comment-public .comment-by-line {
+  background-color: #FFFFE0; 
+}
+
+.comment-comment .comment-datetime {
+  text-align: right;
+}
+
+.comment-comment .comment-text {
+  border: 1px solid #aaa;
+  padding: 10px;
+  background-color: #F8F8FF;
+}
+
+.comment-comment .comment-delete {
+  text-align: right;
+  margin-top: 5px;
+  font-size: 0.8em;
+}

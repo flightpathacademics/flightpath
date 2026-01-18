@@ -1,0 +1,3 @@
+name = Student Search
+description = This module allows users to search for students (advisees)
+core = 7.x 

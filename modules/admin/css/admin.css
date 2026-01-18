@@ -1,0 +1,366 @@
+
+
+___admin-degrees-page{}
+
+.admin-degrees-list-degree .list-degree-row {
+  padding-bottom: 3px; 
+  padding-top: 3px; 
+  font-size: 0.9em;
+}
+.list-degree-row-excluded {
+  background-color: #ddd;
+}
+ 
+.admin-button-msg {
+  padding-left: 30px;
+  font-style: italic;
+  color: #999;
+}
+
+.admin-degrees-upper-links {
+  font-size: 0.8em;
+  margin-bottom: 5px;
+}
+
+#fp-form-admin_degrees_list_filter_form .markup-element-mark_top,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_class,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_school,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_level,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-submit_btn,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-reset_btn,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_class div,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_class label,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_class select,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_school div,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_school label,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_school select,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_level div,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_level label,
+#fp-form-admin_degrees_list_filter_form #element-wrapper-filter_level select,
+#ignore .ignoreme
+ {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 0;  
+  width: auto;
+}
+
+#fp-form-admin_degrees_list_filter_form #element-wrapper-reset_btn {
+  margin-left: 30px;
+}
+
+
+___admin-groups-page{}
+#fp-form-admin_groups_list_filter_form .markup-element-mark_top,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_school,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_name,
+#fp-form-admin_groups_list_filter_form #element-wrapper-submit_btn,
+#fp-form-admin_groups_list_filter_form #element-wrapper-reset_btn,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_school div,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_school label,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_school select,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_name div,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_name label,
+#fp-form-admin_groups_list_filter_form #element-wrapper-filter_name input,
+#ignore .ignoreme
+ {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 0;  
+  width: auto;
+}
+
+#fp-form-admin_groups_list_filter_form #element-wrapper-reset_btn {
+  margin-left: 30px;
+}
+
+
+___admin-courses-page{}
+#fp-form-admin_courses_list_filter_form .markup-element-mark_top,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_school,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_exclude,
+#fp-form-admin_courses_list_filter_form #element-wrapper-submit_btn,
+#fp-form-admin_courses_list_filter_form #element-wrapper-reset_btn,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_school div,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_school label,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_school select,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_exclude div,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_exclude label,
+#fp-form-admin_courses_list_filter_form #element-wrapper-filter_exclude select,
+#ignore .ignoreme
+ {
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 0;  
+  width: auto;
+}
+
+#fp-form-admin_courses_list_filter_form #element-wrapper-reset_btn {
+  margin-left: 30px;
+}
+
+
+.disp-courses-table {
+  width: 100%;
+}
+
+table .rep-msg {
+  display: inline;
+  padding-left: 10px;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+
+
+table.admin-display-main-table td.advising-settings-right,
+table.admin-display-main-table td.system-configuration-left
+{
+  width: 50%;  
+}
+
+
+
+
+
+
+
+
+
+
+.admin-courses-select-letter-bar {
+  background-color: #eee; 
+  border: 1px solid #ddd;
+  margin-bottom:10px; 
+  text-align: center; 
+  padding: 3px; 
+  margin:3px;  
+}
+
+.admin-advising-settings {
+  margin-bottom: 40px;
+  
+}
+
+.watchdog-table {
+  font-size: 0.8em;
+  width: 100%;
+}
+
+.watchdog-table .row-odd {
+  background-color: #ddd;
+}
+
+.watchdog-table .row-alert {
+  background-color: #FFCC99;  
+}
+
+.watchdog-table .row-error {
+  background-color: #FF9999;
+}
+
+.watchdog-table .row-debug {
+  background-color: #FFFFCC;
+}
+.fp-pager {
+  margin-top: 15px;
+  text-align: center;
+}
+.fp-pager a {
+  text-decoration: none;
+  color: blue;
+}
+.fp-pager .pager-link {
+  padding-right: 7px;
+  padding-left: 7px;
+  
+}
+.fp-pager .pager-current {
+  font-weight: bold;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.watchdog-field {
+  padding-top: 5px;
+}
+
+.watchdog-field label {
+  font-weight: bold;  
+}
+
+.watchdog-field label.block {
+  display: block;
+  padding-top: 15px;
+}
+
+.watchdog-filters .severity-filter {
+  padding-left: 15px;
+}
+
+/*
+ * The degrees page (where we list all the degrees)
+ */
+
+.degrees-table .degree-title {
+  
+}
+
+.degrees-table .class-level-3 .degree-title {
+  padding-left: 20px;
+}
+
+.degrees-table .degree-major-code {
+  font-size: 0.8em;
+}
+
+.degrees-filter {
+  margin: 10px;
+  padding: 10px;
+  font-size: 0.8em;
+  background: #eee;
+  border: 1px solid #ccc;
+}
+
+
+
+
+
+
+
+
+
+
+___admin-tools-page{}
+
+
+.display-admin-tools-page .fp-menu-item {
+  
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;  
+  padding-bottom: 3px;
+  clear: both;
+}
+
+.display-admin-tools-page .fp-menu-item a {
+  font-size: 1.2em;
+  color: dodgerblue;
+}
+
+.display-admin-tools-page .fp-menu-item img {
+  max-height: 40px;
+  width: auto;  
+  float: left;
+  margin-bottom: 20px;
+}
+
+
+
+
+
+
+
+/*
+ * 
+ * *********************************************************
+ * *********************************************************
+ * 
+ * The edit degree form page
+ */
+___edit_degree_form{}  /* placeholder for editor */
+
+#fp-form-admin_edit_degree_form {
+  font-size: 0.85em;  
+}
+
+#fp-form-admin_edit_degree_form .form-element label,
+#fp-form-admin_edit_degree_form .edit-degree-semester-block label
+ {
+  font-weight: normal;
+  float: left;
+  
+}
+
+#fp-form-admin_edit_degree_form .form-element {
+  margin-bottom: 10px;
+}
+
+#fp-form-admin_edit_degree_form .form-popup-description {
+  padding-left: 0;
+  padding-right: 3px;
+}
+
+#fp-form-admin_edit_degree_form #element-wrapper-degree_type,
+#fp-form-admin_edit_degree_form #element-wrapper-degree_class,
+#fp-form-admin_edit_degree_form #element-wrapper-degree_level,
+#fp-form-admin_edit_degree_form #element-inner-wrapper-exclude,
+#fp-form-admin_edit_degree_form #element-wrapper-allow_dynamic,
+#fp-form-admin_edit_degree_form #element-wrapper-override_degree_hours,
+#ignoreme .ignoreme 
+{
+  float: left;
+  padding-right: 20px;
+}
+
+
+#fp-form-admin_edit_degree_form input,
+#fp-form-admin_edit_degree_form select
+{
+  padding: 5px;
+  box-shadow: none;
+  width: auto;
+}
+
+#fp-form-admin_edit_degree_form textarea {
+  display: block;
+  width: 95%;
+}
+
+
+
+#fp-form-admin_edit_degree_form #element-wrapper-title,
+#ignore .ignore #ignoreme
+{
+  clear: both;
+}
+
+
+a.delgroup-icon {
+  color: firebrick;
+  font-size: 1.3em;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+
+#fp-form-admin_edit_degree_form #element-wrapper-degree_class select {
+  max-width: 140px;
+}
+
+#fp-form-admin_edit_degree_form .admin-degrees-edit-track-rules-table td {
+  font-size: 0.9em;
+}
+
+#fp-form-admin_edit_degree_form .admin-degrees-edit-track-rules-table .form-element label {
+  display: block;
+  float: none !important;
+  clear: both;
+  font-weight: bold;
+}
+
+#fp-form-admin_edit_degree_form fieldset {
+  margin-top: 40px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

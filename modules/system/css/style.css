@@ -1,0 +1,382 @@
+
+/* Login page */
+
+
+.fp-form-system_login_form {
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+.fp-form-system_login_form label {
+  display: inline-block;
+  width: 105px;
+}
+ 
+
+
+.login-welcome {
+  text-align: center;
+  font-size: 1.1em;    
+  margin-bottom: 10px;
+}
+
+.login-welcome .flightpath-name {
+  color: maroon;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.logout-successful {
+  color: green;
+}
+
+
+.activity-view-all {
+  text-align: right;
+  padding-right: 30px;
+}
+
+
+
+
+/* Misc */
+.fp-system-settings-element {
+  margin-bottom: 20px;  
+}
+
+.fp-system-settings-textfield input {
+  width: 80%;
+}
+
+.fp-system-settings-element textarea {
+  width: 80%;
+  height: 75px;
+}
+
+.fp-system-settings-input {
+  padding-left: 10px;
+}
+
+.fp-system-settings-element label {  
+  font-weight: bold;
+}
+
+.fp-system-settings-element-description {
+  font-size: 0.8em;
+  padding-left: 10px;
+  color: #888;
+}
+
+.fp-system-modules-table {
+  font-size: 0.8em;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.fp-system-modules-type {
+  background-color: #ddd;
+  padding: 3px;
+  font-size: 0.8em;
+}
+
+.fp-system-modules-row td {
+  padding: 3px;
+}
+.fp-system-modules-row-odd
+{
+  background-color: 	#EDF9FF;
+}
+
+.fp-system-modules-machine-name,
+.fp-system-modules-installation-status
+{
+  font-size: 0.85em;
+  font-style: italic;
+  padding-left: 30px;
+}
+
+.fp-system-modules-installation-status {
+  color: #666; 
+}
+
+.status-table .module-status-alert {
+  background-color: pink;
+}
+
+.status-table .module-status-warning {
+  background-color: orange;
+}
+
+
+img.fpmn-item {
+  margin-right: 20px;
+}
+
+
+
+
+
+___dashboard{}
+
+.dash-welcome-block {
+    padding: 25px;
+    background-color: #F9F9F9;
+    color: #555555;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.dash-welcome-block .welcome-section {
+    display: inline;
+}
+
+.dash-welcome-block h1 {
+    font-size: 1.1em;
+    font-weight: 500;
+    margin: 0;
+}
+
+.dash-welcome-block h2 {
+    font-size: 0.95em;
+    font-weight: 200;
+    margin: 0;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.dash-left {
+  display: table-cell;
+  width: 50%;
+  vertical-align: top;
+  
+}
+
+.dash-right {
+  display: table-cell;
+  width: 50%;
+  vertical-align: top;
+}
+
+
+
+
+.activity-feed-block  {
+  border: 1px solid #ccc;
+}
+
+.dash-feed-block .contents
+ {
+  padding-left: 10px;
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+
+
+.appointments-feed-block .contents {
+  max-height: 125px;
+  overflow-y: scroll;  
+}
+
+
+.feed-item {
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.feed-item .feed-item-icon {
+  float: left;
+  display: inline-block;
+  margin-right: 30px;
+  margin-top: 6px;
+  font-size: 2.1em;
+}
+
+.feed-item .feed-item-title {
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.feed-item .feed-item-datetime {
+  text-align: right;
+  padding-right: 20px;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+
+.dash-feed-block {
+  margin-bottom: 10px;
+  border: 1px solid #ccc;  
+}
+
+
+.dash-right .dash-feed-block {
+  margin-left: 10px;  
+}
+
+.announcements-feed-block .feed-item .feed-item-title {
+  margin-bottom: 10px;
+}
+
+
+
+
+
+.dash-full-width {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+
+
+.advising-stats-block-inner-wrapper {
+  text-align: center;
+}
+
+.advising-stats-block-inner-wrapper .advising-stat-box {
+  
+  display: inline-block;
+  min-width: 300px;  
+  text-align: center;
+  padding-right: 30px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+
+.advising-stats-block-inner-wrapper .advising-stat-box-wide {  
+  min-width: 400px;
+  text-align: left;
+}
+.advising-stat-box-upcoming {
+  padding-right: 0;
+}
+ 
+
+
+.advising-stat-box-upcoming .stat-box-wrapper {  
+  width: 100%;
+  overflow-y: scroll;
+  max-height: 150px;
+  height: 150px;
+  padding-right: 20px;
+  padding-bottom: 5px;
+}
+
+
+.advising-stat-box .stat-box-title {
+  text-align: center;
+}
+
+.advising-stat-box .stat-box-row-title {
+  font-size: 1.2em;
+ 
+}
+
+.stat-box-row-date {
+  float: right;
+}
+
+
+
+.advising-stats-block-inner-wrapper .advising-stat-box .stat-box-title {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.advising-stats-block-inner-wrapper .advising-stat-box .stat-box-chart img {
+  min-width: 120px;
+  height: auto;
+}
+
+.advising-stats-block-inner-wrapper .advising-stat-box .stat-box-caption {
+  font-weight: 0.8em;
+  font-style: italic;
+}
+
+
+.snapshot-in-iframe {
+  font-size: 1.2em !important;
+}
+
+.snapshot-in-iframe .pie-image {
+  float: left;
+  margin-right: 10px;
+}
+
+.snapshot-in-iframe .pie-term-title {
+  display: block;
+  font-size: 1.3em ;
+  font-weight: bold;
+  margin-bottom: 7px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: url('throbber.gif') left center no-repeat;
+  margin-left: 10px;
+  padding-left: 20px;
+}
+
+
+
+
+input.disable-element,
+.disable-element
+{
+  background-color: #eee;
+  color: #777;
+  pointer-events: none;
+}
+
+
+/* don't need scroll bars here */
+.snapshot-feed-block .contents {
+  max-height: 85px;
+  overflow-y: hidden;
+  background:url('tenor.gif') center center no-repeat; 
+  background-size: 50px;
+}
+
+.snapshot-school-selector {
+  font-size: 0.8em;
+  float: right;
+}
+
+.snapshot-school-selector select#selected_school_id {
+  border: 1px solid #8E929C;
+  box-shadow: 0px 1px 2px rgb(0 0 0 / 15%);
+  border-radius: 3px;
+  max-width: 120px;
+}
+ 
+
+.textarea-maxlength-count {
+  display: block;
+  text-align: right;
+  font-size: 0.85em; 
+  color: #999; 
+}
+
+.textarea-maxlength-count .current-count {
+  color: black;
+  padding-right: 3px;
+}
+
+
+.textarea-maxlength-count .maxlength-chars {  
+  padding-left: 3px;
+}
+
+
+
+
+
+
+
