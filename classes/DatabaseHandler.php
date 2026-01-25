@@ -1143,17 +1143,17 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
               $school_line
               $catalog_line
                ORDER BY catalog_year DESC LIMIT 1 ", $params) ;
-              if ($this->db_num_rows($res7) > 0)
-              {
-                $cur7 = $this->db_fetch_array($res7);
-                return intval($cur7["course_id"]);
-              }
-              return FALSE;
+    if ($this->db_num_rows($res7) > 0)
+    {
+      $cur7 = $this->db_fetch_array($res7);
+      return intval($cur7["course_id"]);
+    }
+    return FALSE;
+    
   }
   
   
-  function get_student_settings($student_cwid)
-  {
+  function get_student_settings($student_cwid) {
     
     // This returns an array (from the xml) of a student's
     // settings in the student_settings table.  It will
