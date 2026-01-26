@@ -24,7 +24,7 @@ if (function_exists('apcu_fetch')) {
       $lines = file($blocklist_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
       $lines = array_map('trim', $lines);
       $blocked_ips_assoc = array_flip($lines); // fast lookup
-      apcu_store($cache_key, $blocked_ips_assoc, 120); // cache X seconds
+      apcu_store($cache_key, $blocked_ips_assoc, 60); // cache X seconds
     }
   }
 } // if apcu is installed 
@@ -124,6 +124,15 @@ $page = menu_execute_page_request();
 if (!is_int($page)) {
   // Display the page!
   fp_display_page($page);
+  
+  
+  if (isset($_SESSION['fp_should_ban_counter'])) {
+    // If the user was previously racking up bannable offenses, clear them because they
+    // found a valid URL.
+    unset($_SESSION['fp_should_ban_counter']);
+    unset($_SESSION['fp_should_ban_counter_init_ts']);
+  }
+  
 }
 else {  
   if ($page == MENU_NOT_FOUND) {

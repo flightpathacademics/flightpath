@@ -62,10 +62,18 @@ $token = (string) trim($_REQUEST["t"] ?? '');
 if ($token == '' || $token != @$GLOBALS["fp_system_settings"]["cron_security_token"]) {  
   
   watchdog('access_denied', 'Cron security token does not match this site\'s settings', array(), WATCHDOG_DEBUG);  
+  
+  system_check_should_ban_ip();
+  
   header('HTTP/1.1 403 Forbidden', TRUE, 403);  
   die("Sorry, cron security token does not match this site's settings.");
   
 }
+
+// If we made it here, we can clear any bannable offenses from the counter.
+unset($_SESSION['fp_should_ban_counter']);
+unset($_SESSION['fp_should_ban_counter_init_ts']);
+
 
 // Keep the script from timing out prematurely...
 set_time_limit(99999);  // around 27 hours.
@@ -77,3 +85,8 @@ watchdog("cron", "Cron run completed", array(), WATCHDOG_DEBUG);
 
 
 variable_set("cron_last_run", time());
+
+
+
+
+

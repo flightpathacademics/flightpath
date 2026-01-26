@@ -2082,6 +2082,11 @@ function display_not_found() {
   
   watchdog("page_not_found", "404 - Page not found (" . strip_tags($location) . ")", array(), WATCHDOG_DEBUG);
   
+  
+  // Should we ban this IP?
+  system_check_should_ban_ip();
+  
+    
   fp_display_page($page);
   die;
 }
@@ -2100,6 +2105,9 @@ function display_access_denied() {
   
   watchdog("access_denied", "403 - Access denied (" . strip_tags($location) . ")", array(), WATCHDOG_DEBUG);
     
+  // Should we ban this IP?
+  system_check_should_ban_ip();
+  
   fp_display_page($page);
   die;  
 }

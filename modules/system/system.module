@@ -698,7 +698,7 @@ function system_ban_ip_settings_form() {
     'type' => 'select',
     'hide_please_select' => 'TRUE',
     'options' => $options,
-    'value' => variable_get('system_ban_ip_expire', 'never'),
+    'value' => variable_get('system_ban_ip_expire', '2 WEEKS'),
   );
   
     
@@ -764,19 +764,95 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
       $lines = file($ban_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
       $lines = array_map('trim', $lines);
       $blocked_ips_assoc = array_flip($lines);
-      apcu_store('banned_ips', $blocked_ips_assoc, 120); // cache X seconds
+      apcu_store('banned_ips', $blocked_ips_assoc, 60); // cache X seconds
     }
         
     
     // Also put in our table with current timestamp, so cron can expire it later.
-    db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($manual_ip));
-    
+    db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($manual_ip));    
     db_query("INSERT INTO banned_ips (ip_address, posted_ts) VALUES (?, ?)", array($manual_ip, time()));
         
   }
   
 }
 
+
+/**
+ * Adds IP address to our banned_ip list.
+ * @param unknown $ip
+ */
+function system_ban_ip($ip) {
+  
+  $ban_ip_file_path = fp_get_files_path() . '/private/banned_ips.txt';
+  $res = file_put_contents($ban_ip_file_path, "\n$ip", FILE_APPEND | LOCK_EX);
+  
+  if ($res === FALSE) {
+    watchdog("ban_ip", "Unable to write to ban ip file. Possible file permission issue?", array(), WATCHDOG_ERROR);
+    print "failed";
+    return FALSE;
+  }
+  
+  // Add to our apcu cache, if installed.
+  if (function_exists('acpu_store')) {
+    $lines = file($ban_ip_file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $lines = array_map('trim', $lines);
+    $blocked_ips_assoc = array_flip($lines);
+    apcu_store('banned_ips', $blocked_ips_assoc, 60); // cache X seconds
+  }
+  
+  // Also put in our table with current timestamp, so cron can expire it later (if setup).
+  db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($ip));
+  db_query("INSERT INTO banned_ips (ip_address, posted_ts) VALUES (?, ?)", array($ip, time()));
+  
+  
+  watchdog("ban_ip", "Banned IP address: %ip", array("%ip" => $ip));
+  
+  return TRUE; 
+  
+  
+} // system_ban_ip
+
+
+
+
+/**
+ * This is called by theme.inc's functions display_not_found and display_access_denied.
+ * 
+ * We want to see if we should ban this visitor's IP address for racking up too many page_not_found's or access_denied
+ */
+function system_check_should_ban_ip() {
+  global $user;
+  
+  $ip = $_SERVER["REMOTE_ADDR"] ?? '';
+  if (empty($ip)) return FALSE;
+  
+  // Criteria: user is anonymous, and has had more than X "not found" or "access denied" attempts within Y minutes.
+  if (intval($user->id ?? 0) === 0) {
+    
+    $limit = 5;  // TODO: a setting?
+    $minutes = 1; // TODO: a setting?
+    
+    if (!isset($_SESSION['fp_should_ban_counter'])) {
+      $_SESSION['fp_should_ban_counter'] = 0;      
+    }
+    if ($_SESSION['fp_should_ban_counter'] == 0) {
+      $_SESSION['fp_should_ban_counter_init_ts'] = time();
+    }
+    
+    $_SESSION['fp_should_ban_counter']++;
+    
+    if ($_SESSION['fp_should_ban_counter'] > $limit) {
+      if ($_SESSION['fp_should_ban_counter_init_ts'] < strtotime("NOW - $minutes MINUTES")) {
+        // Yes, we should ban them.
+        system_ban_ip($ip);
+      }
+      // Reset value in any event.
+      $_SESSION['fp_should_ban_counter'] = 0;
+    }
+    
+  }
+  
+} // system_check_should_ban_ip
 
 
 
@@ -2886,7 +2962,7 @@ function system_cron() {
   // Should we delete from user_attributes any mda_validation_codes which are older than X hours?
   $max_age_hours = 1;      
   // Okay, let's trim the table.
-  $max_timestamp = strtotime("$max_age_hours HOURS AGO"); 
+  $max_timestamp = strtotime("NOW - $max_age_hours HOURS"); 
   
   $result = db_query("DELETE FROM user_attributes WHERE `name` = 'mfa_validation_code' AND `updated` < ? ", $max_timestamp);
   $rows = db_affected_rows($result);
@@ -2919,7 +2995,7 @@ function system_cron() {
   
   ////////////
   // Remove expired banned ips, if any exist.
-  $ban_expire = variable_get('system_ban_ip_expire', 'never');
+  $ban_expire = variable_get('system_ban_ip_expire', '2 WEEKS');
   if ($ban_expire != 'never') {    
     $ban_ip_file_path = fp_get_files_path() . '/private/banned_ips.txt';
     if (file_exists($ban_ip_file_path)) {
@@ -3518,6 +3594,8 @@ function system_perform_clear_menu_cache() {
  */
 function system_display_login_page() {
   $rtn = "";
+  
+    
   
   fp_add_css(fp_get_module_path("system") . "/css/style.css");  
 

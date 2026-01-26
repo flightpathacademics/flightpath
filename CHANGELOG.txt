@@ -1,6 +1,13 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-01-26
+  Added code to detect and automatically ban an anonymous user (visitor) 
+  if they have received more than 5 page_not_found's or access_denied's 
+  in the last 1 minute. This is almost always indicative of a bogus script or bot 
+  trying to find a point of entry in the system.
+
+
 2026-01-17
   Cleaned up code, added protections against warnings in PHP 8.3.
   
