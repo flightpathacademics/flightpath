@@ -227,6 +227,12 @@ function system_check_clean_urls() {
   
   // First, figure out the base URL.
   $protocol = strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === FALSE ? 'http' : 'https';
+  if ($protocol == 'http') {
+    // Check to see if we have a REQUEST_SCHEME of https...
+    if (($_SERVER['REQUEST_SCHEME'] ?? '') == 'https') {
+      $protocol = "https";
+    }
+  }
   $host = $_SERVER['HTTP_HOST'];
   $script = $_SERVER['SCRIPT_NAME'];
   $base_url = $protocol . "://" . $host . $script;
