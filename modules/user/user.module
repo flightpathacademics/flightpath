@@ -2257,13 +2257,13 @@ function user_edit_user_form_submit($form, $form_state) {
   
   $user_id = intval($values["user_id"]);
   $faculty_cwid = $values["faculty_cwid"];
-  $dept_code = fp_trim(@$values['department']);
+  $dept_code = trim($values['department'] ?? '');
   
   // Save the roles into the database for this user.
   // Begin by deleting what's there all ready.
   db_query("DELETE FROM user_roles WHERE user_id = ? ", $user_id);
 
-  if (is_array($values["roles"])) {
+  if (is_array($values["roles"] ?? NULL)) {
     foreach ($values["roles"] as $rid) {
      //fpm("inserting $rid");
      db_query("INSERT INTO user_roles (user_id, rid)
