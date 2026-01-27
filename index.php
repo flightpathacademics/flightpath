@@ -124,15 +124,6 @@ $page = menu_execute_page_request();
 if (!is_int($page)) {
   // Display the page!
   fp_display_page($page);
-  
-  
-  if (isset($_SESSION['fp_should_ban_counter'])) {
-    // If the user was previously racking up bannable offenses, clear them because they
-    // found a valid URL.
-    unset($_SESSION['fp_should_ban_counter']);
-    unset($_SESSION['fp_should_ban_counter_init_ts']);
-  }
-  
 }
 else {  
   if ($page == MENU_NOT_FOUND) {

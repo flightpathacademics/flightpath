@@ -829,6 +829,11 @@ function system_ban_ip($ip) {
 function system_check_should_ban_ip() {
   global $user;
   
+  // TODO: Rewrite, but using acpu_store instead.
+  
+  
+  
+  /*  
   $ip = $_SERVER["REMOTE_ADDR"] ?? '';
   if (empty($ip)) return FALSE;
   
@@ -857,6 +862,8 @@ function system_check_should_ban_ip() {
     }
     
   }
+  
+  */
   
 } // system_check_should_ban_ip
 
