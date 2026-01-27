@@ -2152,8 +2152,8 @@ function system_school_data_form($school_id = 0) {
     "options" => array("yes" => "Yes", "no" => "No"),
     "value" => variable_get_for_school("group_list_course_show_repeat_information", "yes", $school_id, TRUE),
     "hide_please_select" => TRUE,
-    "description" => t("If set to 'Yes' (default), FlightPath will how many times a groups may be repeated, when viewing a list
-                        of a Group's courses in a popup.  If set to 'No', repeat information will not be displayed, and instead
+    "description" => t("If set to 'Yes' (default), FlightPath will how many times a course may be repeated when viewing a list
+                        of a Group's courses in the popup.  If set to 'No', repeat information will not be displayed, and instead
                         the course's normal hour information is displayed.  If you
                         are unsure what to select, leave this set to 'Yes'."),
   );  
