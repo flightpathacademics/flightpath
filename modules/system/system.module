@@ -671,11 +671,17 @@ function system_ban_ip_settings_form() {
   
   
   
+  
+  
   $form['ban_ip_file_path'] = array(
     'type' => 'value',
     'value' => $ban_ip_file_path,
   );
 
+  
+  // TODO: auto-ban settings.
+  
+  
   
   $form['system_manually_add_ip'] = array(
     'label' => t('Manually add an IP address to the ban list:'),
@@ -787,7 +793,7 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
  * Adds IP address to our banned_ip list.
  * @param unknown $ip
  */
-function system_ban_ip($ip) {
+function system_ban_ip($ip, $comment = "") {
   
   $ban_ip_file_path = fp_get_files_path() . '/private/banned_ips.txt';
   $res = file_put_contents($ban_ip_file_path, "\n$ip", FILE_APPEND | LOCK_EX);
@@ -811,7 +817,7 @@ function system_ban_ip($ip) {
   db_query("INSERT INTO banned_ips (ip_address, posted_ts) VALUES (?, ?)", array($ip, time()));
   
   
-  watchdog("ban_ip", "Banned IP address: %ip", array("%ip" => $ip));
+  watchdog("ban_ip", "Banned IP address: %ip; %comment", array("%ip" => $ip, "%comment" => $comment));
   
   return TRUE; 
   
@@ -829,41 +835,38 @@ function system_ban_ip($ip) {
 function system_check_should_ban_ip() {
   global $user;
   
-  // TODO: Rewrite, but using acpu_store instead.
-  
-  
-  
-  /*  
   $ip = $_SERVER["REMOTE_ADDR"] ?? '';
   if (empty($ip)) return FALSE;
   
   // Criteria: user is anonymous, and has had more than X "not found" or "access denied" attempts within Y minutes.
   if (intval($user->id ?? 0) === 0) {
+    // TODO: check if autoban is enabled
     
-    $limit = 5;  // TODO: a setting?
+    $max_allowed = 5;  // TODO: a setting?
     $minutes = 1; // TODO: a setting?
     
-    if (!isset($_SESSION['fp_should_ban_counter'])) {
-      $_SESSION['fp_should_ban_counter'] = 0;      
-    }
-    if ($_SESSION['fp_should_ban_counter'] == 0) {
-      $_SESSION['fp_should_ban_counter_init_ts'] = time();
-    }
     
-    $_SESSION['fp_should_ban_counter']++;
-    
-    if ($_SESSION['fp_should_ban_counter'] > $limit) {
-      if ($_SESSION['fp_should_ban_counter_init_ts'] < strtotime("NOW - $minutes MINUTES")) {
+    // Perform simple query on watchdog table
+    $count = db_result(db_query("SELECT count(wid) as mycount FROM watchdog
+                        WHERE user_id = 0
+                        AND ip = ?
+                        AND `type` IN ('page_not_found', 'access_denied')
+                        AND `timestamp` < ?",
+                        array($ip, strtotime("NOW - $minutes MINUTES"))));
+
+    if ($count) {
+      $count = intval($count);
+      if ($count >= $max_allowed) {
         // Yes, we should ban them.
-        system_ban_ip($ip);
+        system_ban_ip($ip, "Exceeded $max_allowed forbidden events in the past $minutes minutes.");        
       }
-      // Reset value in any event.
-      $_SESSION['fp_should_ban_counter'] = 0;
     }
+        
+     
     
   }
   
-  */
+  
   
 } // system_check_should_ban_ip
 

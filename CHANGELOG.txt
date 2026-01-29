@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-01-29
+  Tweaking the system to ban IP addresses; adding indexes to the watchdog table for faster
+  comparisons.
+  
+
 2026-01-26
   Added code to detect and automatically ban an anonymous user (visitor) 
   if they have received more than 5 page_not_found's or access_denied's 

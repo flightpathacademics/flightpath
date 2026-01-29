@@ -138,6 +138,16 @@ function system_update($old_schema, $new_schema) {
   }
   
   
+  if (intval($old_schema) < 5) {
+    
+    // Add additional index on watchdog to help with ban ip operations
+    
+    db_query("CREATE INDEX idx_watchdog_user_ip_type_ts
+                ON watchdog (user_id, ip, `type`, `timestamp`)");
+  }
+  
+  
+  
 } // update
 
 
@@ -999,17 +1009,20 @@ CREATE TABLE `watchdog` (
   `is_faculty` tinyint(4) DEFAULT 0,
   `timestamp` int(11) unsigned DEFAULT 0,
   `school_id` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`wid`),
-  KEY `type` (`type`),
-  KEY `uid` (`user_id`),
-  KEY `uname` (`user_name`),
-  KEY `severity` (`severity`),
-  KEY `cwid` (`cwid`),
-  KEY `timestamp` (`timestamp`),
-  KEY `is_student` (`is_student`),
-  KEY `is_faculty` (`is_faculty`),  
-  KEY `school_id` (`school_id`)
-);  ";
+  PRIMARY KEY (`wid`) USING BTREE,
+  KEY `type` (`type`) USING BTREE,
+  KEY `uid` (`user_id`) USING BTREE,
+  KEY `uname` (`user_name`) USING BTREE,
+  KEY `severity` (`severity`) USING BTREE,
+  KEY `cwid` (`cwid`) USING BTREE,
+  KEY `school_id` (`school_id`) USING BTREE,
+  KEY `timestamp` (`timestamp`) USING BTREE,
+  KEY `is_student` (`is_student`) USING BTREE,
+  KEY `is_faculty` (`is_faculty`) USING BTREE,
+  KEY `idx_combo1` (`user_id`,`ip`,`type`,`timestamp`) USING BTREE
+);  
+
+";
   
   db_query($q); 
       
