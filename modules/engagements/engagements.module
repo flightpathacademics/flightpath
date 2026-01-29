@@ -3621,6 +3621,7 @@ function engagements_get_user_notify_sms_receipt_values($user_id = NULL) {
     $user_id = $user->id;
   }
   $options = engagements_get_from_phones_for_fapi(TRUE);
+  $options += engagements_get_from_phones_for_fapi(TRUE, NULL, TRUE);
   
   foreach ($options as $num => $val) {    
     $test = user_get_setting($user_id, "notify_sms_receipt__" . $num);    
@@ -3668,7 +3669,13 @@ function engagements_get_from_phones_for_fapi($bool_return_all = TRUE, $account 
 
   $phones = engagements_get_from_phones($bool_only_mass_text_numbers);
   $default = $phones['default']['num'];
-  $rtn[$default] = t("[Default] ") . engagements_convert_to_pretty_phone_number($default) . ' - ' . $phones['default']['description'];
+  
+  $default_tag = t("[Default]");
+  if ($bool_only_mass_text_numbers) {
+    $default_tag = t("[[[Mass Texts]]]");
+  }
+  
+  $rtn[$default] = $default_tag . " " . engagements_convert_to_pretty_phone_number($default) . ' - ' . $phones['default']['description'];
 
   foreach ($phones['lines'] as $num => $details) {
 

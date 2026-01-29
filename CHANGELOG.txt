@@ -9,6 +9,9 @@ FlightPath 7.x Changelog
   
   Clear cache also clears the APCu cache, if installed
   
+  Added ability to denote recipients to the mass text message line, not just
+  regular lines.
+  
 
 2026-01-26
   Added code to detect and automatically ban an anonymous user (visitor) 

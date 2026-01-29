@@ -2129,6 +2129,9 @@ function user_edit_user_form() {
   if (module_enabled('engagements')) {  
     $user_id = intval($form['user_id']['value']);
     $options = engagements_get_from_phones_for_fapi(TRUE);
+    $mass_options = engagements_get_from_phones_for_fapi(TRUE, NULL, TRUE);
+    $options += $mass_options;
+    
     $default_value = engagements_get_user_notify_sms_receipt_values($user_id);
     if (count($options) > 0 && $user_id > 0) {
   
