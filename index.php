@@ -14,7 +14,7 @@ $remote_ip = $_SERVER['REMOTE_ADDR'];
 $blocklist_file = __DIR__ . '/custom/files/private/banned_ips.txt';
 $cache_key = 'banned_ips';
 
-// Load blocked IPs
+// Load banned IPs
 if (function_exists('apcu_fetch')) {
   $blocked_ips_assoc = apcu_fetch($cache_key);
   if ($blocked_ips_assoc === FALSE) {
@@ -29,7 +29,8 @@ if (function_exists('apcu_fetch')) {
   }
 } // if apcu is installed 
 else {
-  // APCu not installed: fallback to reading file every request
+  // APCu not installed or we are instructed to look at the blocklist file directly
+  // fallback to reading file every request
   $blocked_ips_assoc = array();
   if (file_exists($blocklist_file)) {
     $lines = file($blocklist_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
