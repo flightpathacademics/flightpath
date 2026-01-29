@@ -5,6 +5,8 @@ FlightPath 7.x Changelog
   Tweaking the system to ban IP addresses; adding indexes to the watchdog table for faster
   comparisons.
   
+  Updated jQuery UI from 1.14.0 to 1.14.1.
+  
 
 2026-01-26
   Added code to detect and automatically ban an anonymous user (visitor) 
