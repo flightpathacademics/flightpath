@@ -7,6 +7,8 @@ FlightPath 7.x Changelog
   
   Updated jQuery UI from 1.14.0 to 1.14.1.
   
+  Clear cache also clears the APCu cache, if installed
+  
 
 2026-01-26
   Added code to detect and automatically ban an anonymous user (visitor) 
