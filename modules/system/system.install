@@ -106,8 +106,8 @@ function system_update($old_schema, $new_schema) {
   if (intval($old_schema) < 2) {
     
     db_query("CREATE TABLE `banned_ips` (
-              `ip_address` varchar(255) NOT NULL,
-              `posted_ts` bigint(255) unsigned DEFAULT NULL,
+              `ip_address` varchar(64) NOT NULL,
+              `posted_ts` bigint(20) unsigned DEFAULT NULL,
               PRIMARY KEY (`ip_address`),
               KEY `posted_ts` (`posted_ts`)
               )");
@@ -144,6 +144,19 @@ function system_update($old_schema, $new_schema) {
     
     db_query("CREATE INDEX idx_watchdog_user_ip_type_ts
                 ON watchdog (user_id, ip, `type`, `timestamp`)");
+  }
+  
+  
+  
+  if (intval($old_schema) < 6) {
+    
+    // Modify banned_ips table    
+    db_query("ALTER TABLE banned_ips
+                MODIFY ip_address VARCHAR(64)");
+    
+    db_query("ALTER TABLE banned_ips
+                MODIFY posted_ts INT UNSIGNED DEFAULT NULL");
+    
   }
   
   
@@ -266,8 +279,8 @@ db_query($q);
 
 $q = "
 CREATE TABLE `banned_ips` (
-  `ip_address` varchar(255) NOT NULL,
-  `posted_ts` bigint(255) unsigned DEFAULT NULL,
+  `ip_address` varchar(64) NOT NULL,
+  `posted_ts` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`ip_address`),
   KEY `posted_ts` (`posted_ts`)
 ); ";
