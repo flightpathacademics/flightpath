@@ -693,8 +693,7 @@ function system_ban_ip_settings_form() {
   
   $form['system_manually_add_ip'] = array(
     'label' => t('Manually add an IP address to the ban list:'),
-    'type' => 'text',
-    'description' => 'Note: it may take several minutes to load recently banned IPs into the cache.',
+    'type' => 'text',    
   );
   
   
@@ -779,14 +778,11 @@ function system_ban_ip_settings_form_submit($form, &$form_state) {
       fp_add_message("Unable to write to the ban ip file. File permission issue?", 'error');
     }
         
-    // Add to our apcu cache, if installed.
-    if (function_exists('acpu_store')) {
-      $lines = file($ban_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-      $lines = array_map('trim', $lines);
-      $blocked_ips_assoc = array_flip($lines);
-      apcu_store('banned_ips', $blocked_ips_assoc, 60); // cache X seconds
+    // Reset our apcu cache, if installed.
+    if (function_exists('apcu_store')) {
+      apcu_delete('banned_ips'); // force reload of banned ips next time a page is loaded.
     }
-        
+    
     
     // Also put in our table with current timestamp, so cron can expire it later.
     db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($manual_ip));    
@@ -812,11 +808,9 @@ function system_ban_ip($ip, $comment = "") {
     return FALSE;
   }
   
-  // Add to our apcu cache, if installed.
-  if (function_exists('apcu_store')) {
-    
-    apcu_delete('banned_ips'); // force reload of banned ips next time a page is loaded.
-    
+  // Reset our apcu cache, if installed.
+  if (function_exists('apcu_store')) {    
+    apcu_delete('banned_ips'); // force reload of banned ips next time a page is loaded.    
   } 
   
   // Also put in our table with current timestamp, so cron can expire it later (if setup).  
