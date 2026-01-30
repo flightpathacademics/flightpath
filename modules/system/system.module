@@ -679,7 +679,15 @@ function system_ban_ip_settings_form() {
   );
 
   
-  // TODO: auto-ban settings.
+  // auto-ban settings.
+  $form['system_enable_autoban_ip'] = array(
+    'type' => 'checkbox',
+    'label' => 'Enable auto-ban functionality?',
+    'value' => variable_get('system_enable_autoban_ip', TRUE),
+    'description' => t('If checked, FlightPath will automatically ban IP addresses which
+                        trigger too many (5) page_not_found or access_denied events within a given
+                        time period (5 seconds).'),
+  );
   
   
   
@@ -811,9 +819,9 @@ function system_ban_ip($ip, $comment = "") {
     
   } 
   
-  // Also put in our table with current timestamp, so cron can expire it later (if setup).
-  db_query("DELETE FROM banned_ips WHERE ip_address = ?", array($ip));
-  db_query("INSERT INTO banned_ips (ip_address, posted_ts) VALUES (?, ?)", array($ip, time()));
+  // Also put in our table with current timestamp, so cron can expire it later (if setup).  
+  // Use REPLACE to avoid mysql errors for duplicate IPs
+  db_query("REPLACE INTO banned_ips (ip_address, posted_ts) VALUES (?, ?)", array($ip, time()));
   
   
   watchdog("ban_ip", "Banned IP address: %ip; %comment", array("%ip" => $ip, "%comment" => $comment));
@@ -839,10 +847,11 @@ function system_check_should_ban_ip() {
   
   // Criteria: user is anonymous, and has had more than X "not found" or "access denied" attempts within Y minutes.
   if (intval($user->id ?? 0) === 0) {
-    // TODO: check if autoban is enabled
+    // check if autoban is enabled
+    if (variable_get('system_enable_autoban_ip', TRUE) == FALSE) return;
     
-    $max_allowed = 7;  // TODO: a setting?
-    $minutes = 1; // TODO: a setting?
+    $max_allowed = 5;  // TODO: a setting?
+    $seconds = 5; // TODO: a setting?
     
     
     // Perform simple query on watchdog table
@@ -851,7 +860,7 @@ function system_check_should_ban_ip() {
                         AND ip = ?
                         AND `type` IN ('page_not_found', 'access_denied')
                         AND `timestamp` > ?",
-                        array($ip, strtotime("NOW - $minutes MINUTES"))));
+                        array($ip, strtotime("NOW - $seconds SECONDS"))));
 
     /*
     // We also want to see if they did
@@ -860,7 +869,7 @@ function system_check_should_ban_ip() {
                         AND ip = ?
                         AND `type` NOT IN ('page_not_found', 'access_denied')
                         AND `timestamp` > ?",
-                        array($ip, strtotime("NOW - $minutes MINUTES"))));
+                        array($ip, strtotime("NOW - $seconds SECONDS"))));
     
     if ($safecount) {
       if (intval($safecount) > 0) return;
@@ -871,7 +880,8 @@ function system_check_should_ban_ip() {
       $count = intval($count);
       if ($count >= $max_allowed) {
         // Yes, we should ban them.
-        system_ban_ip($ip, "Exceeded $max_allowed forbidden events in the past $minutes minutes.");        
+        system_ban_ip($ip, "Exceeded $max_allowed forbidden events in the past $seconds seconds.");
+        sleep(2); // Force their browser or script or whatever to sleep for 2 seconds.
       }
     }
         
