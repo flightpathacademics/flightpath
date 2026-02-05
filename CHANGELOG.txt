@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-02-05
+  Changed description of certain system permissions.
+  
+
 2026-01-29
   Tweaking the system to ban IP addresses; adding indexes to the watchdog table for faster
   comparisons.

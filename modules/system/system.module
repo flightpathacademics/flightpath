@@ -47,15 +47,15 @@ function system_perm() {
     ),    
         
     "de_can_administer_system_settings" => array(
-      "title" => t("Can administer system settings"),
-      "description" => t("This allows the user to edit any of the FlightPath
+      "title" => t("Administer System settings"),
+      "description" => t("This allows the user to access and edit any of the FlightPath
                         system settings."),
     ),
     
     "de_can_administer_school_data" => array(
-      "title" => t("Can administer school data"),
-      "description" => t("This allows the user to edit the school data settings for FlightPath.
-                          For example, describing college and subject codes."),
+      "title" => t("Administer School settings"),
+      "description" => t("This allows the user to access and edit the 'Configure school settings' for FlightPath.
+                          For example, describing college and subject codes, policies for repeats, etc."),
     ),
     
     
