@@ -1817,6 +1817,9 @@ function fp_token() {
  */
 function fp_get_session_str() {
   $session_id = session_id();  // Get the PHP session_id
+  
+  // TODO: don't use IP as part of this, as it can change if the user switches networks.
+  
   $ip = @$_SERVER["REMOTE_ADDR"];
   if ($ip == "") $ip = "000";
   

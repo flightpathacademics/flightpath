@@ -83,7 +83,16 @@ if (@$_GET['fp_session_str'] != '') {
   }
   else {
     // The session did not validate.  This might be a hacking attempt.  Kill the script.
-    die("Error: Session could not be validated by FlightPath (index.php).  If this continues, contact your IT administrator.");
+    die("Security Error: Session could not be validated by FlightPath (index.php). This is a security
+         feature to protect data privacy.  
+        <br><br>
+        This can happen for a number of reasons. For example, if you followed a link provided by another
+        user that contained sensitive session information.  Or, if you changed networks or turned a VPN
+        off or on.
+        <br><br>
+        Visit the base URL for this site to log in securely. Ex: https://flightpath.example.com/
+        <br><br>
+        If this error continues, contact your IT administrator.");
   }  
 }
 

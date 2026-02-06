@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-02-06
+  Added more verbose explanation for when a user sees a session str mismatch error in index.php.
+  
+
 2026-02-05
   Changed description of certain system permissions.
   
