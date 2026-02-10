@@ -39,15 +39,19 @@ else {
   }
 }
 
-/*
+
 // Check if IP is blocked
 if (isset($blocked_ips_assoc[$remote_ip])) {
+  
+  // TODO: If banned, give the user a chance to remove ban by visiting a page and answering
+  //       a CAPTCHA or some other challenge?
+  
   error_log("Banned IP: $remote_ip tried to access " . $_SERVER['REQUEST_URI']); // optional
   header('HTTP/1.1 403 Forbidden');
   echo "403: Access denied";
   exit;
 }
-*/
+
 
 
 

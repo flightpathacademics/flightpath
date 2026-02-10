@@ -685,8 +685,8 @@ function system_ban_ip_settings_form() {
     'label' => 'Enable auto-ban functionality?',
     'value' => variable_get('system_enable_autoban_ip', TRUE),
     'description' => t('If checked, FlightPath will automatically ban IP addresses which
-                        trigger too many (5) page_not_found or access_denied events within a given
-                        time period (5 seconds).'),
+                        trigger too many (7) page_not_found or access_denied events within a given
+                        time period (2 seconds).'),
   );
   
   
@@ -844,8 +844,8 @@ function system_check_should_ban_ip() {
     // check if autoban is enabled
     if (variable_get('system_enable_autoban_ip', TRUE) == FALSE) return;
     
-    $max_allowed = 5;  // TODO: a setting?
-    $seconds = 5; // TODO: a setting?
+    $max_allowed = 7;  // TODO: a setting?
+    $seconds = 2; // TODO: a setting?
     
     
     // Perform simple query on watchdog table
