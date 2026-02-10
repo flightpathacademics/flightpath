@@ -39,6 +39,7 @@ else {
   }
 }
 
+/*
 // Check if IP is blocked
 if (isset($blocked_ips_assoc[$remote_ip])) {
   error_log("Banned IP: $remote_ip tried to access " . $_SERVER['REQUEST_URI']); // optional
@@ -46,7 +47,7 @@ if (isset($blocked_ips_assoc[$remote_ip])) {
   echo "403: Access denied";
   exit;
 }
-
+*/
 
 
 
