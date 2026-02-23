@@ -903,7 +903,7 @@ function stats_report_major_counts() {
         </tr>";
   
   $total = 0;
-  
+  $res_array = array();
   $result = db_query("SELECT * FROM degrees
                           GROUP BY major_code 
                           ORDER BY school_id, major_code, title ");
@@ -944,19 +944,20 @@ function stats_report_major_counts() {
     
   }
    
-
-  foreach($res_array as $major => $value) {
-
-    $rtn .= "<tr>";
-    if (module_enabled('schools')) {
-      $rtn .= "<td valign='top' class='tenpt'>{$value["school_code"]}</td>";
+  if (count($res_array) > 0) {
+    foreach($res_array as $major => $value) {
+  
+      $rtn .= "<tr>";
+      if (module_enabled('schools')) {
+        $rtn .= "<td valign='top' class='tenpt'>{$value["school_code"]}</td>";
+      }
+      $rtn .= "
+            <td valign='top' class='tenpt'>$major</td>
+            <td valign='top' class='tenpt'>{$value["count"]}</td>
+            <td valign='top' class='tenpt'>{$value["type"]}</td>
+            <td valign='top' class='tenpt'>{$value["desc"]}</td>
+          </tr>";
     }
-    $rtn .= "
-          <td valign='top' class='tenpt'>$major</td>
-          <td valign='top' class='tenpt'>{$value["count"]}</td>
-          <td valign='top' class='tenpt'>{$value["type"]}</td>
-          <td valign='top' class='tenpt'>{$value["desc"]}</td>
-        </tr>";
   }
 
   $rtn .= "</table>
