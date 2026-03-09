@@ -527,6 +527,7 @@ function admin_process_catalog_repeats_for_group_courses_text($courses, $catalog
 
       $course_repeats = str_replace("[","",$course_repeats);
       $course_repeats = str_replace("]","",$course_repeats);
+      $course_repeats = intval($course_repeats);
       $course_repeats--;
       if ($course_repeats < 0) { $course_repeats = 0; }
 
