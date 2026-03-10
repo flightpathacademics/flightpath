@@ -425,6 +425,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
 
       $course_repeats = str_replace("[","",$course_repeats);
       $course_repeats = str_replace("]","",$course_repeats);
+      $course_repeats = intval($course_repeats);
       $course_repeats--;
       if ($course_repeats < 0) { $course_repeats = 0; }
 
@@ -1837,6 +1838,7 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
 
         $course_repeats = str_replace("[","",$course_repeats);
         $course_repeats = str_replace("]","",$course_repeats);
+        $course_repeats = intval($course_repeats);
         $course_repeats--;
         if ($course_repeats < 0) { $course_repeats = 0; }
 
@@ -1900,6 +1902,7 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
   
           $course_repeats = str_replace("[","",$course_repeats);
           $course_repeats = str_replace("]","",$course_repeats);
+          $course_repeats = intval($course_repeats);
           $course_repeats--;
           if ($course_repeats < 0) { $course_repeats = 0; }
   
