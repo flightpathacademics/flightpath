@@ -2056,7 +2056,7 @@ class FlightPath extends stdClass
                   if (!is_numeric($g->hours_assigned)) {
                     $g->hours_assigned = floatval($g->hours_assigned);
                   }
-                  $g->hours_assigned += $h;                 
+                  $g->hours_assigned += floatval($h);                 
                 }
                 
                 
