@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-03-19
+  Fixed several small issues that caused warnings in PHP 8.3
+  
+
 2026-02-06
   Added more verbose explanation for when a user sees a session str mismatch error in index.php.
   

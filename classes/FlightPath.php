@@ -2053,6 +2053,9 @@ class FlightPath extends stdClass
                                // horribly break.
                     }
                   }
+                  if (!is_numeric($g->hours_assigned)) {
+                    $g->hours_assigned = floatval($g->hours_assigned);
+                  }
                   $g->hours_assigned += $h;                 
                 }
                 
