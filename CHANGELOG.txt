@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-04-01
+  Added better documentation and some functionality changes for legacy concentrations.
+
+
 2026-03-19
   Fixed several small issues that caused warnings in PHP 8.3
   

@@ -1489,7 +1489,7 @@ function engagements_sms_settings_form()
     'label' => 'Mass SMS Password:',
     'type' => 'textfield',
     'value' => variable_get('sms_mass_sms_password', 'changeMe'),
-    'description' => t("Before a user may use the Send Mass Text Messages feature (to sent o many recipients), they must enter this password to protect against accidental submissions."),
+    'description' => t("Before a user may use the Send Mass Text Messages feature (to sent to many recipients), they must enter this password to protect against accidental submissions."),
   );
 
 

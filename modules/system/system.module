@@ -2782,11 +2782,11 @@ function system_settings_form() {
     "label" => t("Enable legacy concentrations?"),
     "type" => "checkbox",
     "value" => variable_get("enable_legacy_concentrations", FALSE),
-    "description" => t("If checked, FlightPath will instruct users creating new degrees (and in other places) to
-                        enter concentrations with a | (pipe) symbol.  This is how concentrations were handled in FlightPath 4x and
-                        before-- as entirely separate degrees.  However, this can cause confusion if Dynamic Degrees
-                        and/or Level-3 degrees are being utilized, as a concentration is a similar concept as a level-3 track, and some schools
-                        may even name it as such.  If you are unsure what to do, leave this unchecked."),    
+    "description" => t("If checked, FlightPath will treat a degree with a concentration as its own unique major_code, rather
+                        than the concentration being treated as a Level-3 degree.  This is how concentrations were handled in FlightPath 4x and
+                        before-- as entirely separate degrees.<br><a href='https://getflightpath.com/node/13467' target='_blank'>See this documentation page for more details.</a>
+                        Note that enabling this setting can cause extra confusion and data entry when creating degrees.
+                        If you are unsure what to do, leave this unchecked."),    
   );
                 
         

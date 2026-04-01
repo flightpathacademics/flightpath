@@ -489,9 +489,9 @@ function admin_add_degree_form() {
   
   $bool_legacy_concentrations = variable_get("enable_legacy_concentrations", FALSE);
   $legacy_text = "";
-  if ($bool_legacy_concentrations) {
-    $legacy_text = " [and concentration] ";
-  }
+  //if ($bool_legacy_concentrations) {
+  //  $legacy_text = " [and concentration]";
+  //}
 
   $form["de_catalog_year"] = array(
     "type" => "hidden",
@@ -500,8 +500,8 @@ function admin_add_degree_form() {
 
   $form["new_major"] = array(
     "type" => "radios",
-    "label" => t("Are you entering a new major code $legacy_text,<br> 
-                  or an existing major code $legacy_text (so you can add a new track)?"),
+    "label" => t("Are you entering a new major code$legacy_text, 
+                  or an existing major code$legacy_text (so you can add a new track)?"),
     "options" => array(
       "new" => t("Entering a <b>new</b> major code"),
       "existing" => t("Entering an <b>existing</b> major code (only adding a new Level-3 track)"),
@@ -515,15 +515,18 @@ function admin_add_degree_form() {
   $desc = "Enter the Level-1 or -2 Major Code here.  
            Do not enter any Level 3 codes (ex: Tracks or Concentrations).
            <br>For example, enter ACCT or ENGL.  <i><b>But not ENGL|_TRKA, etc</b></i>";
+  
+  /*
   if ($bool_legacy_concentrations) {
     $desc = "To enter a concentration code, use MAJOR|CONC. 
-                      The | character is call the pipe, and it should under the backspace key. 
+                      The | character is called the pipe, and it should under the backspace key. 
                       If adding a new concentration to an existing major, you still put this in as a 
                       NEW major code. Do not have any spaces in this box. The concentration code 
                       is optional. If the major does not have a concentration, 
                       then simply enter the major code by itself.  The combined major code and optional track
                       code can only be 18 characters maximum.";
   }
+  */
   
   $form["major_code"] = array(
     "type" => "textfield",
@@ -1100,6 +1103,7 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   
   $db = get_global_database_handler();
 
+  $bool_legacy_concentrations = (bool) variable_get("enable_legacy_concentrations", FALSE);
   
   $draft_setting_current_catalog_year = variable_get_for_school("current_draft_catalog_year", 2006, $school_id);
 
@@ -1145,10 +1149,16 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
     "value" => '',
   );
   
-      
+  $legacy_notice = "";
+  if ($bool_legacy_concentrations) {
+    $legacy_notice .= "<div class='legacy-concentration-notice'>" . t("Note: Since you have 'Enable legacy concentrations' checked
+                          in the System Settings, the Degree Classification Level is limited to either Level 1 or Level 2.") . "</div><br>";
+    
+  }
+  
   
   $form["markup_degree_header"] = array(
-    "value" => "<h3>$degree->degree_type $degree->title<br>$major_code ($de_catalog_year)</h3>",
+    "value" => "<h3>$degree->degree_type $degree->title<br>$major_code ($de_catalog_year)</h3>$legacy_notice",
     "weight" => 1010,
   );
   
@@ -1167,6 +1177,9 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   $options = array();
   $degree_classes = fp_get_degree_classifications();
   foreach ($degree_classes["levels"] as $level => $details) {
+    
+    if (intval($level) == 3 && $bool_legacy_concentrations) continue;
+    
     foreach ($degree_classes["levels"][$level] as $machine_name => $title) {
       //$rtn .= "<option value='$machine_name' $sel>$level - $title</option>";
       $options[$machine_name] = "$level - $title";
@@ -1175,7 +1188,7 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   
   $form["degree_class"] = array(
     "type" => "select",
-    "label" => t("Classification:"),
+    "label" => t("Degree Classification Level:"),
     "options" => $options,
     "value" => $degree->degree_class,
     "hide_please_select" => TRUE,
@@ -1192,7 +1205,7 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   
   $form["degree_level"] = array(
     "type" => "select",
-    "label" => t("Level:"),
+    "label" => t("Student Level:"),
     "size" => 1,
     "options" => array('UG' => 'UG - Under Grad', 'GR' => 'GR - Grad'),
     "value" => $degree->degree_level,
