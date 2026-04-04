@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-04-04
+  Added hooks to the engagements module to allow other modules to act when 
+  new SMS messages come in.
+  
+
 2026-04-01
   Added better documentation and some functionality changes for legacy concentrations.
 
