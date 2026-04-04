@@ -777,6 +777,43 @@ function fp_url_get_contents($url) {
 }
 
 
+
+/**
+ * This function is borrowed from Backdrop version 1.x.  We use it to convert the $data (which is in the form of an assoc 
+ * array of keys and values) into an HTTP query string.
+ * 
+ * 
+ * @param array $data
+ * @param string $parent
+ * @return string
+ */
+function fp_http_build_query(array $data, $parent = '') {
+  $params = array();
+  
+  foreach ($data as $key => $value) {
+    $key = $parent ? $parent . rawurlencode('[' . $key . ']') : rawurlencode($key);
+    
+    // For better readability of paths in query strings, we decode slashes.
+    $key = str_replace('%2F', '/', $key);
+    
+    // Recurse into children.
+    if (is_array($value)) {
+      $params[] = fp_http_build_query($value, $key);
+    }
+    // If a query parameter value is NULL, only append its key.
+    elseif (!isset($value)) {
+      $params[] = $key;
+    }
+    else {
+      // For better readability of paths in query strings, we decode slashes.
+      $params[] = $key . '=' . str_replace('%2F', '/', rawurlencode($value));
+    }
+  }
+  
+  return implode('&', $params);
+}
+
+
   
  
 /**
@@ -858,6 +895,13 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   // or PUT request. Some non-standard servers get confused by Content-Length in
   // at least HEAD/GET requests, and Squid always requires Content-Length in
   // POST/PUT requests.
+  
+  // Convert $data to a query string, if it's an array.
+  if (is_array($data)) {
+    $data = fp_http_build_query($data);
+  }
+  
+  
   $content_length = 0;
   if ($data) {
     $content_length = strlen($data);

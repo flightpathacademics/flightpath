@@ -5,6 +5,9 @@ FlightPath 7.x Changelog
   Added hooks to the engagements module to allow other modules to act when 
   new SMS messages come in.
   
+  Added new function: fp_http_build_query(), used to convert an assoc array into
+  an HTTP query string.
+  
 
 2026-04-01
   Added better documentation and some functionality changes for legacy concentrations.
