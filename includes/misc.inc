@@ -827,6 +827,12 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
 
   $result = new stdClass();
 
+  // If we are trying to POST something, make sure content-type header is set.
+  if ($method == 'POST' && !isset($headers['Content-Type']) && !isset($headers['Content-type']) && !isset($headers['content-type'])) {
+    $headers['Content-type'] = "application/x-www-form-urlencoded";
+  }
+  
+  
   // Parse the URL and make sure we can handle the schema.
   $uri = parse_url($url);
 
