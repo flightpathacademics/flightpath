@@ -16,7 +16,7 @@ can take advantage of.
  * 
  * @param unknown $vars
  */
-function hook_engagements_handle_incomming_sms_init(&$vars) {
+function hook_engagements_handle_incoming_sms_init(&$vars) {
  
   // Example code:
   $message_sid = $vars['MessageSid'];
@@ -29,7 +29,7 @@ function hook_engagements_handle_incomming_sms_init(&$vars) {
 
 
 /**
- * Called at the very end of the engagements_handle_incomming_sms function, after the SMS message has been
+ * Called at the very end of the engagements_handle_incoming_sms function, after the SMS message has been
  * received, and any alerts or other content have been created, and it has been added to the sms_history table.
  *
  * The $sms_history_mid value is the `mid` from the sms_history database table.
@@ -37,7 +37,7 @@ function hook_engagements_handle_incomming_sms_init(&$vars) {
  * $content_created is an array of content (like the engagement, alerts, etc) which were created as a result
  *                    of this SMS).
  */
-function hook_engagements_handle_incomming_sms_post_save(&$vars, $sms_history_mid = 0, $content_created = array()) {
+function hook_engagements_handle_incoming_sms_post_save(&$vars, $sms_history_mid = 0, $content_created = array()) {
   
   // Ex: Query sms_history where mid = $sms_history_mid, insert into other table
   

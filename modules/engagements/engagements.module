@@ -1705,7 +1705,7 @@ function engagements_handle_incoming_sms($vars = array())
   // If we made it here, then it's proven to be from SignalWire, and we can continue.
     
   // Allow other modules would like to handle in incoming SMS or even make changes to what is in $vars.
-  invoke_hook('engagements_handle_incomming_sms_init', array(&$vars));
+  invoke_hook('engagements_handle_incoming_sms_init', array(&$vars));
   
   
   $message_sid = $vars['MessageSid'];
@@ -2055,7 +2055,7 @@ function engagements_handle_incoming_sms($vars = array())
   
   
   // Allow other modules would like to handle in incoming SMS or even make changes to what is in $vars.
-  invoke_hook('engagements_handle_incomming_sms_post_save', array(&$vars, $sms_history_mid, $content_created));
+  invoke_hook('engagements_handle_incoming_sms_post_save', array(&$vars, $sms_history_mid, $content_created));
     
   
   
