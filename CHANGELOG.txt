@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-04-05
+  Simplified the text message STOP and UNSTOP messages.
+  
+
 2026-04-04
   Added hooks to the engagements module to allow other modules to act when 
   new SMS messages come in.

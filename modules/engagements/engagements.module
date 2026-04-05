@@ -2099,8 +2099,7 @@ function engagements_handle_sms_stop($user_id = 0, $cwid = '', $phone_number = '
                     VALUES (?, ?, ?, ?, ?)", array($user_id, $cwid, $phone_number, $prev_notification_method, time()));
   
   // Send final sms back to number telling them how to re-enable.
-  $msg = t("You have opted-out of receiving text messages from @flightpath. To re-subscribe, text UNSTOP or SUBSCRIBE.\n\nYou may also log into @flightpath and edit your notification settings.",
-              array("@flightpath" => variable_get("system_name", "FlightPath"))); 
+  $msg = t("You have opted-out of receiving text messages from this number. To re-subscribe, text UNSTOP or SUBSCRIBE."); 
   
   engagements_send_sms_to_number($phone_number, $msg, '', $from_fp_phone_number, FALSE);
   
@@ -2144,8 +2143,7 @@ function engagements_handle_sms_unstop($user_id = 0, $cwid = '', $phone_number =
   db_query('DELETE FROM sms_do_not_txt WHERE phone_number = ?', array($phone_number));
   
   // Send final sms back to number telling them how to re-enable.
-  $msg = t("You have opted-in to receiving text messages from @flightpath.\nReply STOP to opt-out.\n\nYou may also log into @flightpath and edit your notification settings.",
-              array("@flightpath" => variable_get("system_name", "FlightPath"))); 
+  $msg = t("You have opted-in to receiving text messages from this number.\nReply STOP to opt-out."); 
   
   engagements_send_sms_to_number($phone_number, $msg, '', $from_fp_phone_number, FALSE);
   
