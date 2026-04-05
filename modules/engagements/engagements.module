@@ -1769,7 +1769,7 @@ function engagements_handle_incoming_sms($vars = array())
       engagements_handle_sms_stop($from_user_id, $from_cwid, $from_mobile, $to_mobile);
     }
     // UNSTOP or SUBSCRIBE?
-    if (trim(strtoupper($body)) === 'UNSTOP' || trim(strtoupper($body)) === 'SUBSCRIBE') {
+    if (trim(strtoupper($body)) === 'UNSTOP' || trim(strtoupper($body)) === 'SUBSCRIBE' || trim(strtoupper($body)) === 'START') {
       engagements_handle_sms_unstop($from_user_id, $from_cwid, $from_mobile, $to_mobile);
     }
         
