@@ -701,6 +701,20 @@ function fp_mail($to, $subject, $msg, $bool_html = FALSE, $attachments = array()
   
   
   watchdog('fp_mail', t("Sending mail to @to, subject: @subject.  Last sent md5: @md5", array("@to" => $to, "@subject" => $subject, "@md5" => $md5_check)), array(), WATCHDOG_DEBUG);
+    
+  // Before actually sending an email, make sure IF the recipient belongs a user, then that user is not "disabled".
+  $res = db_query("SELECT * FROM users 
+                    WHERE email = ?
+                    ORDER BY is_disabled
+                    LIMIT 1", array(strtolower(trim($to))));
+  $cur = db_fetch_array($res);
+  if ($cur) {
+    if (intval($cur['is_disabled']) === 1) {
+      watchdog('fp_mail_not_send', "NOT sending to @to, user is marked as is_disabled in users table.", array('@to' => $to), WATCHDOG_DEBUG);
+      return;
+    }
+  }
+  
   
   
   if (module_enabled('smtp')) {
@@ -826,7 +840,8 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   global $db_prefix;
 
   $result = new stdClass();
-
+  $errno = $errstr = '';
+  
   // If we are trying to POST something, make sure content-type header is set.
   if ($method == 'POST' && !isset($headers['Content-Type']) && !isset($headers['Content-type']) && !isset($headers['content-type'])) {
     $headers['Content-type'] = "application/x-www-form-urlencoded";
@@ -877,7 +892,8 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
     $result->error = trim($errstr);
 
     // Log that this failed.
-    watchdog("http_request", "fp_http_request failed! Perhaps the server cannot make requests?", array(), WATCHDOG_ERROR);
+    watchdog("http_request", "fp_http_request failed!  Request URL: @url, Method: @method, 
+                              Error code: @ec, Error msg: @em", array('@ec' => $errno, '@em' => $errstr, '@url' => $url, '@method' => $method), WATCHDOG_ERROR);
 
     return $result;
   }

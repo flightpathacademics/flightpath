@@ -160,6 +160,15 @@ function system_update($old_schema, $new_schema) {
   }
   
   
+  if (intval($old_schema) < 7) {
+    
+    // Add additional index on users for the email column
+    
+    db_query("CREATE INDEX idx_email
+                ON users (`email`)");
+  }
+  
+  
   
 } // update
 
@@ -958,6 +967,7 @@ CREATE TABLE `users` (
   KEY `is_disabled` (`is_disabled`) ,
   KEY `is_faculty` (`is_faculty`) ,
   KEY `is_student` (`is_student`) ,
+  KEY `email` (`email`) ,
   KEY `school_id` (`school_id`)
 );  ";
 db_query($q);

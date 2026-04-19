@@ -1,6 +1,12 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-04-19
+  Added extra logging when fp_http_request fails.
+  
+  Added check before performing fp_mail() to see if recipient is a "disabled" user.
+  
+
 2026-04-05
   Simplified the text message STOP and UNSTOP messages.
   
