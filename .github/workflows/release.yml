@@ -33,14 +33,7 @@ jobs:
           script: |
             const release = context.payload.release;
 
-            const body =
-`Invalid release tag format.
-
-Required format: X.Y.Z (example: 7.9.1)
-
-Provided tag: ${release.tag_name}
-
-No build artifact was generated. Please correct the tag and re-release.`;
+            const body =  "Invalid release tag format.\n\n" + "Required format: X.Y.Z (example: 7.9.1)\n\n" +  "Provided tag: " + release.tag_name + "\n\n" + "No build artifact was generated. Please correct the tag and re-release.";
 
             await github.rest.repos.updateRelease({
               owner: context.repo.owner,
