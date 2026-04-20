@@ -4,34 +4,35 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code at the release commit
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Inject version from GitHub Release tag
       - name: Inject version into bootstrap.inc
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           echo "Using version: $VERSION"
-
           sed -i "s/%FP_VERSION%/$VERSION/g" bootstrap.inc
 
-      # 3. Build zip artifact
-      - name: Create release zip
+      - name: Create zip artifact
         run: |
           zip -r flightpath.zip . \
             -x "*.git*" \
             -x ".github/*"
 
-      # 4. Upload asset to the SAME GitHub Release
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v2
-        with:
-          files: flightpath.zip
+      - name: Upload asset to release
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./flightpath.zip
+          asset_name: flightpath.zip
+          asset_content_type: application/zip
