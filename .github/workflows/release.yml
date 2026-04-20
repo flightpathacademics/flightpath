@@ -12,95 +12,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -----------------------------------
-      # 1. Checkout code
-      # -----------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # -----------------------------------
-      # 2. Validate version format
-      # -----------------------------------
       - name: Validate version format
         id: validate
         run: |
           VERSION="${{ github.event.release.tag_name }}"
-          echo "Validating version: $VERSION"
 
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "INVALID=true" >> $GITHUB_OUTPUT
-          else
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "INVALID=false" >> $GITHUB_OUTPUT
+          else
+            echo "INVALID=true" >> $GITHUB_OUTPUT
           fi
 
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-
-      # -----------------------------------
-      # 3. Mark release visibly as invalid (NO deletion)
-      # -----------------------------------
-      - name: Mark invalid release in UI
+      - name: Update release body if invalid
         if: steps.validate.outputs.INVALID == 'true'
         uses: actions/github-script@v7
         with:
           script: |
             const release = context.payload.release;
 
-            const warning =
-`⚠️ **INVALID RELEASE TAG FORMAT**
+            const body =
+`Invalid release tag format.
 
-This release did NOT pass CI validation.
+Required format: X.Y.Z (example: 7.9.1)
 
-### Required format
-\`X.Y.Z\` (example: \`7.9.1\`)
+Provided tag: ${release.tag_name}
 
-### Your tag
-\`${release.tag_name}\`
+No build artifact was generated. Please correct the tag and re-release.`;
 
----
-
-❌ No build artifact was generated.
-❌ Please edit the tag or delete and recreate the release.
-
-CI has stopped processing this release.`;
-
-            // Update release body
             await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               release_id: release.id,
-              body: warning,
-              name: `❌ INVALID: ${release.name || release.tag_name}`
+              body: body
             });
 
-      # -----------------------------------
-      # 4. Stop workflow (no artifacts)
-      # -----------------------------------
-      - name: Stop invalid build
+      - name: Stop if invalid version
         if: steps.validate.outputs.INVALID == 'true'
         run: |
-          echo "❌ Invalid version format. Build aborted."
+          echo "Invalid version format"
           exit 1
 
-      # -----------------------------------
-      # 5. Inject version into PHP
-      # -----------------------------------
       - name: Inject version into bootstrap.inc
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           sed -i "s/%FP_VERSION%/$VERSION/g" bootstrap.inc
 
-      # -----------------------------------
-      # 6. Build ZIP
-      # -----------------------------------
       - name: Create release zip
         run: |
           zip -r flightpath.zip . \
             -x "*.git*" \
             -x ".github/*"
 
-      # -----------------------------------
-      # 7. Upload artifact
-      # -----------------------------------
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
