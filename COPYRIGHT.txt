@@ -19,7 +19,7 @@ Note that you are not required to release your code under
 typical use (see link below for explanation), but you are required to release it under 
 certain conditions  
 
-See this page for our interpretation of the GNU GPL: http://getflightpath.com/gnu-gpl
+See this page for our interpretation of the GNU GPL: https://getflightpath.com/gnu-gpl
 
 For add-on modules, unless otherwise stated in a separate COPYRIGHT.txt or LICENSE.txt file, 
 all FlightPath modules are also released under the GNU GPL version 3 or any later version, 

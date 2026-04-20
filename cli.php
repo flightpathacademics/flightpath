@@ -33,7 +33,7 @@ $GLOBALS["fp_die_mysql_errors"] = TRUE;
 
 
 // Get the command being issued to the script.  Ex: php cli.php COMMAND
-$command_one = trim($argv[1]);
+$command_one = trim($argv[1] ?? '');
 
 if ($command_one == "" || $command_one == "-h" || $command_one == "--help" || $command_one == "help" || $command_one == "?") {
   // show instructions.

@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-04-20
+  Minor changes for PHP 8, and to change a URL in the COPYRIGHT.txt file to https:// instead of http://
+  
+
 2026-04-19
   Added extra logging when fp_http_request fails.
   
