@@ -12,22 +12,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout code at the release commit
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. Validate version format (STRICT X.Y.Z only)
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          echo "Validating version: $VERSION"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "======================================"
+            echo "❌ INVALID VERSION FORMAT"
+            echo "Tag must be X.Y.Z (example: 7.9.1)"
+            echo "Received: $VERSION"
+            echo "======================================"
+            exit 1
+          fi
+
+          echo "✅ Version format valid"
+
+      # 3. Inject version into PHP bootstrap file
       - name: Inject version into bootstrap.inc
         run: |
           VERSION="${{ github.event.release.tag_name }}"
-          echo "Using version: $VERSION"
+          echo "Injecting version: $VERSION"
+
           sed -i "s/%FP_VERSION%/$VERSION/g" bootstrap.inc
 
-      - name: Create zip artifact
+      # 4. Build ZIP artifact (excluding repo metadata)
+      - name: Create release zip
         run: |
           zip -r flightpath.zip . \
             -x "*.git*" \
             -x ".github/*"
 
-      - name: Upload asset to release
+      # 5. Upload ZIP to GitHub Release
+      - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
