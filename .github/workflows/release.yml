@@ -12,43 +12,93 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code at the release commit
+      # -----------------------------------
+      # 1. Checkout code
+      # -----------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Validate version format (STRICT X.Y.Z only)
+      # -----------------------------------
+      # 2. Validate version format
+      # -----------------------------------
       - name: Validate version format
+        id: validate
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           echo "Validating version: $VERSION"
 
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "======================================"
-            echo "❌ INVALID VERSION FORMAT"
-            echo "Tag must be X.Y.Z (example: 7.9.1)"
-            echo "Received: $VERSION"
-            echo "======================================"
-            exit 1
+            echo "INVALID=true" >> $GITHUB_OUTPUT
+          else
+            echo "INVALID=false" >> $GITHUB_OUTPUT
           fi
 
-          echo "✅ Version format valid"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      # 3. Inject version into PHP bootstrap file
+      # -----------------------------------
+      # 3. Update release body with warning (UI feedback)
+      # -----------------------------------
+      - name: Mark release as invalid (UI warning)
+        if: steps.validate.outputs.INVALID == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release_id = context.payload.release.id;
+
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release_id,
+              body: "⚠️ **INVALID RELEASE TAG FORMAT**\n\n" +
+                    "This release was rejected by CI.\n\n" +
+                    "Required format: `X.Y.Z` (example: `7.9.1`)\n\n" +
+                    "Please delete this release and recreate it correctly."
+            });
+
+      # -----------------------------------
+      # 4. Delete invalid release (enforcement)
+      # -----------------------------------
+      - name: Delete invalid release
+        if: steps.validate.outputs.INVALID == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_ID="${{ github.event.release.id }}"
+
+          curl -X DELETE \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID
+
+      # -----------------------------------
+      # 5. Stop workflow after cleanup
+      # -----------------------------------
+      - name: Stop invalid build
+        if: steps.validate.outputs.INVALID == 'true'
+        run: |
+          echo "❌ Invalid version format. Release removed."
+          exit 1
+
+      # -----------------------------------
+      # 6. Inject version into PHP
+      # -----------------------------------
       - name: Inject version into bootstrap.inc
         run: |
           VERSION="${{ github.event.release.tag_name }}"
-          echo "Injecting version: $VERSION"
-
           sed -i "s/%FP_VERSION%/$VERSION/g" bootstrap.inc
 
-      # 4. Build ZIP artifact (excluding repo metadata)
+      # -----------------------------------
+      # 7. Build ZIP artifact
+      # -----------------------------------
       - name: Create release zip
         run: |
           zip -r flightpath.zip . \
             -x "*.git*" \
             -x ".github/*"
 
-      # 5. Upload ZIP to GitHub Release
+      # -----------------------------------
+      # 8. Upload asset to release
+      # -----------------------------------
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
