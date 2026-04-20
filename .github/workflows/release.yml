@@ -1,37 +1,37 @@
-name: Build and Release
+name: Build and Attach Release Asset
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [published]
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
+      # 1. Checkout code at the release commit
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Get version from tag and inject into PHP file
+      # 2. Inject version from GitHub Release tag
       - name: Inject version into bootstrap.inc
         run: |
-          VERSION="${GITHUB_REF_NAME}"
-          echo "Injecting version: $VERSION"
-          
-          # Replace placeholder safely
+          VERSION="${{ github.event.release.tag_name }}"
+          echo "Using version: $VERSION"
+
           sed -i "s/%FP_VERSION%/$VERSION/g" bootstrap.inc
 
-      # 3. Create release artifact (zip your app)
-      - name: Create ZIP package
+      # 3. Build zip artifact
+      - name: Create release zip
         run: |
           zip -r flightpath.zip . \
             -x "*.git*" \
             -x ".github/*"
 
-      # 4. Create GitHub Release and upload artifact
-      - name: Publish Release
+      # 4. Upload asset to the SAME GitHub Release
+      - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
           files: flightpath.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
