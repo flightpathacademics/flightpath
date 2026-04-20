@@ -36,51 +36,53 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       # -----------------------------------
-      # 3. Update release body with warning (UI feedback)
+      # 3. Mark release visibly as invalid (NO deletion)
       # -----------------------------------
-      - name: Mark release as invalid (UI warning)
+      - name: Mark invalid release in UI
         if: steps.validate.outputs.INVALID == 'true'
         uses: actions/github-script@v7
         with:
           script: |
-            const release_id = context.payload.release.id;
+            const release = context.payload.release;
 
+            const warning =
+`⚠️ **INVALID RELEASE TAG FORMAT**
+
+This release did NOT pass CI validation.
+
+### Required format
+\`X.Y.Z\` (example: \`7.9.1\`)
+
+### Your tag
+\`${release.tag_name}\`
+
+---
+
+❌ No build artifact was generated.
+❌ Please edit the tag or delete and recreate the release.
+
+CI has stopped processing this release.`;
+
+            // Update release body
             await github.rest.repos.updateRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              release_id: release_id,
-              body: "⚠️ **INVALID RELEASE TAG FORMAT**\n\n" +
-                    "This release was rejected by CI.\n\n" +
-                    "Required format: `X.Y.Z` (example: `7.9.1`)\n\n" +
-                    "Please delete this release and recreate it correctly."
+              release_id: release.id,
+              body: warning,
+              name: `❌ INVALID: ${release.name || release.tag_name}`
             });
 
       # -----------------------------------
-      # 4. Delete invalid release (enforcement)
-      # -----------------------------------
-      - name: Delete invalid release
-        if: steps.validate.outputs.INVALID == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          RELEASE_ID="${{ github.event.release.id }}"
-
-          curl -X DELETE \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID
-
-      # -----------------------------------
-      # 5. Stop workflow after cleanup
+      # 4. Stop workflow (no artifacts)
       # -----------------------------------
       - name: Stop invalid build
         if: steps.validate.outputs.INVALID == 'true'
         run: |
-          echo "❌ Invalid version format. Release removed."
+          echo "❌ Invalid version format. Build aborted."
           exit 1
 
       # -----------------------------------
-      # 6. Inject version into PHP
+      # 5. Inject version into PHP
       # -----------------------------------
       - name: Inject version into bootstrap.inc
         run: |
@@ -88,7 +90,7 @@ jobs:
           sed -i "s/%FP_VERSION%/$VERSION/g" bootstrap.inc
 
       # -----------------------------------
-      # 7. Build ZIP artifact
+      # 6. Build ZIP
       # -----------------------------------
       - name: Create release zip
         run: |
@@ -97,7 +99,7 @@ jobs:
             -x ".github/*"
 
       # -----------------------------------
-      # 8. Upload asset to release
+      # 7. Upload artifact
       # -----------------------------------
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
