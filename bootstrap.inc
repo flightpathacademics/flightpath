@@ -65,7 +65,7 @@ invoke_hook('init');
 
 
 // Constants
-define('FLIGHTPATH_VERSION', '%FP_VERSION%');  // will be replaced automatically by getflightpath.com.
+define('FLIGHTPATH_VERSION', '%FP_VERSION%');  // will be set automatically by github release version.
 define('FLIGHTPATH_CORE', '7.x');  // hard-coded core version.
 
 // The watchdog constants are also defined in misc.inc, so add the @ here so we do not define them twice.
