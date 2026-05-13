@@ -238,7 +238,11 @@ function stats_download_csv_from_batch($batch_id) {
   $filename = fp_get_machine_readable(strtolower($_REQUEST["filename"]));
   
   $batch = batch_get($batch_id);
-
+  if (!$batch) {
+    print "Error trying to download CSV.";
+    die;
+  }
+  
   watchdog('stats', "download_csv_from_batch batch_id:$batch_id, filename:$filename.csv", array());
 
   // Give it to the browser...  

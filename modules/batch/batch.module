@@ -71,7 +71,7 @@ function batch_ajax_callback($batch_id) {
   
   
   $batch = batch_get($batch_id);
-  if ($batch["token"] != batch_get_token()) {
+  if (!$batch || $batch["token"] != batch_get_token()) {
     //  Not allowed!  Bad token.
     header('Content-Type: application/json');
     print json_encode(array("error" => t("An error has occured. You are not allowed to run this batch, or the batch does not exist.")));
@@ -401,7 +401,7 @@ function batch_get($batch_id) {
                    WHERE batch_id = ? ", $batch_id);
   $cur = db_fetch_array($res);
   
-  if ($batch = unserialize($cur["batch_data"])) {
+  if ($batch = unserialize($cur["batch_data"] ?? '')) {
     $batch["batch_id"] = $batch_id;
     $batch["token"] = $cur["token"];
     $batch["created"] = $cur["created"];
