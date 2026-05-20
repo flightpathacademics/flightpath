@@ -1718,7 +1718,7 @@ function admin_apply_draft_changes_perform_batch_operation(&$batch, $ops) {
   }
   
   
-  $op_command = key($ops[$batch['results']['current']]);
+  $op_command = @key($ops[$batch['results']['current']]);
   $op_val = $ops[$batch['results']['current']][$op_command];
   
   
