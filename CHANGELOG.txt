@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-06-15
+  Made changes to Engagements module, to disable "New TXT" button and the sending of mass text messages if a text messaging account has not been configured.
+  
+
 2026-04-20
   Minor changes for PHP 8, and to change a URL in the COPYRIGHT.txt file to https:// instead of http://
   

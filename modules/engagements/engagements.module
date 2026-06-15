@@ -882,6 +882,21 @@ function engagements_mass_sms_form()
   );
 
 
+  // Are text messages turned on?  We will make sure there is a sms_project_id.
+  $bool_sms_enabled = TRUE;
+  if (trim(variable_get('sms_project_id', '') == '')) $bool_sms_enabled = FALSE;
+  
+  if (!$bool_sms_enabled) {
+    $form['mark_disabled'] = array(
+      'value' => '<br><br><p>' . t('<h2>SMS Not Configured</h2>Sorry, but sending SMS text messages has not been configured. Please speak to your 
+                      IT or administrative contact to enable.') . '</p>',
+    );
+    return $form;
+  }
+  
+  
+  
+  
 
   if (isset($_SESSION['mass_sms_batch_data'])) {
     $html = "";
@@ -1443,7 +1458,7 @@ function engagements_sms_settings_form()
     'label' => 'From Phone number(s):',
     'type' => 'textarea',
     'rows' => 3,
-    'value' => variable_get('sms_from_phone', '555-555-1234'),
+    'value' => variable_get('sms_from_phone', ''),
     'description' => t("These are the phone numbers from your SignalWire account.  
                         <br>Enter them one per line, with a tilda (~) between the number
                         and a brief line description, like so:
@@ -1460,7 +1475,7 @@ function engagements_sms_settings_form()
     'label' => 'Mass Text Phone number(s):',
     'type' => 'textarea',
     'rows' => 3,
-    'value' => variable_get('sms_mass_phone', '800-555-1234'),
+    'value' => variable_get('sms_mass_phone', ''),
     'description' => t("These are phone numbers from your SignalWire account, specifically belonging to a campaign for marketting or otherwise
                         mass text messages.  At the time of this writing, toll-free numbers do not need to belong to such a campaign.  These
                         will be the only numbers which appear as options to send mass txt messages to."),
@@ -1470,6 +1485,7 @@ function engagements_sms_settings_form()
   $form['sms_header'] = array(
     'label' => 'SMS Header:',
     'type' => 'textfield',
+    'required' => TRUE,
     'value' => variable_get('sms_header', '(@initials) from @name:'),
     'description' => t("All SMS text messages sent from FlightPath will begin with this header, in order to help the student
                         understand the who the sender of the message is.  
@@ -1488,6 +1504,7 @@ function engagements_sms_settings_form()
   $form['sms_mass_sms_password'] = array(
     'label' => 'Mass SMS Password:',
     'type' => 'textfield',
+    'required' => TRUE,
     'value' => variable_get('sms_mass_sms_password', 'changeMe'),
     'description' => t("Before a user may use the Send Mass Text Messages feature (to sent to many recipients), they must enter this password to protect against accidental submissions."),
   );
@@ -1552,7 +1569,7 @@ function engagements_get_from_phones($bool_mass_text_numbers = FALSE)
   $rtn = array();
   $val = variable_get('sms_from_phone', '555-555-1234');
   if ($bool_mass_text_numbers) {
-    $val = variable_get('sms_mass_phone', '800-555-1234');
+    $val = variable_get('sms_mass_phone', '555-555-1234');
   }
 
 
@@ -4055,6 +4072,11 @@ function engagements_display_main()
   );
 
 
+  // Are text messages turned on?  We will make sure there is a sms_project_id.
+  $bool_sms_enabled = TRUE;
+  if (trim(variable_get('sms_project_id', '') == '')) $bool_sms_enabled = FALSE;
+  
+  
   $rtn = "";
   $rtn .= "<div id='engagements-list-page'>";
 
@@ -4062,9 +4084,11 @@ function engagements_display_main()
   if (user_has_permission('can_send_email_engagements')) {
     $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"email\",\"New Email\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-envelope-o'></i>&nbsp; New Email</a>";
   }
-  if (user_has_permission('can_send_txt_engagements')) {
-    $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"txt_msg\",\"New Text Message\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-comment-o'></i>&nbsp; New TXT</a>";
+  
+  if (user_has_permission('can_send_txt_engagements') && $bool_sms_enabled) {
+    $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"txt_msg\",\"New Text Message\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-comment-o'></i>&nbsp; New Text Msg</a>";
   }
+  
   if (user_has_permission('can_log_engagements')) {
     $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"\",\"Log New Engagement\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-plus'></i>&nbsp; Log New Engagement</a>";
   }
