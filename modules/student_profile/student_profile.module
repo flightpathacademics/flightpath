@@ -11,18 +11,26 @@ function student_profile_menu() {
   $items = array();
   
 
-  $items["student-profile"] = array(
-    "title" => "Student Profile",
-    "page_callback" => "student_profile_display_student_profile_page",
-    "access_callback" => "system_can_access_student",  // make sure we are allowed to access the student specified by current_student_id.
-    "type" => MENU_TYPE_TAB,
-    "tab_family" => "system",
-    "weight" => 10,
-    "page_settings" => array(      
-      "display_currently_advising" => FALSE,
-      "screen_mode" => "not_advising",      
-    ),
-  );
+  // Make sure the student-profile has not been disabled in the System Settings. If it hasn't been disabled, we will display this menu entry.
+  $disabled_tabs = variable_get('system_disable_student_tabs', array());
+  if (($disabled_tabs['profile'] ?? '') != 'profile') {
+
+    $items["student-profile"] = array(
+      "title" => "Student Profile",
+      "page_callback" => "student_profile_display_student_profile_page",
+      "access_callback" => "system_can_access_student",  // make sure we are allowed to access the student specified by current_student_id.
+      "type" => MENU_TYPE_TAB,
+      "tab_family" => "system",
+      "weight" => 10,
+      "page_settings" => array(
+        "display_currently_advising" => FALSE,
+        "screen_mode" => "not_advising",
+      ),
+    );
+    
+    
+  }
+  
 
 
 

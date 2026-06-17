@@ -2517,6 +2517,19 @@ function system_settings_form() {
     'value' => variable_get('system_timezone', 'America/Chicago'),
   );
 
+  
+  $form['system_disable_student_tabs'] = array(
+    'type' => 'checkboxes',
+    'label' => t('Disable these student tabs for all users:'),
+    'options' => array('profile' => t('Student Profile'), 'engagements' => t('Engagements')),
+    'value' => variable_get('system_disable_student_tabs', array()),
+    'description' => t('This setting allows you to permanently "hide" the above tabs by simply checking them. If checked,
+                        they will not be available to faculty, staff, or students, regardless of permission settings.
+                        <br>If unsure, <strong>uncheck all boxes</strong> to leave them enabled (default).
+                        <br>If changing this value, you must ') . l(t('clear menu cache'), 'admin/config/clear-menu-cache') . ' ' . t('after saving.'),
+  );
+  
+  
 
   $form['system_default_student_load_tab'] = array(
     'type' => 'select',
@@ -2525,10 +2538,13 @@ function system_settings_form() {
     'value' => variable_get('system_default_student_load_tab', 'profile'),
     'hide_please_select' => TRUE,
     'description' => t("Unless overridden by the user's settings, this is the tab which
-                        the user will see when pulling up a new student for advising.
-                        <br>If unsure what to select, chose 'Student Profile'."),
+                        the user will see when pulling up a new student for advising. <strong>Make sure</strong> you select a default tab which
+                        is not disabled (see above setting). Otherwise, the default tab will default to 'Degree'.
+                        <br>If unsure what to select, choose 'Student Profile'."),
   );
 
+    
+  
   
   // Can we support clean_urls?
   $bool_support_clean = system_check_clean_urls();

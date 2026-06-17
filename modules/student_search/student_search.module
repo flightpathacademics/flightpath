@@ -192,6 +192,14 @@ function student_search_student_select_switchboard() {
   ////////////////////////
   
   
+  // Make sure the "goto_tab" has not been disabled in the System Settings. If it has, we will default to "degree".
+  $disabled_tabs = variable_get('system_disable_student_tabs', array());
+  if (($disabled_tabs[$goto_tab] ?? '') == $goto_tab) {
+    $goto_tab = 'degree';
+  }
+  
+  
+  
   if ($goto_tab == "profile") {
     fp_goto("student-profile");
   }
@@ -1226,7 +1234,7 @@ function z__student_search_render_advisees($adv_array, $title) {
 
 
 
-function student_search_get_advisee_table_headers() {
+function student_search_get_advisee_table_headers($bool_show_priority = TRUE) {
   $table_headers = array();
   $table_headers[] = array("label" => "&nbsp;");  
   $table_headers[] = array("label" => t("CWID"), "field" => "u.cwid");
@@ -1239,7 +1247,10 @@ function student_search_get_advisee_table_headers() {
   $table_headers[] = array("label" => "Major");  
   $table_headers[] = array("label" => "Rank", "field" => 'a.rank_code');  
   $table_headers[] = array("label" => "Catalog<span class='mobile-hidden'> Year</span>", "field" => "a.catalog_year");
-  $table_headers[] = array("label" => "<span class='mobile-hidden'>Academic </span>Priority", "field" => "priority_value");
+  
+  if ($bool_show_priority) {
+    $table_headers[] = array("label" => "<span class='mobile-hidden'>Academic </span>Priority", "field" => "priority_value");
+  }
   
   return $table_headers;
     
@@ -1275,8 +1286,13 @@ function student_search_render_advisees($adv_array, $title) {
   
   $rtn .= fp_render_section_title($title, "search-results");
   
+  // If we have disabled the student profile tab, then we will not display the Academic Priority here.
+  $bool_show_priority = TRUE;
+  $disabled_tabs = variable_get('system_disable_student_tabs', array());
+  if (($disabled_tabs['profile'] ?? '') == 'profile') $bool_show_priority = FALSE;
   
-  $table_headers = student_search_get_advisee_table_headers();
+  
+  $table_headers = student_search_get_advisee_table_headers($bool_show_priority);
   
   $rtn .= "<table border='0' class='advisee-search-results-table'>";
   // Draw our our table headers, with links....
@@ -1359,8 +1375,10 @@ function student_search_render_advisees($adv_array, $title) {
     $student_name = "<span class='student-first-name student-fnf'>$first_name</span><span class='student-last-name'>$last_name</span>";
     
     
+    
+    
     $priority = t("N/A");
-    if ($priority_value > 0) {
+    if ($bool_show_priority && $priority_value > 0) {
       $temp = student_priority_get_student_academic_priority_label($priority_value);
       $machine = $temp['machine'];
       $label = $temp['label'];
@@ -1380,8 +1398,12 @@ function student_search_render_advisees($adv_array, $title) {
     $rtn .= "
             <td class='ss-student-major'>$disp_major</td>
             <td class='ss-student-rank'>$rank</td>
-            <td class='ss-student-catalog-year'>$catalog_year</td>
-            <td class='ss-student-priority-value'>$priority</td>
+            <td class='ss-student-catalog-year'>$catalog_year</td>";
+    
+    if ($bool_show_priority) {
+      $rtn .= "<td class='ss-student-priority-value'>$priority</td>";
+    }
+    $rtn .= "
            
          </tr>
          ";

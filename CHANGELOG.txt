@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-06-17
+  Added ability to disable the Student Profile tab, as well as Engagements tab, for all users.  Setting is found in the System Settings.
+  
+
 2026-06-15
   Made changes to Engagements module, to disable "New TXT" button and the sending of mass text messages if a text messaging account has not been configured.
   

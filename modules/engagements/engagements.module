@@ -16,17 +16,27 @@ function engagements_menu()
 {
   $items = array();
 
-  $items["engagements"] = array(
-    "title" => t("Engagements"),
-    "page_callback" => "engagements_display_main",
-    "access_arguments" => array("can_view_engagements"),
-    "tab_family" => "system",
-    "page_settings" => array(
-      "display_currently_advising" => TRUE,
-    ),
-    "weight" => 20,
-    "type" => MENU_TYPE_TAB,
-  );
+  
+  // Make sure the engagements tab has not been disabled in the System Settings. If it hasn't been disabled, we will display this menu entry.
+  $disabled_tabs = variable_get('system_disable_student_tabs', array());  
+  if (($disabled_tabs['engagements'] ?? '') != 'engagements') {
+    
+    $items["engagements"] = array(
+      "title" => t("Engagements"),
+      "page_callback" => "engagements_display_main",
+      "access_arguments" => array("can_view_engagements"),
+      "tab_family" => "system",
+      "page_settings" => array(
+        "display_currently_advising" => TRUE,
+      ),
+      "weight" => 20,
+      "type" => MENU_TYPE_TAB,
+    );
+    
+    
+  }
+  
+  
 
 
   $items['engagements-track/%/%/pixel.gif'] = array(

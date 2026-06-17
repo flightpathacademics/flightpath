@@ -1005,7 +1005,6 @@ function user_user_settings_form() {
         'value' => '<p>' . t('Passwords must contain the following:') . password_get_complexity_rules(FALSE) . '</p><hr>',        
       ];
       
-      // TODO: Display rules for password complexity (see forgot_password module)
       
     }
     else if (isset($_SESSION['fp_logged_in_external']) && $_SESSION['fp_logged_in_external'] === TRUE) {
@@ -1024,7 +1023,7 @@ function user_user_settings_form() {
       'value' => @$user->settings['image_url'],
       'description' => t('Enter the full URL/URI to your profile image.  Make sure your
                           image is in "portrait" orientation, and generally no larger than 20 or 30kb in filesize.
-                          Also make sure that the originating server is HTTPS and not HTTP.'), 
+                          Also make sure that the originating server is HTTPS and <strong>not HTTP</strong>.'), 
       'suffix' => '<hr>',
     );
   } // user has permission to change their image
@@ -1064,11 +1063,26 @@ function user_user_settings_form() {
       $value = variable_get('system_default_student_load_tab', 'profile');
     }    
     
+    // Make sure the student tab has not been disabled in the System Settings. If it has, we will default to "degree".
+    $disabled_tabs = variable_get('system_disable_student_tabs', array());
+    if (($disabled_tabs[$value] ?? '') == $value) {
+      $value = 'degree';
+    }
+     
+    // Unset tab options which have been disabled
+    $options = array('profile' => t('Student Profile'), 'engagements' => t("Engagements"), 'degree' => t('Degree'));
+    foreach ($options as $k=>$v) {
+      if (($disabled_tabs[$k] ?? '') == $k) {
+        unset($options[$k]);
+      }
+    }
+    
+    
     $form['default_student_load_tab'] = array(
       'label' => t('What is the default tab you want to see when you load a new student?'),
       'type' => 'select',
       'hide_please_select' => TRUE,
-      'options' => array('profile' => t('Student Profile'), 'engagements' => t("Engagements"), 'degree' => t('Degree')),
+      'options' => $options,
       'value' => $value,
       'description' => t('If you are unsure what to select, choose "Student Profile" or leave set to its current setting.'),
     );

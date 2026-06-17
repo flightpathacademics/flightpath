@@ -1310,13 +1310,34 @@ function fp_render_sidebar_left_content($bool_for_hamburger_menu = FALSE) {
     );
   }
   if ($user->is_student) {
+    
+    $path = 'student-profile';
+    
+    // If the profile path is disabled by system settings, then make Engagements default.    
+    $disabled_tabs = variable_get('system_disable_student_tabs', array());
+    if (($disabled_tabs['profile'] ?? '') == 'profile') {
+      $path = 'engagements';
+      
+      // If the engagements tab is also disabled, then set the path to 'degree'
+      if (($disabled_tabs['engagements'] ?? '') == 'engagements') {
+        $path = 'view';
+      }
+      
+    }
+    
+
+    
     $links[] = array(
-      'path' => 'student-profile',
+      'path' => $path,
       'icon' => 'fa-graduation-cap',
       'desc' => t('My Profile'),
       'class' => 'my-profile',
       'weight' => 100, 
     );
+    
+    
+    
+    
   }
   $links[] = array(
     'path' => 'calendar',
