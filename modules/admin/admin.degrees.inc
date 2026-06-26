@@ -201,13 +201,13 @@ function admin_copy_degree_form_validate($form, $form_state) {
 
   $de_catalog_year = $values["de_catalog_year"];
   $destination_major_code = trim(strtoupper($values["destination_major_code"]));
-  $school_id = intval($values['school_id']);
+  $school_id = intval($values['school_id']);  
   $destination_school_id = intval($values['destination_school_id']);
 
   $source_major_code = trim(strtoupper($values["source_major_code"]));
   $include_tracks = @$values["include_tracks"]["yes"];  
   
-  $for_school = $school_name = "";
+  $for_school = $dest_school_name = $source_school_name = "";
   if (module_enabled("schools")) {
     $for_school = " for school %school";
     $source_school_name = schools_get_school_name_for_id($school_id);

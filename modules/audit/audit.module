@@ -32,9 +32,7 @@ function audit_menu() {
     "page_callback" => "fp_render_form",
     "page_arguments" => array("audit_settings_form", "system_settings"),
     "access_arguments" => array("administer_audit"),
-    "page_settings" => array(
-      
-                                        
+    "page_settings" => array(           
       "page_hide_report_error" => TRUE,
       "menu_links" => array(                    
         0 => array(                                               
@@ -811,7 +809,7 @@ function audit_can_access_audit($student_id = "") {
  */
 function audit_perm() {
   
-  return array(
+  return array(     
     "administer_audit" => array(
       "title" => t("Administer audit module settings"),      
     ),  
