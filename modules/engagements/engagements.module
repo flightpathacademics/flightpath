@@ -1961,8 +1961,10 @@ function engagements_handle_incoming_sms($vars = array())
       $advisors = advise_get_advisors_for_student($stu_cwid);
       foreach ($advisors as $c => $afaculty_id) {
         $account_user_id = db_get_user_id_from_cwid($afaculty_id, 'faculty');
-        if ($account_user_id) {          
-          notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
+        if ($account_user_id) {  
+          if (strtolower($tbody) != 'test') {
+            notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
+          }
           $already_notified_users[] = $account_user_id;
         }
       } // foreach advisors
@@ -2031,8 +2033,9 @@ function engagements_handle_incoming_sms($vars = array())
         }                           
                           
                   
-                  
-        notify_send_notification_to_user($account_user_id, $tmsg, $alert->cid, 'alert');
+        if (strtolower($tbody) != 'test') {
+          notify_send_notification_to_user($account_user_id, $tmsg, $alert->cid, 'alert');
+        }
       }
       else {
         // We DO have a student this came from.  Let this user know normally.
@@ -2055,8 +2058,9 @@ function engagements_handle_incoming_sms($vars = array())
                       <a href='$link'>$link</a>";
          }                  
                           
-                  
-        notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
+        if (strtolower($tbody) != 'test') {
+          notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
+        }
       }
     } //foreach to_be_notified
 
