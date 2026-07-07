@@ -1150,7 +1150,7 @@ function user_edit_student_user_form_validate($form, $form_state) {
   
   // If a password was given, make sure it is appropriate.
   // TODO: Make sure it conforms to our complexity
-  if (trim($values["new_password"]) != "") {
+  if (trim($values["new_password"] ?? '') != '') {
     if (strlen(trim($values["new_password"])) < 8) {
       form_error("new_password", t("Please enter a password that is at least 8 characters long."));
       return;
@@ -1239,7 +1239,7 @@ function user_edit_student_user_form_submit($form, $form_state) {
   if ($student_cwid != "new") {
     // NOT a new student!  Insert values normally.
     // First-- was there a password given?  If so, insert that separate.
-    if (trim($values["new_password"]) != "") {
+    if (trim($values["new_password"] ?? '') != '') {
       $new_pass = user_hash_password(trim($values["new_password"]));
       db_query("UPDATE users 
                 SET password = '?' 
