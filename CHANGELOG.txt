@@ -1,6 +1,18 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-02
+  Added ability to have "description" attribute on fieldsets and cfieldsets.
+  
+  Added optgroup-like functionality for radios type.
+  
+
+2026-06-30
+  Added convenience function for setting standard advising breadcrumbs.
+  
+  Added new field type: 'fieldset' which works the same as 'cfieldset' except it isn't collapsible; it's just a plain fieldset.
+  
+
 2026-06-17
   Added ability to disable the Student Profile tab, as well as Engagements tab, for all users.  Setting is found in the System Settings.
   

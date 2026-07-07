@@ -148,18 +148,37 @@ function fp_render_array($render_array, $use_callback = "") {
     
     if (is_array($element) && (isset($element["type"]) || isset($element["value"]))) {
         
-      // Is this a cfieldset (collapsible fieldset)?
-      if (@$element["type"] == "cfieldset") {        
+      // Is this a fieldset or cfieldset (collapsible fieldset)?
+      if (@$element["type"] == "cfieldset" || @$element["type"] == "fieldset") {        
         $celements = $element["elements"];  // get our list of form elements within this fieldset.
         // Go through these new elements and prepare to display them inside a collapsible fieldset.        
         $html = "";
         foreach ($celements as $k => $v) {
-          foreach ($celements[$k] as $name => $celement) {            
-            $html .= fp_render_element($name, $celement, $use_callback);
+          foreach ($celements[$k] as $ename => $celement) {            
+            $html .= fp_render_element($ename, $celement, $use_callback);
           }
         }        
-        // add to c_fieldset
-        $rtn .= fp_render_c_fieldset($html, @$element["label"], @$element["start_closed"], @$element['attributes']['class']);
+        
+        $description = trim($element['description'] ?? '');
+        if ($description) {
+          $html = "<div class='fieldset-description'>$description</div>" . $html;
+        }
+        
+        if ($element['type'] == 'cfieldset') {
+          // add to c_fieldset
+          $rtn .= fp_render_c_fieldset($html, @$element["label"], @$element["start_closed"], @$element['attributes']['class']);
+        }
+        else {
+          // This is a normal fielset.
+          $machine_name = strtolower(fp_get_machine_readable($name));          
+          $rtn .= " <fieldset class='fp-fieldset' id='fs_$machine_name'>
+                      <legend>{$element['label']}</legend>
+                      <div id='fs_content_$machine_name' class='fieldset-content'>
+                        $html
+                      </div>
+                    </fieldset>";
+          
+        }
          
       }
       else {
@@ -518,6 +537,7 @@ function form_has_errors() {
  */
 function fp_render_element($name, $element, $use_session_submission_values_for_callback = "") {
   $rtn = "";
+  
   $type = @$element["type"]; 
   if ($type == "") $type = "markup_no_wrappers"; 
    
@@ -749,28 +769,6 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   }
   
   
-  if ($type == "radios") {
-    $rtn .= "<div class='form-radios form-radios-$cssname'>";
-    foreach ($options as $key => $val) {
-      $checked = "";
-
-      // For radios, it's possible we've been sent an array for the value (though a string is more common and prefered).
-      // We need to check both.  
-      if (is_array($value) && isset($value[$key]) && $value[$key] == $key) {
-        $checked = "checked=checked";
-      }
-      else if (!is_array($value) && $value == $key) {
-        $checked = "checked=checked";
-      }
-      
-      $csskey = fp_get_machine_readable($key);
-      $rtn .= "<div class='radio-element radio-element-$csskey'>
-                 <label class='label-for-radio'><input type='radio' name='$name' id='element-$cssname-$csskey' value='$key' $checked $attributes> $val</label>
-               </div>";
-    }
-    $rtn .= "</div>";
-  }
-
   if ($type == "select") {
     $rtn .= "<select name='$name' id='element-$cssname' $attributes>";
     if ($no_please_select != TRUE) {
@@ -820,7 +818,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
             $checked = "checked=checked";
           }
           
-          $csskey = fp_get_machine_readable($key);
+          $csskey = fp_get_machine_readable($key . '_' . $k);
           $rtn .= "<div class='checkbox-element checkbox-element-$csskey'>
                      <label class='label-for-checkbox'><input type='checkbox' name='$name" . "[$k]' id='element-$cssname-$csskey' value='$k' $checked $attributes> $v</label>
                    </div>";          
@@ -841,6 +839,60 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     $rtn .= "</div>";
   }
 
+  if ($type == "radios") {
+    $rtn .= "<div class='form-radios form-radios-$cssname'>";
+    foreach ($options as $key => $val) {
+      $checked = "";
+      
+      if (is_array($val)) {
+        // Similar to select lists above, we need to simulate having "optgroup"s for checkboxes.
+        $rtn .= "<div class='radio-pseudo-optgroup-wrapper'>
+                  <label>$key</label>";
+        foreach ($val as $k => $v) {
+          $checked = "";
+          // For radios, it's possible we've been sent an array for the value (though a string is more common and prefered).
+          // We need to check both.
+          if (is_array($value) && isset($value[$k]) && $value[$k] == $k) {
+            $checked = "checked=checked";
+          }
+          else if (!is_array($value) && $value == $k) {
+            $checked = "checked=checked";
+          }
+          
+          $csskey = fp_get_machine_readable($key . '_' . $k);
+          $rtn .= "<div class='radio-element radio-element-$csskey'>
+                 <label class='label-for-radio'><input type='radio' name='$name' id='element-$cssname-$csskey' value='$k' $checked $attributes> $v</label>
+               </div>";
+          
+        } // foreach val
+        $rtn .= "</div>"; // close the pseudo-optgroup-wrapper
+      } // if isarray val
+      else {
+        // For radios, it's possible we've been sent an array for the value (though a string is more common and prefered).
+        // We need to check both.
+        if (is_array($value) && isset($value[$key]) && $value[$key] == $key) {
+          $checked = "checked=checked";
+        }
+        else if (!is_array($value) && $value == $key) {
+          $checked = "checked=checked";
+        }
+        
+        $csskey = fp_get_machine_readable($key);
+        $rtn .= "<div class='radio-element radio-element-$csskey'>
+                 <label class='label-for-radio'><input type='radio' name='$name' id='element-$cssname-$csskey' value='$key' $checked $attributes> $val</label>
+               </div>";
+        
+      } // else
+        
+    } // foreach options
+    
+    $rtn .= "</div>";
+  } // if radios
+  
+  
+  
+  
+  
   // A single checkbox... The values will be with 0 (zero) or 1 (one), and boolean
   // values are accepted/saved
   if ($type == "checkbox") {

@@ -1695,18 +1695,8 @@ function advise_display_view($view = "view") {
      
       
   // Let's set our breadcrumbs
-  $db = get_global_database_handler();
-  $crumbs = array();
-  $crumbs[] = array(
-    'text' => 'Students',
-    'path' => 'student-search',
-  ); 
-  $crumbs[] = array(
-    'text' => $db->get_student_name($screen->student->student_id) . " ({$screen->student->student_id})",
-    'path' => 'student-profile', 
-    'query' => "current_student_id={$screen->student->student_id}",
-  );  
-  fp_set_breadcrumbs($crumbs);
+  fp_set_standard_advising_breadcrumbs();
+  
      
      
   return fp_render_content($render);   

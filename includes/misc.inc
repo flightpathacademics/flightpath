@@ -1790,6 +1790,31 @@ function fp_set_page_sub_tabs($tab_array) {
 
 
 
+
+/**
+ * Convenience function to set the basic advising breadcrumbs
+ */
+function fp_set_standard_advising_breadcrumbs() {
+  global $screen, $current_student_id;
+  
+  // Let's set our breadcrumbs
+  $db = get_global_database_handler();
+  $crumbs = array();
+  $crumbs[] = array(
+    'text' => 'Students',
+    'path' => 'student-search',
+  );
+  $crumbs[] = array(
+    'text' => $db->get_student_name($current_student_id) . " ($current_student_id)",
+    'path' => 'student-profile',
+    'query' => "current_student_id=$current_student_id",
+  );
+  fp_set_breadcrumbs($crumbs);
+}
+
+
+
+
 /**
  * Set our breadcrumbs array.
  * 

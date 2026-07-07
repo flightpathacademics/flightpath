@@ -1212,6 +1212,8 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
 
 
 
+
+
 /**
  * Return the HTML for breadcrumbs for the current page we are on.
  * Will skip any breadcrumbs we do not have permission to access.

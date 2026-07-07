@@ -269,9 +269,26 @@ table.tabs-search-table td.search-td {
 
 .c-fieldset-content {
   /*  the astericks mean "only for IE" */
-  *margin-left: 10px;
-  *margin-right: 10px;
+  zmargin-left: 10px;
+  zmargin-right: 10px;
 }
+
+
+fieldset {
+  margin-bottom: 20px;
+}
+
+fieldset legend {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+fieldset .fieldset-description,
+.c-fieldset .fieldset-description
+{
+  padding: 10px 0px;
+}
+
 
 .c-fieldset {
   margin-bottom: 10px;
