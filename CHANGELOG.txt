@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-08
+  Added convenience function to user module, which lets us get all of the roles
+  as an array suitable for the FAPI.
+  
+
 2026-07-02
   Added ability to have "description" attribute on fieldsets and cfieldsets.
   
