@@ -2849,7 +2849,32 @@ function user_list_filter_form_submit($form, $form_state) {
 
 
 
+/**
+ * Return an array, appropriate for Form API
+ */
+function user_get_roles_for_fapi($bool_exclude_anonymous = TRUE, $bool_exclude_authenticated = TRUE) {
+  $rtn = array();
+  
+  $exclude_line = "";
+  if ($bool_exclude_anonymous) {
+    $exclude_line .= " AND rid != 1 ";
+  }
+  
+  if ($bool_exclude_authenticated) {
+    $exclude_line .= " AND rid != 2 ";
+  }
 
+  $res = db_query("SELECT * FROM roles
+                     WHERE rid > 0
+                     $exclude_line
+                     ORDER BY rid");
+  while ($cur = db_fetch_object($res)) {
+    $rtn[$cur->rid] = $cur->name; 
+  }
+  
+  
+  return $rtn;
+}
 
 
 
