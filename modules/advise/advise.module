@@ -732,6 +732,8 @@ function advise_display_popup_change_track() {
   fp_add_css(fp_get_module_path("advise") . "/css/advise.css");
 
   
+  $is_whatif = 0;
+  
   if ($degree_plan->db_allow_dynamic == 0) {
     
     // Since this is NOT a degree plan which can be combined with others, we
