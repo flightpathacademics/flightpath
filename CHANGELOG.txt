@@ -1,52 +1,56 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-10
+  Made various changes for schools using "legacy" concentrations, which were somewhat broken.
+
+
 2026-07-08
   Added convenience function to user module, which lets us get all of the roles
   as an array suitable for the FAPI.
-  
+
 
 2026-07-02
   Added ability to have "description" attribute on fieldsets and cfieldsets.
-  
+
   Added optgroup-like functionality for radios type.
-  
+
 
 2026-06-30
   Added convenience function for setting standard advising breadcrumbs.
-  
+
   Added new field type: 'fieldset' which works the same as 'cfieldset' except it isn't collapsible; it's just a plain fieldset.
-  
+
 
 2026-06-17
   Added ability to disable the Student Profile tab, as well as Engagements tab, for all users.  Setting is found in the System Settings.
-  
+
 
 2026-06-15
   Made changes to Engagements module, to disable "New TXT" button and the sending of mass text messages if a text messaging account has not been configured.
-  
+
 
 2026-04-20
   Minor changes for PHP 8, and to change a URL in the COPYRIGHT.txt file to https:// instead of http://
-  
+
 
 2026-04-19
   Added extra logging when fp_http_request fails.
-  
+
   Added check before performing fp_mail() to see if recipient is a "disabled" user.
-  
+
 
 2026-04-05
   Simplified the text message STOP and UNSTOP messages.
-  
+
 
 2026-04-04
-  Added hooks to the engagements module to allow other modules to act when 
+  Added hooks to the engagements module to allow other modules to act when
   new SMS messages come in.
-  
+
   Added new function: fp_http_build_query(), used to convert an assoc array into
   an HTTP query string.
-  
+
 
 2026-04-01
   Added better documentation and some functionality changes for legacy concentrations.
@@ -54,63 +58,63 @@ FlightPath 7.x Changelog
 
 2026-03-19
   Fixed several small issues that caused warnings in PHP 8.3
-  
+
 
 2026-02-06
   Added more verbose explanation for when a user sees a session str mismatch error in index.php.
-  
+
 
 2026-02-05
   Changed description of certain system permissions.
-  
+
 
 2026-01-29
   Tweaking the system to ban IP addresses; adding indexes to the watchdog table for faster
   comparisons.
-  
+
   Updated jQuery UI from 1.14.0 to 1.14.1.
-  
+
   Clear cache also clears the APCu cache, if installed
-  
+
   Added ability to denote recipients to the mass text message line, not just
   regular lines.
-  
+
 
 2026-01-26
-  Added code to detect and automatically ban an anonymous user (visitor) 
-  if they have received more than 5 page_not_found's or access_denied's 
-  in the last 1 minute. This is almost always indicative of a bogus script or bot 
+  Added code to detect and automatically ban an anonymous user (visitor)
+  if they have received more than 5 page_not_found's or access_denied's
+  in the last 1 minute. This is almost always indicative of a bogus script or bot
   trying to find a point of entry in the system.
 
 
 2026-01-17
   Cleaned up code, added protections against warnings in PHP 8.3.
-  
+
   Altered system.install so that student table's `gpa` is varchar(8) instead of 5.
-  
+
 
 2026-01-01
   Fixed bug in cron.php which was causing it to not run correctly.
-  
+
   Added IP blocking and extra logging to cron.php, so we can see if a bot is repeatedly trying
   to access cron.php (and potentially block their IP).
-  
+
   Minor tweaks to stop warnings/notices in PHP 8.
-  
+
 
 2025-12-09
   Modified the installation script so that the settings.php file stores less information about the database
   connection in the GLOBALS array.
-  
+
   Modification also makes it so if the user changes db connection information in settings.php (eg, the db_host),
   it will respond accordingly.  Previously the db_host was stored in a session variable, causing the user to need
   to log out to see changes.
 
 
 2025-12-08
-  Added new permission to advise module: view_degree_plan_course_descriptions.  This must be enabled 
+  Added new permission to advise module: view_degree_plan_course_descriptions.  This must be enabled
   for the popup dialogs in a degree to show a description.
-  
+
   Modified system.install to grant permission view_degree_plan_course_descriptions to authenticated users
   on first install, and when updating from previous version.
 
@@ -121,45 +125,45 @@ FlightPath 7.x Changelog
   Converted README.txt to README.md, updated some of the information as well.
 
   Updated language in system.module re: banned ips
-  
+
   Implemented removing "expired" IP bans on cron (in system.module)
 
 
 2025-12-05
   Hardening certain URL paths.
-  
+
   Fixing bug in cron.php which allowed it to run w/o the proper token provided.
-  
+
   Hard-coding (and modifying repo) so that /custom/files/private and its .htaccess file is
   included by default, since other modules assume it to be there.
 
-  Added IP-banning functionality. 
+  Added IP-banning functionality.
 
 
 2025-11-20
   Minor changes for PHP 8.3.
-   
+
 
 2025-11-13
   Minor changes for PHP 8.3.
-  
+
   If term structures not set up yet, does not produce a warning.
-  
+
 
 2025-10-13
   Minor changes for PHP 8.3 and to fix warnings.
-  
+
   Removed unnecessary array_get() function from misc.php. It duplicated the functionality of the ??
   operator in PHP 7.0, which is a minimum requirement for FlightPath.
-  
+
 
 2025-09-18
   Minor change to login page CSS for mobile screens
-  
+
 
 2025-09-10
   Minor changes for PHP 8.3.
-  
+
 
 2025-08-31
   Made modifications to make more compatible with PHP 8.3.
@@ -176,92 +180,92 @@ FlightPath 7.x Changelog
 
 2025-07-29
   Added a try/catch around a call to the Twilio API in the engagements module.
-  
+
   Added some code to fix a deprecated message when setting password.
-  
+
 
 2025-07-28
   Modifications to ensure that if a password is entered, it is trimmed of preceeding or trailing whitespace before being saved.
-  
+
   Modifications to display password complexity requirements.  Added comments for future revisions.
-  
+
 
 2025-07-26
   Tweak to style.css so that fpm messages are always left-aligned.
-  
+
   Added documentation to hook.api.php
-  
-  Added a new argument in form_error(), that tells FlightPath to stop running other validator functions if the form error is set.  
-  
+
+  Added a new argument in form_error(), that tells FlightPath to stop running other validator functions if the form error is set.
+
   Created new functions in password.inc to check that a password is complex enough, and another to return
   the complexity rules so we can print them on screen.
-  
+
 
 2025-07-21
   Hardening inputs in course_search module (when selecting subject).
 
   Added function: filter_untrusted_input() to misc.inc. Useful for stripping possible trouble characters
   from user input.
-  
+
   Tidied up code in various spots, hardened inputs as well just to be safe.
-  
+
 
 2025-05-23
   Added new setting to System Settings form (utilized by the advise module, content module, comments, etc.) which lets you selectively delete or NOT delete
   data (like student substitutions) which have been flagged as "deleted" in the database.  The previous behavior was to
   delete such data.
-  
+
   Added extra watchdog logging to student_files deletion as well as modifications in the audit module.
-  
-  Minor changes to engagements module to stop "notices" from PHP 8. 
-  
+
+  Minor changes to engagements module to stop "notices" from PHP 8.
+
 
 2025-05-20
   Made various modifications to the "Duplicate entire year" functionality in admin module, specifically as
   to how it uses the batch API. This was necessary for schools with lots of data, to prevent the operation
-  from timing out. 
-  
+  from timing out.
+
   Adjusted wording for Duplicate form.
-  
+
 
 2025-05-19
   Made it so that "apply draft changes" occurs in a batch operation, to reduce the chances of something timing out
   or running out of memory.
-  
+
   Added new hook:  hook_admin_duplicate_year, so other modules can act when we perform the duplicate catalog year function.
-  
+
   Made it so "Duplicate entire catalog year" is now a batch operation, to reduce chances of something timing out.
-  
+
   Fixed typos in batch module.
-  
+
   Added a "fail" condition to batch.js, in case the batch op fails to complete it will alert the user.
-  
+
 
 2025-04-21
   Added new functionality to batch module, so we can easily create files to append data to. This hopefully uses less memory
-  than storing everything in variables. Especially useful for batch operations over large datasets to create CSV files. 
-  
+  than storing everything in variables. Especially useful for batch operations over large datasets to create CSV files.
+
 
 2025-02-24
   Minor documentation changes to hook.api.php.
-  
+
   Added simple caching to databasehandler when looking for student catalog year.  Also removed some extra processing
   that was left over from a previous version of FP.
-   
+
 
 2025-02-01
   Added new hook to allow modules to add/modify the left sidebar links.
-  
+
 
 2025-01-30
   Small changes to clean up code.
-  
+
   Added new "school_name" to per-school settings.  Ex:  University of FlightPath.
 
   Added new convenience function: fp_url_absolute() for getting full URLs to FP pages.
-  
+
   Fixed bug where anonymous users were not getting permissions set correctly.
-  
+
 
 2024-11-08
   Small change in alerts module to make sure that $content is a valid object before
@@ -270,22 +274,22 @@ FlightPath 7.x Changelog
 
 2024-11-07
   Minor tweaks to ensure course hours are numeric before attempting arithmatic with them.
-  
-  
+
+
 2024-11-04
   Made various tweaks so that every time we are working with a min_grade, it has always been converted to uppercase.
-  
+
 
 2024-10-29
   Fixing display of school name when an invalid school_id is supplied to schools module.
-  
+
 
 2024-10-25
   Added an extra warning when editing degrees or groups if the draft catalog year setting is LESS than the year you are editing, as that
   can cause problems loading course names.
-  
+
   Added to default style for a "warning" message via fp_add_message("text", "warning")
-  
+
 
 2024-10-16
   Tidying up code relating to querying for course_id.
@@ -293,97 +297,97 @@ FlightPath 7.x Changelog
 
 2024-10-12
   Was alerted to possible XSS vulnerabilities (fixing in this release) by Rauf Giray Doğan (https://github.com/redhotchilihacker1)
-  
+
   Added convenience function filter_plain($str) to help sanitize fields which obviously should not contain HTML tags.
-  
+
   Modified various spots in the codebase to use either filter_plain() or filter_markup() where appropriate, to mitigate
   any possible XSS vulnerabilities.
-    
+
   Changed the way filter_markup cleans malformed HTML, so it doesn't add extra <p> tags.
-  
+
   Fixed bug in content module where a file field in a fieldset wouldn't perform upload.
-  
+
 
 2024-10-11
   Fixed warning from content->title (content.module) in PHP 8.
-  
+
   Fixed warnings in prereqs module in PHP 8 if the advising_term_id isn't set.
 
   Removed out of date JS code in TinyMCE module.
-  
-  Modified menu.inc menu_check_user_access to prevent warnings in PHP 8. 
-  
+
+  Modified menu.inc menu_check_user_access to prevent warnings in PHP 8.
+
   Upgraded jQuery UI to version 1.14.0.
-  
+
 
 2024-10-07
   Fixed CSS bug where sometimes when printing, the body of the page would appear on a different sheet than the header.
-  
+
 
 2024-10-04
   Modified Engagements display so that engagements are sorted by activity_datetime desc FIRST, then by vid DESC.  Otherwise, this
   caused a bug where the most recently modified was appearing first.
-  
+
   Modified Engagements display so that emails show their subject line.
 
   Fixed a bug in content module, where titles were being passed through filter_markup, and consequently having <p></p> added to
   them.
-  
+
 
 2024-09-30
   Fixing bug when receiving SMS, where it wasn't sending full contents of SMS to non-advisor users, if set.
-  
+
   Made a non-breaking change to modules_implement_hook() function, so we can specified modules to skip when
   checking to see which ones implement a hook.
-  
+
   Made changes to the order in which content is loaded and saved, to make sure content is fully created before
   being passed to a hook.
-  
+
   Added alerts_content_load() hook to alerts module, so if there are attached media we will show them in the
   alert, similar to email and text messages.
 
 
 2024-09-19
   Added server hostname to the PHP mail errors email.
-    
+
   Cleaning up some code in the batch module.
-  
+
 
 2024-09-05
   Created a convenience function and added it to misc.inc: array_get().  This lets you get a value from an array (if it exists), or,
-  if it does not exist, you get back an empty string ("") or whatever you specify.  
+  if it does not exist, you get back an empty string ("") or whatever you specify.
   This is helpful for the common PHP warning in PHP 8 of an "undefined array key".  My intention is to slowly replace the $x = @$arr['something'] type
   statements with $x = array_get($arr, 'something') over time.  All those @'s are ugly.
-  
-  Modified cron.php to make it slightly more secure in how it checks for the cron token. 
-  
+
+  Modified cron.php to make it slightly more secure in how it checks for the cron token.
+
 
 2024-09-04
   Various tweaks for PHP 8.
-  
+
   Added option in Engagements - SMS Settings, to allow the full contents of an SMS message to be sent to specified recipients, instead of a simple
   notification that they should log in to view.
-  
-  Removed a line from .htaccess which was affecting cookies and being able to open links to FlightPath from emails.  
-  
+
+  Removed a line from .htaccess which was affecting cookies and being able to open links to FlightPath from emails.
+
 
 2024-08-30
   Made an extra check to make sure there is an .htaccess file in the "private" files directory. If not, one is created.
 
 
 2024-08-27
-  In engagements module, added "image/jpg" to list of accepted mime types for incoming sms/email, even though *officially* 
+  In engagements module, added "image/jpg" to list of accepted mime types for incoming sms/email, even though *officially*
   that mime type is invalid.  It should only ever be "image/jpeg".  This is to accomodate incoming sms/emails which don't follow the official rules.
-  
+
 
 2024-08-22
   Fixed bug in system where if a disallowed student rank was trying to log in, the message displayed didn't show what ranks *were* allowed in.
-    
+
 
 2024-08-21
   Fixed bug in engagements module, where we were checking for calls.  It was not correctly requesting the calls, and was therefor getting
   *every* call in the account history on every cron run.  Fixed that, and simplified what gets added to the watchdog.
-  
+
 
 2024-08-06
   Fixed bug in system.module where mfa verification codes were being deleted every cron run, instead of
@@ -392,63 +396,63 @@ FlightPath 7.x Changelog
 
 2024-08-04
   Minor tweaks for PHP 8.
-  
+
   Updated information in lassie module's readme file.
-  
+
 
 2024-08-03
   Updated logic for incoming SMS messages in engagements module.  It now verifies the message came from SignalWire correctly.
-  
+
 
 2024-08-02
   SignalWire will send an MMS's body as a media attachment.  Changing how we receive that in the engagements module.
-  
+
   Also updating prices in the engagements module to better match SignalWire's.
-    
+
 
 2024-07-30
   Fixed bug in course_search where anticipated availability was not showing correctly in PHP 8, since "" no longer equals integer 0.
-  
+
 
 2024-07-23
   Fixed a bug in Engagements where the "Engagements Received" list (under the Alerts screen) was not showing the pager
   correctly.
-  
+
   Also corrected timezone not being factored in on the above mentioned screen.
-  
+
   If a student's name cannot be found because they aren't in the "students" table, we will show their name from the "users"
   table on their profile, with an alert icon.
-  
+
 
 2024-07-19
   Various small tweaks to remove PHP deprecated warnings in PHP 8x.
-  
+
 
 2024-07-04
   Various changes to remove PHP deprecated warnings in PHP 8.
-  
+
   Made a slight change to password.inc where if any values are not supplied, it immediately
   returns FALSE when checking if a password is valid.
-  
+
   Modified user module to not have an issue if a value was not supplied in the User Settings form.
-  
+
 
 2024-07-03
   Changed the default max_levels value for fpm() from 20 to 15, to make it a little less likely to run out of memory.
-  
+
 
 2024-07-02
   Added default values to when the anonymous user object is created.  Ex: cwid, f_name, l_name, etc.
-  
+
 
 2024-06-29
   Modified .htaccess file to disallow downloading .enc (encrypted) files directly from the files directory.
-  
+
 
 2024-06-27
   When receiving a text message form an unrecognized sender, their phone number
   will appear in the Alert title that is generated.
-  
+
 
 2024-06-26
   Fixes for PHP 8 warnings.
@@ -456,72 +460,72 @@ FlightPath 7.x Changelog
 
 2024-06-22
   Fixed PHP 8 warnings.
-  
+
   Added watchdog entry if our custom error handler is unable to write to the errors file (that gets emailed out).
-  
+
   Fixed bug where anon users (which triggered PHP errors) were not being added to the errors file to email.
-  
+
   Fixed warning where if php errors file isn't in the private dir, it will be created on cron run.
 
   Completed Mailgun webhook integration functionality.  All email attachments are encrypted.
-  
+
   Moved the "attached files" section of received emails to be always visible, and numbered.
 
 
 2024-06-21
   Worked on Mailgun webhook integration.  Made it so that all email attachments are encrypted.
-  
+
   Renamed content.module's constant CONTENT_PRIVATE_FILE to CONTENT_ENCRYPTED_FILE to better describe what it is.
   Also changed some of the code in content.module's content_add_new_uploaded_file() function to better handle from emails.
 
 
 2024-06-18
   Show message on new Email form when the student has no email address available.
-  
+
   Minor fix to remove warning in PHP 8.x.
 
 
 2024-06-17
   Fixed minor warning in alerts module, caused if the author of an alert could not be loaded
   or was generated by the system. Warning appeared when trying to find the author's CWID.
-  
+
 
 2024-06-16
   Added a robots.txt file to the project directory.
-  
+
   Updated the README.txt file.
-  
+
   Added .htaccess file to files directory
-  
+
   Created ability for FlightPath to manage a "private" files directory within custom/files, which
   contains a special .htaccess file to keep Apache from serving any files in that dir.  Changed
-  the error handling functionality (which emails on php errors) to use this new private dir.  
-  
+  the error handling functionality (which emails on php errors) to use this new private dir.
+
   Fixed minor typo in lassie module.
-  
+
 
 2024-06-15
   Various changes to suppress warnings and deprecated notices in PHP 8.x
-  
+
   Added spot to enter a temporary directory.
-  
+
   Added code so that PHP errors collect in a temporary file, then get emailed as a digest once per cron run.
-  
+
   When executing PHP code from the Admin Console, warnings are not suppressed with @.  This allows for testing
   error handling.
-  
+
 
 2024-06-04
   Added new system setting, allowing the trimming of ERROR messages from the watchdog table based on age.
-  
-  Made changes to other files for warnings generated by PHP 8.2. 
-  
+
+  Made changes to other files for warnings generated by PHP 8.2.
+
 
 2024-06-02
   Various modifications to remove compatibility issues for PHP 8.2.
-  
+
   Working on adding MailGun route (web hook) functionality for receiving emails, to replace IMAP method.
-    
+
 
 2024-05-26
   Made modifications to install.php so that bare-domain installs go more smoothly.
@@ -529,22 +533,22 @@ FlightPath 7.x Changelog
   Fixed warnings for PHP 8.2
 
   Tagging this point as RC1 (Release Candidate 1); no longer in "dev".
-  
+
 
 2024-05-25
   Added PHP version to System status page.
-  
+
   Removed more warnings which appear in PHP 8.2.
-  
+
   Added extra help (and the way that fp_get_js_alert() function shows a ? link) for selecting a catalog year from
   the admin console.
-  
+
   Fixed issues with installation.
-  
+
   Fixed spot where theme was defaulting to "fp6_clean"
-  
+
   Made modifications to the default banner to bring in a consistent style.
-  
+
 
 2024-04-24
   Updated README.txt for information re: the silk icon set.
@@ -553,10 +557,10 @@ FlightPath 7.x Changelog
 2024-04-08
   Removed possible exploit vector that would have allowed users without the proper permissions to submit
   the "report contact" form.
-  
-  Added new constants to bootstrap.inc, indiating location of jquery and jquery ui.  This lets us update 
+
+  Added new constants to bootstrap.inc, indiating location of jquery and jquery ui.  This lets us update
   either of those files/locations later on, without disrupting custom scripts.
-  
+
   Modification to SMTP module to add MessageID to sent emails.
 
   General cleanup of old files.
@@ -564,7 +568,7 @@ FlightPath 7.x Changelog
 
 2024-03-26
   Various changes and fixes to remove warnings for PHP 8.2
-  
+
 
 2024-03-20
   To fix XSS vulnerability, modified Content module to disallow dangerous HTML (like script tags)
@@ -573,26 +577,26 @@ FlightPath 7.x Changelog
 
 2024-03-15
   Fixed various deprecated warnings for PHP 8.2.
-  
+
   Fixed issue where substitutions were no longer working, due to changes in how PHP 8.2
   compares numbers and strings.
-  
+
   Added new function fp_trim(), which is meant to act as a drop-in replacement for trim(),
   except that it can accept NULL or FALSE and return ''.  Regular trim() cannot do this
   without triggering a deprecated warning.
-  
+
 
 2024-01-26
   Fixing warnings in stats module.
-  
+
 
 2024-01-07
   Updated signalwire library for PHP 8.x, made modifications to it for FlightPath (removed need for \twilio\Fax, which wasn't included)
 
   Continuing to clean code of deprecated an warning messages.
-  
+
   Added a more robust UID when sending calendar invites, to better ensure uniqueness.
- 
+
   DatabaseHandler->get_student_name() returns "Unknown Student" if it cannot find the student.
 
   Had an issue where if a hidden form variable (using FAPI) was '0', then it was not correctly
@@ -601,15 +605,15 @@ FlightPath 7.x Changelog
 
 2023-12-02
   Updated TinyMCE to version 5.10.9 (current stable release at the time of this writing)
-  
+
   Updated jQuery to 3.7.1 (current stable release at the time of this writing)
-  
+
   Updated jQuery UI to 13.1.2 (current stable release at the time of this writing)
-  
+
   Renamed the "core" theme to simply fp_clean, instead of "fp6_clean".  Made adjustments to code to use this name.
-  
+
   Continuing to clean code of deprecated and warning messages.
-  
+
 
 2023-12-01
   Initial move to new 7.x branch, from the 6.x branch.  The primary goal of this branch (while in a "dev" state) is
