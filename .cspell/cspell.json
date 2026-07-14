@@ -1,0 +1,39 @@
+{
+  "version": "0.2",
+  "language": "en-US",
+
+  "words": [
+    "FlightPath",
+    "MariaDB",
+    "MySQL",
+    "jQuery",
+    "PHP",
+    "JavaScript",
+    "Apache",
+    "Linux",
+    "FERPA",
+    "SSO",
+    "LDAP",
+    "OAuth",
+    "API",
+    "UUID",
+    "webhook"
+  ],
+
+  "ignorePaths": [
+    ".git/**",
+    ".github/**",
+    "vendor/**",
+    "node_modules/**",
+    "libraries/**",
+    "core/**",
+    "**/*.min.js",
+    "**/*.min.css"
+  ],
+
+  "ignoreRegExpList": [
+    "/https?:\\/\\/\\S+/",
+    "/[A-Fa-f0-9]{32,}/",
+    "/[A-Za-z0-9_-]{20,}/"
+  ]
+}
