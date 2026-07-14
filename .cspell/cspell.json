@@ -34,7 +34,8 @@
     "**/lib/**",
     "libraries/**",
     "**/*.min.js",
-    "**/*.min.css"
+    "**/*.min.css",
+    "**/*.css"
   ],
 
   "ignoreRegExpList": [
