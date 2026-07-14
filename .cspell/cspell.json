@@ -2,17 +2,6 @@
   "version": "0.2",
   "language": "en-US",
 
-    "files": [
-      "**/*.php",
-      "**/*.class",
-      "**/*.inc",
-      "**/*.js",
-      "**/*.md",
-      "**/*.txt",
-      "**/*.html"
-    ],
-
-
   "dictionaryDefinitions": [
     {
       "name": "project-words",
@@ -33,8 +22,7 @@
     "**/vendor/**",
     "**/lib/**",
     "libraries/**",
-    "**/*.min.js",
-    "**/*.min.css",
+    "**/*.js",
     "**/*.css"
   ],
 

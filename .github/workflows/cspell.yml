@@ -16,3 +16,10 @@ jobs:
           config: .cspell/cspell.json
           incremental_files_only: false
           verbose: true
+          files: |
+                **/*.php
+                **/*.class
+                **/*.inc
+                **/*.md
+                **/*.txt
+                **/*.html
