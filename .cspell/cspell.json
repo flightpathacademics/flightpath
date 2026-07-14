@@ -15,17 +15,6 @@
   ],
 
 
-
-  "ignorePaths": [
-    ".git/**",
-    ".github/**",
-    "**/vendor/**",
-    "**/lib/**",
-    "libraries/**",
-    "**/*.js",
-    "**/*.css"
-  ],
-
   "ignoreRegExpList": [
     "/https?:\\/\\/\\S+/",
     "/[A-Fa-f0-9]{32,}/",
