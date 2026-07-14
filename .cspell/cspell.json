@@ -13,31 +13,26 @@
     ],
 
 
-  "words": [
-    "FlightPath",
-    "MariaDB",
-    "MySQL",
-    "jQuery",
-    "PHP",
-    "JavaScript",
-    "Apache",
-    "Linux",
-    "FERPA",
-    "SSO",
-    "LDAP",
-    "OAuth",
-    "API",
-    "UUID",
-    "webhook"
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "ignore-words.txt",
+      "addWords": true
+    }
   ],
+
+  "dictionaries": [
+    "project-words"
+  ],
+
+
 
   "ignorePaths": [
     ".git/**",
     ".github/**",
-    "vendor/**",
-    "node_modules/**",
+    "**/vendor/**",
+    "**/lib/**",
     "libraries/**",
-    "core/**",
     "**/*.min.js",
     "**/*.min.css"
   ],
@@ -45,6 +40,11 @@
   "ignoreRegExpList": [
     "/https?:\\/\\/\\S+/",
     "/[A-Fa-f0-9]{32,}/",
+    "/\\$[A-Za-z_][A-Za-z0-9_]*/",
+    "/\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()/",
+    "/\\b[A-Za-z_][A-Za-z0-9_]*\\s*\\([^)]*\\)/",
+    "/https?:\\/\\/\\S+/",
+    "/\\b[A-Za-z0-9_]*_[A-Za-z0-9_]*\\b/",
     "/[A-Za-z0-9_-]{20,}/"
   ]
 }
