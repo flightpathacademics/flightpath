@@ -21,8 +21,8 @@ jobs:
                 **/*.class
                 **/*.inc
                 **/*.md
-                **/*.txt
                 **/*.html
                 !**/libraries/**
                 !**/vendor/**
                 !**/lib/**
+                !**/themes/**
