@@ -15,32 +15,32 @@ function calendar_menu() {
   $items['calendar'] = array(
     'title' => 'Appointments',
     'page_callback' => 'calendar_display_calendar',
-    'access_arguments' => array('access_logged_in_content'),    
+    'access_arguments' => array('access_logged_in_content'),
     'type' => MENU_TYPE_TAB,
-    'tab_family' => 'calendar_tabs',    
+    'tab_family' => 'calendar_tabs',
     "weight" => 10,
-  );    
+  );
 
 
   $items['calendar/upcoming'] = array(
     'title' => 'Upcoming Appointments',
     'page_callback' => 'calendar_display_upcoming_appointments',
-    'access_arguments' => array('access_logged_in_content'),    
+    'access_arguments' => array('access_logged_in_content'),
     'type' => MENU_TYPE_TAB,
-    'tab_family' => 'calendar_tabs',    
+    'tab_family' => 'calendar_tabs',
     "weight" => 15,
-  );    
+  );
 
 
 
   $items['calendar/schedule-staff'] = array(
     'title' => 'Schedule Appointments',
     'page_callback' => 'calendar_display_schedule_staff_page',
-    'access_callback' => 'fp_user_is_student',    
+    'access_callback' => 'fp_user_is_student',
     'type' => MENU_TYPE_TAB,
-    'tab_family' => 'calendar_tabs',    
+    'tab_family' => 'calendar_tabs',
     "weight" => 50,
-  );    
+  );
 
 
 //calendar/confirm-cancel-appointment/$content->cid
@@ -59,25 +59,25 @@ function calendar_menu() {
     'page_callback' => 'calendar_display_schedule_appointment_page',
     'page_arguments' => array(1),
     'access_callback' => TRUE,
-    'type' => MENU_TYPE_NORMAL_ITEM,    
+    'type' => MENU_TYPE_NORMAL_ITEM,
   );
 
 
   $items['schedule-appointment/%/confirm'] = array(
     'title' => 'Confirm Appointment',
-    'page_callback' => 'fp_render_form',    
+    'page_callback' => 'fp_render_form',
     'page_arguments' => array('calendar_schedule_appointment_confirm_form', 'normal', 1),
     'access_callback' => TRUE,
-    'type' => MENU_TYPE_NORMAL_ITEM,    
+    'type' => MENU_TYPE_NORMAL_ITEM,
   );
 
 
   $items['schedule-appointment-completed/%'] = array(
     'title' => t('Appointment Scheduled Successfully'),
-    'page_callback' => 'calendar_display_schedule_appointment_completed_page',    
+    'page_callback' => 'calendar_display_schedule_appointment_completed_page',
     'page_arguments' => array(1),
     'access_callback' => TRUE,
-    'type' => MENU_TYPE_NORMAL_ITEM,    
+    'type' => MENU_TYPE_NORMAL_ITEM,
   );
 
 
@@ -98,15 +98,15 @@ function calendar_menu() {
 
 
 
-  $items['admin/config/appointments'] = array(  
+  $items['admin/config/appointments'] = array(
     'title' => 'Appointment settings',
     'description' => 'Configure global appointment settings',
     'page_callback' => 'fp_render_form',
     'page_arguments' => array('calendar_appointment_settings_form', 'system_settings'),
-    'access_arguments' => array('administer_appointment_settings'),    
+    'access_arguments' => array('administer_appointment_settings'),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_icon" => fp_get_module_path('system') . "/icons/calendar_view_day.png",     
+      "menu_icon" => fp_get_module_path('system') . "/icons/calendar_view_day.png",
       "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
@@ -120,11 +120,11 @@ function calendar_menu() {
   );
 
 
-  
-  
 
- 
-  return $items;  
+
+
+
+  return $items;
 } // hook_menu
 
 
@@ -136,10 +136,10 @@ function calendar_menu() {
  */
 function calendar_appointment_settings_form($school_id = 0) {
   $form = array();
-  
+
   // Similar to other forms, this one must be separated out by school.  See the course search settings.
   $school_id = intval($school_id);
-  
+
   $fs = "";  // The field name suffix.  We will add this to the end of all of our field names.  If this is the default school, leave blank.
   if (module_enabled("schools")) {
     $school_name = schools_get_school_name_for_id($school_id);
@@ -148,23 +148,23 @@ function calendar_appointment_settings_form($school_id = 0) {
       $fs = "~~school_" . $school_id;
     }
   }
-  
+
   $form['school_id'] = array(
     'type' => 'hidden',
     'value' => $school_id,
   );
-    
-    
+
+
   $options = fp_get_departments();
   $form['appointments_from_departments' . $fs] = array(
     'type' => 'checkboxes',
     'label' => t("Select departments which allow any of their employees to appear on the student Schedule Appointment screen (for every student):"),
     'options' => $options,
-    'value' => variable_get_for_school('appointments_from_departments', array(), $school_id, TRUE), 
+    'value' => variable_get_for_school('appointments_from_departments', array(), $school_id, TRUE),
   );
-  
-  
-  return $form;  
+
+
+  return $form;
 } // calendar_appointment_settings_form
 
 
@@ -179,51 +179,51 @@ function calendar_appointment_settings_form($school_id = 0) {
 /**
  * This tab displays the upcoming appointments for the user.  It's meant to be a tab on their Calendar screen.
  */
-/* 
+/*
 function z__calendar_display_upcoming_appointments() {
   global $user;
 
   fp_add_css(fp_get_module_path("system") . "/css/style.css");
-  
-  
+
+
   $render = array();
   $render['#id'] = 'calendar_display_upcoming_appointments';
-  
-  
+
+
   // Build up the "appoinments" HTML
-  
+
   $render['mark_top'] = array(
     'value' => "<h4>" . t("Your upcoming appointments/agenda over the next few weeks:") . "</h4><hr>",
   );
-    
+
   $user_tz = fp_get_user_timezone();
-  
+
   $ranges = array(
     "today" => array(strtotime("NOW $user_tz"), strtotime("TOMORROW - 1 SECOND $user_tz")),
     "tomorrow" => array(strtotime("TOMORROW $user_tz"), strtotime("NOW + 1 DAY $user_tz")),
     "this week" => array(strtotime("NOW + 1 DAY $user_tz"), strtotime("NEXT MONDAY - 1 SECOND $user_tz")),
     "next 2 weeks" => array(strtotime("NEXT MONDAY $user_tz"), strtotime("NEXT MONDAY + 15 DAYS $user_tz")),
   );
-  
-  
+
+
   $bool_is_empty = TRUE;
-  $c = 0;  
+  $c = 0;
   foreach ($ranges as $when => $details) {
 
     $when_desc = t("Today");
     if ($when == "tomorrow") $when_desc = t("Tomorrow");
     if ($when == "this week") $when_desc = t("Remaining days this week");
     if ($when == "next 2 weeks") $when_desc = t("Next few weeks");
-    
-       
+
+
     $start_ts = $details[0];
     $end_ts = $details[1];
 
 
     $start_time = date("Y-m-d H:i:s", $start_ts);
     $end_time = date("Y-m-d H:i:s", $end_ts);
-    
-        
+
+
     $upcoming = calendar_get_upcoming_appointments_for_cwid($user->cwid, $start_time, $end_time);
     if ($upcoming && count($upcoming) > 0) {
       $render['mark_' . fp_get_machine_readable($when)] = array(
@@ -233,19 +233,19 @@ function z__calendar_display_upcoming_appointments() {
     else {
       continue;
     }
-    
-    foreach ($upcoming as $details) {      
-      $thedate = format_date(convert_time($details['utc_start_ts']), 'long_no_year');      
+
+    foreach ($upcoming as $details) {
+      $thedate = format_date(convert_time($details['utc_start_ts']), 'long_no_year');
       $use_name = $details['faculty_name'];
       if ($user->is_faculty) {
         $use_name = $details['student_name'];
-      }            
-      
+      }
+
       $bool_is_empty = FALSE;
-                        
+
       $msg = t("You have an appointment with @fn on @td.", array("@fn" => $use_name, "@td" => $thedate));
-      
-      
+
+
       $render['appointment_' . $c] = array(
         'value' => "<div class='feed-item'>
                                 <div class='feed-item-icon'><i class='fa fa-calendar'></i></div>
@@ -253,31 +253,31 @@ function z__calendar_display_upcoming_appointments() {
                                 <div class='feed-item-desc'>$msg</div>
                          </div>",
       );
-      
+
       $c++;
-      
+
     } // foreach
-  
+
   } //foreach ranges
-  
+
   if ($bool_is_empty) {
     $render['no_appointments'] = array(
       'value' => "<div class='empty'>
-                    <p>" . t("You have no upcoming appointments within the next few weeks.") . "</p> 
+                    <p>" . t("You have no upcoming appointments within the next few weeks.") . "</p>
                   </div>",
     );
-     
+
   }
-  
-      
-    
-            
-    
-  
-  
+
+
+
+
+
+
+
   return fp_render_content($render);
-    
-  
+
+
 } // z__calendar_display_upcoming_appointments
 */
 
@@ -286,84 +286,84 @@ function calendar_display_upcoming_appointments() {
   global $user;
 
   fp_add_css(fp_get_module_path("system") . "/css/style.css");
-  
+
   fp_set_title('');
-  
+
   $render = array();
   $render['#id'] = 'calendar_display_upcoming_appointments';
-  
-  
+
+
   // Build up the "appoinments" HTML
-  
+
   $render['mark_top'] = array(
     'value' => "<h4>" . t("Your upcoming appointments/agenda over the next few weeks:") . "</h4><hr>",
   );
-    
-  $user_tz = fp_get_user_timezone();
-  
-  
-  $bool_is_empty = TRUE;
-  $c = 0;  
 
-    
+  $user_tz = fp_get_user_timezone();
+
+
+  $bool_is_empty = TRUE;
+  $c = 0;
+
+
   $start_ts = convert_time(time());
   $end_ts = strtotime("NOW + 21 DAYS");
 
 
   $start_time = date("Y-m-d H:i:s", $start_ts);
   $end_time = date("Y-m-d H:i:s", $end_ts);
-  
-      
+
+
   $upcoming = calendar_get_upcoming_appointments_for_cwid($user->cwid, $start_time, $end_time);
-  
+
   $today = date('Y-m-d', $start_ts);
   $tomorrow = date('Y-m-d', $start_ts + (24 * 60 * 60));  // 24 hours later
   $next_few_weeks_ts = $start_ts + (24 * 60 * 60) + 1;
-  
-    
+
+
   $current_range = "";
-    
-  foreach ($upcoming as $details) {      
+
+  foreach ($upcoming as $details) {
     $thedate = format_date(convert_time($details['utc_start_ts']), 'long_no_year');
-    
+
     // Figure out of this is TODAY, TOMORROW, or over the next few weeks.
     $ymd = date('Y-m-d', convert_time($details['utc_start_ts']));
-      
+
     if ($ymd == $today && $current_range != "today") {
       $render['mark_today_header'] = array(
         'value' => "<h4>" . t("Today") . "</h4>",
       );
       $current_range = "today";
-    }          
-          
+    }
+
     if ($ymd == $tomorrow && $current_range != "tomorrow") {
       $render['mark_tomorrow_header'] = array(
-        'value' => "<h4>" . t("Tomorrow") . "</h4>",        
+        'value' => "<h4>" . t("Tomorrow") . "</h4>",
       );
-      
+
       $current_range = "tomorrow";
-    }          
-          
-    //if (convert_time($details['utc_start_ts']) >= $next_few_weeks_ts && $current_range != "next_few") {      
-    if ($ymd != $today && $ymd != $tomorrow && $current_range != "next_few") {      
+    }
+
+    //if (convert_time($details['utc_start_ts']) >= $next_few_weeks_ts && $current_range != "next_few") {
+    if ($ymd != $today && $ymd != $tomorrow && $current_range != "next_few") {
       $render['mark_next_few_header'] = array(
         'value' => "<h4>" . t("Next few weeks") . "</h4>",
       );
       $current_range = "next_few";
-    }          
+    }
 
 
-                    
+
     $use_name = $details['faculty_name'];
     if ($user->is_faculty) {
       $use_name = $details['student_name'];
-    }            
-    
+    }
+
     $bool_is_empty = FALSE;
-                      
+
     $msg = t("You have an appointment with @fn on @td.", array("@fn" => $use_name, "@td" => $thedate));
-    
-    
+
+
     $render['appointment_' . $c] = array(
       'value' => "<div class='feed-item'>
                               <div class='feed-item-icon'><i class='fa fa-calendar'></i></div>
@@ -371,30 +371,30 @@ function calendar_display_upcoming_appointments() {
                               <div class='feed-item-desc'>$msg</div>
                        </div>",
     );
-    
+
     $c++;
-    
+
   } // foreach
-  
-  
+
+
   if ($bool_is_empty) {
     $render['no_appointments'] = array(
       'value' => "<div class='empty'>
-                    <p>" . t("You have no upcoming appointments within the next few weeks.") . "</p> 
+                    <p>" . t("You have no upcoming appointments within the next few weeks.") . "</p>
                   </div>",
     );
-     
+
   }
-  
-      
-    
-            
-  watchdog("calendar", "display_upcoming", array());  
-  
-  
+
+
+
+
+  watchdog("calendar", "display_upcoming", array());
+
+
   return fp_render_content($render);
-    
-  
+
+
 } // calendar_display_upcoming_appointments
 
 
@@ -408,21 +408,21 @@ function calendar_display_upcoming_appointments() {
 
 /**
  * Make sure the user is allowed to cancel this appointment.
- * 
+ *
  * Used by the hook_menu item
  */
 function calendar_access_can_cancel_appointment($cid) {
-  global $user;  
+  global $user;
   $content = content_load($cid);
- 
+
   if (user_has_permission("can_cancel_own_appointments")) {
     if ($user->cwid == $content->field__student_id['value'] || $user->cwid == $content->field__faculty_id['value'] || $user->id == 1) {
       return TRUE;
     }
-  }         
- 
+  }
+
   return FALSE;
-  
+
 }
 
 
@@ -430,36 +430,36 @@ function calendar_access_can_cancel_appointment($cid) {
  * Confirm we actually want to cancel this appointment
  */
 function calendar_confirm_cancel_appointment_form($cid) {
-  
+
   $form = array();
-  
+
   $content = content_load($cid);
 
   fp_add_css(fp_get_module_path("content") . "/css/content.css");
 
   $types = content_get_types();
   $type = $content->type;
-  
+
 
   // Go back to the original content (our default option)
   $form['#redirect'] = array('path' => "content/$cid");
 
-    
+
   // We want to redirect correctly based on this type's options....
   // Are there any special settings for the title?
-  if (isset($types[$type]['settings'])) {    
-    if (is_array(@$types[$type]['settings']['#redirect'])) {      
+  if (isset($types[$type]['settings'])) {
+    if (is_array(@$types[$type]['settings']['#redirect'])) {
       $form['#redirect'] = $types[$type]['settings']['#redirect'];
     }
   }
-  
-    
+
+
   $student_name = @fp_get_student_name($content->field__student_id['value'], TRUE);
   $faculty_name = @fp_get_faculty_name($content->field__faculty_id['value']);
- 
+
   // Make a nice title for this appointment.
   $apt_title = t("Meeting between @ft and @st on @dt", array("@ft" => $faculty_name, "@st" => $student_name, "@dt" => $content->field__appointment_datetime['display_value']));
-  
+
   $form['cid'] = array(
     'type' => 'hidden',
     'value' => $cid,
@@ -470,13 +470,13 @@ function calendar_confirm_cancel_appointment_form($cid) {
     'value' => "<h2>" . t("Are you sure you wish to cancel %ap?", array("%ap" => $apt_title)) . "</h2>
                 <p>" . t("This action will send a notification to both parties that the appointment has been canceled.") . "</p>
                 <hr>",
-    
+
   );
 
 
-  //If this appointment had meeting data (zoom) then we should include some text here that explains it will be cancelled as well.  
+  //If this appointment had meeting data (zoom) then we should include some text here that explains it will be cancelled as well.
   if (isset($content->field__video_data) && isset($content->field__video_data['value']) && $content->field__video_data['value'] != "") {
-    $data = json_decode($content->field__video_data['value']);    
+    $data = json_decode($content->field__video_data['value']);
     $video_provider = $data->video_provider;
     if ($video_provider == "zoom" && module_enabled('zoomapi')) {
       $id = $data->id;
@@ -485,7 +485,7 @@ function calendar_confirm_cancel_appointment_form($cid) {
         'value' => t("<strong>Zoom Meeting:</strong> By cancelling this appointment, the scheduled Zoom meeting (ID: $id) will also be cancelled."),
       );
     }
-  } 
+  }
 
 
 
@@ -494,37 +494,37 @@ function calendar_confirm_cancel_appointment_form($cid) {
     'label' => t("Reason"),
     'description' => t("Please enter a brief reason for canceling this appointment."),
   );
- 
-  
 
-  
-  
+
+
+
+
   $form['submit_confirm'] = array(
     'type' => 'submit',
     'spinner' => TRUE,
-    'value' => t('Confirm & Cancel Appointment'),    
+    'value' => t('Confirm & Cancel Appointment'),
     'attributes' => array('class' => 'content-submit-btn'),
     'suffix' => "&nbsp; &nbsp; <a href='javascript:history.go(-1);'>" . t("Cancel") . "</a>",
   );
-  
 
-    
+
+
   return $form;
-  
+
 } // confirm_cancel_appointment_form
 
 
 function calendar_confirm_cancel_appointment_form_submit(&$form, &$form_state) {
   global $user;
-  
+
   if ($user->is_student) {
     $user_name = fp_get_student_name($user->cwid, FALSE);
   }
-  else {  
+  else {
     $user_name = fp_get_faculty_name($user->cwid);
   }
-  
-  if (isset($form['#redirect'])) {    
+
+  if (isset($form['#redirect'])) {
     fp_add_message(t("The appointment was cancelled."));
     if (!isset($form['#redirect']['query'])) $form['#redirect']['query'] = '';
     $form['#redirect']['query'] .= "&cancel=yes";
@@ -532,24 +532,24 @@ function calendar_confirm_cancel_appointment_form_submit(&$form, &$form_state) {
   else {
     // No redirect was specified, so let's just return.
     fp_add_message(t("The appointment was cancelled."));
-  }  
+  }
 
-  
-    
+
+
   $cid = $form_state['values']['cid'];
-  $content = content_load($cid);    
-  
+  $content = content_load($cid);
+
   $reason_msg = trim(filter_markup($form_state['values']['msg'], 'plain'));
-  
+
   $utc_appointment_datetime = strtotime($content->field__appointment_datetime['value']);
-  
+
   $student_cwid = $content->field__student_id['value'];
   $faculty_cwid = $content->field__faculty_id['value'];
-      
-  
+
+
   // If the appointment had meeting data (eg, Zoom), make sure we send a request to delete the Zoom meeting as well.
   if (isset($content->field__video_data) && isset($content->field__video_data['value']) && $content->field__video_data['value'] != "") {
-    $data = json_decode($content->field__video_data['value']);    
+    $data = json_decode($content->field__video_data['value']);
     $video_provider = $data->video_provider;
     if ($video_provider == "zoom") {
       $id = $data->id;
@@ -559,71 +559,71 @@ function calendar_confirm_cancel_appointment_form_submit(&$form, &$form_state) {
       }
     }
   }
-  
-  
-       
+
+
+
   // First, send a notification to the student.
   $student_user_id = db_get_user_id_from_cwid($student_cwid, 'student');
   $student_account = fp_load_user($student_user_id);
   $student_tz = fp_get_user_timezone($student_account);
-  
-  $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $student_tz), 'short');  
+
+  $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $student_tz), 'short');
   $msg = "APPOINTMENT CANCELED: $user_name has canceled appointment: $apt_date";
   if ($reason_msg) {
     $msg .= "\n\n<br><br>--- Reason given: " . $reason_msg;
   }
-  
+
   notify_send_notification_to_user($student_user_id, $msg, $cid, 'appointment');
-  
-  
+
+
 
   // Now, send message to faculty member
   $faculty_user_id = db_get_user_id_from_cwid($faculty_cwid, 'faculty');
   $faculty_account = fp_load_user($faculty_user_id);
   $faculty_tz = fp_get_user_timezone($faculty_account);
-  
-  $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $faculty_tz), 'short');  
+
+  $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $faculty_tz), 'short');
   $msg = "APPOINTMENT CANCELED: $user_name has canceled appointment: $apt_date";
   if ($reason_msg) {
     $msg .= "\n\n<br><br>--- Reason given: " . $reason_msg;
   }
 
-  
+
   notify_send_notification_to_user($faculty_user_id, $msg, $cid, 'appointment');
-    
-    
+
+
   // Okay, now we set the content to be "unpublished" and save.
   $content->published = 0;
   content_save($content);
-  
+
   watchdog("calendar", "appointment_cancel cid:$cid", array());
-  
-      
+
+
 } // .. confirm_cancel_appointment_form_submit
 
 
 
 
 /**
- * This page (primarily meant for students) is for quickly finding 
+ * This page (primarily meant for students) is for quickly finding
  * your advisor or professor or whomever, and finding their link to schedule
  * an appointment with them.
  */
 function calendar_display_schedule_staff_page() {
   global $user;
-  
+
   $rtn = "";
-  
+
   fp_set_title('');
   fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
   $db = get_global_database_handler();
   if ($user->is_student) {
-    
+
     $your_options = array();
-        
+
     $advisors = advise_get_advisors_for_student($user->cwid);
     foreach ($advisors as $c => $faculty_id) {
-      
+
       // Does this faculty member accept appointments?
       $event_types = content_get_content_for_faculty_id('schedule_event_type', $faculty_id);
 
@@ -633,15 +633,15 @@ function calendar_display_schedule_staff_page() {
           $bool_at_least_one_enabled = TRUE;
         }
       }
-    
+
       if ($bool_at_least_one_enabled) {
         $your_options['advisors'][0][$faculty_id] = $faculty_id;
       }
-      
+
     } // foreach
 
-       
-       
+
+
     $dept_line = "";
     $params = array();
     $departments = fp_get_departments($user->school_id);
@@ -656,20 +656,20 @@ function calendar_display_schedule_staff_page() {
       $dept_line = rtrim($dept_line, ",");
       $dept_line .= ")";
     }
-    
+
     // Any other staff at the university who have appointments allowed.
     if ($dept_line) {
       $res = db_query("SELECT * FROM users u, faculty f
-                       WHERE is_faculty = 1 
+                       WHERE is_faculty = 1
                        AND is_disabled = 0
-                       $dept_line 
+                       $dept_line
                        ORDER BY l_name, f_name ", $params);
       while ($cur = db_fetch_array($res)) {
-        
+
         $faculty_id = $cur['cwid'];
         $uid = intval($cur['uid']);
         $dept_code = $cur['department_code'];
-        
+
         // Does this faculty member accept appointments?
         $event_types = content_get_content_for_faculty_id('schedule_event_type', $faculty_id);
 //  fpm($event_types);
@@ -679,36 +679,36 @@ function calendar_display_schedule_staff_page() {
             $bool_at_least_one_enabled = TRUE;
           }
         }
-      
+
         if ($bool_at_least_one_enabled && !in_array($faculty_id, $your_options['advisors'][0])) {
           $your_options['staff'][$dept_code][$faculty_id] = $faculty_id;
         }
-        
+
       } // while
-      
+
     } // if dept_line
-    
-    
-    
-    
+
+
+
+
     // TODO:  Hook that modifies $your_options array, so that other modules can add or remove people
-    //        from it.     
-    
-    
-    
-    
-    
+    //        from it.
+
+
+
+
+
     // Display the various links
     $c = 0;
     foreach ($your_options as $type => $details) {
-      
+
       foreach ($your_options[$type] as $dept_code => $details2) {
-        
+
         foreach ($your_options[$type][$dept_code] as $faculty_id) {
-          
+
           $faculty_name = fp_get_faculty_name($faculty_id);
           $faculty_user_id = db_get_user_id_from_cwid($faculty_id);
-          
+
           $title = t("Your Advisor(s)");
           if ($type == 'staff') {
             $dept_title = @$departments[$dept_code];
@@ -717,30 +717,30 @@ function calendar_display_schedule_staff_page() {
             if ($c == 0) {
               $rtn .= "<div class='schedule-appt-sep'>" . t("Other faculty/staff you may schedule appointments with:") . "</div>";
             }
-            $c++;            
+            $c++;
           }
-          
+
           $rtn .= "<h3>" . $title . "</h3>
-                    <ul>";    
+                    <ul>";
           $base_url = $GLOBALS['fp_system_settings']['base_url'];
-          $link = $base_url . '/' . fp_url("schedule-appointment/$faculty_user_id", '', FALSE);        
-                
+          $link = $base_url . '/' . fp_url("schedule-appointment/$faculty_user_id", '', FALSE);
+
           $rtn .= "<li>" . $faculty_name . " - <a href='$link'><i class='fa fa-calendar-plus-o'></i> Schedule appointment</a></li>";
-          
+
           $rtn .= "</ul>";
         } // foreach
-        
+
       }
     }
-    
-    
+
+
   } // user is student
-  
-  
-    
-  
+
+
+
+
   return $rtn;
-  
+
 } // calendar_display_schedule_staff_page
 
 
@@ -753,31 +753,31 @@ function calendar_display_schedule_staff_page() {
 
 function calendar_perm() {
   $arr = array();
-  
+
   $arr['can_accept_appointments'] = array(
     'title' => t("Can accept appointments"),
     'description' => t("Give to users who are allowed to accept appointments from students.  For example, only give this permission to advisors, professors, etc."),
   );
-  
+
   $arr['can_schedule_appointments_with_staff'] = array(
     'title' => t("Can schedule appointments with faculty/staff"),
-    'description' => t("Give to users who are allowed to schedule appointments with faculty/staff.  Ex: basically all students."),                        
+    'description' => t("Give to users who are allowed to schedule appointments with faculty/staff.  Ex: basically all students."),
   );
 
 
   $arr['can_cancel_own_appointments'] = array(
     'title' => t("Can cancel own appointments"),
-    'description' => t("The user can cancel appointments which involve themselves.  Give to both students and faculty/staff."),                        
+    'description' => t("The user can cancel appointments which involve themselves.  Give to both students and faculty/staff."),
   );
-  
-  
+
+
   $arr['administer_appointment_settings'] = array(
     'title' => t("Administer appointment settings"),
     'description' => t("The user can configure the global appointment settings within FlightPath.  Only grant to trusted users."),
   );
-  
-  
-  
+
+
+
   return $arr;
 }
 
@@ -789,24 +789,24 @@ function calendar_perm() {
 function calendar_display_schedule_appointment_completed_page($appointment_cid) {
   $rtn = "";
   $content = content_load($appointment_cid);
-  
+
   fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
-  
-      
+
+
   $rtn .= "<p>" . t("Thank you for scheduling an appointment!  Your details are visible below, and will appear
                      in your FlightPath calendar as well.") . "</p>";
   $rtn .= "<p>" . t("You may close this window.") . "</p>";
-  
+
   $rtn .= "<div class='appointment-summary-view'>";
-    
+
   $rtn .= "<div><strong>" . t("Appointment Details:") . "</strong><br>" . $content->field__appointment_msg['display_value'] . "</div>";
-  
+
   $rtn .= "</div>";
-  
-  
-  
+
+
+
   return $rtn;
-  
+
 } // calendar_display_schedule_appointment_completed_page
 
 
@@ -816,18 +816,18 @@ function calendar_display_schedule_appointment_completed_page($appointment_cid) 
  */
 function calendar_display_user_appointment_settings_page() {
   global $user;
-  
+
   $rtn = "";
-    
-  fp_add_css(fp_get_module_path('calendar') . '/css/style.css');  
-    
-  $day_names = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); 
-    
+
+  fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
+
+  $day_names = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+
   $base_url = $GLOBALS['fp_system_settings']['base_url'];
-  $url = $base_url . '/' . fp_url("schedule-appointment/$user->id", '', false);  
-    
+  $url = $base_url . '/' . fp_url("schedule-appointment/$user->id", '', false);
+
   fp_set_title($user->f_name . " " . $user->l_name . " (" . $user->cwid . ")");
-  
+
 
   $rtn .= "<p>FlightPath allows you to offer appointment scheduling to students at this URL: <a href='$url' target='_blank'>$url</a> </p>
               <p>To begin, create a new Appointment Type you wish to offer
@@ -835,9 +835,9 @@ function calendar_display_user_appointment_settings_page() {
 
   $url = fp_url("content/add/schedule_event_type", "faculty_id=" . $user->cwid . "&window_mode=popup");
   $dtitle = t("Create New Appointment Type");
-  
+
   $rtn .= "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");' class='button'><i class='fa fa-plus'></i> $dtitle</a>";
-  
+
   $rtn .= "
         <table class='schedule-event-types'>
           <tr>
@@ -845,25 +845,25 @@ function calendar_display_user_appointment_settings_page() {
             <th>Enabled?</th>
             <th>Appointment Type Title</th>
             <th>Duration</th>
-            <th>Buffer</th>            
-            <th>Video Meeting?</th>            
+            <th>Buffer</th>
+            <th>Video Meeting?</th>
           </tr>";
-  
+
   // Display all of the event types for this faculty member.
-  
+
   $event_types = content_get_content_for_faculty_id('schedule_event_type', $user->cwid);
   foreach ($event_types as $cid => $content) {
-        
-    $dtitle = t("Edit Event Type");        
+
+    $dtitle = t("Edit Event Type");
     $url = fp_url("content/$cid/edit", "window_mode=popup&content_tabs=false");
-    $edit_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");'><i class='fa fa-pencil'></i></a>";    
-    
+    $edit_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");'><i class='fa fa-pencil'></i></a>";
+
     $video = "-";
     if ($content->field__video_meeting['value'] == 'zoom' && module_enabled('zoomapi')) {
       $video = "Zoom";
     }
-    
-    
+
+
     $rtn .= "<tr>
                 <td class='actions'>$edit_link</td>
                 <td>{$content->field__enabled['display_value']}</td>
@@ -872,52 +872,53 @@ function calendar_display_user_appointment_settings_page() {
                 <td>{$content->field__event_buffer_minutes['display_value']}</td>
                 <td>$video</td>
              </tr>";
-      
+
   } // foreach
-  
-  
+
+
   $rtn .= "</table>";
- 
+
   // Connect Zoom?
   if (module_enabled("zoomapi") && isset($GLOBALS['zoom_client_id'])) {
-          
+
     $msg = t("To enable automatic Zoom meeting creation for video chats, you must first link your Zoom account with your FlightPath account by pressing
-                            the button below:");    
-    $button_text = t("Link Zoom Account");  
-    $link_class = "button";    
+                            the button below:");
+    $button_text = t("Link Zoom Account");
+    $link_class = "button";
     // is the user already set up with Zoom?  If so, display a message, and change the install link to something like "Re-install Zoom", etc.
     $zoomapi_data = zoomapi_get_zoomapi_data_for_user($user->id);
-    
+
     if ($zoomapi_data) {
       $msg = t("You have already linked your FlightPath account with Zoom!  If you need to re-link your account, click the following:");
       $button_text = "Re-Link Zoom Account";
       $link_class = "";
-    } 
+    }
     $rtn .= "<p>" . t("<strong>Zoom:</strong> @msg", array("@msg" => $msg)) . "</p>";
     $url = zoomapi_get_zoom_install_url();
     $rtn .= "<div class='zoom-install-btn'>&nbsp; &nbsp; <a href='$url' class='$link_class' title='" . t($button_text) . "'><i class='fa fa-external-link'></i> " . t($button_text) . "</a> &nbsp;";
     if ($zoomapi_data) {
+      // TODO: change to "w2" subdomain.
       $rtn .= t("To unlink/de-authorize Zoom from FlightPath, view the instructions here: ") . "<a href='https://flightpathacademics.com/help/61' target='_blank'>Uninstalling Zoom from FlightPath</a>";
     }
     $rtn .= "</div>";
-    
+
   } // we have zoom client id set up.
-   
- 
- 
-  
+
+
+
+
   $rtn .= "<hr><h3>Unavailabile Times</h3>
             <p>Use the options below to define when you will be <em>unavailable</em> for appointments.  For example, you should set that you are unavailable on
                 weekends, mornings, and evenings outside of your work hours.  You may create as many of these <em>Unavailable Time</em> records as you wish.</p>
-            
+
             <p>To create specific one-off dates and times, you may enter appointments into your calendar.</p>
             <p>You may also provide a URL to an outside calendar (in ICS format) to mark your unavailable times.</p>";
-  
+
   $url = fp_url("content/add/schedule_unavailable_time", "faculty_id=" . $user->cwid . "&window_mode=popup");
   $dtitle = t("Create New Unavailable Time");
-  
+
   $rtn .= "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");' class='button'><i class='fa fa-plus'></i> Create New Unavailable Time</a>";
-  
+
 
   // Display all of the schedule_unavailable_time nodes.
   $rtn .= "
@@ -927,66 +928,66 @@ function calendar_display_user_appointment_settings_page() {
             <th>Short Name</th>
             <th>Days</th>
             <th>Unavailable Desc</th>
-            <th>Start Time</th>            
-            <th>End Time</th>            
-            <th>External calendar?</th>            
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>External calendar?</th>
           </tr>";
-  
+
   // Display all of the event types for this faculty member.
   $unavail_time = content_get_content_for_faculty_id('schedule_unavailable_time', $user->cwid);
   foreach($unavail_time as $cid => $content) {
-      
+
     $tz = (string) @$content->field__timezone['value'];
     $ftz = friendly_timezone($tz);
-    
-    $start_time = date('g:ia', convert_time(strtotime("2020-01-01 " . $content->field__start_time['value']), 'UTC', $tz));    
+
+    $start_time = date('g:ia', convert_time(strtotime("2020-01-01 " . $content->field__start_time['value']), 'UTC', $tz));
     $end_time = date('g:ia', convert_time(strtotime("2020-01-01 " . $content->field__end_time['value']), 'UTC', $tz));
     $days = "";
     if (is_array($content->field__days['value'])) {
       foreach ($content->field__days['value'] as $k => $v) {
         $days .= $day_names[$v] . ", ";
-      }    
+      }
     }
     $days = rtrim(trim($days), ","); // remove trailing comma
-    
+
     $ics = '';
     if (trim($content->field__ics_url['value'])) {
       $ics = 'Y';
       $start_time = $end_time = "";
     }
-        
+
     $time_selector_disp = $content->field__time_selector['display_value'];
     $time_selector = $content->field__time_selector['value'];
-    
+
     if ($time_selector == "none") {
       $time_selector_disp = t("None on these days");
       $start_time = "";
       $end_time = "";
     }
-    
+
     if ($time_selector == "" || $time_selector == "default") {
       $time_selector_disp = t("No appointments...");
       $start_time = "before " . $content->field__day_start_hour['display_value'];
       $end_time = "after " . $content->field__day_stop_hour['display_value'];
     }
-    
+
     if ($time_selector == "manual") {
       $time_selector_disp = t("No appointments during...");
     }
-    
-    
-    
+
+
+
     if ($ics) {
       $time_selector_disp = "Using external cal";
       $start_time = "";
       $end_time = "";
     }
-    
-    
-    $dtitle = t("Edit Unavailability Time");        
+
+
+    $dtitle = t("Edit Unavailability Time");
     $url = fp_url("content/$cid/edit", "window_mode=popup&content_tabs=false");
-    $edit_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");'><i class='fa fa-pencil'></i></a>";    
-    
+    $edit_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");'><i class='fa fa-pencil'></i></a>";
+
     $rtn .= "<tr>
                 <td class='actions'>$edit_link</td>
                 <td>$content->title</td>
@@ -996,18 +997,18 @@ function calendar_display_user_appointment_settings_page() {
                 <td>$end_time</td>
                 <td>$ics</td>
              </tr>";
-      
+
   } // foreach
-  
-  
+
+
   $rtn .= "</table>";
-  
-  
-  
-  
-     
-    
-  
+
+
+
+
+
+
+
   return $rtn;
 } // calendar_display_user_appointment_settings_page
 
@@ -1022,29 +1023,29 @@ function calendar_display_user_appointment_settings_page() {
  * Implements hook_cron
  */
 function calendar_cron() {
-    
+
   calendar_find_and_remind_notify_upcoming_appointments();
-    
+
 } // hook_cron
- 
+
 
 /**
  * This function will find appointments approaching within X number of minutes,
  * and send out notifications to all involved.
- * 
+ *
  * We will keep track of ones we've already sent by looking at the notification_history table.
  */
 function calendar_find_and_remind_notify_upcoming_appointments() {
-  
-  $start_date = date('Y-m-d H:i:s', time()); 
+
+  $start_date = date('Y-m-d H:i:s', time());
   $end_date = date("Y-m-d H:i:s", strtotime("NOW + 30 MINUTES"));
-  
+
   $res = db_query("SELECT DISTINCT(a.cid) FROM content__appointment a, content n
                    WHERE (field__appointment_datetime BETWEEN ? AND ?)
                    AND a.vid = n.vid
                    AND a.cid = n.cid
                    AND n.delete_flag = 0
-                   AND published = 1                                                                     
+                   AND published = 1
                    ORDER BY field__appointment_datetime ASC, a.vid DESC", array($start_date, $end_date));
   while ($cur = db_fetch_object($res)) {
     $cid = $cur->cid;
@@ -1056,24 +1057,24 @@ function calendar_find_and_remind_notify_upcoming_appointments() {
     }
 
     // If we are here, then we need to remind the users about the appointment!
-    $content = content_load($cid);    
+    $content = content_load($cid);
     $utc_appointment_datetime = strtotime($content->field__appointment_datetime['value']);
-    
+
     $student_cwid = $content->field__student_id['value'];
     $faculty_cwid = $content->field__faculty_id['value'];
 
     $student_name = fp_get_student_name($student_cwid);
     $faculty_name = fp_get_faculty_name($faculty_cwid);
-            
+
     // First, send a notification to the student.
     $student_user_id = db_get_user_id_from_cwid($student_cwid, 'student');
     $student_account = fp_load_user($student_user_id);
     $student_tz = fp_get_user_timezone($student_account);
-    
-    $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $student_tz), 'short');  
+
+    $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $student_tz), 'short');
     $msg = "APPOINTMENT REMINDER: You have an appointment soon with $faculty_name: $apt_date";
-    
-    $video_info = "";    
+
+    $video_info = "";
     // If there is meeting data (eg, Zoom, include URLs and phone numbers here)
     if (strlen($content->field__video_data['value']) > 0) {
       $decoded = json_decode($content->field__video_data['value']);
@@ -1083,37 +1084,37 @@ function calendar_find_and_remind_notify_upcoming_appointments() {
           $video_info = $video_info_test;
         }
       }
-      
+
       $msg .= "\n" . $video_info;
-      
+
     }
-        
+
     notify_send_notification_to_user($student_user_id, $msg, $cid, 'appointment', 'remind');
-    
-    
-  
+
+
+
     // Now, send message to faculty member
     $faculty_user_id = db_get_user_id_from_cwid($faculty_cwid, 'faculty');
     $faculty_account = fp_load_user($faculty_user_id);
     $faculty_tz = fp_get_user_timezone($faculty_account);
-    
-    $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $faculty_tz), 'short');  
-    $msg = "APPOINTMENT REMINDER: You have an appointment soon with $student_name: $apt_date";  
-    
+
+    $apt_date = format_date(convert_time($utc_appointment_datetime, 'UTC', $faculty_tz), 'short');
+    $msg = "APPOINTMENT REMINDER: You have an appointment soon with $student_name: $apt_date";
+
     // If there is meeting data (eg, Zoom, include URLs and phone numbers here)
     if ($video_info) {
       $msg .= "\n" . $video_info;
     }
-        
-    notify_send_notification_to_user($faculty_user_id, $msg, $cid, 'appointment', 'remind');    
+
+    notify_send_notification_to_user($faculty_user_id, $msg, $cid, 'appointment', 'remind');
 
     // No need to insert into the notification_history table, since these notification functions would have already done it.
-              
-  } // while  
-  
-    
-  
-  
+
+  } // while
+
+
+
+
 } // calendar_find_and_notify_upcoming_appointments
 
 
@@ -1128,53 +1129,53 @@ function calendar_find_and_remind_notify_upcoming_appointments() {
 /**
  * Returns an array of upcoming appointments, where the user is specified by CWID.  start_date and end_date
  * is meant to be in UTC, in the form of Y-m-d
- * 
+ *
  * If start or end is left blank, we will use NOW and NOW + x DAYS respectively
- *  
+ *
  * This function is used by the dashboard and similar situations.
- *  
+ *
  */
 function calendar_get_upcoming_appointments_for_cwid($cwid, $start_date = "", $end_date = "") {
   $rtn = array();
-  
+
   if ($start_date == "") {
     $start_date = date("Y-m-d H:i:s", strtotime("NOW"));
   }
-  else {    
+  else {
     $start_date .= " 00:00:01";
   }
-  
-  
+
+
   if ($end_date == "") {
     $end_date = date("Y-m-d H:i:s", strtotime("NOW + 5 DAYS"));
   }
-  else {  
+  else {
     $end_date .= " 23:59:59";
   }
-    
-       
+
+
   $res = db_query("SELECT DISTINCT(a.cid) FROM content__appointment a, content n
                    WHERE (field__faculty_id = ? OR field__student_id = ?)
                    AND (field__appointment_datetime BETWEEN ? AND ?)
                    AND a.vid = n.vid
                    AND a.cid = n.cid
                    AND n.delete_flag = 0
-                   AND published = 1                                                                     
+                   AND published = 1
                    ORDER BY field__appointment_datetime ASC, a.vid DESC", array($cwid, $cwid, $start_date, $end_date));
   while ($cur = db_fetch_object($res)) {
-    $cid = $cur->cid;      
+    $cid = $cur->cid;
     $content = content_load($cid);
-    
+
     $ap_datetime_ts = strtotime($content->field__appointment_datetime['value']);
-    
+
     $year = date('Y', $ap_datetime_ts);
     $month = date('n', $ap_datetime_ts);
     $day = date('j', $ap_datetime_ts);
-    
-    
+
+
     $faculty_name = @fp_get_faculty_name($content->field__faculty_id['value']);
     $student_name = @fp_get_student_name($content->field__student_id['value'], TRUE);
-    
+
     $rtn[] = array(
       'utc_start_ts' => $ap_datetime_ts,
       'utc_end_ts' => $ap_datetime_ts + (intval($content->field__appointment_duration_minutes['value']) * 60),
@@ -1182,13 +1183,13 @@ function calendar_get_upcoming_appointments_for_cwid($cwid, $start_date = "", $e
       'content' => $content,
       'faculty_name' => $faculty_name,
       'student_name' => $student_name,
-    );  
-      
-    
-  } // while  
-  
+    );
+
+
+  } // while
+
   return $rtn;
-  
+
 }
 
 
@@ -1196,64 +1197,64 @@ function calendar_get_upcoming_appointments_for_cwid($cwid, $start_date = "", $e
 /**
  * Return back a list of appointment content nodes for this faculty member, which fall between the
  * specified datetimes.
- * 
+ *
  * dates expected to look like:  Y-m-d
- * 
+ *
  */
 function calendar_get_appointments_for_faculty($faculty_id, $start_date, $end_date, $bool_include_external_cals = FALSE) {
-  
+
   $rtn = array();
-      
+
   $start_date .= " 00:00:01";
   $end_date .= " 23:59:59";
-  
-  
-       
+
+
+
   $res = db_query("SELECT DISTINCT(a.cid) FROM content__appointment a, content n
                    WHERE field__faculty_id = ?
                    AND (field__appointment_datetime BETWEEN ? AND ?)
                    AND a.vid = n.vid
                    AND a.cid = n.cid
                    AND n.delete_flag = 0
-                   AND published = 1                                                                     
+                   AND published = 1
                    ORDER BY a.vid DESC", array($faculty_id, $start_date, $end_date));
   while ($cur = db_fetch_object($res)) {
-    $cid = $cur->cid;      
+    $cid = $cur->cid;
     $content = content_load($cid);
-    
+
     //$ap_datetime_ts = convert_time(strtotime($content->field__appointment_datetime['value']));
     $ap_datetime_ts = strtotime($content->field__appointment_datetime['value']);
-    
+
     $year = date('Y', $ap_datetime_ts);
     $month = date('n', $ap_datetime_ts);
     $day = date('j', $ap_datetime_ts);
-    
+
     $hm = date('g:ia', $ap_datetime_ts);
-    
+
     $rtn[$year][$month][$day][$ap_datetime_ts] = array(
       'start_ts' => $ap_datetime_ts,
       'hm' => $hm,
-      'end_ts' => $ap_datetime_ts + (intval($content->field__appointment_duration_minutes['value']) * 60),      
+      'end_ts' => $ap_datetime_ts + (intval($content->field__appointment_duration_minutes['value']) * 60),
       'origin' => 'fp',
       'tz' => 'UTC',
-    );  
-      
-    
+    );
+
+
   } // while
-  
+
   $faculty_user_id = db_get_user_id_from_cwid($faculty_id, 'faculty');
   $faculty_tz = fp_get_user_timezone($faculty_user_id);
-  
+
   if ($bool_include_external_cals) {
     // Meaning, we should also look up the external ics feeds we may have.
-    
+
     $x = fp_get_module_path('calendar', TRUE, FALSE) . '/lib/ics-parser/vendor/autoload.php';
     require_once($x);
-        
-    
+
+
     // Find external feeds (if any exist) for this user.
     $ics_feeds = array();
-    
+
     $res = db_query("SELECT * FROM content__schedule_unavailable_time a, content n
                      WHERE field__faculty_id = ?
                      AND field__ics_url != ''
@@ -1272,99 +1273,99 @@ function calendar_get_appointments_for_faculty($faculty_id, $start_date, $end_da
         );
       }
     }
-    
-    
+
+
     // DEV
     //$ics_feeds[] = array(
     //  'url' => "https://calendar.google.com/calendar/ical/example_url_here/public/basic.ics",
     //  'tz' => 'America/Chicago',
-    //);      
-    
-    
+    //);
+
+
     foreach ($ics_feeds as $details) {
       $ics = $details['url'];
       $tz = @$details['tz'];
       $cid = $details['cid'];
       if (!$tz) $tz = $faculty_tz;
-      
-           
+
+
       $ical = NULL;
       $ical_str = "";
-      
+
       try {
-        
+
         // grab from cache or re-download the ics file?
         // See if more than 5 number of minutes have passed since we last pulled this file,
-        // and regenerate it if so. Otherwise, use a database cache.  Maybe serialized into the user_attributes table?        
+        // and regenerate it if so. Otherwise, use a database cache.  Maybe serialized into the user_attributes table?
         $test = user_get_attribute($faculty_user_id, 'cache_ics_feed__' . $cid . '_reload_after_ts', 0);
-                
+
         if (time() < $test) {
-          // It has been cached previously, and the cache is still valid.  Let's see if we can get what's there.           
+          // It has been cached previously, and the cache is still valid.  Let's see if we can get what's there.
           $ical_str = user_get_attribute($faculty_user_id, 'cache_ics_feed__' . $cid, "");
           watchdog('calendar_ical', "Loading cached ics $ics ($cid)", array(), WATCHDOG_DEBUG);
         }
-        
+
         if (!$ical_str || $ical_str == "") {
-          watchdog('calendar_ical', "Downloading ics $ics ($cid) from web and caching", array(), WATCHDOG_DEBUG);                         
-          $ical_str = fp_url_get_contents($ics);          
+          watchdog('calendar_ical', "Downloading ics $ics ($cid) from web and caching", array(), WATCHDOG_DEBUG);
+          $ical_str = fp_url_get_contents($ics);
           // Save to user_attributes as a cache for later retrieval
           user_set_attribute($faculty_user_id, 'cache_ics_feed__' . $cid, $ical_str);
           user_set_attribute($faculty_user_id, 'cache_ics_feed__' . $cid . '_reload_after_ts', time() + (5 * 60));
-                              
+
         }
-        
+
         if ($ical_str == "") {
           watchdog('calendar_ical', "Error trying to read ical: $ics (cid: $cid). String is empty", array(), WATCHDOG_ERROR);
           fpm("error trying to read ical");
           return;
         }
-        
-        $ical = new ICal\ICal();                 
-        $ical->initString($ical_str);        
+
+        $ical = new ICal\ICal();
+        $ical->initString($ical_str);
         if ($ical == NULL) {
           watchdog('calendar_ical', "Error trying to load ical: $ics string (cid: $cid) String: $ical_str", array(), WATCHDOG_ERROR);
           fpm("error trying to load ical_str");
           return;
         }
-        
-        
+
+
         $events = $ical->eventsFromRange($start_date, $end_date);
-        
+
         foreach ($events as $event) {
-          
+
           // if this is a "free" time, then the "transp" property will == "TRANSPARENT".  If it's "busy" it will be "OPAQUE".
           // We want to ignore anything marked as "free".
           if (@$event->transp === "TRANSPARENT") continue;
-                   
-                    
-          $utc_start = $event->dtstart_array[2]; // the UTC timestamp 
-          $utc_end = $event->dtend_array[2]; 
-          
+
+
+          $utc_start = $event->dtstart_array[2]; // the UTC timestamp
+          $utc_end = $event->dtend_array[2];
+
           // Convert into the OWNER's timezone!
           $converted_start = convert_time($utc_start, 'UTC', $tz);
           $converted_end = convert_time($utc_end, 'UTC', $tz);
-          
-          $ap_datetime_ts = $converted_start;                    
-                    
-          $summary = $event->summary;  // title. basically.          
+
+          $ap_datetime_ts = $converted_start;
+
+          $summary = $event->summary;  // title. basically.
           $location = $event->location;   // zoom link or whatever.  Goes with body.
           $description = $event->description;  // the body.
-          
-          
+
+
           // In order to catch events which span more than one day, let's add an entry
           // for each day covered between our start and end times.
-          $last_date = '';          
-          for ($t = $converted_start; $t <= $converted_end; $t = $t + 21600) {            
-            $test_ts = $t;            
+          $last_date = '';
+          for ($t = $converted_start; $t <= $converted_end; $t = $t + 21600) {
+            $test_ts = $t;
             if (date('Y-m-d', $test_ts) == $last_date) continue; // same date already, skip it.
-            
-            
+
+
             $year = date('Y', $test_ts);
             $month = date('n', $test_ts);
             $day = date('j', $test_ts);
-            
+
             $last_date = date('Y-m-d', $test_ts);
-                       
+
             $rtn[$year][$month][$day][$ap_datetime_ts] = array(
               'start_ts' => $converted_start,
               'end_ts' => $converted_end,
@@ -1373,36 +1374,36 @@ function calendar_get_appointments_for_faculty($faculty_id, $start_date, $end_da
               'summary' => $summary,
               'location' => $location,
               'description' => filter_markup($description, 'basic'),
-            );            
+            );
 
-            
-            
+
+
           } // for t
-          
-         
+
+
         } // foreach events
-        
-                    
+
+
       } catch (Exception $e) {
         watchdog('calendar_ical', "Couldn't load calendar ical $ics.  Exception: <pre>" . print_r($e, TRUE) . "</pre>");
-        fp_add_message($e->getMessage());        
+        fp_add_message($e->getMessage());
       }
-            
-        
-        
-        
-    
+
+
+
+
+
     }
-    
+
   } // bool_include_external_cals
-  
-  
-  
-  
-  
-      
+
+
+
+
+
+
   return $rtn;
-  
+
 } // calendar_get_appointments_for_faculty
 
 
@@ -1410,45 +1411,45 @@ function calendar_get_appointments_for_faculty($faculty_id, $start_date, $end_da
 
 /**
  * Returns back an array of time slots available for this faculty member and event_type
- * 
+ *
  * We will convert all times to local timezone as well.
- * 
+ *
  */
 function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $month, $year) {
-  
+
   $rtn = array();
-  
+
   $event_type_content = content_load($event_type_cid);
-  // Confirm that the faculty_id in this content matches our supplied faculty_id.  
+  // Confirm that the faculty_id in this content matches our supplied faculty_id.
   if ($event_type_content->field__faculty_id['value'] != $faculty_id) {
     fp_add_message(t("Invalid schedule link."));
     fp_goto("<front>");
     return;
-  }  
-  
+  }
+
   $prevent_less_than_hours = intval($event_type_content->field__prevent_less_than_hours['value']);
-  
+
   // Get this faculty user's timezone.
   $faculty_user_id = db_get_user_id_from_cwid($faculty_id);
-  $tz = fp_get_user_timezone($faculty_user_id);  
-    
+  $tz = fp_get_user_timezone($faculty_user_id);
+
   // Get all of our unavailable times into a single array, organized by days.
   $unavailable_times = content_get_content_for_faculty_id('schedule_unavailable_time', $faculty_id);
   $unavailable_by_days = array();
   foreach ($unavailable_times as $ut_content) {
         // If this is an ICS link, then skip for now.
         if (trim($ut_content->field__ics_url['value']) != '') continue;
-                
+
         $time_selector = trim($ut_content->field__time_selector['value']);
         if ($time_selector == "") $time_selector = "default";
-                        
+
         foreach ($ut_content->field__days['value'] as $dow) {
 
 
-          
+
           $start_end_array = array();
-                    
-          if ($time_selector == "manual") {          
+
+          if ($time_selector == "manual") {
             $st = $ut_content->field__start_time['value'];
             $et = $ut_content->field__end_time['value'];
 
@@ -1457,47 +1458,47 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
               'end' => $et,
               'convert_tz' => TRUE,  // since these are in UTC, they will indeed need to be converted.
             );
-                        
+
           } // manual
           else if ($time_selector == "default") {
-            
-            // We will construct times based on the day_start_hour and stop_hour          
+
+            // We will construct times based on the day_start_hour and stop_hour
             $st = $ut_content->field__day_start_hour['value'] . ":00:00";
             $et = $ut_content->field__day_stop_hour['value'] . ":00:00";
-           
+
             if ($et == "0:00:00") $et = "23:59:59";  // meaning, we are stopping at midnight
 
-            
+
             // We want to calculate out what our start time is LESS 1 second, so that we can begin accepting appointments
             // on the time we selected.
             $st_less_one_sec = $st;  // default
             $start_hour = intval($ut_content->field__day_start_hour['value']);
             if ($start_hour > 0) {
               $st_less_one_sec = ($start_hour - 1) . ":59:59";
-            }            
-            
+            }
+
             $et_plus_one_sec = $et; // default
             $stop_hour = intval($ut_content->field__day_stop_hour['value']);
             if ($stop_hour < 23) {
               $et_plus_one_sec = ($stop_hour + 1) . ":00:01";
             }
-            
-             
-            
+
+
+
             // The first one is the start.  We go from midnight to $st minus 1 second.
             $start_end_array[] = array(
               'start' => "00:00:00",
               'end' => $st_less_one_sec,
               'convert_tz' => FALSE, // these times are in the faculty member's time zone.  They'll NOT need to be converted to UTC in the next step.
-            );  
-                        
+            );
+
             // The second one is the end.  We go from $et (plus one second) to 23:59:59
             $start_end_array[] = array(
               'start' => $et_plus_one_sec,
               'end' => "23:59:59",
               'convert_tz' => FALSE, // these times are in the faculty member's time zone.  They'll NOT need to be converted to UTC in the next step.
             );
-                        
+
           } // default
           else if ($time_selector == "none") {
             // The user doesn't work at all on the selected days.
@@ -1507,27 +1508,27 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
               'end' => "23:59:59",
               'convert_tz' => FALSE, // these times are in the faculty member's time zone.  They'll NOT need to be converted to UTC in the next step.
             );
-                        
+
           } // none
 
-          
-                    
-          // Now, populate our unavailable array          
+
+
+          // Now, populate our unavailable array
           foreach ($start_end_array as $c => $details) {
-                         
+
             $st = $details['start'];
             $et = $details['end'];
             $convert_tz = $details['convert_tz'];
-          
+
             // st and et are in UTC.  The original faculty user's timezone is tz.
             // Let's first convert them to the ORIGINAL timezone FROM UTC.
-               
+
             $sample_date = '2020-01-01';
-            
+
             // Grab the UTC times.  Since we only care about hours/minutes, it's OK that we use the same date.
             $utc_st = strtotime($sample_date . " " . $st);
             $utc_et = strtotime($sample_date . " " . $et);
-            
+
             $tz_st = $utc_st;
             $tz_et = $utc_et;
             if ($convert_tz == TRUE) {
@@ -1537,166 +1538,166 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
             }
             // The start and end times are now in the original faculty member's timezone.
             $unavailable_by_days[$dow][] = array(
-              'start_time' => date("H:i", $tz_st),  
-              'end_time' => date("H:i", $tz_et),   
+              'start_time' => date("H:i", $tz_st),
+              'end_time' => date("H:i", $tz_et),
               'tz' => $tz,
             );
           }
-          
 
-          
+
+
         } // foreach field__days
-        
-        
-  } // foreach unavailable_times  
-  
+
+
+  } // foreach unavailable_times
+
     // Add to the unavailable_by_days array:
   // existing appointments on our FP calendar
-  
-    
-   
+
+
+
   $existing_appointments = calendar_get_appointments_for_faculty($faculty_id, date('Y-m-d', strtotime("NOW - 24 HOURS")), date('Y-m-d', strtotime('NOW + 4 MONTHS')), TRUE);
-  
+
   // Okay, we need to find out how long this event lasts + any buffer time.
   // how_long_min is basically when we can create our "slots" for the user to select.  So if the number is 20 minutes, and we start at 11:30am, then
   // we'd see a slot at:  11:30am, 11:50am, 12:10pm, 12:30pm, and so on.
-    
+
   $how_long_min = intval($event_type_content->field__event_duration_minutes['value']) + intval($event_type_content->field__event_buffer_minutes['value']);
   $how_long_sec = $how_long_min * 60;
-      
+
   // Next, we are going to go through every single day of this month, to find out what all our slots are.
   $total_days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-  
+
   for ($day = 1; $day <= $total_days; $day++) {
-    
+
     $begin_time = "00:00:00";
     $end_time = "23:59:59";
 
     $skip_begin_slot = array();
 
-    // We DO NOT NEED TO CONVERT for this!    
+    // We DO NOT NEED TO CONVERT for this!
     $begin_time_ts = strtotime("$year-$month-$day $begin_time");
     $end_time_ts = strtotime("$year-$month-$day $end_time");
- 
+
     $day_of_week = intval(date('w', $begin_time_ts));
-    
+
     // Loop from our begin time to our end time, by how_long_sec each step.  We then
     // want to see if there were any conflicts.  If not, then it's safe to permit that time slot in our $rtn array
     // for this day.
     $begin_slot_ts = $begin_time_ts;
     for ($end_slot_ts = $begin_time_ts + $how_long_sec; $end_slot_ts <= $end_time_ts; $end_slot_ts += $how_long_sec) {
-    
-    
-      // Skip if it's before X hours from now, based on the event_type_content. This will also catch all the days that have already passed.    
+
+
+      // Skip if it's before X hours from now, based on the event_type_content. This will also catch all the days that have already passed.
       if ($begin_slot_ts < strtotime("NOW + $prevent_less_than_hours HOURS")) {
-                
-        // get ready for next time through the loop      
-        $begin_slot_ts = $end_slot_ts;        
+
+        // get ready for next time through the loop
+        $begin_slot_ts = $end_slot_ts;
         continue;
       }
-            
+
       // Okay--  We have a slot of time-- from begin_slot_ts to end_slot_ts.
       // check to see if there are any conflicts during this "slot".
-      
+
       $bool_conflict = FALSE;
       // check our unavailable times
       if (isset($unavailable_by_days[$day_of_week])) {
         foreach ($unavailable_by_days[$day_of_week] as $details) {
           $un_start_time = $details['start_time'];  // These are now in their original timezone!
           $un_end_time = $details['end_time'];    // these are now in their original timezone!
-                              
-          $un_start_time_ts = strtotime("$year-$month-$day $un_start_time");          
+
+          $un_start_time_ts = strtotime("$year-$month-$day $un_start_time");
           $un_end_time_ts = strtotime("$year-$month-$day $un_end_time");
-          
-          
-         
+
+
+
           // Now, does our "slot" conflict with this unavailable time window?
-          
+
           // Scenario #1:  Our unavailable time completely engulfs our slot.
           // Ex:  { unavail     [ slot ]      }
-          if ($un_start_time_ts <= $begin_slot_ts && $un_end_time_ts >= $end_slot_ts) {            
+          if ($un_start_time_ts <= $begin_slot_ts && $un_end_time_ts >= $end_slot_ts) {
             $bool_conflict = TRUE;
             break;
           }
-          
+
           // Scenario #2:  Our slot completely engulfs our unavailable time window.
           // Ex:  [ slot     { unavail }      ]
-          if ($begin_slot_ts <= $un_start_time_ts && $end_slot_ts >= $un_end_time_ts) {            
+          if ($begin_slot_ts <= $un_start_time_ts && $end_slot_ts >= $un_end_time_ts) {
             $bool_conflict = TRUE;
             break;
           }
-                    
+
           // Scenario #3:  Our unavail time starts before slot, but ends inside of the slot.
-          // Ex:  { unavail  [ slot  }    ]      
+          // Ex:  { unavail  [ slot  }    ]
           if ($un_start_time_ts <= $begin_slot_ts && $un_end_time_ts >= $begin_slot_ts && $un_end_time_ts <= $end_slot_ts ) {
             $bool_conflict = TRUE;
             break;
           }
-          
+
           // Scenario #4:  Our unavail time starts after slot begins
-          // Ex:  [ slot         { unavail     ]    }      
+          // Ex:  [ slot         { unavail     ]    }
           if ($un_start_time_ts >= $begin_slot_ts && $un_start_time_ts <= $end_slot_ts && $un_end_time_ts >= $end_slot_ts ) {
             $bool_conflict = TRUE;
-            break;            
+            break;
           }
 
         } // foreach unavailable by days[dow]
-      }      
-            
-      
+      }
+
+
       // Okay, now check our existing_appointments, and see if there are any conflicts thee.
       if (isset($existing_appointments[$year][$month][$day])) {
         foreach ($existing_appointments[$year][$month][$day] as $appt) {
           $un_start_time_ts = $appt['start_ts'];   // These are in UTC
           $un_end_time_ts = $appt['end_ts'];
-      
-      
+
+
           // For reasons that aren't completely known to me, here we are going to add the time-converted
           // begin_slot_ts to an array, which we'll use later to "prune" our return results.
-      
-      
-          
-          // Now, does our "slot" conflict with this unavailable time window?          
+
+
+
+          // Now, does our "slot" conflict with this unavailable time window?
           // Scenario #1:  Our unavailable time completely engulfs our slot.
           // Ex:  { unavail     [ slot ]      }
-          if ($un_start_time_ts <= $begin_slot_ts && $un_end_time_ts >= $end_slot_ts) {            
-            $bool_conflict = TRUE;            
+          if ($un_start_time_ts <= $begin_slot_ts && $un_end_time_ts >= $end_slot_ts) {
+            $bool_conflict = TRUE;
             $skip_begin_slot[] = convert_time($begin_slot_ts, 'UTC', $tz);
             break;
           }
-          
+
           // Scenario #2:  Our slot completely engulfs our unavailable time window.
           // Ex:  [ slot     { unavail }      ]
-          if ($begin_slot_ts <= $un_start_time_ts && $end_slot_ts >= $un_end_time_ts) {            
-            $bool_conflict = TRUE;            
+          if ($begin_slot_ts <= $un_start_time_ts && $end_slot_ts >= $un_end_time_ts) {
+            $bool_conflict = TRUE;
             $skip_begin_slot[] = convert_time($begin_slot_ts, 'UTC', $tz);
             break;
           }
-                    
+
           // Scenario #3:  Our unavail time stars before slot, but ends inside of the slot.
-          // Ex:  { unavail  [ slot  }    ]      
+          // Ex:  { unavail  [ slot  }    ]
           if ($un_start_time_ts <= $begin_slot_ts && $un_end_time_ts >= $begin_slot_ts && $un_end_time_ts <= $end_slot_ts ) {
-            $bool_conflict = TRUE;   
-               
+            $bool_conflict = TRUE;
+
             $skip_begin_slot[] = convert_time($begin_slot_ts, 'UTC', $tz);
             break;
           }
-          
+
           // Scenario #4:  Our unavail time stars after slot begins
-          // Ex:  [ slot         { unavail     ]    }      
+          // Ex:  [ slot         { unavail     ]    }
           if ($un_start_time_ts >= $begin_slot_ts && $un_start_time_ts <= $end_slot_ts && $un_end_time_ts >= $end_slot_ts ) {
-            $bool_conflict = TRUE;            
+            $bool_conflict = TRUE;
             $skip_begin_slot[] = convert_time($begin_slot_ts, 'UTC', $tz);
             break;
-            
-          }          
-          
-          
-          
-          
+
+          }
+
+
+
+
         } // foreach existing appt
       } // if isset
-      
+
       ////////////
       // If we made it here, then there are no conflicts.
       // Let's add it in to our rtn array.
@@ -1706,23 +1707,23 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
           'begin_slot_ts' => $begin_slot_ts,
           'end_slot_ts' => $end_slot_ts,
           'begin_hm' => $begin_hm,
-          'end_hm' => date('g:ia', $end_slot_ts),    
-          'tz' => $tz,          
+          'end_hm' => date('g:ia', $end_slot_ts),
+          'tz' => $tz,
           'how_long_min' => $how_long_min,
-          'how_long_sec' => $how_long_sec,    
+          'how_long_sec' => $how_long_sec,
         );
       }
-      
-      
-      
-      // get ready for next time through the loop      
+
+
+
+      // get ready for next time through the loop
       $begin_slot_ts = $end_slot_ts;
     } // for end_slot_ts
-      
-         
-  
+
+
+
     // Prune our rtn array based on the skip_begin_slot array.  I know this is an inefficient hack.  I am being
-    // slowly driven crazy by this timezone shit.  
+    // slowly driven crazy by this timezone shit.
     if (isset($rtn[$year][$month][$day])) {
       foreach ($rtn[$year][$month][$day] as $bg => $deets) {
         if (in_array($bg, $skip_begin_slot)) {
@@ -1730,14 +1731,14 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
         }
       }
     }
-      
+
   } // for day
 
-    
-      
-  
+
+
+
   return $rtn;
-  
+
 } // calendar_get_available_faculty_schedule
 
 
@@ -1750,35 +1751,35 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
  */
 function calendar_schedule_appointment_confirm_form($faculty_user_id) {
   global $user;
-    
+
   $form = array();
-  
+
   fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
-  
-  $faculty_user = fp_load_user($faculty_user_id);  
-  
+
+  $faculty_user = fp_load_user($faculty_user_id);
+
   if (!$faculty_user || $faculty_user->is_faculty != TRUE) {
     return "<p>" . t("We're sorry! The link you followed is either invalid, or the selected user ID is not listed as a faculty/staff member at your
             insititution.") . "</p>";
   }
-  
+
   $faculty_id = $faculty_user->cwid;
   $faculty_name = fp_get_faculty_name($faculty_id);
-  
+
   $faculty_tz = fp_get_user_timezone($faculty_user);
-  
+
   fp_set_title(t("Confirm Appointment with @name", array("@name" => $faculty_name)));
-  
+
   $event_type_cid = intval($_REQUEST['event_type_cid']);
-  $content = content_load($event_type_cid);  
-  
+  $content = content_load($event_type_cid);
+
   $date = $_REQUEST['date'];
-  $begin_hm = $_REQUEST['begin_hm'];  
+  $begin_hm = $_REQUEST['begin_hm'];
   $temp = explode('-', $date);
   $year = intval($temp[0]);
   $month = intval($temp[1]);
   $day = intval($temp[2]);
-  
+
   $month_year = $month . '_' . $year;
 
 
@@ -1793,137 +1794,137 @@ function calendar_schedule_appointment_confirm_form($faculty_user_id) {
   );
 
 
-  
+
   $url = fp_url("schedule-appointment/$faculty_user_id", "stage=3&event_type_cid=$content->cid&day=$day&month_year=$month_year");
   $link_back = "<a href='$url' title='Back'><i class='fa fa-arrow-circle-left'></i></a>&nbsp; &nbsp;";
-  
+
   $form['mark_top'] = array(
     'value' => "<h3>$link_back" . t("Please confirm to schedule your appointment:") . "</h3>",
   );
-  
-  
-  
+
+
+
   $schedule_time_ts = strtotime($date . " " . $begin_hm);  // currently this is in the STUDENT's TIMEZONE.  We want to convert it to UTC
   $offset = get_timezone_offset('UTC', $student_tz);
   $utc_schedule_time_ts = $schedule_time_ts - $offset;
 
 
   $form['utc_schedule_time_ts'] = array(
-    'type' => 'hidden',    
+    'type' => 'hidden',
     'value' => $utc_schedule_time_ts,
   );
-  
-  
+
+
   $formatted_date_for_student = format_date($schedule_time_ts, "pretty");;
-  
+
   $student_timezone_pretty = friendly_timezone($student_tz);
   if ($student_timezone_pretty) $student_timezone_pretty = "(" . $student_timezone_pretty . ")";
-  
-  
+
+
   // display all our information to the user to confirm
-  
+
   $html = "";
   $html .= "<div class='confirm-schedule-appt-type'><strong>Appointment Type:</strong> $content->title</div>";
   $html .= "<div class='confirm-schedule-appt-datetime'><strong>Date & Time:</strong> $formatted_date_for_student $student_timezone_pretty</div>";
 
-  
+
   $form['formatted_date_for_student'] = array(
     'type' => 'hidden',
     'value' => $formatted_date_for_student,
   );
-  
+
   $form['schedule_date'] = array(
-    'type' => 'hidden',    
+    'type' => 'hidden',
     'value' => $date,
   );
 
   $form['schedule_begin_hm'] = array(
-    'type' => 'hidden',    
+    'type' => 'hidden',
     'value' => $begin_hm,
   );
-  
+
   $form['faculty_user_id'] = array(
-    'type' => 'hidden',    
+    'type' => 'hidden',
     'value' => $faculty_user_id,
   );
-  
+
   $form['event_type_cid'] = array(
-    'type' => 'hidden',    
+    'type' => 'hidden',
     'value' => $event_type_cid,
   );
-    
 
-  
-  
+
+
+
   $form['mark_html'] = array(
     'value' => $html,
   );
-  
-  
+
+
   $name = $cwid = $email = $phone = "";
-  
+
   $field_attributes = array();
-  
+
   if ($user->id > 0) {
     // Meaning, the user is logged in!
     $name = $user->f_name . " " . $user->l_name;
     $cwid = $user->cwid;
     $email = $user->email;
     $phone = engagements_convert_to_pretty_phone_number(@$user->attributes['mobile_phone']);
-    
-    
-            
+
+
+
     $field_attributes = array("readonly" => "readonly", "class" => "readonly");
-        
+
   }
-  
-  
+
+
   $form['name'] = array(
     'type' => 'textfield',
     'label' => t('Your Name:'),
     'value' => $name,
     'attributes' => $field_attributes,
   );
-  
+
   $form['cwid'] = array(
     'type' => 'textfield',
     'label' => t('Your CWID:'),
     'value' => $cwid,
     'attributes' => $field_attributes,
   );
-  
+
   $form['email'] = array(
     'type' => 'textfield',
     'label' => t('Your Email:'),
     'value' => $email,
     'attributes' => $field_attributes,
   );
-    
+
   $form['phone'] = array(
     'type' => 'textfield',
     'label' => t('Your Phone:'),
     'value' => $phone,
     'attributes' => $field_attributes,
   );
-      
+
   $form['comments'] = array(
     'type' => 'textarea',
     'label' => t('Additional Comments:'),
     'description' => t("(Optional) Please enter any comments or details you'd like me to know before our meeting."),
   );
-  
-  
-  
-  
+
+
+
+
   $form['submit_btn'] = array(
     'type' => 'submit',
     'spinner' => TRUE,
-    'value' => t('Confirm Appointment & Save!'),    
+    'value' => t('Confirm Appointment & Save!'),
   );
-  
-  
-  
-  
+
+
+
+
   // Set our breadcrumbs
   $crumbs = array();
   $crumbs[] = array(
@@ -1940,11 +1941,11 @@ function calendar_schedule_appointment_confirm_form($faculty_user_id) {
     'path' => "schedule-appointment/$faculty_user_id",
     'query' => "stage=3&event_type_cid=$content->cid&day=$day&month_year=$month_year",
   );
-  
-  
-  fp_set_breadcrumbs($crumbs);            
-  
-  
+
+
+  fp_set_breadcrumbs($crumbs);
+
+
   return $form;
 } // calendar_schedule_appointment_confirm_form
 
@@ -1953,7 +1954,7 @@ function calendar_schedule_appointment_confirm_form($faculty_user_id) {
 
 /**
  * This is our last chance to validate the form before saving.
- * 
+ *
  * - Make sure the CWID goes to a real student
  * - Make sure the time slot is still available!  It might have gotten booked while we've been
  *   doing this.
@@ -1965,38 +1966,38 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
   $faculty_user = fp_load_user($faculty_user_id);
   $faculty_cwid = $faculty_user->cwid;
   $faculty_name = $faculty_user->f_name . " " . $faculty_user->l_name;
-          
+
   $schedule_date = $form_state['values']['schedule_date'];
   $schedule_begin_hm = $form_state['values']['schedule_begin_hm'];
-  
+
   $schedule_time_ts = strtotime($schedule_date . " " . $schedule_begin_hm);
-  
+
   $utc_schedule_time_ts = $form_state['values']['utc_schedule_time_ts'];
-  
-  
-  
-  
-  
+
+
+
+
+
   $month = date('n', $schedule_time_ts);
   $year = date('Y', $schedule_time_ts);
   $day = date('j', $schedule_time_ts);
-  
-  
+
+
   $event_type_cid = intval($form_state['values']['event_type_cid']);
   $event_type_content = content_load($event_type_cid);
- 
+
   $event_duration_minutes = intval($event_type_content->field__event_duration_minutes['value']);
   // Confirm that the faculty_cwid matches this event type's faculty member.
   if ($faculty_cwid != $event_type_content->field__faculty_id['value']) {
     form_error('', t("Sorry, but there was an issue attempting to save this appointment.  Please try again."));
     return;
   }
-  
-    
-  
-  
+
+
+
+
   $db = get_global_database_handler();
-  
+
   $student_name = trim($form_state['values']['name']);
   $student_cwid = trim($form_state['values']['cwid']);
   // Make sure this cwid actually exists.
@@ -2008,13 +2009,13 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
       return;
     }
   }
-  
+
   $student_email = trim($form_state['values']['email']);
   $student_phone = trim($form_state['values']['phone']);
   $student_comments = trim($form_state['values']['comments']);
-  
-  
-  
+
+
+
   $bool_found_it = FALSE;
   $available_slots = calendar_get_available_faculty_schedule($faculty_cwid, $event_type_cid, $month, $year);
   $avail_times = calendar_get_available_times_on_date($available_slots, $faculty_user_id, $year, $month, $day, $event_type_cid);
@@ -2031,26 +2032,26 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
   if (!isset($available_slots[$year][$month][$day][$schedule_time_ts])) {
     form_error('', t("Sorry, but the time you selected for your appointment is no longer available.  Please select a new time."));
     return;
-  }  
+  }
   if (!$bool_found_it) {
     form_error('', t("Sorry, but the time you selected for your appointment is no longer available.  Please select a new time."));
-    return; 
+    return;
   }
-  
-  
-  
+
+
+
   ////////////////////////////////////
   // We have made it this far with no errors.  If this is a video meeting, let's attempt to create that meeting.
-  
-  
-  
+
+
+
   // If this is a Zoom meeting, then attempt to create the zoom meeting and save it in form_state['values']['field__video_data'] so it
-  // gets saved with the content.    
+  // gets saved with the content.
   if (module_enabled("zoomapi") && @$event_type_content->field__video_meeting['value'] == 'zoom') {
-    
+
     //gmt_date_time must look like yyyy-MM-ddTHH:mm:ssZ.  For example: 2020-03-31T22:02:00Z.  The Z tells it that we are using GMT/UTC time.
     $gmt_date_time = date("Y-m-d\TH:i:s\Z", $utc_schedule_time_ts);
-        
+
     $response = zoomapi_create_zoom_meeting($faculty_user_id, $gmt_date_time, $event_duration_minutes, "Video meeting - $faculty_name / $student_name");
     if (!$response) {
       form_error("", t("Sorry, but there was an issue creating the Zoom meeting for this appointment.  Your appointment has not been saved.
@@ -2061,18 +2062,18 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
     $form_state['values']['video_type'] = "zoom";
     $form_state['values']['video_account_owner_user_id'] = $faculty_user_id;
   }
-    
-  
-  
-  
+
+
+
+
   //form_error("title", 'hey');
   //return;
-  
-    
-  
+
+
+
   // Okay, if we made it here, then we are good to proceed and save!
-    
-  
+
+
 } // hook_validate
 
 
@@ -2081,35 +2082,35 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
  * We passed validation, it's time to actually submit now!
  */
 function calendar_schedule_appointment_confirm_form_submit($form, &$form_state) {
-  
+
   $schedule_date = $form_state['values']['schedule_date'];
   $schedule_begin_hm = $form_state['values']['schedule_begin_hm'];
-  
+
   $schedule_time_ts = strtotime($schedule_date . " " . $schedule_begin_hm);
-  
+
   $utc_schedule_time_ts = $form_state['values']['utc_schedule_time_ts'];
-  
+
   $formatted_date_for_student = $form_state['values']['formatted_date_for_student'];
-  
-  
+
+
   $fstudent_tz = friendly_timezone($form_state['values']['student_tz']);
   $faculty_tz = $form_state['values']['faculty_tz'];
   $ffaculty_tz = friendly_timezone($faculty_tz);
-  
-  
+
+
   $faculty_user_id = intval($form_state['values']['faculty_user_id']);
   $faculty_user = fp_load_user($faculty_user_id);
   $faculty_cwid = $faculty_user->cwid;
-  
+
   $faculty_name = fp_get_faculty_name($faculty_cwid);
-  
+
   $event_type_cid = intval($form_state['values']['event_type_cid']);
   $event_type_content = content_load($event_type_cid);
   $event_additional_msg = fp_trim(@$event_type_content->field__additional_email_msg['display_value']);
-  
-    
+
+
   $event_duration_minutes = intval($event_type_content->field__event_duration_minutes['value']);
-  
+
   $student_name = trim(filter_markup($form_state['values']['name'], 'plain'));
   $student_cwid = trim(filter_markup($form_state['values']['cwid'], 'plain'));
   $student_email = trim(filter_markup($form_state['values']['email'], 'plain'));
@@ -2119,133 +2120,133 @@ function calendar_schedule_appointment_confirm_form_submit($form, &$form_state) 
   $video_info = $video_data = $join_url = $dial_in = $meeting_id = "";
   $location = t("In-Person");
   $event_title = "Meeting between $student_name and $faculty_name";
-  
-  
+
+
   if (isset($form_state['values']['video_data'])) {
     $video_data = $form_state['values']['video_data'];
     $decoded = json_decode($video_data);
     if ($form_state['values']['video_type'] == 'zoom') {
-      
+
       $meeting_id = $decoded->id;
       $join_url = $decoded->join_url;
       $location = $join_url;
       $dial_in = $decoded->settings->global_dial_in_numbers[0]->number;
-      
+
       if (function_exists("engagements_convert_to_pretty_phone_number")) {
         $dial_in = engagements_convert_to_pretty_phone_number($dial_in, TRUE);
       }
-      
+
       $event_title = t("Zoom meeting between @stu and @fac", array("@stu" => $student_name, "@fac" => $faculty_name));
-      
-      
-      $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";                                               
-      
+
+
+      $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";
+
       $decoded->video_info = $video_info;  // add to our json object for ease of use later.
       $decoded->video_provider = "zoom";  // declare that this is a "zoom" meeting.
       $decoded->video_account_owner_user_id = $form_state['values']['video_account_owner_user_id'];
-      $video_data = json_encode($decoded); // re-encode as a simpl string, so we can add to the database.                     
-    }    
+      $video_data = json_encode($decoded); // re-encode as a simpl string, so we can add to the database.
+    }
   }
 
-  
+
   // NOTE: the "\n" at the end is important, since when we txt these the tags get stripped.
   $msg = "";
-  
+
   if ($event_additional_msg) {
     $msg .= "<p>" . $event_additional_msg . "</p>\n-----\n";
   }
-      
+
   $msg .= "<p><b>" . t("Scheduled:") . "</b> $event_type_content->title " . t("between") . " $student_name " . t("and") . " $faculty_name</p>\n";
   $msg .= "<p><b>" . t("Date and Time:") . "</b> " . format_date(convert_time($utc_schedule_time_ts), 'pretty') . " ($fstudent_tz)</p>\n";
   $msg .= "<p><b>" . t("Duration:") . "</b> " . $event_duration_minutes . " min</p>\n";
   $msg .= $video_info;
-  
+
   if ($student_comments) {
     $msg .= "<p><b>" . t("Student comments:") . "</b> $student_comments</p>\n";
   }
 
   // We will be creating a new appointment content node programmatically, then calling content_save() on it.
-  
+
   // We will then redirect to a confirmation page.
   // This is a NEW content obj!
   $content = new stdClass();
   $content->type = 'appointment';
-  $content->cid = "new";    
+  $content->cid = "new";
   $content->published = 1;
 
   $content->title = "appointment content saved on " . format_date(convert_time(time()));
-  
+
   $content->field__appointment_datetime['value'] = date('Y-m-d H:i:s', $utc_schedule_time_ts);
   $content->field__appointment_duration_minutes['value'] = $event_duration_minutes;
   $content->field__faculty_id['value'] = $faculty_cwid;
   $content->field__student_id['value'] = $student_cwid;
-  $content->field__appointment_type['value'] = 'advising';  
+  $content->field__appointment_type['value'] = 'advising';
   $content->field__appointment_msg['value'] = $msg;
   $content->field__video_data['value'] = $video_data;
-  
+
   content_save($content);
-  
+
   $acid = $content->cid;  // save for later.
-  
-  
-  
+
+
+
   // save as an "activity record" for this student.
   $acontent = new stdClass();
   $acontent->type = 'activity_record';
-  $acontent->cid = "new";    
+  $acontent->cid = "new";
   $acontent->published = 1;
   $acontent->delete_flag = 0;
   $acontent->title = t('Student has scheduled an appointment with @fn.', array("@fn" => $faculty_name));
   $acontent->field__student_id['value'] = $student_cwid;
   $content->field__faculty_id['value'] = $faculty_cwid;
-  $acontent->field__activity_type['value'] = 'calendar'; 
+  $acontent->field__activity_type['value'] = 'calendar';
   content_save($acontent);
-  
-  
-  
+
+
+
   // Get ics invitation string for email attachments
   $start_dt = date("Ymd\THis\Z", $utc_schedule_time_ts);
-  $end_dt = date("Ymd\THis\Z", $utc_schedule_time_ts + ($event_duration_minutes * 60));  
+  $end_dt = date("Ymd\THis\Z", $utc_schedule_time_ts + ($event_duration_minutes * 60));
   $ics = calendar_get_ics_invitation_string($event_title, $location, $video_info, $start_dt, $end_dt);
 
   $attachment = array(
     'invite.ics' => $ics,
   );
-  
-  
-  
-          
+
+
+
+
   // Send notifications
-   
-  // First, send a notification to the student 
-  $student_user_id = db_get_user_id_from_cwid($student_cwid, 'student');  
-  $nmsg = "You have scheduled an appointment with $faculty_name:\n";    
+
+  // First, send a notification to the student
+  $student_user_id = db_get_user_id_from_cwid($student_cwid, 'student');
+  $nmsg = "You have scheduled an appointment with $faculty_name:\n";
   notify_send_notification_to_user($student_user_id, $nmsg . $msg, $acid, 'appointment', '', $attachment);
-    
-  
+
+
 
   // Now, send a notification to the faculty member.
-  $nmsg = "$student_name has scheduled an appointment with you:\n"; 
-  $msg = "";  
-  
+  $nmsg = "$student_name has scheduled an appointment with you:\n";
+  $msg = "";
+
   if ($event_additional_msg) {
     $msg .= "<p>" . $event_additional_msg . "</p>\n-----\n";
   }
-    
+
   $msg .= "<p><b>" . t("Scheduled:") . "</b> $event_type_content->title between $student_name and $faculty_name</p>\n";
   $msg .= "<p><b>" . t("Date and Time:") . "</b> " . format_date(convert_time($utc_schedule_time_ts, 'UTC', $faculty_tz), 'pretty') . " ($ffaculty_tz)</p>\n";
   $msg .= "<p><b>" . t("Duration:") . "</b> " . $event_duration_minutes . " min</p>\n";
   $msg .= $video_info;
-  
+
   notify_send_notification_to_user($faculty_user_id, $nmsg . $msg, $acid, 'appointment', '', $attachment);
-      
-  
+
+
   watchdog("calendar", "schedule_appointment student_id:$student_cwid, faculty_id:$faculty_cwid, appointment details: " . ppm($content, TRUE), array());
-  
-  
+
+
   fp_goto("schedule-appointment-completed/$content->cid");
-  
-  
+
+
 } // ... submit
 
 
@@ -2257,188 +2258,188 @@ function calendar_schedule_appointment_confirm_form_submit($form, &$form_state) 
 /**
  * This is the page which lets students schedule an appointment with the faculty member
  * supplied in the user_id.
- * 
+ *
  * Notice this is USER_ID and not CWID!  This is so that the cwid is kept secret, since it might
  * be private information.
  */
 function calendar_display_schedule_appointment_page($faculty_user_id) {
-  
+
   fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
-  
-  $faculty_user = fp_load_user($faculty_user_id);  
-  
+
+  $faculty_user = fp_load_user($faculty_user_id);
+
   if (!$faculty_user || $faculty_user->is_faculty != TRUE) {
     return "<p>" . t("We're sorry! The link you followed is either invalid, or the selected user ID is not listed as a faculty/staff member at your
             insititution.") . "</p>";
   }
-  
+
   $rtn = "";
-  
+
   $faculty_id = $faculty_user->cwid;
   $faculty_name = fp_get_faculty_name($faculty_id);
-  
+
   fp_set_title(t("Schedule Appointment with @name", array("@name" => $faculty_name)));
-     
+
 
   $image_url = @$faculty_user->settings['image_url'];
-  $image_html = ""; 
+  $image_html = "";
   if ($image_url) {
     $image_html .= "<span class='small-circle-profile-image'>
-                  <img src='$image_url'> 
+                  <img src='$image_url'>
                 </span>";
-  }  
-  
-  
-  $stage = trim($_REQUEST['stage']);  
-  
-  
+  }
+
+
+  $stage = trim($_REQUEST['stage']);
+
+
   if ($stage == '' || $stage == '1') {
-    
+
     $event_types = content_get_content_for_faculty_id('schedule_event_type', $faculty_id);
     $rtn .= $image_html;
     $rtn .= "<p class='select-directions'>" . t("Begin by selecting which type of appointment you wish to schedule.") . "</p>
-              
+
               <div class='select-from-event-types'>";
-        
+
     foreach($event_types as $cid => $content) {
-      
+
       if ($content->field__enabled['value'] != 'enabled') continue;
-      
+
       $title = $content->title;
       $description = trim($content->field__description['display_value']);
-      
+
       $url = fp_url("schedule-appointment/$faculty_user_id", "stage=2&event_type_cid=$cid");
-      
+
       $rtn .= "<a class='event-type' href='$url'>
                 <div class='event-type-title'>$title <i class='fa fa-arrow-circle-right'></i></div>
                 <div class='event-type-description'>$description</div>
               </a>";
-      
-    }    
-  
+
+    }
+
     $rtn .= '</div>';
-  
-  
+
+
     //$rtn .= "<br><br><div class='tzexplain'><i class='tzglobe fa fa-clock-o'></i> " . t("The time you select will be shown in your timezone of %tz.", array("%tz" => fp_get_user_timezone())) . "</div>";
-  
-            
-    
+
+
+
   } // stage 1
 
-        
+
   // Having selected the month, get a list of *unavailble* dates and times for this faculty member, for the selected month.
   if ($stage == '2') {
-    
-    
+
+
     $event_type_cid = intval($_REQUEST['event_type_cid']);
     $content = content_load($event_type_cid);
-    
-    
+
+
     $month_year = fp_trim(@$_REQUEST['month_year']);
     if (!$month_year) {
       // Not set, so use today's month and year.
       $month = date('n');
-      $year = date('Y');  
+      $year = date('Y');
       $month_year = $month . "_" . $year;
     }
-    
+
     $temp = explode("_", $month_year);
     $month = intval($temp[0]);
     $year = intval($temp[1]);
-    
-    
+
+
     $url = fp_url("schedule-appointment/$faculty_user_id");
     $link_back = "<a href='$url' title='Back'><i class='fa fa-arrow-circle-left'></i></a>&nbsp; &nbsp;";
-    
-    
+
+
     $rtn .= "<h3>$link_back$faculty_name has time available on the following days:</h3>";
-    
+
     $title = $content->title;
     $description = trim($content->field__description['display_value']);
-      
+
     $rtn .= "<div class='event-type-box'>
                 <div class='event-type-title'>$title</div>
                 <div class='event-type-description'>$description</div>
               </div>";
-    
-    
-    
+
+
+
     // Get array of unavailable dates/times for the faculty user, for the selected month and year.
     $available_slots = calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $month, $year);
-                        
-    // Draw a mini calendar, and make clickable any days which are at least partially available.    
+
+    // Draw a mini calendar, and make clickable any days which are at least partially available.
     $rtn .= calendar_render_mini_calendar($month, $year, $faculty_user_id, $event_type_cid, $available_slots);
-        
-    
+
+
     $crumbs = array();
     $crumbs[] = array(
       'text' => t('Schedule Appointment with @name', array("@name" => $faculty_name)),
       'path' => "schedule-appointment/$faculty_user_id",
     );
-  
-    
-    fp_set_breadcrumbs($crumbs);      
-    
-    
-      
-    
+
+
+    fp_set_breadcrumbs($crumbs);
+
+
+
+
   } // stage = 2
-  
-  
+
+
   // The user has selected a day, display the available times.
   if ($stage == '3') {
-    
+
     $event_type_cid = intval($_REQUEST['event_type_cid']);
     $content = content_load($event_type_cid);
-    
+
     $month_year = fp_trim(@$_REQUEST['month_year']);
     if (!$month_year) {
       // Not set, so use today's month and year.
       $month = date('n');
-      $year = date('Y');  
+      $year = date('Y');
       $month_year = $month . "_" . $year;
     }
-    
+
     $temp = explode("_", $month_year);
     $month = intval($temp[0]);
     $year = intval($temp[1]);
-        
-    $day = intval($_REQUEST['day']);          
-    
+
+    $day = intval($_REQUEST['day']);
+
     $url = fp_url("schedule-appointment/$faculty_user_id", "stage=2&event_type_cid=$event_type_cid");
     $link_back = "<a href='$url' title='Back'><i class='fa fa-arrow-circle-left'></i></a>&nbsp; &nbsp;";
-    
+
     $rtn .= "<h3>$link_back" . t("Select a time for") . " " . format_date(strtotime("$year-$month-$day"), '', 'l, F jS Y') . "</h3>";
-    
-    
-    
-    
-    $title = $content->title;   
+
+
+
+
+    $title = $content->title;
     $description = trim($content->field__description['display_value']);
-      
+
     $rtn .= "<div class='event-type-box'>
                 <div class='event-type-title'>$title</div>
                 <div class='event-type-description'>$description</div>
-              </div>";   
-        
-    
-    
-    
+              </div>";
+
+
+
+
     $rtn .= "<div class='event-select-time'>";
     $rtn .= "<div class='tzexplain'><i class='tzglobe fa fa-globe'></i> " . t("Times are shown in your timezone of <br>%tz", array("%tz" => friendly_timezone(fp_get_user_timezone()))) . "</div>";
-            
+
     // Get array of unavailable dates/times for the faculty user, for the selected month and year.
     $available_slots = calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $month, $year);
-            
+
     $avail_times = calendar_get_available_times_on_date($available_slots, $faculty_user_id, $year, $month, $day, $event_type_cid);
     foreach ($avail_times as $disp_hm => $details) {
       $rtn .= $details['html'];
     }
-    
-    
+
+
     $rtn .= "</div>";
-      
-    
+
+
     $crumbs = array();
     $crumbs[] = array(
       'text' => t('Schedule Appointment with @name', array("@name" => $faculty_name)),
@@ -2449,55 +2450,55 @@ function calendar_display_schedule_appointment_page($faculty_user_id) {
       'path' => "schedule-appointment/$faculty_user_id",
       'query' => "stage=2&event_type_cid=$content->cid",
     );
-  
-    
-    fp_set_breadcrumbs($crumbs);          
-    
-    
-    
+
+
+    fp_set_breadcrumbs($crumbs);
+
+
+
   } // stage 3
-  
-    
-  
-  
+
+
+
+
   return $rtn;
-  
+
 } // calendar_display_schedule_appointment_page
 
 
 function calendar_get_available_times_on_date($available_slots, $faculty_user_id, $year, $month, $day, $event_type_cid = 0) {
-  
+
   $rtn = array();
-  
-    
+
+
   foreach ($available_slots[$year][$month][$day] as $slot) {
     $begin_hm = $slot['begin_hm'];
-    
+
     $tz = $slot['tz'];
     $student_timezone = fp_get_user_timezone();
-    
+
     // Okay, here is where we actually convert FROM the faculty timezone into the STUDENT's timezone!
-    $offset = get_timezone_offset($student_timezone, $tz);      
+    $offset = get_timezone_offset($student_timezone, $tz);
     $test_time = strtotime("$year-$month-$day $begin_hm");
-    
+
     $adjusted_student_tz_time = $test_time - $offset;
     $student_begin_hm = date("g:ia", $adjusted_student_tz_time);
-    
+
     $url = fp_url("schedule-appointment/$faculty_user_id/confirm", "event_type_cid=$event_type_cid&date=$year-$month-$day&begin_hm=$student_begin_hm");
-    
+
     //$rtn .= "<a href='$url' class='select-time'>
     //            $student_begin_hm
     //         </a>";
-    
+
     $rtn[$student_begin_hm]['html'] = "
         <a href='$url' class='select-time'>
                 $student_begin_hm
              </a>   ";
-    
-    
+
+
   } // foreach
-  
-  return $rtn;    
+
+  return $rtn;
 }
 
 
@@ -2507,38 +2508,38 @@ function calendar_get_available_times_on_date($available_slots, $faculty_user_id
 
 // From: https://stackoverflow.com/questions/10309094/display-calendar-on-php/18752260
 function calendar_render_mini_calendar($month, $year, $faculty_user_id, $event_type_cid = 0, $available_slots = array()) {
-      
-  $today_num = intval(date('j', convert_time(time())));  
+
+  $today_num = intval(date('j', convert_time(time())));
   $today_month = intval(date('n', convert_time(time())));
   $today_year = intval(date('Y', convert_time(time())));
-    
-  $day_name_length = 3;       
+
+  $day_name_length = 3;
   $first_day = 0;
 
 
   $month_ts = convert_time(strtotime("$year-$month-01 07:01:01"));  // get us into the correct month.
 
   $month_title = date('M', $month_ts) . " $year";
-    
+
   $month_year = $month . "_$year";
-  
+
 
   $first_of_month = mktime(0, 0, 0, $month, 1, $year);
   // remember that mktime will automatically correct if invalid dates are entered
   // for instance, mktime(0,0,0,12,32,1997) will be the date for Jan 1, 1998
   // this provides a built in "rounding" feature
 
-  $day_names = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'); 
-    
-    
+  $day_names = array('Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
+
+
   list($month, $year, $month_name, $weekday) = explode(',', strftime('%m, %Y, %B, %w', $first_of_month));
   $weekday = ($weekday + 7 - $first_day) % 7; //adjust for $first_day
-  
+
   // Make sure they are integers.
   $month = intval($month);
   $year = intval($year);
-    
-  
+
+
 
   $prev_month = $month - 1;
   $prev_year = $year;
@@ -2547,36 +2548,36 @@ function calendar_render_mini_calendar($month, $year, $faculty_user_id, $event_t
     $prev_year--;
   }
 
-  $prev_url = fp_url("schedule-appointment/$faculty_user_id", "stage=2&event_type_cid=$event_type_cid&month_year=$prev_month" . "_" . "$prev_year");   
+  $prev_url = fp_url("schedule-appointment/$faculty_user_id", "stage=2&event_type_cid=$event_type_cid&month_year=$prev_month" . "_" . "$prev_year");
   $prev = '<span class="calendar-prev"><a href="' . $prev_url . '">&laquo; ' . t('Prev') . '</a></span>';
-  
+
   // If we are already on TODAY's month and year, then there should be no Prev link at all.
   if ($month == date('m') && $year == date('Y')) {
     $prev = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;";
-  }  
-   
-  
+  }
+
+
   $next_month = $month + 1;
   $next_year = $year;
   if ($next_month > 12) {
     $next_month = 1;
     $next_year++;
-  } 
-    
-  $next_url = fp_url("schedule-appointment/$faculty_user_id", "stage=2&event_type_cid=$event_type_cid&month_year=$next_month" . "_" . "$next_year");  
-  
+  }
+
+  $next_url = fp_url("schedule-appointment/$faculty_user_id", "stage=2&event_type_cid=$event_type_cid&month_year=$next_month" . "_" . "$next_year");
+
   $next = '<span class="calendar-next"><a href="' . $next_url . '">' . t("Next") . ' &raquo;</a></span>';
-  
+
   // TODO:  limit future months/dates based on settings?  Ex: don't let the user go past 3 months.
-    
-  
+
+
   $top_text = '<caption class="calendar-month">' . $prev . "<span class='month-title'>$month_title</span>" . $next . "</caption>";
-    
-    
-  
-  
+
+
+
+
   $calendar = "<div class='calendar-mini-calendar'>
-                                
+
                 <table class='mini-calendar'>
                   $top_text
                   <tr class='day-names'>";
@@ -2596,63 +2597,63 @@ function calendar_render_mini_calendar($month, $year, $faculty_user_id, $event_t
           $calendar  .= "<td class='empty-day'>&nbsp;</td>"; //initial 'empty' days
       }
   }
-  
+
   /////////////////////////////////////////////////////
   // Begin to output the actual days in the month.
-  $days_in_month = date('t',$first_of_month);  
+  $days_in_month = date('t',$first_of_month);
   for ($day = 1; $day <= $days_in_month; $day++, $weekday++) {
-    
+
       $disp_day = $day;
-    
+
       if($weekday == 7) {
           $weekday   = 0; //start a new week
           $calendar  .= "</tr>
                          <tr class='week'>";
-      }      
-      
+      }
+
       $extra = "";
       if ($day === intval($today_num) && $month == $today_month && $year == $today_year) {
         $extra .= " mini-day-today";
       }
-      
-      
-      // has the date already passed? 
+
+
+      // has the date already passed?
       if ($day < $today_num && $month == $today_month && $year == $today_year) {
         $extra .= " mini-past-date";
       }
       else {
         // We are on track to being able to make this a link!
-        
+
         $disp_day = $day;
-        
+
         // is the faculty member available?  If so, make it a link
         if (isset($available_slots[$year][$month][$day]) && is_array($available_slots[$year][$month][$day]) && count($available_slots[$year][$month][$day]) > 0) {
           $disp_day = l($day, "schedule-appointment/$faculty_user_id", "month_year=$month_year&stage=3&day=$day&event_type_cid=$event_type_cid");
         }
-        
-        
-        
+
+
+
       } // else
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
       $calendar  .= "<td class='mini-day $extra'>$disp_day</td>";
-      
-      
-      
+
+
+
   }
   //////////////////////////////////////////////////////
-  
-  
+
+
   // We are finished, but if we didn't end on the last day of the month,
-  // we need to fill in the remaining table cells with an empty td.  
+  // we need to fill in the remaining table cells with an empty td.
   if($weekday != 7) {
     $calendar  .= '<td class="empty-day empty-day-multi" id="emptydays" colspan="' . (7-$weekday) . '">&nbsp;</td>'; //remaining "empty" days
   }
-  
+
   // Time to close up!
   $calendar .= "</tr>
                 </table>
@@ -2673,9 +2674,9 @@ function calendar_render_mini_calendar($month, $year, $faculty_user_id, $event_t
  */
 function calendar_content_register_content_type() {
   global $user;
-  
+
   $arr = array();
-  
+
   $arr['appointment'] = array(
     'title' => 'Appointment',
     'description' => 'This is a content type meant to track an appointment between a student and an advisor in the system.',
@@ -2701,7 +2702,7 @@ function calendar_content_register_content_type() {
     ),
   );
 
- 
+
   $arr['schedule_unavailable_time'] = array(
     'title' => 'Schedule Unavailable Time',
     'description' => 'This content type allows the user to mark when they will be unavailable for appointments.',
@@ -2715,30 +2716,30 @@ function calendar_content_register_content_type() {
   );
 
 
-  
-  
+
+
   // If we are in a popup (dialog)...
   if (@$_GET['window_mode'] == 'popup') {
     // We want to make sure we redirect to our handler URL, which will close the dialog.
     $arr['appointment']['settings']['#redirect'] = array(
       'path' => 'content-dialog-handle-after-save',
-      'query' => '',        
+      'query' => '',
     );
     $arr['schedule_event_type']['settings']['#redirect'] = array(
       'path' => 'content-dialog-handle-after-save',
-      'query' => '',        
+      'query' => '',
     );
     $arr['schedule_unavailable_time']['settings']['#redirect'] = array(
       'path' => 'content-dialog-handle-after-save',
-      'query' => '',        
+      'query' => '',
     );
 
-    
+
   }
-  
-  
-  
-  
+
+
+
+
   $fields = array();
 
   $fields['appointment_datetime'] = array(
@@ -2772,7 +2773,7 @@ function calendar_content_register_content_type() {
     'label' => 'Faculty/Staff',
     'weight' => 20,
   );
-  
+
   $fields['student_id'] = array(
     'type' => 'textfield',
     'label' => 'Student',
@@ -2781,11 +2782,11 @@ function calendar_content_register_content_type() {
     'required' => TRUE,
   );
 
-      
+
   $fields['appointment_type'] = array(
     'type' => 'select',
     'options' => array(
-      'advising' => t('Advising'),      
+      'advising' => t('Advising'),
       'other' => t('Other'),
     ),
     'label' => 'Type',
@@ -2794,12 +2795,12 @@ function calendar_content_register_content_type() {
     'weight' => 40,
   );
 
-    
+
   $fields['appointment_msg'] = array(
-    'type' => 'textarea',  
+    'type' => 'textarea',
     'label' => '(Optional) Message / Comments',
     'filter' => 'basic',
-    'weight' => 50,    
+    'weight' => 50,
   );
 
 
@@ -2813,11 +2814,11 @@ function calendar_content_register_content_type() {
     'weight' => 999999,
     'attributes' => array('readonly' => 'readonly', "style" => "display: none"),
   );
-  
-  
-  
+
+
+
   $arr['appointment']['fields'] = $fields;
-  
+
 
   ///////////////////////////////////
   ///  Schedule Event Type
@@ -2839,19 +2840,19 @@ function calendar_content_register_content_type() {
                         then no student will be able to make appointments with you.  If you are unsure what to do, leave this set to 'Enabled'."),
     'options' => array('enabled' => 'Enabled', 'disabled' => 'Disabled'),
     'hide_please_select' => TRUE,
-    'required' => TRUE,    
+    'required' => TRUE,
     'weight' => 30,
   );
 
-  
+
   $zoomapi_data = "";
-  if (module_enabled("zoomapi")) {    
+  if (module_enabled("zoomapi")) {
     $zoomapi_data = zoomapi_get_zoomapi_data_for_user($user->id);
     $attr = array();
     if (!$zoomapi_data) {
       $attr = array("style" => "display: none; ");   // hide this field if the user doesn't have anything set up for Zoom.
     }
-    
+
     $fields['video_meeting'] = array(
       'type' => 'select',
       'label' => t('Automatically generate Zoom meeting?'),
@@ -2863,12 +2864,12 @@ function calendar_content_register_content_type() {
       'attributes' => $attr,
       'weight' => 40,
     );
-    
-    
+
+
   }
-  
-    
-  
+
+
+
 
 
   $fields['description'] = array(
@@ -2917,14 +2918,14 @@ function calendar_content_register_content_type() {
     'description' => t('This setting stops students from scheduling events too soon, which you might not notice because you are otherwise occupied.
                        For example, if you set this to 1 hour, and the current time is 2pm, then a student would not be able to schedule
                        this event before 3pm today.'),
-  );  
+  );
 
-  
+
   $fields['additional_email_msg'] = array(
     'type' => 'textarea',
     'label' => t('Additional Email Message'),
     'description' => t('When a student schedules this event, they will see a generic email message which confirms their appointment date and time.
-                        If you wish, you can add an additional message here.                        
+                        If you wish, you can add an additional message here.
                         <br>For example:
                         <br>&nbsp; &nbsp; <i>Thank you for scheduling this in-person meeting.  My office is in Walker Hall, 3rd floor.  Check in at the reception.</i>'),
     'weight' => 140,
@@ -2961,15 +2962,15 @@ function calendar_content_register_content_type() {
     if ($t == 0) {
       $twelve_version = "12am (midnight)";
     }
-    
+
     if ($t > 12) {
       $twelve_version = ($t - 12) . "pm";
     }
     $hour_options[$t] = $twelve_version;
   }
 
-  
-  
+
+
   $fields['time_selector'] = array(
     'type' => 'radios',
     'label' => t('How would you like to describe when you are unavailable to take appointments on the selected days?'),
@@ -2995,7 +2996,7 @@ function calendar_content_register_content_type() {
     'weight' => 25,
   );
 
-  
+
 
   $fields['start_time'] = array(
     'type' => 'time',
@@ -3018,7 +3019,7 @@ function calendar_content_register_content_type() {
     'start_closed' => TRUE,
     'weight' => 50,
   );
-  
+
   $fields['advanced_fs']['elements'][0]['ics_url'] = array(
     'type' => 'textarea',
     'rows' => 2,
@@ -3026,22 +3027,22 @@ function calendar_content_register_content_type() {
     'description' => t("If a URL is entered here, all other fields will be ignored.  This optional field lets you specify the URL to an external
                         calendar feed (ex: Google Calendar, Outlook, Zoho, etc) in .ics format.  Any event times listed on that calendar
                         will be marked off as unavailable for scheduling in FlightPath.  This is a convenient way to prevent students
-                        from scheduling appointments when you might otherwise be occupied, by entering a link to your work calendar.  
+                        from scheduling appointments when you might otherwise be occupied, by entering a link to your work calendar.
                         <br>If you are unsure what to enter here, leave
                         this field blank."),
-    'weight' => 60,                        
+    'weight' => 60,
   );
-  
+
 
 
   $arr['schedule_unavailable_time']['fields'] = $fields;
 
-  
+
 
 
 
   return $arr;
-  
+
 } // hook_content_register_content_type
 
 
@@ -3050,34 +3051,34 @@ function calendar_content_register_content_type() {
 
 function calendar_display_calendar() {
   $rtn = "";
-  
+
   fp_set_title('');
-  
+
 
   $year_month = @trim($_REQUEST['year_month']);
   if ($year_month == '') $year_month = 'now';
 
-      
+
   if ($year_month == 'now') {
     $temp = strtotime('now');
     $year_month = date('Y-m', $temp);
   }
-  
+
   $temp = explode("-", $year_month);
   $year = intval($temp[0]);
   $month = intval($temp[1]);
-  
+
   // if mobile_date has been set, then display that (the entire day).
   if (isset($_REQUEST['mobile_date'])) {
     $rtn .= calendar_display_mobile_date_page($_REQUEST['mobile_date'], $_REQUEST['mobile_cids']);
   }
-  else {    
+  else {
     $rtn .= calendar_build_custom_calendar($month, $year);
   }
-  
-  
+
+
   watchdog("calendar", "display_calendar", array());
-  
+
   return $rtn;
 } //calendar_display_calendar
 
@@ -3085,22 +3086,22 @@ function calendar_display_calendar() {
 /**
  * This function is specifically for displaying the events on a particular day
  * for the user, presumed to be in a mobile experience.
- * 
+ *
  * The HTML we need to display is assumed to be in our SESSION[calendar_cache][date][cid]
- * 
+ *
  */
 function calendar_display_mobile_date_page($date, $cids_csv) {
   $rtn = "";
-  
+
   fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
-  
+
   $date_ts = strtotime($date);
-  $month_desc = date('F', $date_ts);  
-  $month = date('m', $date_ts);  
-  $year = date('Y', $date_ts);  
-  $day = date('d', $date_ts);  
-  $ord = date('S', $date_ts);  
-  $dow = date('l', $date_ts);  
+  $month_desc = date('F', $date_ts);
+  $month = date('m', $date_ts);
+  $year = date('Y', $date_ts);
+  $day = date('d', $date_ts);
+  $ord = date('S', $date_ts);
+  $dow = date('l', $date_ts);
 
 
   fp_set_title("$dow, $month_desc $day$ord, $year");
@@ -3109,27 +3110,27 @@ function calendar_display_mobile_date_page($date, $cids_csv) {
 
 
   $rtn .= "<div class='mobile-day-page'>";
-  
+
   foreach ($cids as $cid) {
-    
+
     $rtn .= $_SESSION['calendar_cache'][$date][$cid];
-    
+
   } // foreach
-  
-  
+
+
   $rtn .= "</div>";
-  
+
   // Let's set our breadcrumbs
   $db = get_global_database_handler();
   $crumbs = array();
   $crumbs[] = array(
     'text' => t("Calendar"),
-    'path' => 'calendar', 
+    'path' => 'calendar',
     'query' => "month_year=$month" . "_$year",
-  );  
-  fp_set_breadcrumbs($crumbs);    
-    
-  
+  );
+  fp_set_breadcrumbs($crumbs);
+
+
   return $rtn;
 }
 
@@ -3179,104 +3180,104 @@ function calendar_get_date_range($first, $last, $step = '+1 day', $output_format
 
 /**
  * Implements hook_form_alter
- * 
+ *
  * We want to make various modifications to our form, based on what we are trying to do to it.  We may also
  * want to add in some custom javascript as well.
- * 
+ *
  */
 function calendar_form_alter(&$form, $form_id) {
   global $user;
-  
+
   if ($form_id == 'content_edit_content_form') {
     if (@$form['type']['value'] == 'appointment') {
 
       $db = get_global_database_handler();
 
       $form['#validate_handlers'][] = 'calendar_appointment_content_form_validate';
-      
-      // If this is a NEW form, then check for values in the URL to auto-fill.      
+
+      // If this is a NEW form, then check for values in the URL to auto-fill.
       if ($form['cid']['value'] === 'new') {
-        
+
 
         if (isset($_GET['student_id'])) {
           $form['student_id']['value'] = $_GET['student_id'];
-          
+
           $form['student_id']['attributes'] = array('class' => 'hidden');
-          
-          
+
+
           $form['mark_to'] = array(
             'type' => 'markup',
             'value' => "<div class='appointment-field-mark appointment-student'><label>" . t("To") . ":</label>
                                " . $db->get_student_name($form['student_id']['value'], TRUE) . "
                         </div>",
-            'weight' => $form['student_id']['weight'], 
-          );          
-        }   
+            'weight' => $form['student_id']['weight'],
+          );
+        }
 
         if (isset($_GET['faculty_id'])) {
           $form['faculty_id']['value'] = $_GET['faculty_id'];
-          
+
           $form['faculty_id']['attributes'] = array('class' => 'hidden');
           $form['mark_from'] = array(
             'type' => 'markup',
             'value' => "<div class='appointment-field-mark calendar-faculty_id'><label>" . t("Faculty/Staff") . ":</label>
                                 " . $db->get_faculty_name($form['faculty_id']['value']) . "
                         </div>",
-            'weight' => $form['faculty_id']['weight'], 
+            'weight' => $form['faculty_id']['weight'],
           );
-        }  
+        }
 
         // Set the date/time to NOW (since this is new).
         $form['appointment_datetime']['value'] = date('Y-m-d\TH:i', convert_time(time()));
-        
+
         // If _GET['date'] is set, then we will set the appointment date to THAT + the current time.
         // We pass it through strtotime to help sanitize.
         if (isset($_GET['date']) && $_GET['date'] != '') {
           $form['appointment_datetime']['value'] = date('Y-m-d', strtotime($_GET['date'])) . date('\TH:i', convert_time(time()));
         }
-        
-        // Always set the published = TRUE, and hide.        
+
+        // Always set the published = TRUE, and hide.
         $form['published']['value'] = TRUE;
         $form['published']['attributes'] = array('class' => 'hidden');
-        
+
         // If this user has Zoom set up, then show an option to make this a zoom meeting.
         $test = FALSE;
         if (module_enabled("zoomapi")) {
-          $test = zoomapi_get_zoomapi_data_for_user($user->id);    
+          $test = zoomapi_get_zoomapi_data_for_user($user->id);
         }
-        if ($test) {           
+        if ($test) {
           $form['enable_zoom'] = array(
             'type' => 'checkbox',
-            'label' => t("Make this a Zoom video meeting?"),            
+            'label' => t("Make this a Zoom video meeting?"),
             'description' => t("Check this box if this is a Zoom video meeting.  A Zoom meeting will be created automatically
                                 and the recipients will be notified."),
             'weight' => 5,
           );
         }
-        
-                        
-        
-        
+
+
+
+
       } // cid == new
-      
-      
-      
+
+
+
     } // form type == appointment
-    
-    
+
+
     if (@$form['type']['value'] == 'schedule_event_type') {
-      
+
       if ($form['cid']['value'] === 'new') {
-            
-        $db = get_global_database_handler();  
-            
+
+        $db = get_global_database_handler();
+
         if (isset($_GET['faculty_id'])) {
           $form['faculty_id']['value'] = $_GET['faculty_id'];
-        }            
-        
+        }
+
       } // new
-      
-      // Always set the published = TRUE, and hide.        
+
+      // Always set the published = TRUE, and hide.
       $form['published']['value'] = TRUE;
       $form['published']['attributes'] = array('class' => 'hidden');
 
@@ -3287,37 +3288,37 @@ function calendar_form_alter(&$form, $form_id) {
         'value' => "<div class='appointment-field-mark calendar-faculty_id'><label>" . t("Faculty/Staff") . ":</label>
                             " . fp_get_faculty_name($form['faculty_id']['value']) . "
                     </div>",
-        'weight' => $form['faculty_id']['weight'], 
+        'weight' => $form['faculty_id']['weight'],
       );
 
-  
-      
-            
-    } // schedule_event_type    
-    
-    
-    
-    
+
+
+
+    } // schedule_event_type
+
+
+
+
     if (@$form['type']['value'] == 'schedule_unavailable_time') {
-      
+
       if ($form['cid']['value'] === 'new') {
-            
-        $db = get_global_database_handler();  
-            
+
+        $db = get_global_database_handler();
+
         if (isset($_GET['faculty_id'])) {
           $form['faculty_id']['value'] = $_GET['faculty_id'];
-        }            
-        
+        }
+
         // Set timezone to the user's timezone (or system if unavail)
         $form['timezone']['value'] = fp_get_user_timezone();
-        
-        
+
+
       } // new
-      
-      // Always set the published = TRUE, and hide.        
+
+      // Always set the published = TRUE, and hide.
       $form['published']['value'] = TRUE;
       $form['published']['attributes'] = array('class' => 'hidden');
-  
+
       // Always hide faculty_id field.
       $form['faculty_id']['attributes'] = array('class' => 'hidden');
       $form['mark_from'] = array(
@@ -3325,17 +3326,17 @@ function calendar_form_alter(&$form, $form_id) {
         'value' => "<div class='appointment-field-mark calendar-faculty_id'><label>" . t("Faculty/Staff") . ":</label>
                             " . fp_get_faculty_name($form['faculty_id']['value']) . "
                     </div>",
-        'weight' => $form['faculty_id']['weight'], 
+        'weight' => $form['faculty_id']['weight'],
       );
-      
-      
-            
-    } // schedule_unavailable_time        
-    
-    
-    
+
+
+
+    } // schedule_unavailable_time
+
+
+
   } // content_edit_content_form
-  
+
 } // hook_form_alter
 
 
@@ -3345,9 +3346,9 @@ function calendar_form_alter(&$form, $form_id) {
  */
 function calendar_appointment_content_form_validate($form, &$form_state) {
   global $user;
-  
+
   $values = $form_state['values'];
-    
+
   $student_id = $line = $form_state['values']['student_id'];
   // Might look like this:  first last (CWID).  We only want the CWID.
   if (strstr($line, "(")) {
@@ -3355,21 +3356,21 @@ function calendar_appointment_content_form_validate($form, &$form_state) {
     $student_id = $temp[1];
     $student_id = trim(str_replace(")", "", $student_id));
   }
-  
+
   // $student_id should now contain only the CWID of the student.  Let's make sure it's a real person, by making sure their name is entered.
   $db = get_global_database_handler();
   $name = trim($db->get_student_name($student_id, FALSE));
   if (!$name) {
     form_error('student_id', t("Sorry, but the Student (by CWID or Name) you entered is not valid.  Please try again."));
   }
-  
+
   // If we're good to go, it means we can add the new (stripped down) student_id to the form_state for saving.
-  $form_state['values']['student_id'] = $student_id;  
-  
-  
-      
+  $form_state['values']['student_id'] = $student_id;
+
+
+
   // Since we have passed validation, we can see if we should try to create a new Zoom meeting.
-      
+
   $video_info = $location = "";
   $acid = 0;
   $location = "In-Person";
@@ -3379,126 +3380,126 @@ function calendar_appointment_content_form_validate($form, &$form_state) {
   $faculty_cwid = $faculty_user->cwid;
   $faculty_name = $faculty_user->f_name . " " . $faculty_user->l_name;
   $faculty_tz = fp_get_user_timezone($user);
-                
+
   $student_name = $db->get_student_name($student_id);
   $schedule_time_ts = strtotime($values['appointment_datetime']);
   $utc_schedule_time_ts = convert_time($schedule_time_ts, $faculty_tz, 'UTC');  // convert to utc time from our current timezone.
   $event_duration_minutes = intval($values['appointment_duration_minutes']);
 
   $event_title = "Meeting between $student_name and $faculty_name";
-      
+
   // Only do this for NEW appointments.
   if ($values['cid'] === 'new' && module_enabled('zoomapi') && isset($values['enable_zoom']) && $values['enable_zoom'] === TRUE) {
-    
+
     // We want to create a new Zoom meeting!
-    $event_title = t("Zoom meeting between @stu and @fac", array("@stu" => $student_name, "@fac" => $faculty_name));  
+    $event_title = t("Zoom meeting between @stu and @fac", array("@stu" => $student_name, "@fac" => $faculty_name));
     $month = date('n', $schedule_time_ts);
     $year = date('Y', $schedule_time_ts);
     $day = date('j', $schedule_time_ts);
-    
-    
+
+
     //gmt_date_time must look like yyyy-MM-ddTHH:mm:ssZ.  For example: 2020-03-31T22:02:00Z.  The Z tells it that we are using GMT/UTC time.
     $gmt_date_time = date("Y-m-d\TH:i:s\Z", $utc_schedule_time_ts);
 
     $response = zoomapi_create_zoom_meeting($faculty_user_id, $gmt_date_time, $event_duration_minutes, "Video meeting - $faculty_name / $student_name");
-  
+
     if (!$response) {
       form_error("", t("Sorry, but there was an issue creating the Zoom meeting for this appointment.  Your appointment has not been saved.
                         Please try another method, or contact the IT administrator to let them know of this issue."));
       return;
     }
-        
+
     $decoded = json_decode($response);
-          
+
     $meeting_id = $decoded->id;
     $join_url = $decoded->join_url;
     $location = $join_url;
     $dial_in = $decoded->settings->global_dial_in_numbers[0]->number;
-    
+
     if (function_exists("engagements_convert_to_pretty_phone_number")) {
       $dial_in = engagements_convert_to_pretty_phone_number($dial_in, TRUE);
     }
-    
-    $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";                                               
-    
+
+    $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";
+
     $decoded->video_info = $video_info;  // add to our json object for ease of use later.
     $decoded->video_provider = "zoom";  // declare that this is a "zoom" meeting.
     $decoded->video_account_owner_user_id = $user->id;
     $video_data = json_encode($decoded); // re-encode as a simpl string, so we can add to the database.
-    $form_state['values']['video_data'] = $video_data;                       
-        
-  } // enable_zoom 
-    
-    
-    
-    
-    
+    $form_state['values']['video_data'] = $video_data;
+
+  } // enable_zoom
+
+
+
+
+
   // Send notifications
- 
-  
+
+
   // Get ics invitation string for email attachments
   $start_dt = date("Ymd\THis\Z", $utc_schedule_time_ts);
-  $end_dt = date("Ymd\THis\Z", $utc_schedule_time_ts + ($event_duration_minutes * 60));  
+  $end_dt = date("Ymd\THis\Z", $utc_schedule_time_ts + ($event_duration_minutes * 60));
   $ics = calendar_get_ics_invitation_string($event_title, $location, $video_info, $start_dt, $end_dt);
 
   $attachment = array(
     'invite.ics' => $ics,
   );
-         
+
   // First, send a notification to the student.
-  $student_user_id = db_get_user_id_from_cwid($student_id, 'student');  
+  $student_user_id = db_get_user_id_from_cwid($student_id, 'student');
   $student_tz = fp_get_user_timezone($student_user_id);
   $fstudent_tz = friendly_timezone($student_tz);
   $nmsg = "You have been scheduled for an appointment with $faculty_name:\n";
-  
+
   $msg = "";
   $msg .= "<p><b>" . t("Scheduled:") . "</b> $event_title</p>\n";
   $msg .= "<p><b>" . t("Date and Time:") . "</b> " . format_date(convert_time($utc_schedule_time_ts, 'UTC', $student_tz), 'pretty') . " ($fstudent_tz)</p>\n";
   $msg .= "<p><b>" . t("Duration:") . "</b> " . $event_duration_minutes . " min</p>\n";
   $msg .= $video_info;
-  
-  
+
+
   notify_send_notification_to_user($student_user_id, $nmsg . $msg, $acid, 'appointment', '', $attachment);
-  
-  // Now, send a notification to the faculty member.    
+
+  // Now, send a notification to the faculty member.
   $ffaculty_tz = friendly_timezone($faculty_tz);
-  $nmsg = "You have scheduled an appointment with $student_name:\n"; 
+  $nmsg = "You have scheduled an appointment with $student_name:\n";
   $msg = "";
   $msg .= "<p><b>" . t("Scheduled:") . "</b> $event_title</p>\n";
   $msg .= "<p><b>" . t("Date and Time:") . "</b> " . format_date(convert_time($utc_schedule_time_ts, 'UTC', $faculty_tz), 'pretty') . " ($ffaculty_tz)</p>\n";
   $msg .= "<p><b>" . t("Duration:") . "</b> " . $event_duration_minutes . " min</p>\n";
   $msg .= $video_info;
-  
-      
-  notify_send_notification_to_user($user->id, $nmsg . $msg, $acid, 'appointment', '', $attachment);    
 
-  
+
+  notify_send_notification_to_user($user->id, $nmsg . $msg, $acid, 'appointment', '', $attachment);
+
+
 } // validate
 
 
 /**
  * Return back an ics file (as a string) to be used as an attachment for emails, which
  * will facilitate a calendar invitation.
- * 
+ *
  * Inspired from: https://gist.github.com/jakebellacera/635416/3c81643cc236a5efdf535fcbf3f876eaaa6c4787
- * 
+ *
  * start_dt and end_dt should look like Ymd\THis\Z  (in UTC format)
- * 
+ *
  */
 function calendar_get_ics_invitation_string($event_title, $location, $description = "", $start_dt = 0, $end_dt = 0) {
   $rtn = "";
-  
+
   if ($description == "") $description = $event_title;
   $description = strip_tags($description);
-  
+
   $description = str_replace("\r\n", "\n", $description); // Convert from windows to unix style linebreaks.
   $description = str_replace("\n", "\\n", $description); // required if we have line breaks in the description.  We have to escape the slash.
   $description = str_replace(";", "\\;", $description); // We have to escape semi-colons the same way
   $description = str_replace(",", "\\,", $description); // And commas.
-  
+
   // We have to do "line folding" for the description if it is longer than 75 chars.  See: https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
-  
-  
+
+
   $rtn .= "BEGIN:VCALENDAR\n";
   $rtn .= "VERSION:2.0\n";
   $rtn .= "PRODID:-//hacksw/handcal//NONSGML v1.0//EN\n";
@@ -3512,11 +3513,11 @@ function calendar_get_ics_invitation_string($event_title, $location, $descriptio
   $rtn .= "DESCRIPTION:" . calendar_ics_split("DESCRIPTION:", $description) . "\n";
   //$rtn .= "URL;VALUE=URI: http://mydomain.com/events/blah\n";
   $rtn .= "SUMMARY:$event_title\n";
-  $rtn .= "DTSTART:$start_dt\n";  
+  $rtn .= "DTSTART:$start_dt\n";
   $rtn .= "END:VEVENT\n";
-  $rtn .= "END:VCALENDAR";      
-  
-  
+  $rtn .= "END:VCALENDAR";
+
+
   return $rtn;
 } // get_ics_invitation_string
 
@@ -3524,7 +3525,7 @@ function calendar_get_ics_invitation_string($event_title, $location, $descriptio
 /**
  * This lets us split up a line for ics into 75-char octets, according to the rules
  * from:  https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
- * 
+ *
  * This function comes from: https://gist.github.com/hugowetterberg/81747
  */
 function calendar_ics_split($preamble = "DESCRIPTION:", $value = "") {
@@ -3568,11 +3569,11 @@ function calendar_ics_split($preamble = "DESCRIPTION:", $value = "") {
  */
 function calendar_build_custom_calendar($month, $year) {
      global $user;
-     
+
      fp_add_css(fp_get_module_path('calendar') . '/css/style.css');
-          
+
      $extra = "";
-     
+
      $today = date('Y-m-d', convert_time(time()));
 
      // Create array containing abbreviations of days of week.
@@ -3592,8 +3593,8 @@ function calendar_build_custom_calendar($month, $year) {
 
 
      $original_month = intval($month);
-          
-          
+
+
      // How many days does this month contain?
      $numberDays = date('t',$firstDayOfMonth);
 
@@ -3611,7 +3612,7 @@ function calendar_build_custom_calendar($month, $year) {
      $dayOfWeek = $dateComponents['wday'];
 
 
-      
+
 
      $calendar = "";
      $prev_month = $month - 1;
@@ -3620,41 +3621,41 @@ function calendar_build_custom_calendar($month, $year) {
        $prev_year--;
        $prev_month = 12;
      }
-     
+
      $prev_url = fp_url("calendar", "year_month=$prev_year-$prev_month");
-     
-     
+
+
      $next_month = $month + 1;
      $next_year = $year;
      if ($next_month > 12) {
        $next_year++;
        $next_month = 1;
      }
-     
+
      $next_url = fp_url("calendar", "year_month=$next_year-$next_month");
-     
-     
+
+
      // Create the table tag opener and day headers
      $calendar .= "<div class='calendar-header'><span class='cal-prev-link'><a href='$prev_url'>&laquo; Prev</a></span>$extra$short_month_name $year<span class='cal-next-link'><a href='$next_url'>Next &raquo;</a></span></div>";
-     $calendar .= "<table class='custom-calendar calendar-calendar calendar-month-" . strtoupper($monthName) . " calendar-weeks-displayed-zWEEKSDISPLAYEDz calendar-visible-$extra'>";     
+     $calendar .= "<table class='custom-calendar calendar-calendar calendar-month-" . strtoupper($monthName) . " calendar-weeks-displayed-zWEEKSDISPLAYEDz calendar-visible-$extra'>";
      $calendar .= "<tr>";
 
      // Create the calendar headers
 
      foreach($daysOfWeek as $day) {
           $calendar .= "<th class='header'>$day</th>";
-     } 
+     }
 
      // Create the rest of the calendar
      $start_day = 1;
      $start_month = $month;
      $start_year = $year;
-     
+
      // If our month starts on any day OTHER than Sunday (0), then we need to include days at the end of the LAST month!
      if ($dayOfWeek > 0) {
        for ($t = $dayOfWeek; $t > 1; $t--) {
          $last_day_of_prev_month--;
-       } 
+       }
        $start_day = $last_day_of_prev_month;
        $start_month = intval($month) - 1;
        if ($start_month < 1) {
@@ -3662,36 +3663,36 @@ function calendar_build_custom_calendar($month, $year) {
          $start_month = 12;
        }
        $dayOfWeek = 0;
-     }     
-     
-     
+     }
+
+
      // Similarly, if the last day of this month falls on any other day than Saturday (6), we need to advance it to the NEXT month.
      $to_day = $numberDays;
      $to_month = $month;
      $to_year = $year;
-     
+
      $last_w = date('w', strtotime("$to_year-$to_month-$to_day"));
-     
+
      if ($last_w < 6) {
        $to_day = 1;
-       
+
        for ($t = $last_w + 1; $t < 6; $t++) {
-         $to_day++;         
+         $to_day++;
        }
-       
+
        $to_month++;
        if ($to_month > 12) {
          $to_year++;
          $to_month = 1;
        }
-       
-       
+
+
      }
-     
-     
+
+
      $all_dates = calendar_get_date_range("$start_year-$start_month-$start_day", "$to_year-$to_month-$to_day");
-          
-     
+
+
      // Initiate the day counter, starting with the 1st.
      $currentDay = 1;
 
@@ -3701,40 +3702,40 @@ function calendar_build_custom_calendar($month, $year) {
      // ensure that the calendar
      // display consists of exactly 7 columns.
 
-     if ($dayOfWeek > 0) { 
-          $calendar .= "<td colspan='$dayOfWeek'>&nbsp;</td>"; 
+     if ($dayOfWeek > 0) {
+          $calendar .= "<td colspan='$dayOfWeek'>&nbsp;</td>";
      }
-     
+
      $month = str_pad($month, 2, "0", STR_PAD_LEFT);
      $next_month = str_pad($next_month, 2, "0", STR_PAD_LEFT);
-     $number_of_weeks_displayed = 1;  
-     
+     $number_of_weeks_displayed = 1;
+
       $db = get_global_database_handler();
-    
-     $all_appointments = array(); 
+
+     $all_appointments = array();
      // Get all of our activity dates into an array, so we can then convert them to local timezone, to figure out what dates they belong on.
      $res = db_query("SELECT DISTINCT(a.cid) FROM content__appointment a, content n
                    WHERE a.vid = n.vid
                    AND a.cid = n.cid
                    AND delete_flag = 0
                    AND (field__appointment_datetime LIKE ? OR field__appointment_datetime LIKE ?)
-                   AND (field__faculty_id = ? OR field__student_id = ?)                                     
+                   AND (field__faculty_id = ? OR field__student_id = ?)
                    ORDER BY field__appointment_datetime ASC", array("$year-$month%", "$next_year-$next_month%", $user->cwid, $user->cwid));  // Because of stupid timezones, I need to grab from the NEXT month as well, just in case.
-     while ($cur = db_fetch_object($res)) { 
+     while ($cur = db_fetch_object($res)) {
        $cid = $cur->cid;
        $content = content_load($cid);
-                                  
+
        $mobile_day_cids[] = $cid;
-       $db_date_ts = strtotime($content->field__appointment_datetime['value']);  // This is in UTC     
+       $db_date_ts = strtotime($content->field__appointment_datetime['value']);  // This is in UTC
        $converted_date_ts = convert_time($db_date_ts);  // Convert to our local timezone
        $start_date = date('Y-m-d', $converted_date_ts);
        $start_time = date('g:ia', $converted_date_ts);
-      
-      
+
+
        $duration_min = $content->field__appointment_duration_minutes['value'];
-      
-       $end_time = format_date(strtotime("$start_date $start_time + $duration_min MINUTES"), 'just_time');     
- 
+
+       $end_time = format_date(strtotime("$start_date $start_time + $duration_min MINUTES"), 'just_time');
+
        $all_appointments[$start_date][$start_time][] = array(
          'db_date_ts' => $db_date_ts,
          'converted_date_ts' => $converted_date_ts,
@@ -3743,9 +3744,9 @@ function calendar_build_custom_calendar($month, $year) {
          'cid' => $cid,
          'content' => $content,
        );
- 
+
      } // while
-     
+
      foreach ($all_dates as $the_date) {
 
           $extra_class = "";
@@ -3754,11 +3755,11 @@ function calendar_build_custom_calendar($month, $year) {
           $year = $temp[0];
           $month = intval($temp[1]);
           $month = str_pad($month, 2, "0", STR_PAD_LEFT);
-          
+
           if (intval($month) != $original_month) {
             $extra_class .= " out-of-range-day";
           }
-          
+
           $currentDay = intval($temp[2]);
 
           // Seventh column (Saturday) reached. Start a new row.
@@ -3769,12 +3770,12 @@ function calendar_build_custom_calendar($month, $year) {
                $calendar .= "</tr><tr>";
 
           }
-          
+
           $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
-          
+
           $date = "$year-$month-$currentDayRel";
-          
-          $corrected_date = date('Y-m-d', strtotime($date));          
+
+          $corrected_date = date('Y-m-d', strtotime($date));
           if ($date == $today) {
             $extra_class .= " today";
           }
@@ -3782,112 +3783,112 @@ function calendar_build_custom_calendar($month, $year) {
           $add_link = "";
           if (user_has_permission('add_appointment_content')) {
             $url = fp_url('content/add/appointment', "window_mode=popup&date=$date&faculty_id=$user->cwid");
-            $add_link = "<a class='add-date' href='javascript:fpOpenLargeIframeDialog(\"$url\", \"Add New Appointment\", \"\");'><i class='fa fa-plus'></i></a>";          
+            $add_link = "<a class='add-date' href='javascript:fpOpenLargeIframeDialog(\"$url\", \"Add New Appointment\", \"\");'><i class='fa fa-plus'></i></a>";
           }
-          
+
           $calendar .= "<td class='day $extra_class' rel='$date'><span class='date-box-top'>$add_link<span class='the-day-num'>$currentDay</span></span>";
-                    
+
           $mobile_day_count = 0;
           $mobile_day_cids = array();
-          $html = "";          
-          
+          $html = "";
+
           if (isset($all_appointments[$date])) {
             foreach ($all_appointments[$date] as $start_time => $XX) {
               foreach ($all_appointments[$date][$start_time] as $c => $details) {
-              
+
                 $start_date = $date;
-  
+
                 $cid = $details['cid'];
                 $content = $details['content'];
-                
+
                 $mobile_day_cids[] = $cid;
-                
-                                                
+
+
                 $duration_min = $content->field__appointment_duration_minutes['value'];
-                
+
                 $end_time = format_date(strtotime("$start_date $start_time + $duration_min MINUTES"), 'just_time');
-                
-                
+
+
                 $student_name = fp_get_student_name($content->field__student_id['value']);
                 if (!$student_name) {
                   $student_name = fp_get_faculty_name($content->field__student_id['value']);
                 }
-                
+
                 $faculty_name = fp_get_faculty_name($content->field__faculty_id['value']);
-                
+
                 $apt_title = $faculty_name . " - " . $student_name;
-                
-                
+
+
                 if ($student_name == $faculty_name) {
                   $apt_title = $student_name;
                 }
-                
-                
+
+
                 // Let's make the apt_title be a link to open the appointment.
                 $view_url = fp_url("content/$cid", "window_mode=popup&content_tabs=false");
                 $dtitle = t("View Appointment");
-                $view_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$view_url\",\"$dtitle\");' title='" . t("View") . "' >$apt_title</a>";    
-                              
-                
+                $view_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$view_url\",\"$dtitle\");' title='" . t("View") . "' >$apt_title</a>";
+
+
                 $time_line = "<div class='time-line'>$start_time - $end_time</div>";
-                
+
                 $appt_extra_class = "";
                 if ($content->published == 0) {
                   $appt_extra_class = "appt-canceled";
                   $view_link = "<span title='This appointment was canceled.'>$apt_title</span>";  // no longer a link, since it was canceled
                 }
-                
-                
+
+
                 $html = "<div class='calendar-entry $appt_extra_class'>
                                 <div class='name-shift-line'>$view_link</div>
                                 $time_line
-                              </div>";            
-    
+                              </div>";
+
                 $_SESSION['calendar_cache'][$date][$cid] = $html;  // save to our SESSION, we may need it later in a mobile context.
-    
+
                 $calendar .= $html;
-                  
+
                 $mobile_day_count++;
-  
-              
-              }              
+
+
+              }
             }
           }
-          
-          
-            
-          
-          
+
+
+
+
+
           if ($mobile_day_count > 0) {
             //$url = fp_url('calendar', "year_month=$year_month&mobile_date=$date&mobile_cids=" . join(",", $mobile_day_cids));
             $url = fp_url('calendar', "mobile_date=$date&mobile_cids=" . join(",", $mobile_day_cids));
             $calendar .= "<div style='display: none;' class='mobile-day-count'>
                             <a href='" . $url . "'>$mobile_day_count</a>
-                          </div>";  
+                          </div>";
           }
-          
-         
-          
+
+
+
           $calendar .= '</td>';
 
           // Increment counters
- 
+
           //$currentDay++;
           $dayOfWeek++;
 
      }
-     
-     
+
+
 
      // Complete the row of the last week in month, if necessary
 
-     if ($dayOfWeek != 7) { 
-     
+     if ($dayOfWeek != 7) {
+
           $remainingDays = 7 - $dayOfWeek;
-          $calendar .= "<td colspan='$remainingDays'>&nbsp;</td>"; 
+          $calendar .= "<td colspan='$remainingDays'>&nbsp;</td>";
 
      }
-     
+
      $calendar .= "</tr>";
 
      $calendar .= "</table>";
@@ -3906,33 +3907,33 @@ function calendar_build_custom_calendar($month, $year) {
  */
 function calendar_content_alter(&$render, $render_id) {
   global $user;
-  
+
   if (strstr($render_id, "content_")) {
     if (@$render['#content-type'] == 'appointment') {
-          
+
       $cid = str_replace("content_", "", $render_id);
       $content = content_load($cid);
-        
+
       $student_name = @fp_get_student_name($content->field__student_id['value'], TRUE);
       $faculty_name = @fp_get_faculty_name($content->field__faculty_id['value']);
-      
-              
+
+
       // Replace our rendered values with actual names, instead of ONLY cwids.
-                
-      $render['field__faculty_id']['value'] = "<div class='field-value'>$faculty_name</div>";  
-      $render['field__student_id']['value'] = "<div class='field-value'>$student_name</div>";  
-      
+
+      $render['field__faculty_id']['value'] = "<div class='field-value'>$faculty_name</div>";
+      $render['field__student_id']['value'] = "<div class='field-value'>$student_name</div>";
+
       // Make a nice title for this appointment.
-      
+
       $apt_title = t("Meeting between @ft and @st on @dt", array("@ft" => $faculty_name, "@st" => $student_name, "@dt" => $content->field__appointment_datetime['display_value']));
-      
+
       $render['content_title']['value'] = "<div class='content-title'>$apt_title</div>";
       fp_set_title($apt_title);  // set the page title in case we are viewing not in a dialog
-            
+
       // If the user has permission to cancel appointments involving them, then show link!
       if (user_has_permission("can_cancel_own_appointments")) {
         if ($user->cwid == $content->field__student_id['value'] || $user->cwid == $content->field__faculty_id['value'] || $user->id == 1) {
-          
+
           // if we are in an iframe, include that in query
           $query = "";
           if (isset($_REQUEST['window_mode'])) {
@@ -3946,53 +3947,53 @@ function calendar_content_alter(&$render, $render_id) {
           );
 
 
-          
-                    
+
+
         } // if user is involved in this, or they are admin.
-        
-        
-      } // user has permission            
-      
-      
+
+
+      } // user has permission
+
+
       // If we have valid video data, we should display relevant links to join the meeting and such.
-      
+
       unset($render['field__video_data']);
       if ($render['#content_object'] && $render['#content_object']->field__video_data['value'] != "") {
         // Meaning, we have video meeting data to display!
-          
+
         // create new markup field which renders out the video links and such.
         $decoded = json_decode($render['#content_object']->field__video_data['value']);
-          
+
         $meeting_id = $decoded->id;
         $join_url = $decoded->join_url;
         $dial_in = $decoded->settings->global_dial_in_numbers[0]->number;
-        
+
         if (function_exists("engagements_convert_to_pretty_phone_number")) {
           $dial_in = engagements_convert_to_pretty_phone_number($dial_in, TRUE);
         }
-        
-        $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";                                               
-            
+
+        $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";
+
         $render['video_information'] = array(
           'type' => 'markup',
           'value' => "<div class='video-information'>" . $video_info . "</div>",
           'weight' => 65,
         );
-        
-        
+
+
       } // video_data != ""
-      
-      
-      
-      
-            
+
+
+
+
+
     } // this is type appointment
-        
-      
-    
+
+
+
   } // this probably is a content node view
-  
-  
+
+
 } // hook_content_alter
 
 
