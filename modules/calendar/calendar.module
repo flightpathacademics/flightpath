@@ -898,7 +898,7 @@ function calendar_display_user_appointment_settings_page() {
     $rtn .= "<div class='zoom-install-btn'>&nbsp; &nbsp; <a href='$url' class='$link_class' title='" . t($button_text) . "'><i class='fa fa-external-link'></i> " . t($button_text) . "</a> &nbsp;";
     if ($zoomapi_data) {
       // TODO: change to "w2" subdomain.
-      $rtn .= t("To unlink/de-authorize Zoom from FlightPath, view the instructions here: ") . "<a href='https://flightpathacademics.com/help/61' target='_blank'>Uninstalling Zoom from FlightPath</a>";
+      $rtn .= t("To unlink/de-authorize Zoom from FlightPath, view the instructions here: ") . "<a href='https://w2.flightpathacademics.com/help/61' target='_blank'>Uninstalling Zoom from FlightPath</a>";
     }
     $rtn .= "</div>";
 

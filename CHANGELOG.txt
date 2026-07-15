@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-15
+  Changed some links from flightpathacademics.com to w2.flightpathacademics.com.
+
+
 2026-07-10
   Made various changes for schools using "legacy" concentrations, which were somewhat broken.
 
