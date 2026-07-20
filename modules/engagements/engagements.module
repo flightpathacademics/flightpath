@@ -16,11 +16,11 @@ function engagements_menu()
 {
   $items = array();
 
-  
+
   // Make sure the engagements tab has not been disabled in the System Settings. If it hasn't been disabled, we will display this menu entry.
-  $disabled_tabs = variable_get('system_disable_student_tabs', array());  
+  $disabled_tabs = variable_get('system_disable_student_tabs', array());
   if (($disabled_tabs['engagements'] ?? '') != 'engagements') {
-    
+
     $items["engagements"] = array(
       "title" => t("Engagements"),
       "page_callback" => "engagements_display_main",
@@ -32,11 +32,11 @@ function engagements_menu()
       "weight" => 20,
       "type" => MENU_TYPE_TAB,
     );
-    
-    
+
+
   }
-  
-  
+
+
 
 
   $items['engagements-track/%/%/pixel.gif'] = array(
@@ -61,15 +61,15 @@ function engagements_menu()
   );
 
 
-  
+
   /*
-  
+
   $items['engagements-handle-incoming-aws-email'] = array(
     'page_callback' => 'engagements_handle_incoming_aws_email',
     'access_callback' => TRUE,
     'type' => MENU_TYPE_CALLBACK,
   );
-  
+
   */
 
 
@@ -147,10 +147,10 @@ function engagements_menu()
     'tab_family' => 'alerts',
     'weight' => 15,
     "page_settings" => array(
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Dashboard",
-          "path" => "main",          
+          "path" => "main",
         ),
       ),
     ),
@@ -169,42 +169,42 @@ function engagements_menu()
 
 
 function engagements_handle_incoming_aws_email() {
-  
+
   $sns = @json_decode(@file_get_contents("php://input"), TRUE);
-  
+
   if (!$sns) die();
-  
-  
-  
-  
+
+
+
+
   $source_arn = "";
   $to_email = "";
   $event_type = "";
-  
+
   if (isset($sns['bounce']) && $sns['bounce']['bounceType'] == 'Permanent') {
     $event_type = "bounce";
     $to_email = $sns['mail']['destination'][0];
     $source_arn = $sns['mail']['sourceArn'];
   } // sns permanent bounce has occured.
-  
+
   if (isset($sns['complaint']) && isset($sns['complaint']['complainedRecipients'])) {
     $event_type = "complaint";
     $to_email = $sns['mail']['destination'][0];
     $source_arn = $sns['mail']['sourceArn'];
   } // sns complaint (spam mark by recipient) has occured.
-  
-  
+
+
   // TODO: verify by looking at the source_arn and make sure its mine.  Not the most fool-proof way to do it, but eh, who cares.
-  
-  
-  
-  
+
+
+
+
   watchdog('debug_aws', "Type: $event_type<br>to_email $to_email<br>srcarn: $source_arn<br>
                           <pre>" . print_r($sns, TRUE) . '</pre>');
-  
-  
-  
-  
+
+
+
+
 } // engagements_handle_incoming_aws_email
 
 
@@ -214,37 +214,37 @@ function engagements_handle_incoming_aws_email() {
 function engagements_handle_incoming_mailgun_email() {
   watchdog('debug', 'From Post: <pre>' . print_r($_POST, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
   watchdog('debug', 'From Files: <pre>' . print_r($_FILES, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
-  
+
   // See Mailgun's Securing Web hooks documentation to know what to do with "signature" and "token", to confirm
   //       it came from MailGun.  https://www.mailgun.com/blog/email/your-guide-to-webhooks/#chapter-5
   // This code shows how we verify....
   //     if (isset($event->signature) && hash_hmac('sha256', $event->signature->timestamp.$event->signature->token, $key) === $event->signature->signature) {
   // In this case, $key is our mailgun api key. Configured in the Engagements - email settings section.
   // This should be the "HTTP webhook signing Key".  Go to mailgun dashboard.  Lower right will be a link to the API Keys
-  
+
   $timestamp = fp_trim(@$_POST['timestamp']);
   $token = fp_trim(@$_POST['token']);
-  $signature = fp_trim(@$_POST['signature']);  
+  $signature = fp_trim(@$_POST['signature']);
   $api_key = variable_get('engagements_mailgun_api_key', 'NONE SET');
-  
+
   $confirm_hash = hash_hmac('sha256', $timestamp . $token, $api_key);
-  
+
   // Before continuing, verify that the signature is correct (that we really came from MailGun)
   if (!$signature || strlen($signature) == 0 || $confirm_hash !== $signature) {
     watchdog('engagements_mailgun', "Tried to receive mailgun email, but could not verify signature. timestamp: $timestamp, token: $token, signature: $signature, confirm_hash = $confirm_hash", array(), WATCHDOG_ERROR);
-    
+
     // As this was some sort of hacking attempt, we don't want mailgun to keep trying to notify us of the message,
     // so send back 200 and exit.
-    
+
     // To tell MailGun not to retry this message, we need to deliver a 200 response.  Otherwise they will keep trying for 3 days.
-    http_response_code(200); exit; 
-  } 
-  
-  
+    http_response_code(200); exit;
+  }
+
+
   // If we are here, it means this email is valid and we can continue.
-  
-  
-  
+
+
+
   $sender = $_POST['sender'];
   $recipient = $_POST['recipient'];
   $body_html = $_POST['body-html'];
@@ -252,9 +252,9 @@ function engagements_handle_incoming_mailgun_email() {
   $body_stripped_html = $_POST['stripped-html'];
   $body_stripped_text = $_POST['stripped-text'];
   $subject = $_POST['subject'];
-  $timestamp = intval($_POST['timestamp']);  // in UTC already?  
+  $timestamp = intval($_POST['timestamp']);  // in UTC already?
   $date = $_POST['Date'];
-  
+
   $body = $body_stripped_text;
   if ($body_plain) {
     $body = $body_plain;
@@ -262,8 +262,8 @@ function engagements_handle_incoming_mailgun_email() {
   if ($body_html) {
     $body = $body_html;
   }
-   
-  
+
+
 
   // Sometimes, emails contain odd encoding.  Ex:  =C2=A0, which is apparently a non-breaking space.  Let's convert just in case.
   // From: https://stackoverflow.com/questions/12682208/parsing-email-body-with-7bit-content-transfer-encoding-php
@@ -273,7 +273,7 @@ function engagements_handle_incoming_mailgun_email() {
       '=20' => ' ', // space.
       '=2C' => ',', // comma.
       '=E2=80=99' => "'", // single quote.
-      '=C2=A0' => ' ', // non-breaking space.      
+      '=C2=A0' => ' ', // non-breaking space.
       '=0A' => "\r\n", // line break.
       '=0D' => "\r\n", // carriage return.
       '=A0' => ' ', // non-breaking space.
@@ -288,10 +288,10 @@ function engagements_handle_incoming_mailgun_email() {
   foreach ($characters as $key => $value) {
     $body = str_replace($key, $value, $body);
   }
-      
-   
-    
-        
+
+
+
+
   // This will map any inline images in the body of the email to their attachment names.
   // Example, this is in the body_html where an inline image was:
   // <img title="Inline image" alt="Inline image" src="cid:285ac981-ff52-55bb-f766-fb05ec0c9a74@yahoo.com" class="yahoo-inline-image" draggable="false" style="max-width: 800px; width: 100%;" data-id="<285ac981-ff52-55bb-f766-fb05ec0c9a74@yahoo.com>">
@@ -301,12 +301,12 @@ function engagements_handle_incoming_mailgun_email() {
   //      "<138bab3e-5b05-91d2-133b-adbba379dd23@yahoo.com>":"attachment-2",
   //      "<285ac981-ff52-55bb-f766-fb05ec0c9a74@yahoo.com>":"attachment-1"}
   // Notice that 285ac......@yahoo.com says it matches "attachment-1".  That is the same src= for our inline image tag.
-  // 
+  //
   // Note: From gmail, the content-id-map has no useful information.  Very strange.  But what we DO have is the "alt" tag.
   // See: <img src="cid:ii_lwy9bb9j1" alt="um actually.png" width="399" height="398">
   // We can use THAT to figure out the inline image, since [name] in the FILES states the filename.
-  $content_id_map = fp_trim(@$_POST['content-id-map']); 
-  
+  $content_id_map = fp_trim(@$_POST['content-id-map']);
+
   // Our attachments are in $_FILES...
   /*
    * Array
@@ -343,23 +343,23 @@ function engagements_handle_incoming_mailgun_email() {
 
     )
    */
-  
+
   // Curiously, mailgun one time sent me the same email twice.  We didn't have attachments with the first POST, but we did on the second.  We should
   // always overwrite any email we've already got with a new one, if such comes in.
   // We can't use the Message-Id to identify unique messages!
   // Note: from Gmail, the Message-Id is blank!  In that case, we can hash the date, sender, recipient, subject, message, etc, to create our own ID.
-    
-  $external_msg_id = hash('sha256', $sender . $subject . $date . $recipient . $body . $body_html . $body_plain . $body_stripped_text . $content_id_map);  
-  
-  
+
+  $external_msg_id = hash('sha256', $sender . $subject . $date . $recipient . $body . $body_html . $body_plain . $body_stripped_text . $content_id_map);
+
+
   // Create the email entry in FlightPath:
-  
+
     // Match the sender's email to a student.
     $student_user_id = db_get_user_id_from_email($sender, 'student');
     if ($student_user_id) {
-      
+
       watchdog('engagements_mailgun', "Found from student $student_user_id, creating engagement content.", array(), WATCHDOG_DEBUG);
-      
+
       // create this as an engagement for this student.
       $account = fp_load_user($student_user_id);
       $student_cwid = $account->cwid;
@@ -369,8 +369,8 @@ function engagements_handle_incoming_mailgun_email() {
       $content = new stdClass();
       $content->type = 'engagement';
       $content->cid = "new";
-      
-      
+
+
       $content->published = 1;
       $content->delete_flag = 0;
       $content->title = $subject;  // required
@@ -391,32 +391,32 @@ function engagements_handle_incoming_mailgun_email() {
       if ($content_id_map) {
         $map = json_decode($content_id_map, TRUE);
         watchdog('debug', 'map is: <pre>' . print_r($map, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
-        
+
         $sender_machine_readable = fp_get_machine_readable($sender);
-        
+
         foreach ($_FILES as $xid => $details) {
-          $filename_prefix = "email__" . $sender_machine_readable;          
-          
+          $filename_prefix = "email__" . $sender_machine_readable;
+
           $file = array(
             'name' => $details['name'],
             'type' => $details['type'],
-            'tmp_name' => $details['tmp_name'],            
+            'tmp_name' => $details['tmp_name'],
           );
-          
-          
-          $fid = content_add_new_uploaded_file($file, $cid, TRUE, CONTENT_ENCRYPTED_FILE, FALSE, $filename_prefix);                       
-                    
+
+
+          $fid = content_add_new_uploaded_file($file, $cid, TRUE, CONTENT_ENCRYPTED_FILE, FALSE, $filename_prefix);
+
           if (!$fid) {
-            watchdog('engagements_mailgun', 'Unable to save email attachment file: @fn', array('@fn' => $file['name']), WATCHDOG_ERROR);            
+            watchdog('engagements_mailgun', 'Unable to save email attachment file: @fn', array('@fn' => $file['name']), WATCHDOG_ERROR);
             $body .= "\n\n[ATTACHMENT UNABLE TO SAVE. Check with system administrator.]";
             continue;
-          }            
-          
+          }
+
           // If we are here, it means we DID save the file.
           // Modify body as necessary.  Replace embedded <img> tag with a message stating that for
           // security, the image is encrypted and stored with attachments?
           if (strstr($body, "<img")) {
-            
+
             // Go through and replace elements from our map with names...  Helps fix a bug with Yahoo where the preg_replace breaks.
             $c = 1;
             foreach ($map as $e => $v) {
@@ -424,24 +424,24 @@ function engagements_handle_incoming_mailgun_email() {
               $body = preg_replace("/<img[^>]+\>/i", "<div class='email-inline-img-replace'>Inline image #$c securely encrypted - See attachments</div> ", $body, 1);
               $c++;
             }
-            
+
             // Get any others left not replaced in the foreach above.
-            $body = preg_replace("/<img[^>]+\>/i", "<div class='email-inline-img-replace'>Inline image securely encrypted - See attachments</div> ", $body); 
+            $body = preg_replace("/<img[^>]+\>/i", "<div class='email-inline-img-replace'>Inline image securely encrypted - See attachments</div> ", $body);
           }
-          
-                    
+
+
 
           // Add to our list of attachments
           $attachments[] = array('fid' => $fid);
-                    
-          
+
+
         } // foreach FILES
-          
+
       } // if content_id_map
-      
-      
-      
-      
+
+
+
+
       // save attachements along with the engagement, if there are any
       if (count($attachments) > 0) {
 
@@ -454,8 +454,8 @@ function engagements_handle_incoming_mailgun_email() {
         $content->field__attachment['value'] = $fid_line;
       }
 
-      
-      // Re-add body, as it may have changed because of attachments.      
+
+      // Re-add body, as it may have changed because of attachments.
       $content->field__engagement_msg['value'] = filter_markup($body, 'basic');
       $content->field__visibility['value'] = 'public';
 
@@ -485,27 +485,27 @@ function engagements_handle_incoming_mailgun_email() {
           $link = $base_url . "/engagements?current_student_id=$student_cwid";
           $tmsg = "";
           $tmsg .= "$student_name has submitted an email to FlightPath.<br><br>\n\n
-                    To view, visit the student's Engagements tab by logging in and following this link:<br>\n 
+                    To view, visit the student's Engagements tab by logging in and following this link:<br>\n
                     <a href='$link'>$link</a>";
 
           notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
         }
       }
-    } // if student_user_id    
+    } // if student_user_id
     else {
       // The student_user_id could not be found!  This is possibly spam.
       // TODO: handle the rejection of this email?
     }
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
   // To tell MailGun not to retry this message, we need to deliver a 200 response.  Otherwise they will keep trying for 3 days.
-  http_response_code(200); exit; 
-    
+  http_response_code(200); exit;
+
 } // engagements_handle_incoming_mailgun_email
 
 
@@ -518,103 +518,103 @@ function engagements_handle_incoming_mailgun_email() {
  * implements hook_menu_handle_replacement_pattern
  */
 function engagements_menu_handle_replacement_pattern($str) {
-      
+
   if (strstr($str, "%ENGAGEMENTS_ADVISEE_ALERTS_COUNT%")) {
     // Get our count.
     $alert_counts = fp_get_alert_count_by_type();
-         
+
     $c = intval($alert_counts['engagements']['engagement']['unread']);
-    
+
     $x = "";
     if ($c > 0) {
       $x .= " ($c)";
-    }  
-    
+    }
+
     $str = str_replace("%ENGAGEMENTS_ADVISEE_ALERTS_COUNT%", $x, $str);
-  }    
-  
+  }
+
   return $str;
 }
 
 
 /**
  * Implements hook_get_count_for_alert_type
- * 
+ *
  * Set and Return back "unread" (not in content_last_access)
- * 
+ *
  */
 function engagements_get_alert_count_by_type($account = NULL) {
   global $user;
   if ($account === NULL) $account = $user;
-  
+
   if ($account->id == 0) return FALSE;
-  
-   
+
+
   $rtn = array();
-  
+
   $rtn['engagement']['total'] = 0;
   $rtn['engagement']['read'] = 0;
   $rtn['engagement']['unread'] = 0;
-  
-  
-  
+
+
+
   $already_counted = array();
-  
+
   // We need to know this user's list of advisees.
   $advisees = advise_get_advisees($account->cwid);
-      
+
   $advisee_line = "";
   if ($advisees && count($advisees) > 0) {
-    
+
     $advisees_list = "'" . join("','", $advisees) . "'";
-    
+
     $advisee_line = " AND b.field__student_id IN (" . $advisees_list . ") ";
-        
-  
-/*          
-    $total_count = db_result(db_query("SELECT COUNT(*) as mycount 
-                      FROM content__engagement b,                                            
+
+
+/*
+    $total_count = db_result(db_query("SELECT COUNT(*) as mycount
+                      FROM content__engagement b,
                            content n
                      WHERE n.type = ?
                      AND b.vid = n.vid
                      AND b.cid = n.cid
                      AND n.published = 1
-                     AND n.delete_flag = 0                     
+                     AND n.delete_flag = 0
                      AND field__direction = 'received'
                      AND field__engagement_type IN ('email', 'txt_msg')
                      AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
-                     $advisee_line ", array('engagement'))); 
+                     $advisee_line ", array('engagement')));
   */
-  
+
     $total_count = 0;
-    $res = db_query("SELECT b.cid  
-                      FROM content__engagement b,                                            
+    $res = db_query("SELECT b.cid
+                      FROM content__engagement b,
                            content n
                      WHERE n.type = ?
                      AND b.vid = n.vid
                      AND b.cid = n.cid
                      AND n.published = 1
-                     AND n.delete_flag = 0                     
+                     AND n.delete_flag = 0
                      AND field__direction = 'received'
                      AND field__engagement_type IN ('email', 'txt_msg')
                      AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
                      $advisee_line ", array('engagement'));
     while($cur = db_fetch_array($res)) {
-      $cid = $cur['cid'];      
+      $cid = $cur['cid'];
       $already_counted[$cid] = $cid;
       $total_count++;
     }
-    
-    
-    
-    $read_count = db_result(db_query("SELECT COUNT(*) as mycount 
+
+
+
+    $read_count = db_result(db_query("SELECT COUNT(*) as mycount
                       FROM content_last_access a,
-                           content__engagement b,                                            
+                           content__engagement b,
                            content n
                      WHERE n.type = ?
                      AND n.published = 1
                      AND b.vid = n.vid
-                     AND b.cid = n.cid                                          
+                     AND b.cid = n.cid
                      AND n.delete_flag = 0
                      AND n.cid = a.cid
                      AND field__direction = 'received'
@@ -622,57 +622,57 @@ function engagements_get_alert_count_by_type($account = NULL) {
                      AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
                      $advisee_line
                      AND a.user_id = ?", array('engagement', $account->id)));
-    
-    
+
+
     $rtn['engagement']['total'] = intval($total_count);
     $rtn['engagement']['read'] = intval($read_count);
-    $rtn['engagement']['unread'] = $total_count - $read_count; 
+    $rtn['engagement']['unread'] = $total_count - $read_count;
 
-  } // if advisees      
+  } // if advisees
 
   // We should ALSO get these students to show up when we're the recipient of a text number, regardless of if they are
   // considered our "advisee" or not.
   $numbers = engagements_get_user_notify_sms_receipt_values($account->id);
-    
+
   if ($numbers && is_array($numbers) && count($numbers) > 0) {
-    // Were there any txt messages sent to these number, which we have not read?    
+    // Were there any txt messages sent to these number, which we have not read?
     $numbers_line = "";
     $numbers_list = "'" . join("','", $numbers) . "'";
-    
+
     $numbers_line = " AND b.field__to_sms_phone IN (" . $numbers_list . ") ";
-    
+
     // So, we should also search for results where we received at these numbers, regardless of if the user was our advisee or not.
-    
+
     $total_count = 0;
-    $res = db_query("SELECT b.cid  
-                      FROM content__engagement b,                                            
+    $res = db_query("SELECT b.cid
+                      FROM content__engagement b,
                            content n
                      WHERE n.type = ?
                      AND b.vid = n.vid
                      AND b.cid = n.cid
                      AND n.published = 1
-                     AND n.delete_flag = 0                     
+                     AND n.delete_flag = 0
                      AND field__direction = 'received'
                      AND field__engagement_type IN ('email', 'txt_msg')
                      AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
-                     $numbers_line ", array('engagement')); 
+                     $numbers_line ", array('engagement'));
     while($cur = db_fetch_array($res)) {
-      $cid = $cur['cid'];      
+      $cid = $cur['cid'];
       if (!in_array($cid, $already_counted)) {
         $already_counted[$cid] = $cid;
         $total_count++;
       }
     }
-            
-    
-    $read_count = db_result(db_query("SELECT COUNT(*) as mycount 
+
+
+    $read_count = db_result(db_query("SELECT COUNT(*) as mycount
                       FROM content_last_access a,
-                           content__engagement b,                                            
+                           content__engagement b,
                            content n
                      WHERE n.type = ?
                      AND n.published = 1
                      AND b.vid = n.vid
-                     AND b.cid = n.cid                                          
+                     AND b.cid = n.cid
                      AND n.delete_flag = 0
                      AND n.cid = a.cid
                      AND field__direction = 'received'
@@ -680,23 +680,23 @@ function engagements_get_alert_count_by_type($account = NULL) {
                      AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
                      $numbers_line
                      AND a.user_id = ?", array('engagement', $account->id)));
-    
-    
+
+
     $rtn['engagement']['total'] += intval($total_count);
     $rtn['engagement']['read'] += intval($read_count);
-    $rtn['engagement']['unread'] += ($total_count - $read_count);     
-    
-    
-    
+    $rtn['engagement']['unread'] += ($total_count - $read_count);
+
+
+
   } // if numbers
-  
-   
-  
-  
+
+
+
+
   if (count($rtn) == 0) return FALSE;
-  
+
   return $rtn;
-  
+
 } // engagements_get_alert_count_by_type
 
 
@@ -705,116 +705,116 @@ function engagements_get_alert_count_by_type($account = NULL) {
 
 
 function engagements_display_advisee_engagements_page() {
-  global $user;  
+  global $user;
   $rtn = "";
   fp_set_title('');
-  
+
   fp_add_css(fp_get_module_path('alerts') . '/css/style.css');
-  
+
   $rtn .= "<p>" . t("This screen shows engagements/communications (emails and text messages) which advisees have sent, but not those which you or any other
                      faculty/staff member has sent.  To see the complete history of engagements with an advisee, visit the advisee's
                      Engagements tab.") . "</p>";
-  
-  
-  $student_ids = advise_get_advisees($user->cwid);    
+
+
+  $student_ids = advise_get_advisees($user->cwid);
   $student_line = "''";
   if ($student_ids && count($student_ids) > 0) {
     $student_line = "'" . join("','", $student_ids) . "'";
   }
-  
+
   if ($student_line) {
     $student_line = " field__student_id IN ($student_line) ";
   }
-  
-  
+
+
   // We also want to show messages sent to us which might not have been from an advisee, but we are a designated recipient anyway.
   $numbers = engagements_get_user_notify_sms_receipt_values($user->id);
   $numbers_line = "";
-  $numbers_list = "''";    
+  $numbers_list = "''";
   if ($numbers && is_array($numbers) && count($numbers) > 0) {
-    // Were there any txt messages sent to these number, which we have not read?    
+    // Were there any txt messages sent to these number, which we have not read?
     $numbers_line = "";
     $numbers_list = "'" . join("','", $numbers) . "'";
   }
-   
+
   $numbers_line = " field__to_sms_phone IN (" . $numbers_list . ") ";
-  
-  
+
+
   $table_headers = array();
-  $table_headers[] = array("label" => "Actions");  
-  $table_headers[] = array("label" => "Student");  
-  $table_headers[] = array("label" => "Type");  
-  $table_headers[] = array("label" => "Details/Preview");  
+  $table_headers[] = array("label" => "Actions");
+  $table_headers[] = array("label" => "Student");
+  $table_headers[] = array("label" => "Type");
+  $table_headers[] = array("label" => "Details/Preview");
   $table_headers[] = array("label" => "Updated", "field" => "n.updated");
-  
+
   $limit = 25;
-  
-  // Set our initial sort, if none is already set.   
+
+  // Set our initial sort, if none is already set.
   theme_table_header_sortable_set_initial_sort('n.updated', 'DESC');
-  
+
   $phones = engagements_get_from_phones();
-  
+
   $rtn .= "<table border='0' class='advisees-alerts'>";
   // Draw our our table headers, with links....
-  $rtn .= theme_table_header_sortable($table_headers);  
-  // Get our order by clause based on selected table header, if any.    
-  $order_by = theme_table_header_sortable_order_by($table_headers);  
-              
-  
+  $rtn .= theme_table_header_sortable($table_headers);
+  // Get our order by clause based on selected table header, if any.
+  $order_by = theme_table_header_sortable_order_by($table_headers);
+
+
   // Now, we are going to search for alerts about these students, in the form of a pager query.
   // Query for alerts for this student.  We will be using a pager_query, so we can display a complete history, if we wish.
   $res = pager_query("SELECT DISTINCT(a.cid) FROM content__engagement a, content n
-                   WHERE a.vid = n.vid                                  
+                   WHERE a.vid = n.vid
                    AND a.cid = n.cid
                    AND n.delete_flag = 0
-                   AND n.published = 1  
+                   AND n.published = 1
                    AND field__direction = 'received'
-                   AND ($student_line OR $numbers_line)    
-                   AND field__engagement_type IN ('email', 'txt_msg')   
-                   AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')    
-                   GROUP BY a.cid                       
+                   AND ($student_line OR $numbers_line)
+                   AND field__engagement_type IN ('email', 'txt_msg')
+                   AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
+                   GROUP BY a.cid
                    $order_by", array(), $limit, 0, "SELECT COUNT(DISTINCT(a.cid)) FROM content__engagement a, content n
-                                                                                                         WHERE a.vid = n.vid                                                                                                         
+                                                                                                         WHERE a.vid = n.vid
                                                                                                          AND a.cid = n.cid
                                                                                                          AND n.delete_flag = 0
                                                                                                          AND n.published = 1
                                                                                                          AND field__direction = 'received'
-                                                                                                         AND ($student_line OR $numbers_line)  
+                                                                                                         AND ($student_line OR $numbers_line)
                                                                                                          AND field__engagement_type IN ('email', 'txt_msg')
                                                                                                          AND (field__manual_entry IS NULL OR field__manual_entry != 'Y')
-                                                                                                         $order_by");  // NOTE: remove the "GROUP BY" clause because it was causing this to not work.  
+                                                                                                         $order_by");  // NOTE: remove the "GROUP BY" clause because it was causing this to not work.
   while ($cur = db_fetch_object($res)) {
     $cid = $cur->cid;
     $content = content_load($cid);
-        
+
     $updated = format_date(convert_time($content->updated), 'short');
 
     $student_id = $content->field__student_id['value'];
     $student_name = fp_get_student_name($student_id, TRUE);
-        
+
     $extra_class = "";
     // If this content hasn't been read by this user, mark as "unread"
     if (!content_get_last_access($cid)) {
       $extra_class .= " unread";
-    }    
-    
+    }
+
     $student_url = fp_url('student-profile', "current_student_id=$student_id");
     $view_url = fp_url("content/$cid", "window_mode=popup&content_tabs=false");
     $dtitle = t("View Engagement");
-    $view_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$view_url\",\"$dtitle\");' title='" . t("View") . "' class='action-link' ><i class='fa fa-eye'></i></a>";    
+    $view_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$view_url\",\"$dtitle\");' title='" . t("View") . "' class='action-link' ><i class='fa fa-eye'></i></a>";
 
     $student_profile_link = "<a href='$student_url' title='" . t("Student Profile") . "' class='action-link'><i class='fa fa-user'></i></a>";
-    
+
     $disp_preview = "";
-      
+
     if ($content->field__engagement_type['value'] == "txt_msg") {
       $msg = trim(filter_markup($content->field__engagement_msg['value'], 'plain'));
       if (strstr($msg, "~~")) {
         $temp = explode("~~", $msg);
         $msg = $temp[0];
       }
-      
-      $desc = $pretty_to_number = "";      
+
+      $desc = $pretty_to_number = "";
       $details = engagements_get_sms_from_history($content->field__external_msg_id['value']);
       if ($details) {
         $to = $details['to_number'];
@@ -823,29 +823,29 @@ function engagements_display_advisee_engagements_page() {
         if (!$desc) $desc = @$phones['lines'][$details['from_number']]['description'];
         if ($desc) $desc = " / $desc";
       }
-      $disp_preview = "$pretty_to_number$desc: $msg";  
-      
-    } // txt_msg    
+      $disp_preview = "$pretty_to_number$desc: $msg";
+
+    } // txt_msg
     else if ($content->field__engagement_type['value'] == 'email') {
       $disp_preview = trim(filter_markup($content->field__engagement_msg['value'], 'plain'));
     }
-    
+
     if (strlen($disp_preview) > 60) {
       $disp_preview = trim(substr($disp_preview, 0, 57)) . "...";
     }
-    
-        
+
+
     $disp_type = $content->field__engagement_type['display_value'];
-    
-    
+
+
     $status_value = (string) @$content->field__alert_status['value'];
-        
+
     $rtn .= "
       <tr class='$status_value $extra_class'>
         <td class='actions'>$view_link $student_profile_link</td>
         ";
      $rtn .= "<td class='student'>$student_name</td>";
-     $rtn .= "        
+     $rtn .= "
         <td class='short-desc'><div class='short-desc-wrapper'>$disp_type</div></td>
         <td class='short-desc'><div class='short-desc-wrapper'>$disp_preview</div></td>
         <td class='updated'>$updated</td>
@@ -853,17 +853,17 @@ function engagements_display_advisee_engagements_page() {
     ";
   } // while cur
 
-  
+
   $rtn .= "</table>";
-  
+
   $rtn .= theme_pager(array(t('« newest'), t('‹ newer'), '', t('older ›'), t('oldest »')), $limit);
-  //$rtn .= theme_pager();  
-    
-  
-  
-  
-  
-  
+  //$rtn .= theme_pager();
+
+
+
+
+
+
   return $rtn;
 } // engagements_display_advisee_engagements_page
 
@@ -895,18 +895,18 @@ function engagements_mass_sms_form()
   // Are text messages turned on?  We will make sure there is a sms_project_id.
   $bool_sms_enabled = TRUE;
   if (trim(variable_get('sms_project_id', '') == '')) $bool_sms_enabled = FALSE;
-  
+
   if (!$bool_sms_enabled) {
     $form['mark_disabled'] = array(
-      'value' => '<br><br><p>' . t('<h2>SMS Not Configured</h2>Sorry, but sending SMS text messages has not been configured. Please speak to your 
+      'value' => '<br><br><p>' . t('<h2>SMS Not Configured</h2>Sorry, but sending SMS text messages has not been configured. Please speak to your
                       IT or administrative contact to enable.') . '</p>',
     );
     return $form;
   }
-  
-  
-  
-  
+
+
+
+
 
   if (isset($_SESSION['mass_sms_batch_data'])) {
     $html = "";
@@ -957,7 +957,7 @@ function engagements_mass_sms_form()
     'required' => TRUE,
     'description' => t("To insert emoji in Windows, press <span style='padding-left: 10px; padding-right: 10px; font-size: 1.3em;'><i class='fa fa-windows'></i> + .</span>  <em>(Windows key + period)</em>
                         <br><br>
-                        Keep in mind that pricing is based on 160-chars = 1 message segment.  
+                        Keep in mind that pricing is based on 160-chars = 1 message segment.
                         <br><b>Important:</b> Your message <u>will NOT</u> have any
                         header attached.  It would be a good idea to begin by stating what unit/department/school you are sending from.
                         <br>&nbsp; &nbsp; Ex: &nbsp; <em>From the UFP President's Office:  Welcome students to the new term...</em>
@@ -1070,7 +1070,7 @@ function engagements_mass_sms_perform_batch_operation(&$batch, $recipients, $mes
     $batch["results"]["total"] = count($lines);
     $batch["results"]["current"] = 0;
     $batch["results"]["finished"] = FALSE;
-  } // if....   (this is our first time through)    
+  } // if....   (this is our first time through)
 
 
 
@@ -1083,7 +1083,7 @@ function engagements_mass_sms_perform_batch_operation(&$batch, $recipients, $mes
   $total = $batch["results"]["total"];
 
   $limit = 1;  // How many numbers to process this time through
-  $c = 0;  // count of records.      
+  $c = 0;  // count of records.
 
 
   $lines = explode("\n", $recipients);
@@ -1167,7 +1167,7 @@ function engagements_mass_sms_perform_batch_operation(&$batch, $recipients, $mes
       continue;
     }
 
-    // If we made it here, then we have a valid recipient!  Let's put it into an array called details.    
+    // If we made it here, then we have a valid recipient!  Let's put it into an array called details.
     $details = array(
       'num' => $num,
       'user_id' => $test,
@@ -1182,7 +1182,7 @@ function engagements_mass_sms_perform_batch_operation(&$batch, $recipients, $mes
       $batch['opt_out'][] = $line;
       $batch['csv'] .= "\"$from_number\",\"$line\",\"$cwid\",\"$user_type\",\"\",\"user opted-out of receiving text\",\"\",\"\",\"\",\"\"\n";
       $c++;
-      continue;      
+      continue;
     }
 
     // Send our message to this number, record it as an engagement as well.
@@ -1253,18 +1253,18 @@ function engagements_email_settings_form()
                     <br>If you are instead using a Webhook or similar, see below.</p>',
   );
 
-  
+
   $form['engagements_send_email_method'] = array(
     'type' => 'radios',
     'label' => t("Method to send emails"),
     'options' => array('smtp' => 'SMTP'),
     'value' => variable_get('engagements_send_email_method', 'smtp'),
     'required' => TRUE,
-    'description' => t("What method will FlightPath use to send emails?  If unsure, select SMTP (the default) and configure 
+    'description' => t("What method will FlightPath use to send emails?  If unsure, select SMTP (the default) and configure
                         the SMTP settings from the Admin Console link."),
   );
-  
-  
+
+
   $form['engagements_receive_email_method'] = array(
     'type' => 'select',
     'label' => t("Method to receive emails"),
@@ -1275,17 +1275,17 @@ function engagements_email_settings_form()
     'description' => t("What method will FlightPath use to <b>receive</b> emails?  If unsure, or
                           if you do not wish to receive emails in FlightPath, select None."),
   );
-  
-  
-  
+
+
+
   $form['mark_based_on_receive_method'] = array(
     'value' => '<br><br><hr><p>' . t("Based on your <b>receive method</b> selected above, please expand the correct section below
                    and continue configuration:") . '</p><br><br>',
   );
-  
-  
+
+
   // Set up fieldsets for our different receive methods...
-  
+
   $e = array();
   $e[]['imap_host'] = array(
     'type' => 'textfield',
@@ -1328,13 +1328,13 @@ function engagements_email_settings_form()
   // TODO:  folder names to look in?
   // TODO:  other settings on deleting messages once read, etc?
 
-    
+
   $bool_start_closed = TRUE;
   if (variable_get('engagements_receive_email_method', 'none') == 'imap') {
     $bool_start_closed = FALSE;
   }
-                        
-                        
+
+
   // Add imap elements to a fieldset.
   $form['imap_settings_fs'] = array(
     'type' => 'cfieldset',
@@ -1354,20 +1354,20 @@ function engagements_email_settings_form()
                   ". t("The URL to forward the emails to is:") . " " . base_url() . "/engagements-handle-incoming-mailgun-email
                   <br><br>",
   );
-  
+
   $e[]['engagements_mailgun_api_key'] = array(
     'type' => 'textfield',
     'label' => t('Enter your MailGun API Key for Webhooks'),
     'value' => variable_get('engagements_mailgun_api_key', ''),
     'description' => 'This is a value found in your MailGun account, under API Keys.  It may be called something like "HTTP Webhook Signing Key" or similar.',
   );
-  
+
   $bool_start_closed = TRUE;
   if (variable_get('engagements_receive_email_method', 'none') == 'mailgun') {
     $bool_start_closed = FALSE;
   }
-                        
-                        
+
+
   // Add imap elements to a fieldset.
   $form['engagements_mailgun_settings_fs'] = array(
     'type' => 'cfieldset',
@@ -1399,12 +1399,12 @@ function engagements_sms_settings_form()
 
   $form = array();
 
-    
+
   ///////////////////
   $form['mark_general_top'] = array(
     'value' => "<fieldset><legend>General SMS Settings</legend>",
   );
-  
+
   $form['engagements_send_incoming_sms_contents_in_email'] = array(
     'type' => 'checkbox',
     'label' => t('Send incoming (received) text message contents in recipient notification emails?'),
@@ -1418,13 +1418,13 @@ function engagements_sms_settings_form()
                       are willing to accept that risk.
                       <br>If unsure, leave this box <b>unchecked</b>.'),
   );
-  
+
   $form['mark_general_bottom'] = array(
     'value' => "</fieldset><br><br>",
   );
-  //////////////////////  
-  
-  
+  //////////////////////
+
+
 
   $form['mark_signalwire_top'] = array(
     'value' => "<fieldset><legend>Settings for SignalWire</legend>
@@ -1469,7 +1469,7 @@ function engagements_sms_settings_form()
     'type' => 'textarea',
     'rows' => 3,
     'value' => variable_get('sms_from_phone', ''),
-    'description' => t("These are the phone numbers from your SignalWire account.  
+    'description' => t("These are the phone numbers from your SignalWire account.
                         <br>Enter them one per line, with a tilda (~) between the number
                         and a brief line description, like so:
                       <br> &nbsp; &nbsp; 555-123-4567 ~ Brief Description ~ default
@@ -1480,7 +1480,7 @@ function engagements_sms_settings_form()
                           numbers will not appear as options to send mass txt messages."),
   );
 
-  
+
   $form['sms_mass_phone'] = array(
     'label' => 'Mass Text Phone number(s):',
     'type' => 'textarea',
@@ -1490,15 +1490,15 @@ function engagements_sms_settings_form()
                         mass text messages.  At the time of this writing, toll-free numbers do not need to belong to such a campaign.  These
                         will be the only numbers which appear as options to send mass txt messages to."),
   );
-    
-  
+
+
   $form['sms_header'] = array(
     'label' => 'SMS Header:',
     'type' => 'textfield',
     'required' => TRUE,
     'value' => variable_get('sms_header', '(@initials) from @name:'),
     'description' => t("All SMS text messages sent from FlightPath will begin with this header, in order to help the student
-                        understand the who the sender of the message is.  
+                        understand the who the sender of the message is.
                         <br>You may leave blank to disable (not recommended),
                         or use the following replacement patterns:
                         <ul>
@@ -1638,11 +1638,11 @@ function engagements_get_sms_from_history($message_sid)
 
 /**
  * Implements hook_cron
- * 
+ *
  * One of the things we want to do is check on all of our SMS messages.
- * 
- * We will also want to check our imap messages 
- * 
+ *
+ * We will also want to check our imap messages
+ *
  */
 function engagements_cron()
 {
@@ -1650,30 +1650,30 @@ function engagements_cron()
   $last_sms_check = intval(variable_get('engagements_sms_get_all_last_check', 0));
   $last_imap_check = variable_get('engagements_imap_get_all_last_check', 0);
 
-  
-  // only check every X minutes at most.  
+
+  // only check every X minutes at most.
   // TODO: Maybe this is a setting?
   $sms_check_against = strtotime("NOW - 1 MINUTES");
-  if ($sms_check_against >= $last_sms_check) {  
+  if ($sms_check_against >= $last_sms_check) {
     engagements_sms_get_all_messages();  // refreshes sms information for messages we've sent and received
   }
-  
-  
-  
+
+
+
   if (variable_get('engagements_receive_email_method', 'none') == 'imap') {
     // Check for imap messages in a similar way as the SMS messages (if we have selected imap as our method to receive emails)
     engagements_imap_get_all_received_messages();
   }
-  
+
 } // hook_cron
 
 
 /**
- * This catches incoming sms messages from POST, but can also be used by our "sms_get_all_messages" function, but it is also used by the 
+ * This catches incoming sms messages from POST, but can also be used by our "sms_get_all_messages" function, but it is also used by the
  * sms_get_all_messages to save/update information.
- * 
+ *
  * TODO:  Have a way to handle incoming calls, too, so we can charge correctly.
- * 
+ *
  */
 function engagements_handle_incoming_sms($vars = array())
 {
@@ -1684,7 +1684,7 @@ function engagements_handle_incoming_sms($vars = array())
   if (count($vars) === 0) {
     // Meaning, we are NOT calling this manually from cron, but rather this is
     // being sent to us from the webhook.  So, we will want to verify using the signing key.
-    $vars = $_POST;    
+    $vars = $_POST;
     $signing_key = variable_get('sms_signing_key', 'none');
   }
 
@@ -1697,7 +1697,7 @@ function engagements_handle_incoming_sms($vars = array())
     require_once(fp_get_module_path('engagements', TRUE, FALSE) . '/lib/signalwire/vendor/autoload.php');
     // See: https://www.twilio.com/docs/usage/webhooks/webhooks-security
     // see: https://developer.signalwire.com/guides/webhook-security/
-    
+
     $validator = new Twilio\Security\RequestValidator($signing_key);
     $headers = getallheaders();
     $signature = $headers['X-Twilio-Signature'];
@@ -1707,34 +1707,34 @@ function engagements_handle_incoming_sms($vars = array())
     unset($vars['current_student_id']);
     unset($vars['advising_student_id']);
     ksort($vars); // needs to be in alphabetical order by keys
-    
+
     $result = $validator->validate($signature, $url, $vars);
     watchdog('engagements_sms', "Validator result with $signature, $url and vars...: <pre>" . print_r(intval($result), TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
-    
-    // reject if intval($result) === 0    
+
+    // reject if intval($result) === 0
     if (intval($result) === 0) {
       // As this was some sort of hacking attempt, we don't want signalwire to keep trying to notify us of the message,
       // so send back 200 and exit.
       watchdog('engagements_sms', "Tried to receive signalwire sms, but could not verify signature. Signature given: $signature", array(), WATCHDOG_ERROR);
-      
+
       // Email php error contact to let them know this happened.
       // Dev: comment this out when we know it is working correctly?
       // smtp_mail(variable_get("notify_php_error_email_address", ""), "Error validating incoming SMS", "Tried to receive signalwire sms, but could not verify signature. Signature given: $signature.");
-      
-      
+
+
       // To tell not to retry this message, we need to deliver a 200 response.  Otherwise they will keep trying.
-      http_response_code(200); exit;     
+      http_response_code(200); exit;
     }
-    
+
   } // if signing_key
 
-  
+
   // If we made it here, then it's proven to be from SignalWire, and we can continue.
-    
+
   // Allow other modules would like to handle in incoming SMS or even make changes to what is in $vars.
   invoke_hook('engagements_handle_incoming_sms_init', array(&$vars));
-  
-  
+
+
   $message_sid = $vars['MessageSid'];
   $from_mobile = engagements_convert_to_valid_phone_number($vars['From']);
   $to_mobile = engagements_convert_to_valid_phone_number($vars['To']);
@@ -1747,7 +1747,7 @@ function engagements_handle_incoming_sms($vars = array())
   $price = 0.0042;  // We know this is an SMS, so this is the price per segment inbound.
   if ($num_media > 0) {
     $price += 0.01;  // Contained at least one piece of media, so price increases.  This is SignalWire's price.
-  } 
+  }
   $direction = "inbound";
   $fp_price = engagements_get_fp_price($price, $direction, $num_segments);
 
@@ -1762,9 +1762,9 @@ function engagements_handle_incoming_sms($vars = array())
 
   $content = NULL;
   $content_created = array();
-  
+
   $link = $alert_link = $media_filenames = "";
-  
+
   // Figure out what user this came from/to!
   $from_cwid = $from_user_id = $to_user_id = "";
   $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($from_mobile)));
@@ -1780,7 +1780,7 @@ function engagements_handle_incoming_sms($vars = array())
     $to_user_id = $user_id;
   }
 
-  
+
   $dir = "received";
   $fac_cwid = $to_cwid;
   $stu_cwid = $from_cwid;
@@ -1789,7 +1789,7 @@ function engagements_handle_incoming_sms($vars = array())
     $fac_cwid = $from_cwid;
     $stu_cwid = $to_cwid;
   }
-  
+
   // Did we receive STOP?
   if ($dir == 'received') {
     if (trim(strtoupper($body)) === 'STOP') {
@@ -1799,17 +1799,17 @@ function engagements_handle_incoming_sms($vars = array())
     if (trim(strtoupper($body)) === 'UNSTOP' || trim(strtoupper($body)) === 'SUBSCRIBE' || trim(strtoupper($body)) === 'START') {
       engagements_handle_sms_unstop($from_user_id, $from_cwid, $from_mobile, $to_mobile);
     }
-        
+
       // We do not return.  Go ahead and let it create an engagement below, so the
       // advisor can see that this happened.
-              
-  }  
-  
+
+  }
+
   //////////////////////
   // Get the message and any files attached.
   $media_filenames = "";
   $files = array();
-  
+
   // Handle retreiving and saving media.
   if ($num_media > 0) {  // Do we have any media?
     for ($t = 0; $t < $num_media; $t++) {
@@ -1827,11 +1827,11 @@ function engagements_handle_incoming_sms($vars = array())
 
       if ($media_type == "text/plain") {
         // The body for whatever reason has been sent as a kookie media attachment.  Add it to the body and skip adding it to media.
-        $body .= $file_contents;          
+        $body .= $file_contents;
         continue;
       }
 
-      
+
       // Save to our temporary location on the server.
       $test = file_put_contents(sys_get_temp_dir() . '/' . $tmp_name, $file_contents);
       if (!$test) {
@@ -1840,23 +1840,23 @@ function engagements_handle_incoming_sms($vars = array())
         continue;
       }
 
-    
+
       $file = array(
         'name' => $filename,
         'type' => $media_type,
-        'tmp_name' => $tmp_name,          
+        'tmp_name' => $tmp_name,
       );
-      
+
       $files[] = $file;  // Add to our "files" array, for attaching to content later.
-      
+
       $media_filenames .= $filename . ',';
     } // for t (media)
 
     $media_filenames = rtrim($media_filenames, ',');
   } // if num media > 0
-          
+
   $tbody = trim($body);
-  
+
   // if we have media, add to the end of body.
   if ($media_filenames) {
     $body .= "~~MEDIA~~$media_filenames~~END_MEDIA~~";
@@ -1864,9 +1864,9 @@ function engagements_handle_incoming_sms($vars = array())
   }
 
   $tbody = filter_markup($tbody, 'plain');
-  $tbody = nl2br($tbody);  
+  $tbody = nl2br($tbody);
   ///////////////////////////////////
-  
+
   if (trim($stu_cwid) != "") {
     // create an engagement content node for this student!
 
@@ -1887,12 +1887,12 @@ function engagements_handle_incoming_sms($vars = array())
 
     content_save($content);
     $cid = $content->cid;
-    
+
     foreach ($files as $file) {
       // This function will handle encryption of files automatically.
       $fid = content_add_new_uploaded_file($file, $cid, FALSE);
     }
-        
+
     $content->field__engagement_msg['value'] = $body;
     $content->field__external_msg_id['value'] = $message_sid;
 
@@ -1901,18 +1901,18 @@ function engagements_handle_incoming_sms($vars = array())
     content_save($content);
 
     $content_created['engagement'] = $content;
-    
+
   } // We have a student to attach this to.
 
-  
-  
+
+
   if ($dir != "sent") { // meaning, we RECEIVED this message.
     $already_notified_users = array();
 
     $student_name = fp_get_student_name($stu_cwid, TRUE);
     $base_url = $GLOBALS['fp_system_settings']['base_url'];
     $link = $base_url . "/engagements?current_student_id=$stu_cwid";
-    
+
     $phones = engagements_get_from_phones();
     $desc = "";
     $to = $to_mobile;
@@ -1920,9 +1920,9 @@ function engagements_handle_incoming_sms($vars = array())
     $desc = @$phones['lines'][$to]['description'];
     if (!$desc) $desc = @$phones['lines'][$from_mobile]['description'];
     if ($desc) $desc = " $desc";
-  
+
     if (trim($stu_cwid) != "") {
-      // Create a new "activity record" that the student has sent a txt message    
+      // Create a new "activity record" that the student has sent a txt message
       $acontent = new stdClass();
       $acontent->type = 'activity_record';
       $acontent->cid = "new";
@@ -1931,54 +1931,54 @@ function engagements_handle_incoming_sms($vars = array())
       $acontent->title = t('Student sent a text message to ') . $pretty_to_number . " / " . $desc;
       $acontent->field__student_id['value'] = $stu_cwid;
       $acontent->field__activity_type['value'] = 'comment';
-      content_save($acontent);    
-    
+      content_save($acontent);
+
       $content_created['activity_record'] = $acontent;
-      
-      // Notify the advisor(s).      
-      
-      $tmsg = "$student_name has submitted a text message to $system_name 
+
+      // Notify the advisor(s).
+
+      $tmsg = "$student_name has submitted a text message to $system_name
                     (To: $pretty_to_number / $desc).
                     <br><br>\n\n
-                    To view/respond, visit the student's Engagements tab by logging in and following this link:<br>\n 
+                    To view/respond, visit the student's Engagements tab by logging in and following this link:<br>\n
                     <a href='$link'>$link</a>";
-  
+
       // If we have enabled sending the full contents, then send that (stripped of HTML):
       if (intval(variable_get('engagements_send_incoming_sms_contents_in_email', FALSE)) === 1) {
-        $tmsg = "$student_name has submitted a text message to $system_name 
+        $tmsg = "$student_name has submitted a text message to $system_name
                     (To: $pretty_to_number / $desc).
                     <br><br>\n\n
                     The filtered contents of the message are as follows:
                     <blockquote>\n\n
                       $tbody
                     </blockquote>
-                    To view/respond to the full message, visit the student's Engagements tab by logging in and following this link:<br>\n 
+                    To view/respond to the full message, visit the student's Engagements tab by logging in and following this link:<br>\n
                     <a href='$link'>$link</a>";
-        
-      } 
-  
-  
+
+      }
+
+
       $advisors = advise_get_advisors_for_student($stu_cwid);
       foreach ($advisors as $c => $afaculty_id) {
         $account_user_id = db_get_user_id_from_cwid($afaculty_id, 'faculty');
-        if ($account_user_id) {  
+        if ($account_user_id) {
           if (strtolower($tbody) != 'test') {
             notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
           }
           $already_notified_users[] = $account_user_id;
         }
       } // foreach advisors
-          
+
     }
-   
 
 
 
-    // Notify other users who might have been assigned to receive notifications 
+
+    // Notify other users who might have been assigned to receive notifications
     $to_be_notified = engagements_get_users_to_be_notified_for_sms_on_number($to_mobile);
     foreach ($to_be_notified as $account_user_id) {
       if (in_array($account_user_id, $already_notified_users)) continue;
-      
+
       if (trim($stu_cwid) == "") {
         // Meaning, we couldn't find this student in our system!
         // Create an alert for the recipient which does show the full txt message.  The notification provides a link to the alert.
@@ -1987,8 +1987,8 @@ function engagements_handle_incoming_sms($vars = array())
         $alert->cid = "new";
         $alert->published = 1;
         $alert->delete_flag = 0;
-        
-        
+
+
         $from_mobile_pretty = engagements_convert_to_pretty_phone_number($from_mobile);
         $alert->title = t('Unrecognized sender (@fmb) sent a text message to ', array("@fmb" => $from_mobile_pretty)) . $pretty_to_number . " / " . $desc;
         $alert->field__alert_msg['value'] = $body;
@@ -1997,29 +1997,29 @@ function engagements_handle_incoming_sms($vars = array())
         $alert->field__target_faculty_id['value'] = db_get_cwid_from_user_id($account_user_id);
         $alert->field__student_id['value'] = "N/A";
         $alert->field__exclude_advisor['value'] = 1;
-        
-        content_save($alert);    
-        
+
+        content_save($alert);
+
         $content_created['alerts'][$alert->cid] = $alert;
-        
+
         // If there were any files attached, save them with the ALERT here, since this is from an unknown sender.
         foreach ($files as $file) {
           // This function will handle encryption of files automatically.
           $fid = content_add_new_uploaded_file($file, $alert->cid, FALSE);
         }
-        
-        
+
+
         $alert_link = $base_url . "/content/$alert->cid?content_crumbs=alerts";
-                
+
         $tmsg = "A text message has been received for $system_name. (To: $pretty_to_number / $desc).<br><br> No student could be found which is
                   associated with the sending number ($from_mobile).<br><br>Message SID: $message_sid.
-                  <br><br>To view the full message, view the Alert by logging in and clicking here: 
-                  <a href='$alert_link'>$alert_link</a>"; 
-                  
-                          
+                  <br><br>To view the full message, view the Alert by logging in and clicking here:
+                  <a href='$alert_link'>$alert_link</a>";
+
+
         // If we have enabled sending the full contents, then send that (stripped of HTML):
         if (intval(variable_get('engagements_send_incoming_sms_contents_in_email', FALSE)) === 1) {
-          $tmsg = "A text message has been received for $system_name. 
+          $tmsg = "A text message has been received for $system_name.
                       (To: $pretty_to_number / $desc).
                       <br><br>\n\n
                       No student could be found which is associated with the sending number ($from_mobile).
@@ -2027,12 +2027,12 @@ function engagements_handle_incoming_sms($vars = array())
                       <blockquote>\n\n
                         $tbody
                       </blockquote>
-                      To view the full message, view the Alert by logging in and clicking here: 
+                      To view the full message, view the Alert by logging in and clicking here:
                       <a href='$alert_link'>$alert_link</a>";
-          
-        }                           
-                          
-                  
+
+        }
+
+
         if (strtolower($tbody) != 'test') {
           notify_send_notification_to_user($account_user_id, $tmsg, $alert->cid, 'alert');
         }
@@ -2041,23 +2041,23 @@ function engagements_handle_incoming_sms($vars = array())
         // We DO have a student this came from.  Let this user know normally.
         $tmsg = "$student_name has submitted a text message to $system_name (To: $pretty_to_number / $desc).
                   <br><br>\n\n
-                  To view, visit the student's Engagements tab by logging in and following this link:<br>\n 
+                  To view, visit the student's Engagements tab by logging in and following this link:<br>\n
                   <a href='$link'>$link</a>";
-           
-                  
+
+
         // If we have enabled sending the full contents, then send that (stripped of HTML):
         if (intval(variable_get('engagements_send_incoming_sms_contents_in_email', FALSE)) === 1) {
-          $tmsg = "$student_name has submitted a text message to $system_name 
+          $tmsg = "$student_name has submitted a text message to $system_name
                       (To: $pretty_to_number / $desc).
                       <br><br>\n\n
                       The filtered contents of the message are as follows:
                       <blockquote>\n\n
                         $tbody
                       </blockquote>
-                      To view/respond to the full message, visit the student's Engagements tab by logging in and following this link:<br>\n 
+                      To view/respond to the full message, visit the student's Engagements tab by logging in and following this link:<br>\n
                       <a href='$link'>$link</a>";
-         }                  
-                          
+         }
+
         if (strtolower($tbody) != 'test') {
           notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
         }
@@ -2066,9 +2066,9 @@ function engagements_handle_incoming_sms($vars = array())
 
 
   } // dir != sent  (we received this text)
-    
-   
-  
+
+
+
 
 
 
@@ -2076,20 +2076,20 @@ function engagements_handle_incoming_sms($vars = array())
 
   // Write our data to our sms_history table.
   db_query(
-    "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `from_cwid`, `to_cwid`, `updated`, `direction`, 
+    "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `from_cwid`, `to_cwid`, `updated`, `direction`,
                               `media_filenames`, `date_sent`, price_processed, num_segments, delivery_status, err_code, err_message, err_friendly_message)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
-    array($message_sid, 'sms', $body, $from_mobile, $to_mobile, $price, $fp_price, $from_cwid, $to_cwid, time(), $direction, 
+    array($message_sid, 'sms', $body, $from_mobile, $to_mobile, $price, $fp_price, $from_cwid, $to_cwid, time(), $direction,
                 $media_filenames, $date_sent_ts, 1, $num_segments, @$vars['display_status'], @$vars['err_code'], @$vars['err_message'], @$vars['err_friendly_message'])
   );
   $sms_history_mid = db_insert_id();
-  
-  
+
+
   // Allow other modules would like to handle in incoming SMS or even make changes to what is in $vars.
   invoke_hook('engagements_handle_incoming_sms_post_save', array(&$vars, $sms_history_mid, $content_created));
-    
-  
-  
+
+
+
 } // engagements_handle_incoming_sms
 
 
@@ -2100,21 +2100,23 @@ function engagements_handle_incoming_sms($vars = array())
  * We must add them to our "sms_do_not_txt" table, and send a reply letting them know how to re-subscribe in the future.
  */
 function engagements_handle_sms_stop($user_id = 0, $cwid = '', $phone_number = '', $from_fp_phone_number = '') {
-  
+
   if ($user_id === 0) {
     // Try to figure out what the user_id is based on the phone number.
     $test = db_result(db_query("SELECT user_id FROM user_attributes WHERE name = 'mobile_phone' AND value = ?", array($from_fp_phone_number)));
     $test = intval($test);
     if ($test > 0) $user_id = $test;
   }
-  
+
   $phone_number = engagements_convert_to_valid_phone_number($phone_number);
   if (!$phone_number) {
     // watchdog that there was an error because phone number not valid.
-    watchdog('engagements_sms', "User tried to opt-out of sms, but invalid phone number: $user_id, $cwid, $phone_number", array(), WATCHDOG_ERROR);    
+    watchdog('engagements_sms', "User tried to opt-out of sms, but invalid phone number: $user_id, $cwid, $phone_number", array(), WATCHDOG_ERROR);
     return FALSE;
   }
-  
+
+  $prev_notification_method = '';
+
   if ($user_id) {
     // Get current notification method for this user.
     $prev_notification_method = user_get_setting($user_id, 'default_notification_method', 'email');
@@ -2122,19 +2124,19 @@ function engagements_handle_sms_stop($user_id = 0, $cwid = '', $phone_number = '
     user_set_setting($user_id, 'default_notification_method', 'email');
     // also set an opt-out setting value here, so the user can change it from within flightpath.
     user_set_setting($user_id, "sms_opt_out__" . $phone_number, 'yes');
-  }  
-    
+  }
+
   // Save everything to do_not_txt table.  (First, delete anything already there for this phone_number, which is the most important to keep track of)
   db_query('DELETE FROM sms_do_not_txt WHERE phone_number = ?', array($phone_number));
   db_query("INSERT INTO sms_do_not_txt (user_id, cwid, phone_number, prev_notification_method, updated)
                     VALUES (?, ?, ?, ?, ?)", array($user_id, $cwid, $phone_number, $prev_notification_method, time()));
-  
+
   // Send final sms back to number telling them how to re-enable.
-  $msg = t("You have opted-out of receiving text messages from this number. To re-subscribe, text UNSTOP or SUBSCRIBE."); 
-  
+  $msg = t("You have opted-out of receiving text messages from this number. To re-subscribe, text UNSTOP or SUBSCRIBE.");
+
   engagements_send_sms_to_number($phone_number, $msg, '', $from_fp_phone_number, FALSE);
-  
-  
+
+
   watchdog('engagements_sms', "User opted-out of sms: $user_id, $cwid, $phone_number");
 } // engagements_handle_sms_stop
 
@@ -2150,15 +2152,15 @@ function engagements_handle_sms_unstop($user_id = 0, $cwid = '', $phone_number =
     $test = intval($test);
     if ($test > 0) $user_id = $test;
   }
-  
+
   $phone_number = engagements_convert_to_valid_phone_number($phone_number);
-  
+
   if (!$phone_number) {
     // watchdog that there was an error because phone number not valid.
-    watchdog('engagements_sms', "User tried to opt-in to sms, but invalid phone number: $user_id, $cwid, $phone_number", array(), WATCHDOG_ERROR);    
+    watchdog('engagements_sms', "User tried to opt-in to sms, but invalid phone number: $user_id, $cwid, $phone_number", array(), WATCHDOG_ERROR);
     return FALSE;
   }
-  
+
   if ($user_id) {
     // Get current notification method for this user.
     $notification_method = db_result(db_query("SELECT prev_notification_method FROM sms_do_not_txt WHERE phone_number = ?", array($phone_number)));
@@ -2168,17 +2170,17 @@ function engagements_handle_sms_unstop($user_id = 0, $cwid = '', $phone_number =
     }
     // also set our opt-out setting value here, so the user can change it from within flightpath.
     user_set_setting($user_id, "sms_opt_out__" . $phone_number, 'no');
-  }  
-    
+  }
+
   // Save everything to do_not_txt table.  (First, delete anything already there for this phone_number, which is the most important to keep track of)
   db_query('DELETE FROM sms_do_not_txt WHERE phone_number = ?', array($phone_number));
-  
+
   // Send final sms back to number telling them how to re-enable.
-  $msg = t("You have opted-in to receiving text messages from this number.\nReply STOP to opt-out."); 
-  
+  $msg = t("You have opted-in to receiving text messages from this number.\nReply STOP to opt-out.");
+
   engagements_send_sms_to_number($phone_number, $msg, '', $from_fp_phone_number, FALSE);
-  
-  
+
+
   watchdog('engagements_sms', "User opted-out of sms: $user_id, $cwid, $phone_number");
 
 }
@@ -2189,24 +2191,24 @@ function engagements_handle_sms_unstop($user_id = 0, $cwid = '', $phone_number =
 function engagements_can_send_sms_to_number($phone_number) {
   $phone_number = engagements_convert_to_valid_phone_number($phone_number);
   if (!$phone_number) return FALSE;
-  
+
   $mid = db_result(db_query("SELECT mid FROM sms_do_not_txt WHERE phone_number = ?", array($phone_number)));
-  
+
   // We found an entry in this table, so NO, we cannot txt this number.
   if ($mid) return FALSE;
-  
+
   // else
   return TRUE;
-  
-  
+
+
 }
 
 
 /**
- * 
+ *
  */
 function engagements_get_signalwire_sms_error_codes_array() {
-  $rtn = array(  
+  $rtn = array(
     "10002" => "Trial account does not support this feature",
     "11200" => "HTTP Retrieval Failure",
     "11751" => "MMS -> Media exceeds mobile operator size limit",
@@ -2234,12 +2236,12 @@ function engagements_get_signalwire_sms_error_codes_array() {
     "30007" => "Message marked as spam",
     "30008" => "Unknown error",
     "30010" => "Message price exceeds max price",
-    "30022" => "Campaign Registry Throughput Limit Exceeded", 
+    "30022" => "Campaign Registry Throughput Limit Exceeded",
   );
-  
-  
-  
-  
+
+
+
+
   return $rtn;
 }
 
@@ -2247,7 +2249,7 @@ function engagements_get_signalwire_sms_error_codes_array() {
 
 /**
  * Retrieve all messages, update the ones which don't have prices associated with them yet.
- * 
+ *
  * We will also be getting voice calls & prices too for our log table.
  */
 function engagements_sms_get_all_messages()
@@ -2270,81 +2272,81 @@ function engagements_sms_get_all_messages()
   $space_url = variable_get('sms_space_url', '');
 
   $client = new SignalWire\Rest\Client($project_id, $auth_token, array("signalwireSpaceUrl" => $space_url));
-  
+
   // Get all messages so we can update our table.
 
   // We only care about messages sent TODAY, since we theoretically already got them yesterday
-  $check_since = date('Y-m-d', strtotime("NOW - 3 HOURS")); // We will get messages from 3 hours in the past and today, 
-                                                            // (in case it's close to ***midnight***) 
-                                                            // to make sure we don't miss anything.  The idea being that we have a cron 
+  $check_since = date('Y-m-d', strtotime("NOW - 3 HOURS")); // We will get messages from 3 hours in the past and today,
+                                                            // (in case it's close to ***midnight***)
+                                                            // to make sure we don't miss anything.  The idea being that we have a cron
                                                             // running frequently enough that this gives us lots of chances to retrieve information.
 
   $messages = NULL;
   try {
     $messages = $client->messages->read(array('dateSentAfter' => $check_since));
   } catch (Exception $ex) {}
-  
+
   if ($messages) {
     foreach ($messages as $record) {
-      //fpm(ppm($record, TRUE)); 
+      //fpm(ppm($record, TRUE));
       //    fpm($record->status);
-  
+
       //watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Reviewing message: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
-  
-      $status = strtolower(trim($record->status));     
+
+      $status = strtolower(trim($record->status));
       $error_message = $record->errorMessage;
       $error_code = intval($record->errorCode);
-      
+
       if ($error_code == 12100 || $error_code == 11200) {
         // We don't care about these code, as they appear on EVERY message.
         $error_code = NULL;
         $status = NULL;
       }
-      
+
       $friendly_error_message = '';
       if ($error_code) {
         $friendly_error_message = @$error_codes[$error_code];
       }
       $message_sid = $record->sid;
-  
+
       $vars['MessageSid'] = $message_sid;
-  
+
       // Should we update any details about this message? Price, errors, etc?
       $test = engagements_get_sms_from_history($message_sid);
       if ($test && (floatval($record->price) != floatval($test['sw_price']) || $error_code != $test['err_code'])) {
-        
+
         // update prices
         $price = $record->price;
         //$fp_price = engagements_get_fp_price($price, $test['direction'], intval($test['num_segments']));
         $fp_price = 0;  // no longer using this field.
-  
+
         watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Updating sms_history table
-                                          from record: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG); 
-        
+                                          from record: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
+
         db_query("UPDATE sms_history
                   SET sw_price = ?, fp_price = ?, price_processed = 1, delivery_status = ?, err_code = ?, err_message = ?, err_friendly_message = ?
                   WHERE mid = ?", array($price, $fp_price, $status, $error_code, $error_message, $friendly_error_message, $test['mid']));
-        
+
         // Meaning, we already have this one saved, and now that we've updated it, we can continue.
         continue;
       } // if test and we have things to update
       else if ($test) {
-        // meaning, we already have this one saved.  Skip it.  
+        // meaning, we already have this one saved.  Skip it.
         continue;
       }
-  
+
       $from_mobile = engagements_convert_to_valid_phone_number($record->from);
       $to_mobile = engagements_convert_to_valid_phone_number($record->to);
-  
+
       $body = $record->body;
-  
+
       $date_sent = $record->dateSent;  // this is a Datetime object
       $date_sent_ts = strtotime($date_sent->format("Y-m-d H:i:s"));
-  
+
       $direction = $record->direction;
       $num_segments = intval($record->numSegments);
-  
-  
+
+
       $vars['From'] = $from_mobile;
       $vars['To'] = $to_mobile;
       $vars['Body'] = $body;
@@ -2355,35 +2357,35 @@ function engagements_sms_get_all_messages()
       $vars['err_code'] = $error_code;
       $vars['err_message'] = $error_message;
       $vars['err_friendly_message'] = $friendly_error_message;
-  
+
       $vars['NumMedia'] = 0;
-  
+
       // Is there media?
       if (intval($record->numMedia) > 0) {
-  
+
         $vars['NumMedia'] = intval($record->numMedia);
-  
+
         // List all media for this message.
         $allmedia = $client->messages($message_sid)->media->read();
         $c = 0;
         foreach ($allmedia as $mitem) {
-  
+
           $media_sid = $mitem->sid;
           $content_type = $mitem->contentType;
-  
+
           $vars['MediaContentType' . $c] = $content_type;
           $vars['MediaUrl' . $c] = "https://$space_url/api/laml/2010-04-01/Accounts/$project_id/Messages/$message_sid/Media/$media_sid";
-  
-  
+
+
           $c++;
         } // foreach media
-  
-  
+
+
       } // there was media!
-  
-  
-      watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Sending to engagements_handle_incoming_sms: <pre>" . print_r($vars, TRUE) . "</pre>", array(), WATCHDOG_DEBUG); 
-  
+
+
+      watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Sending to engagements_handle_incoming_sms: <pre>" . print_r($vars, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
+
       // Save this message using our "handle_incoming_sms" function.
       engagements_handle_incoming_sms($vars);
     } // foreach messages
@@ -2393,61 +2395,61 @@ function engagements_sms_get_all_messages()
 
 
   $body = "";
-  
+
   // Now, we also want to get a list of all calls and their prices too.
   $calls = NULL;
   try {
     $calls = $client->calls->read(array('startTimeAfter' => $check_since));
   } catch (Exception $ex){}
-  
+
   if ($calls) {
     foreach ($calls as $record) {
-  
+
       //watchdog('engagements_debug', "In engagements_sms_get_all_messages().  Reviewing CALL: <pre>" . print_r($record, TRUE) . "</pre>", array(), WATCHDOG_DEBUG);
-  
+
       $sid = $record->sid;
-  
+
       // Do we already have this in our table?  If so, skip.
       $test = engagements_get_sms_from_history($sid);
       if ($test) continue;  // We've already recorded this, so skip.
-  
+
       $date_sent = $record->startTime;  // this is a Datetime object
       $date_sent_ts = strtotime($date_sent->format("Y-m-d H:i:s"));
-  
-  
+
+
       $to_mobile = engagements_convert_to_valid_phone_number($record->to);
       $from_mobile = engagements_convert_to_valid_phone_number($record->from);
-  
+
       // Figure out what user this came from/to!
       $from_cwid = "";
       $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($from_mobile)));
       if ($user_id) {
         $from_cwid = db_get_cwid_from_user_id($user_id);
       }
-  
+
       $to_cwid = "";
       $user_id = db_result(db_query("SELECT user_id FROM user_attributes WHERE `name` = 'mobile_phone' AND `value` = ?", array($to_mobile)));
       if ($user_id) {
         $to_cwid = db_get_cwid_from_user_id($user_id);
       }
-  
+
       $duration = $record->duration;
       $direction = $record->direction;
       $price = $record->price;
       $fp_price = engagements_get_fp_price($price, $direction, 1, 'call');
-  
-  
+
+
       // Write our data to our sms_history table.
       db_query(
-        "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `to_cwid`, `from_cwid`, `updated`, `direction`, 
+        "INSERT INTO sms_history (`message_sid`, sw_type, `body`, `from_number`, `to_number`, `sw_price`, `fp_price`, `to_cwid`, `from_cwid`, `updated`, `direction`,
                                   `media_filenames`, `date_sent`, price_processed, num_segments)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
         array($sid, 'call', $body, $from_mobile, $to_mobile, $price, $fp_price, $to_cwid, $from_cwid, time(), $direction, '', $date_sent_ts, 1, $duration)
       );
-      
-      watchdog("engagements_sms", "Documented call to $to_mobile. From record: <pre>" . print_r($record, TRUE) . "</pre>" , array(), WATCHDOG_DEBUG);    
-      
-    }  //foreach calls as record 
+
+      watchdog("engagements_sms", "Documented call to $to_mobile. From record: <pre>" . print_r($record, TRUE) . "</pre>" , array(), WATCHDOG_DEBUG);
+
+    }  //foreach calls as record
   } // if calls
 
 
@@ -2509,7 +2511,7 @@ function engagements_get_fp_price($price, $direction, $num_segments = 1, $type =
 /**
  * This function will look at the mime type (aka content type) to figure out what the
  * file extension should be.  This is useful when retrieving txt message media.
- * 
+ *
  * We will only have the ones we think students might actually try to txt to their teachers.
  */
 function engagements_get_file_extension_from_mime_type($mime)
@@ -2772,15 +2774,15 @@ function engagements_imap_get_all_received_messages()
     $from_email = $matches[0][0];  // Since this is a FROM email, we assume there's only one sender.
 
     $body = _engagements_imap_get_body($mbox, $msgno);
-    
+
     watchdog('imap', "Found Body: $body", array(), WATCHDOG_DEBUG);
-    
+
     // match the from email to a student
     $student_user_id = db_get_user_id_from_email($from_email, 'student');
     if ($student_user_id) {
-      
+
       watchdog('imap', "Found from student $student_user_id, creating engagement content.", array(), WATCHDOG_DEBUG);
-      
+
       // create this as an engagement for this student.
       $account = fp_load_user($student_user_id);
       $student_cwid = $account->cwid;
@@ -2845,7 +2847,7 @@ function engagements_imap_get_all_received_messages()
           $link = $base_url . "/engagements?current_student_id=$student_cwid";
           $tmsg = "";
           $tmsg .= "$student_name has submitted an email to FlightPath.<br><br>\n\n
-                    To view, visit the student's Engagements tab by logging in and following this link:<br>\n 
+                    To view, visit the student's Engagements tab by logging in and following this link:<br>\n
                     <a href='$link'>$link</a>";
 
           notify_send_notification_to_user($account_user_id, $tmsg, $content->cid, 'engagement');
@@ -2864,7 +2866,7 @@ function engagements_imap_get_all_received_messages()
   imap_expunge($mbox);
 
   watchdog('imap', "Closing connection to imap server.", array(), WATCHDOG_DEBUG);
-  // Close connection, we're done.  
+  // Close connection, we're done.
   imap_close($mbox);
 
 
@@ -2876,7 +2878,7 @@ function engagements_imap_get_all_received_messages()
 
 // From https://stackoverflow.com/questions/2649579/downloading-attachments-to-directory-with-imap-in-php-randomly-works
 /**
- * $inbox is the imap link.  email_number is msg_no. 
+ * $inbox is the imap link.  email_number is msg_no.
  */
 function _engagements_imap_get_attachments($inbox, $email_number, $from_email_machine_readable, $cid = 0)
 {
@@ -2940,7 +2942,7 @@ function _engagements_imap_get_attachments($inbox, $email_number, $from_email_ma
         // Create a new random filename to save it as.
         $filename = 'email__' . $from_email_machine_readable . '_' . time() . '_' .  mt_rand(1, 9999);  // We will figure out the ext (from mimetype) later.
         $tmp_name = sha1($filename . time() . mt_rand(1,99999) . mt_rand(1,99999));
-        
+
         // Save to our temporary location on the server.
         $test = file_put_contents(sys_get_temp_dir() . '/' . $tmp_name, $at['attachment']);
         if (!$test) {
@@ -2948,7 +2950,7 @@ function _engagements_imap_get_attachments($inbox, $email_number, $from_email_ma
           fpm('Unable to write media file at temp location:' . sys_get_temp_dir() . '.  Permissions issue?');
           continue;
         }
-         
+
 
         // Next, we want to rename it to have the proper file extension, as best we can tell.
         $ext = strtolower($at['subtype']);  // if we can't figure it out, use this.
@@ -2964,19 +2966,19 @@ function _engagements_imap_get_attachments($inbox, $email_number, $from_email_ma
         }
 
         $filename .= ".$ext";  // the filename doesn't have its extension already for whatever reason.
-      
+
         $file = array(
           'name' => $filename,
           'type' => $mimetype,
-          'tmp_name' => $tmp_name,          
+          'tmp_name' => $tmp_name,
         );
-        
+
         $fid = content_add_new_uploaded_file($file, $cid, FALSE);
         // TODO:  Possibly rename filename based on if it is encrypted or not?
 
         $rtn[] = array(
           'fid' => $fid,
-          'filename' => $filename,          
+          'filename' => $filename,
           'mimetime' => $mimetype,
           'ext' => $ext,
         );
@@ -3040,7 +3042,7 @@ function _engagements_imap_get_body($imapLink, $msgno)
       '=20' => ' ', // space.
       '=2C' => ',', // comma.
       '=E2=80=99' => "'", // single quote.
-      '=C2=A0' => ' ', // non-breaking space.      
+      '=C2=A0' => ' ', // non-breaking space.
       '=0A' => "\r\n", // line break.
       '=0D' => "\r\n", // carriage return.
       '=A0' => ' ', // non-breaking space.
@@ -3055,8 +3057,8 @@ function _engagements_imap_get_body($imapLink, $msgno)
   foreach ($characters as $key => $value) {
     $text = str_replace($key, $value, $text);
   }
-  
-  
+
+
 
   return $text;
 }
@@ -3071,7 +3073,7 @@ function _engagements_imap_get_body($imapLink, $msgno)
 /**
  * The user has opened an email with a tracking pixel.  We will now record that
  * it was opened in our engagements_tracking table.
- * 
+ *
  * We also need to actually render the pixel to the browser.
  */
 function engagements_handle_tracking_pixel_request($cid, $token)
@@ -3110,7 +3112,7 @@ function engagements_handle_tracking_pixel_request($cid, $token)
 
 
 
-  // Render pixel to browser and die.  We will be using the 1x1.gif file in our assets folder.  
+  // Render pixel to browser and die.  We will be using the 1x1.gif file in our assets folder.
   // Output the image to browser
   header('Content-Type: image/gif');
   $im = imagecreatefromgif(fp_get_module_path('engagements', TRUE, FALSE) . '/assets/1x1.gif');
@@ -3169,7 +3171,7 @@ function engagements_perm()
 
   $rtn['can_send_mass_sms'] = array(
     'title' => t("Send mass txt messages"),
-    'description' => t("The user may access and send mass SMS (txt) messages to lists of recipients from the designated mass text lines.  
+    'description' => t("The user may access and send mass SMS (txt) messages to lists of recipients from the designated mass text lines.
                         Only give to trusted users."),
   );
 
@@ -3300,7 +3302,7 @@ function engagements_content_register_content_type()
     'label' => t('Message'),
     'filter' => 'basic',
     'weight' => 70,
-    'attributes' => array('class' => ''),    
+    'attributes' => array('class' => ''),
   );
 
 
@@ -3417,10 +3419,10 @@ function engagements_convert_to_pretty_phone_number($phoneNumber, $bool_convert_
 
 /**
  * Implements hook_form_alter
- * 
+ *
  * We want to make various modifications to our form, based on what we are trying to do to it.  We may also
  * want to add in some custom javascript as well.
- * 
+ *
  */
 function engagements_form_alter(&$form, $form_id)
 {
@@ -3435,7 +3437,7 @@ function engagements_form_alter(&$form, $form_id)
       fp_add_js(fp_get_module_path("engagements") . "/js/engagements.js");
       fp_add_css(fp_get_module_path("engagements") . "/css/style.css");
 
-      // If this is a NEW form, then check for values in the URL to auto-fill.      
+      // If this is a NEW form, then check for values in the URL to auto-fill.
       if ($form['cid']['value'] === 'new') {
 
         if (!isset($_GET['engagement_type']) || $_GET['engagement_type'] == '' || $_GET['engagement_type'] == 'new') {
@@ -3492,23 +3494,23 @@ function engagements_form_alter(&$form, $form_id)
 
             // TODO:  The EMAIL header may need to be a setting with replacement values
             $form['engagement_msg']['prefix'] = "<div>" . t("Your message will automatically begin with <strong>(@initials) from @name:</strong>", array("@initials" => $initials, "@name" => $db->get_faculty_name($form['faculty_id']['value']))) . "</div>";
-            
-            
+
+
             if (trim($extra_mark) != "" && $bool_no_email) {
               // Meaning, the student has no email address (or opted out?)  Disable fields and let the user know.
-              
+
               if (!isset($form['title']['attributes']['class'])) $form['title']['attributes']['class'] = ' ';
-              
+
               $form['title']['attributes']['readonly'] = 'readonly';
               $form['title']['attributes']['class'] .= ' readonly';
 
               $form['submit_submit']['attributes']['disabled'] = 'disabled';
               $form['submit_submit']['attributes']['class'] .= ' button-disabled';
               $form['submit_submit']['suffix'] = "<strong>" . t('NOTE: Cannot send an email message as there is no email address on file for this recipient.  Try text message or calling instead.') . "</strong>";
-                            
-              
+
+
             }
-            
+
           }
 
 
@@ -3529,9 +3531,9 @@ function engagements_form_alter(&$form, $form_id)
                         not have permission to send txt messages from any number.
                         See your system administrator for access.") . "</h3>";
 
-              
 
-                        
+
+
               $form['from_sms_phone']['attributes']['readonly'] = "readonly";
               $form['from_sms_phone']['attributes']['class'] .= " readonly";
               $form['from_sms_phone']['attributes']['disabled'] = "disabled";
@@ -3556,8 +3558,8 @@ function engagements_form_alter(&$form, $form_id)
               // Mobile phone was never found, so disable submit and message box.
 
               $form['engagement_msg']['attributes']['readonly'] = 'readonly';
-              
-                            
+
+
               $form['engagement_msg']['attributes']['class'] .= ' readonly';
 
               $form['submit_submit']['attributes']['disabled'] = 'disabled';
@@ -3573,12 +3575,12 @@ function engagements_form_alter(&$form, $form_id)
               $form['submit_submit']['attributes']['disabled'] = 'disabled';
               $form['submit_submit']['attributes']['class'] .= ' button-disabled';
               $form['submit_submit']['suffix'] = "<strong>" . t('NOTE: Cannot send a text message as this recipient has opted-out of receving text messages.  Try email or calling instead.') . "</strong>";
-                            
-              
+
+
             }
 
 
-            // The header needs to be a setting with replacement values           
+            // The header needs to be a setting with replacement values
             $sms_header = engagements_sms_replace_patterns(variable_get('sms_header', '(@initials) from @name:'), "", $user);
 
             $form['engagement_msg']['prefix'] = t("Your message will automatically begin with <strong>@header</strong>", array("@header" => $sms_header));
@@ -3601,7 +3603,7 @@ function engagements_form_alter(&$form, $form_id)
 
 
 
-        // Always set the published = TRUE, and hide.        
+        // Always set the published = TRUE, and hide.
         $form['published']['value'] = TRUE;
         $form['published']['attributes'] = array('class' => 'hidden');
 
@@ -3665,9 +3667,9 @@ function engagements_get_user_notify_sms_receipt_values($user_id = NULL) {
   }
   $options = engagements_get_from_phones_for_fapi(TRUE);
   $options += engagements_get_from_phones_for_fapi(TRUE, NULL, TRUE);
-  
-  foreach ($options as $num => $val) {    
-    $test = user_get_setting($user_id, "notify_sms_receipt__" . $num);    
+
+  foreach ($options as $num => $val) {
+    $test = user_get_setting($user_id, "notify_sms_receipt__" . $num);
     if (intval($test) === intval($num)) {
       $rtn[$num] = $num;
     }
@@ -3683,7 +3685,7 @@ function engagements_get_user_notify_sms_receipt_values($user_id = NULL) {
 function engagements_get_users_to_be_notified_for_sms_on_number($num) {
   $rtn = array();
 
-  $res = db_query("SELECT user_id FROM user_settings 
+  $res = db_query("SELECT user_id FROM user_settings
                     WHERE name = ?", array('notify_sms_receipt__' . $num));
   while ($cur = db_fetch_array($res)) {
     $rtn[$cur['user_id']] = intval($cur['user_id']);
@@ -3698,10 +3700,10 @@ function engagements_get_users_to_be_notified_for_sms_on_number($num) {
 
 /**
  * Returns back the phone lines available.
- * 
+ *
  * If bool_return_all == FALSE, it means we will first check to make sure the user (specified by account) has permission
  * to send sms for that number.
- * 
+ *
  */
 function engagements_get_from_phones_for_fapi($bool_return_all = TRUE, $account = NULL, $bool_only_mass_text_numbers = FALSE)
 {
@@ -3712,12 +3714,12 @@ function engagements_get_from_phones_for_fapi($bool_return_all = TRUE, $account 
 
   $phones = engagements_get_from_phones($bool_only_mass_text_numbers);
   $default = $phones['default']['num'];
-  
+
   $default_tag = t("[Default]");
   if ($bool_only_mass_text_numbers) {
     $default_tag = t("[[[Mass Texts]]]");
   }
-  
+
   $rtn[$default] = $default_tag . " " . engagements_convert_to_pretty_phone_number($default) . ' - ' . $phones['default']['description'];
 
   foreach ($phones['lines'] as $num => $details) {
@@ -3753,16 +3755,16 @@ function engagements_send_email_or_txt_form_validate($form, &$form_state)
 {
 
   $values = $form_state['values'];
-  
+
   ////////
-  // TODO: I am not sure I even need to get the cid here...  delete it?  
+  // TODO: I am not sure I even need to get the cid here...  delete it?
   $cid = NULL;
   if (isset($form_state['content_object']) && is_object($form_state['content_object'])) {
     $cid = $form_state['content_object']->cid;   // At this point, the content has already been saved, so we know its cid.
-  }  
+  }
   ////////
-  
-    
+
+
   $engagement_type = $values['engagement_type'];
 
   $manual_entry = @trim(strtoupper($values['manual_entry']));
@@ -3831,7 +3833,7 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
   $faculty_id = $values['faculty_id'];
   $faculty_name = $db->get_faculty_name($faculty_id);
 
-  
+
   $initials = variable_get_for_school("school_initials", "DEMO", db_get_school_id_for_student_id($student_id));
 
   // get the "from_number"
@@ -3854,18 +3856,18 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
     // We will use that to tell how many times the message gets opened.
     $tracking_img_url = engagements_create_new_tracking_img_url($cid);
 
-                      
-    $receive_method = variable_get('engagements_receive_email_method', 'none');    
+
+    $receive_method = variable_get('engagements_receive_email_method', 'none');
     // Only display this if we have the ability to receive emails turned on!!
     if ($receive_method != 'none' && $receive_method != '') {
       $msg .= "<br><br>----<br>You may respond directly to this email.  It will be stored with FlightPath for $faculty_name to then review.";
-    } 
+    }
     else {
       // We can NOT receive messages.
       $msg .= "<br><br>----<br>Please do not respond to this email, as it is not monitored.";
       $msg .= "<br><br>You are receiving this message because you are a user with $initials. You may adjust communication settings by contacting your institution.";
     }
-    
+
     $msg .= "\n\n<img src='$tracking_img_url'>";
 
 
@@ -3879,25 +3881,25 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
         if ($fid == "") continue;
         $file = content_get_uploaded_file($fid);
         if ($file) {
-          // Handle encrypted files  
+          // Handle encrypted files
           $fcont = file_get_contents($file['full_filename']);  // the full_filename already contains the path to the file
           if (intval($file['is_encrypted']) === 1) {
             $fcont = encryption_decrypt($fcont);
           }
-          $attachments[$file['original_filename']] = $fcont; 
+          $attachments[$file['original_filename']] = $fcont;
         }
       }
     }
 
 
-    
+
     smtp_mail($student_email, $subject, $header . "<br><br>" . $msg, TRUE, $attachments, TRUE);  // the TRUE sends as HTML.
     fp_add_message(t("Email has been successfully sent."));
   } // type == 'email'
- 
+
 
   $mobile_phone = '';
-  
+
   if ($engagement_type == 'txt_msg' && $manual_entry != 'Y') {
 
     $student_user_id = db_get_user_id_from_cwid($student_id, 'student');
@@ -3913,11 +3915,11 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
       fp_add_message(t("Text Message has been successfully sent."));
       // save the external_msg_id with the content.
       $content->field__external_msg_id['value'] = $external_msg_id;
-      
+
       $content->field__to_sms_phone['value'] = $mobile_phone;
       $content->field__from_sms_phone['value'] = $from_number;
-      
-      $content->log = "[AUTO] Updating external_msg_id"; 
+
+      $content->log = "[AUTO] Updating external_msg_id";
       content_save($content);
     }
   } // type == 'txt_msg'
@@ -3928,14 +3930,14 @@ function engagements_send_email_or_txt_form_submit($form, &$form_state)
   else {
     watchdog("engagements", "logged $engagement_type to $student_id");
   }
-  
+
   watchdog("engagements", "$engagement_type message to $student_id: $header <br> $msg", array(), WATCHDOG_DEBUG);
 } // ... send email or txt form submit
 
 
 
 /**
- * Actually send a text message.  Will drupal_set_message() as an error if there is a problem, and return FALSE. 
+ * Actually send a text message.  Will drupal_set_message() as an error if there is a problem, and return FALSE.
  * Returns TRUE on success, no drupal_set_message is printed.
  */
 function engagements_send_sms_to_number($to_number, $body, $to_cwid = "", $from_number = "default", $bool_send_opt_out_message = TRUE)
@@ -3976,7 +3978,7 @@ function engagements_send_sms_to_number($to_number, $body, $to_cwid = "", $from_
       ->create(
         "+1" . $to_number, // to
         array(
-          "from" => "+1" . $from_phone,   // my signalwire account phone number 
+          "from" => "+1" . $from_phone,   // my signalwire account phone number
           "body" => $body
         )
       );
@@ -3993,7 +3995,7 @@ function engagements_send_sms_to_number($to_number, $body, $to_cwid = "", $from_
     $body = $record->body;
     $num_segments = intval($record->numSegments);
 
-    $date_sent = $record->dateCreated;  // Since we just created it, just dateCreated instead of dateSent.    
+    $date_sent = $record->dateCreated;  // Since we just created it, just dateCreated instead of dateSent.
     $throw_away = print_r($date_sent, TRUE);  // Not sure why, but I have to do this in order for the data field to populate.
 
     //$date_sent_ts = strtotime($date_sent->date);  // Was causing a mysql error all of a sudden.  Just use current time.
@@ -4089,8 +4091,8 @@ function engagements_display_main()
   // Are text messages turned on?  We will make sure there is a sms_project_id.
   $bool_sms_enabled = TRUE;
   if (trim(variable_get('sms_project_id', '') == '')) $bool_sms_enabled = FALSE;
-  
-  
+
+
   $rtn = "";
   $rtn .= "<div id='engagements-list-page'>";
 
@@ -4098,11 +4100,11 @@ function engagements_display_main()
   if (user_has_permission('can_send_email_engagements')) {
     $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"email\",\"New Email\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-envelope-o'></i>&nbsp; New Email</a>";
   }
-  
+
   if (user_has_permission('can_send_txt_engagements') && $bool_sms_enabled) {
     $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"txt_msg\",\"New Text Message\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-comment-o'></i>&nbsp; New Text Msg</a>";
   }
-  
+
   if (user_has_permission('can_log_engagements')) {
     $rtn .= "<a href='javascript:engagementsNewEngagementDialog(\"\",\"Log New Engagement\",\"$current_student_id\",\"$faculty_id\");' class='button'><i class='fa fa-plus'></i>&nbsp; Log New Engagement</a>";
   }
@@ -4123,7 +4125,7 @@ function engagements_display_main()
                    AND a.vid = n.vid
                    AND a.cid = n.cid
                    AND n.delete_flag = 0
-                   AND n.published = 1                                    
+                   AND n.published = 1
                    ORDER BY field__activity_datetime DESC, a.vid DESC", array($current_student_id), 5, 0, "SELECT COUNT(DISTINCT(a.cid)) FROM content__engagement a, content n
                                                                                                          WHERE field__student_id = ?
                                                                                                          AND a.vid = n.vid
@@ -4158,8 +4160,8 @@ function engagements_display_main()
     if ($type == 'email') {
       $subject = $content->title;
     }
-    
-        
+
+
     $external_msg_id = @trim($content->field__external_msg_id['value']);
 
 
@@ -4178,14 +4180,14 @@ function engagements_display_main()
         $sms_extra_details = "<span class='sms-extra-details'>";
         $sms_extra_details .= t("(%desc)", array('%desc' => $desc));
         $sms_extra_details .= "</span>";
-                
+
         if (isset($details['delivery_status']) && $details['delivery_status'] == 'undelivered') {
-          
+
           $moreinfo = "";
-          
+
           $moreinfo .= "<p>" . t("We're sorry, but this message was not delivered.
                                   Usually this happens when the recipient's carrier (ex: AT&T, Verizon, etc) marks the message as 'spam' and refuses to deliver
-                                  it to the user. <strong>Unfortunately, this is something which is outside the control of @fp.</strong> 
+                                  it to the user. <strong>Unfortunately, this is something which is outside the control of @fp.</strong>
                                   <br><br>
                                   This may also be due to the user's phone being invalid, disconnected, or incapable of receiving SMS text messages.
                                   <br><br>
@@ -4194,12 +4196,12 @@ function engagements_display_main()
                                   <br><br>
                                   Note: the recipient <strong><u>did not receive this message</u></strong>.  Please try again via email or another
                                   communication route.", array("@fp" => variable_get("system_name", "FlightPath"))) . "</p>";
-        
+
           $moreinfo = base64_encode($moreinfo);
           $sms_delivery_details .= "<div class='sms-undelivered-error'><i class='fa fa-warning'></i> " . t("Undelivered by phone carrier network - %msg", array("%msg" => @$details['err_friendly_message'])) . "
                                     &nbsp; <a href='javascript:fp_alert(\"$moreinfo\",\"base64\");' title='" . t("More information") . "'><i class='fa fa-question-circle'></i></a></div>";
-        } 
-        
+        }
+
       }
     }
 
@@ -4227,7 +4229,7 @@ function engagements_display_main()
         $msg = $temp[0]; // get rid of the media part of the msg.
         $ttemp = explode("~~END_MEDIA~~", $temp[1]);
       }
-          
+
       $res2 = db_query("SELECT * FROM content_files WHERE cid = ? ORDER BY cid", array($cid));
       while ($cur2 = db_fetch_array($res2)) {
         $fid = $cur2['fid'];
@@ -4235,14 +4237,14 @@ function engagements_display_main()
         $img_tag = "<img src='{$file['url']}' style='max-width: 200px; height: auto;'>";
         $msg .= "<div class='media-attached'><a href='{$file['url']}' target='_BLANK'>
                       $img_tag
-                    </a></div>";             
+                    </a></div>";
       }
       $msg .= $ttemp[1];  // in case there was anything AFTER ~~END_MEDIA~~
     }
-    
-       
+
+
     ////////////
-    
+
 
 
     $header_desc_extra = "";
@@ -4262,8 +4264,8 @@ function engagements_display_main()
         $attachments = array();
         $attachment_csv = fp_trim(@$content->field__attachment['value']);
         // TODO:  An option here would be to just query the content_files table for this cid.
-        
-        
+
+
         $attachmsg = "";
         $c = 1;
         if ($attachment_csv) {
@@ -4276,12 +4278,12 @@ function engagements_display_main()
               $mime_icon = content_get_fontawesome_icon_for_mimetype($file['mimetype'], $file['ext']);
               $attachmsg .= "<div class='attached-file'>#$c &nbsp; <a href='{$file['url']}'><i class='fa $mime_icon'></i> {$file['original_filename']}</a></div>";
               $c++;
-            }            
+            }
           }
           $attachmsg .= "</div>";
         }
-        
-        
+
+
       }
 
       // We need a random id to assign to this email body.
@@ -4299,11 +4301,11 @@ function engagements_display_main()
     }
 
 
-    
+
     $author_user_id = intval($content->user_id);
     $author_account = fp_load_user($author_user_id);
     $author_name = "";
-    if (isset($author_account->f_name) && isset($author_account->l_name)) {    
+    if (isset($author_account->f_name) && isset($author_account->l_name)) {
       $author_name = $author_account->f_name . " " . $author_account->l_name;
     }
 
@@ -4322,12 +4324,12 @@ function engagements_display_main()
                   <span class='header-icon'><i class='fa $icon'></i></span>
                   <span class='header-description'>
                       <span class='pre-description'>$pre_description</span>
-                      {$content->field__engagement_type['display_value']}                      
-                  </span>$sms_extra_details 
+                      {$content->field__engagement_type['display_value']}
+                  </span>$sms_extra_details
                   <span class='header-phone-outcome'>: {$content->field__direction['display_value']} $header_desc_extra</span>
                   $sms_delivery_details
                   <span class='header-edit'></span>
-                  <span class='header-date-time'>" . $content->field__activity_datetime['display_value'] . "</span>                  
+                  <span class='header-date-time'>" . $content->field__activity_datetime['display_value'] . "</span>
                   <span class='header-author'>$author_name</span>
                   <span class='header-visibility'>$visibility_icon</span>
                 </div>
@@ -4335,9 +4337,9 @@ function engagements_display_main()
     if ($subject != '') {
       $rtn .= "<div class='activity-subject'><label>" . t("Subject:") . "</label>$subject</div>";
     }
-                    
+
     $rtn .= "   <div class='activity-comment'>
-                    $msg                    
+                    $msg
                   </div>
                 </div>
              </div>
@@ -4345,15 +4347,15 @@ function engagements_display_main()
 
     // mark this content as "read" since it appeared on the screen.
     content_set_last_access($content->cid);
-    
+
   } // while cur
 
 
 
-  // Display the pager that was generated by the pager_query above!  
+  // Display the pager that was generated by the pager_query above!
   $rtn .= theme_pager(array(t('« newest'), t('‹ newer'), '', t('older ›'), t('oldest »')));
 
-  $rtn .= "</div>"; // engagements-list         
+  $rtn .= "</div>"; // engagements-list
 
 
 
@@ -4361,7 +4363,7 @@ function engagements_display_main()
 
   // Let's set our breadcrumbs
   fp_set_standard_advising_breadcrumbs();
-  
+
 
 
 
@@ -4369,4 +4371,4 @@ function engagements_display_main()
 
 
   return $rtn;
-} // engagements_display_main 
+} // engagements_display_main
