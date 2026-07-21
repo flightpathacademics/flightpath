@@ -2046,7 +2046,7 @@ function fp_render_tab_array($tab_array) {
     $title = @$tab_array[$t]["title"];
 
     // If the title has a replacement pattern in it, then we need to call a hook to see what it should be set to.
-    if (strpos($title, "%") !== 0) {
+    if (strpos(($title ?? ''), "%") !== 0) {
       $title = menu_convert_replacement_pattern($title);
     }
 
