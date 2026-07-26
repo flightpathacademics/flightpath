@@ -17,18 +17,18 @@
  */
 function stats_menu() {
   $items = array();
-  
+
   $items["stats"] = array(
     "title" => "Analytics & Reports",
     "page_callback" => "stats_display_main",
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
       "page_show_title" => TRUE,
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
   );
 
-  
+
   $items["stats/select-school"] = array(
     "title" => "Select School",
     "page_callback" => "fp_render_form",
@@ -37,18 +37,18 @@ function stats_menu() {
     "page_settings" => array(
       "page_show_title" => TRUE,
       "bool_print" => FALSE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
-      ),            
-    ),         
-    "type" => MENU_TYPE_CALLBACK,        
-  );   
-  
-  
-  
+      ),
+    ),
+    "type" => MENU_TYPE_CALLBACK,
+  );
+
+
+
   $items["stats/reports/access"] = array(
     "title" => "Access Stats",
     "description" => "See recent access within the system.  This can be useful to see if anyone is currently using the system.",
@@ -56,17 +56,17 @@ function stats_menu() {
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
-          "text" => t("Analytics"),          
-          "path" => "stats",          
+          "text" => t("Analytics"),
+          "path" => "stats",
         ),
-      ),      
-    ),    
+      ),
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 100,
   );
-  
+
 
   $items["stats/reports/major-counts"] = array(
     "title" => "Major Counts",
@@ -74,18 +74,18 @@ function stats_menu() {
     "page_callback" => "stats_report_major_counts",
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
-      "page_show_title" => TRUE,      
-      "menu_links" => array(         
+      "page_show_title" => TRUE,
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
       ),
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 150,
   );
-  
+
 
 
 
@@ -97,14 +97,14 @@ function stats_menu() {
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
       "bool_print" => FALSE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
-      ),      
-    ),    
-    "type" => MENU_TYPE_NORMAL_ITEM, 
+      ),
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 170,
     "file" => menu_get_module_path("stats") . "/reports.major-students-progress.inc",
   );
@@ -123,13 +123,13 @@ function stats_menu() {
     "page_settings" => array(
       "page_show_title" => TRUE,
       "bool_print" => FALSE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
-      ),      
-    ),    
+      ),
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 250,
   );
@@ -143,19 +143,19 @@ function stats_menu() {
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
-      ),      
-    ),    
+      ),
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 300,
-  );  
-  
-  
-  
+  );
+
+
+
 
   $items["stats/reports/flightpath-use-summary"] = array(
     "title" => "$system_name Use Summary",
@@ -164,51 +164,51 @@ function stats_menu() {
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
-      ),      
-    ),    
+      ),
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 350,
   );
 
 
 
-  
+
 
   $items["stats/reports/course-use-summary"] = array(
     "title" => "Course Use Summary",
     "description" => "A report of everywhere a particular course is used in $system_name (groups or degrees).",
-    "page_callback" => "stats_report_course_use_summary",    
+    "page_callback" => "stats_report_course_use_summary",
     "access_arguments" => array("can_access_stats"),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => t("Analytics"),
           "path" => "stats",
         ),
-      ),      
-    ),    
+      ),
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "weight" => 450,
   );
-  
-  
-  
-  
-  
-  // Lets the user download a CSV file stored in the batch_queue table, with a batch_id.
+
+
+
+
+
+  // Lets the user download a CSV file where the contents are stored in the batch_queue table itself, with a batch_id.
   $items["stats/download-csv-from-batch/%"] = array(
     "page_callback" => "stats_download_csv_from_batch",
     "page_arguments" => array(2),
     "access_arguments" => array("can_access_stats"),
     "type" => MENU_TYPE_CALLBACK,
   );
-  
+
   // Lets the user download a CSV file stored in a FILE, in the files/private directory, with a batch_id.
   $items["stats/download-csv-from-batch-file/%"] = array(
     "page_callback" => "stats_download_csv_from_batch_file",
@@ -217,10 +217,10 @@ function stats_menu() {
     "type" => MENU_TYPE_CALLBACK,
   );
 
-  
-  
-  
-  
+
+
+
+
   return $items;
 }
 
@@ -228,30 +228,30 @@ function stats_menu() {
 
 /**
  * Lets the user download a CSV file from a completed batch.
- * 
+ *
  * There are no permissions on this, except the can_access_stats permission.
  *
  * @param unknown_type $batch_id
  */
 function stats_download_csv_from_batch($batch_id) {
-  
+
   $filename = fp_get_machine_readable(strtolower($_REQUEST["filename"]));
-  
+
   $batch = batch_get($batch_id);
   if (!$batch) {
     print "Error trying to download CSV.";
     die;
   }
-  
+
   watchdog('stats', "download_csv_from_batch batch_id:$batch_id, filename:$filename.csv", array());
 
-  // Give it to the browser...  
+  // Give it to the browser...
   header('Content-type: text/csv');
   header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
   print $batch["csv"];
 
-  die;    
-  
+  die;
+
 }
 
 
@@ -259,35 +259,35 @@ function stats_download_csv_from_batch($batch_id) {
 
 /**
  * Lets the user download a CSV file from a completed batch, from a file created during the batch operation.
- * 
+ *
  *
  * @param unknown_type $batch_id
  */
 function stats_download_csv_from_batch_file($batch_id) {
-  
+
   $filename = fp_get_machine_readable(strtolower($_REQUEST["filename"]));
-  
+
   $batch = batch_get($batch_id);
 
   watchdog('stats', "download_csv_from_batch_file batch_id:$batch_id, filename:$filename.csv", array());
 
   // calcuate the full path to the file...
-  $private_path = fp_get_files_path() . "/private";  
+  $private_path = fp_get_files_path() . "/private";
   $batch_id = $batch['batch_id'];
-  $created = $batch['created'];  
+  $created = $batch['created'];
   $filepath = $private_path . '/batch_' . $batch_id . '__' . $created . '.csv.tmp';
-    
 
-  // Give it to the browser...  
+
+  // Give it to the browser...
   header('Content-type: text/csv');
   header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-  
+
   // Read directly from the server...
   readfile($filepath);
-    
 
-  die;    
-  
+
+  die;
+
 }
 
 
@@ -301,27 +301,27 @@ function stats_download_csv_from_batch_file($batch_id) {
  * Implementation of hook_perm().
  * Expects to return an array of permissions recognized by
  * this module.
- * 
- * Ex:   $a = array( 
- *          "deCanDoSomething" => array ( 
+ *
+ * Ex:   $a = array(
+ *          "deCanDoSomething" => array (
  *              "title" => "Can Do Something",
- *              "description" => "Allow the user to do something." 
+ *              "description" => "Allow the user to do something."
  *          )
  *        );
  *
  */
 function stats_perm() {
-  
+
   $perms = array (
     "can_access_stats" => array(
       "title" => t("Access/view stats & analytics"),
       "description" => t("This allows the user to access the stats module, letting them run
                         reports on usage."),
-    ),    
+    ),
   );
 
   return $perms;
-  
+
 }
 
 
@@ -334,24 +334,24 @@ function stats_perm() {
  * @param unknown_type $display_submit
  */
 function stats_draw_catalog_year_pulldown($selected = "", $display_submit = FALSE) {
-  
+
   $rtn = "";
 
-  
+
   $rtn .= "
       <table border='0'>
-      
+
           <td valign='middle'>
-          
+
           <select name='catalog_year' id='catalog_year'><option value=''>
                 " . t("Please select a catalog year") . "</option>
           <option value=''>-----------------------------------</option>";
-  
-  
+
+
   $current_catalog_year = variable_get("current_catalog_year", "");  // TODO: school_id?
 
   if ($selected == "") $selected = $current_catalog_year;
-  
+
   $res = db_query("SELECT DISTINCT (catalog_year) FROM degrees
                    WHERE exclude = '0'
                    ORDER BY catalog_year DESC");
@@ -359,7 +359,7 @@ function stats_draw_catalog_year_pulldown($selected = "", $display_submit = FALS
     $sel = ($cur["catalog_year"] == $selected) ? "selected=selected" : "";
     $rtn .= "<option value='{$cur["catalog_year"]}' $sel>{$cur["catalog_year"]}-" . ($cur["catalog_year"] + 1) . "</option>";
   }
-  
+
   $rtn .= "                </select> </td>";
   if ($display_submit == true)
   {
@@ -367,9 +367,9 @@ function stats_draw_catalog_year_pulldown($selected = "", $display_submit = FALS
   }
 
   $rtn .= "</table>";
-  
+
   return $rtn;
-  
+
 }
 
 
@@ -380,14 +380,14 @@ function stats_draw_catalog_year_pulldown($selected = "", $display_submit = FALS
  */
 function stats_report_course_use_summary() {
   $rtn = "";
-  
+
   $draft = "";
   $use_draft = FALSE;
 
   $school_id = 0;  // TODO: school is selectable / based on user's school?
-  
+
   $subject_id = $course_num = $draft_check = "";
-  
+
   if (isset($_GET["subject_id"])) {
     $subject_id = trim($_GET["subject_id"]);
     $course_num = trim($_GET["course_num"]);
@@ -396,15 +396,15 @@ function stats_report_course_use_summary() {
       $draft_check = $_GET["draft"];
     }
   }
-    
+
   if ($draft_check == "checked") {
     $draft = "draft_";
     $use_draft = TRUE;
   }
-  
+
   $rtn .= "<form action='" . fp_url("stats/reports/course-use-summary") . "' method='GET' >";
   $rtn .= "Please enter a course's subject ID and course number to search:<br>";
-           
+
   if (module_enabled("schools")) {
     $options = schools_get_schools_for_fapi();
     $rtn .= "<select name='school_id'>";
@@ -415,27 +415,27 @@ function stats_report_course_use_summary() {
     }
     $rtn .= "</select> &nbsp; ";
   }
-                      
-              
-  $rtn .= " 
+
+
+  $rtn .= "
             <input type='text' name='subject_id' placeholder='Subject ID' size='10' value='$subject_id'> &nbsp;
             <input type='text' name='course_num' placeholder='Course Num' size='10' value='$course_num'> &nbsp;
             <input type='checkbox' name='draft' value='checked' $draft_check>Check draft tables? &nbsp;
             <input type='submit' value='Search'>
             <br><b>Note:</b> This may take up to a minute to run, please be patient.";
-            
+
   $rtn .= "</form>";
-  
+
   if ($subject_id && $course_num) {
     $rtn .= "<hr>";
-    
+
     // First, look up this course's ID.
     $db = get_global_database_handler();
     $course_id = $db->get_course_id($subject_id, $course_num, '', $use_draft, $school_id);
-    
+
     if ($course_id) {
       $rtn .= "<h2>Course $subject_id $course_num (id is $course_id)</h2>";
-      
+
       // Groups
       $rtn .= "<div><b>Groups:</b></div>
                 <table border='1'>
@@ -444,7 +444,7 @@ function stats_report_course_use_summary() {
                     <th>Name</th>
                     <th>Title</th>
                     <th>Year</th>
-                    
+
                   </tr>";
       $res = db_query("SELECT * FROM {$draft}group_requirements WHERE course_id = ?
                         order by `id`", $course_id);
@@ -468,9 +468,9 @@ function stats_report_course_use_summary() {
                   </tr>";
       }
       $rtn .= "</table>";
-      
+
       // Now, look for degrees...
-      
+
       $rtn .= "<br><br><br>
                 <b>Degrees:</b>
                <table border='1'>
@@ -482,12 +482,12 @@ function stats_report_course_use_summary() {
                 <th>Sem</th>
                 <th>Year</th>
                </tr>";
-      
+
       $res = db_query("SELECT * FROM {$draft}degree_requirements WHERE course_id = ? ORDER BY `id`", $course_id);
       while ($cur = db_fetch_array($res)) {
         $degree_id = $cur["degree_id"];
         $degree = new DegreePlan($degree_id, $db, TRUE, FALSE, $use_draft);
-        
+
         $rtn .= "<tr>
                     <td>$degree_id</td>
                     <td>$degree->title</td>
@@ -497,24 +497,24 @@ function stats_report_course_use_summary() {
                     <td>$degree->catalog_year</td>
                   </tr>";
       }
-      
-      
-      
+
+
+
       $rtn .= '</table>';
-      
+
     } // if course_id
     else {
       $rtn .= "<div>Course could not be found.  Check spelling.";
     }
-    
+
   }
-  
-  
+
+
   watchdog('stats', "report_course_use_summary subject_id:$subject_id, course_num:$course_num, school_id:$school_id, draft_check:$draft_check", array());
-  
-  
+
+
   return $rtn;
-  
+
 }
 
 
@@ -529,8 +529,8 @@ function stats_report_course_use_summary() {
  */
 function z__stats_report_selected_degree_options() {
   $rtn = "";
-  
-  
+
+
   // What major have they selected?
   $major = fp_trim((string) @$_GET["major"]);
 
@@ -541,24 +541,24 @@ function z__stats_report_selected_degree_options() {
   $db = get_global_database_handler();
 
   if ($major != "")
-  { 
+  {
     $count_in_major = 0;
     $degree_option_count = array();
-    
+
     $sql = "SELECT * FROM students a, student_degrees b
             WHERE substring_index(major_code, '|', 1) = '?'
             AND rank_code IN %RANKIN%
             AND a.cwid = b.student_id
-            %EXTRA_STUDENTSEARCH_CONDITIONS% 
-            GROUP BY a.cwid";      
-    
+            %EXTRA_STUDENTSEARCH_CONDITIONS%
+            GROUP BY a.cwid";
 
-    $rank_in = "( '" . join("', '", csv_to_array(variable_get("allowed_student_ranks",''))) . "' )";    
-    $sql = str_replace("%RANKIN%", $rank_in, $sql);   
-    $sql = str_replace("%EXTRA_STUDENTSEARCH_CONDITIONS%", variable_get("extra_student_search_conditions",''), $sql);  
+
+    $rank_in = "( '" . join("', '", csv_to_array(variable_get("allowed_student_ranks",''))) . "' )";
+    $sql = str_replace("%RANKIN%", $rank_in, $sql);
+    $sql = str_replace("%EXTRA_STUDENTSEARCH_CONDITIONS%", variable_get("extra_student_search_conditions",''), $sql);
 
     $result = db_query($sql, $major);
-    
+
     while($cur = db_fetch_array($result))
     {
       extract($cur, 3, "db");
@@ -567,24 +567,24 @@ function z__stats_report_selected_degree_options() {
       $track = "";
       // Does this student have a track (degree option) specified?
       //$student_settings = $db->get_student_settings($db_cwid);
-      
+
       $student_major_codes = $db->get_student_majors_from_db($db_cwid);
       // Look through all the major codes for this student, and see if any
       // have a |_ in them.  If they do, that means they are a track.
       foreach ($student_major_codes as $mc) {
         if (strstr($mc, $major . "|_")) {
           $track = $mc;  // Yes, so this is a track for this major.
-          
+
           // Init if not already...
           if (!isset($degree_option_count[$track])) {
             $degree_option_count[$track] = 0;
           }
-    
+
           $degree_option_count[$track]++;
-                    
+
         }
-      } 
-      
+      }
+
 
 
       // No track found.  Add that one, too.
@@ -595,20 +595,20 @@ function z__stats_report_selected_degree_options() {
         if (!isset($degree_option_count[$track])) {
           $degree_option_count[$track] = 0;
         }
-        
+
         $degree_option_count[$track]++;
-              
+
       }
 
 
-                
-      
+
+
 
     } // while db_fetch_array
 
     arsort($degree_option_count);
 
-    
+
 
     $rtn .= "<table border='1'>
         <tr>
@@ -640,16 +640,16 @@ function z__stats_report_selected_degree_options() {
             <td valign='top'>
               $desc
             </td>
-            
+
           </tr>";
     }
 
     $rtn .= "</table>" . t("Total number of students:") . " $count_in_major.";
 
   }
-  
-  
-  
+
+
+
   return $rtn;
 }
 
@@ -658,30 +658,30 @@ function z__stats_report_selected_degree_options() {
 
 /**
  * Display a major selection pulldown, used by other reports.
- * 
+ *
  * If bool_only_majors_with_tracks == TRUE, then we will only display the majors which
  * have tracks associated with them.
- * 
+ *
  * If bool_exclude_tracks == TRUE, then we will skip over any major_code with a "_" in it,
  * meaning, this code describes a track and not the base major.
- * 
+ *
  * If bool_only_current_catalog_year == TRUE, then only degrees from the current catalog year
  * will be displayed.
  *
  */
 function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool_only_majors_with_tracks = FALSE, $label = "Please select a major", $bool_exclude_tracks = FALSE, $bool_only_current_catalog_year = TRUE, $bool_return_options_array = FALSE, $school_id = 0)
 {
-  
+
   $rtn = "";
   $db = get_global_database_handler();
   $major_array = array();
 
   $options_array = array();
-  
-  
-  $current_catalog_year = variable_get_for_school("current_catalog_year", "", $school_id);  
 
-  $m_a_count = 0;  
+
+  $current_catalog_year = variable_get_for_school("current_catalog_year", "", $school_id);
+
+  $m_a_count = 0;
   if ($bool_only_current_catalog_year) {
     $query = "SELECT * FROM degrees
           WHERE  catalog_year = ?
@@ -696,24 +696,24 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
           AND school_id = ?
           GROUP BY major_code
           ORDER BY major_code  ";
-    $result = db_query($query, $school_id);    
+    $result = db_query($query, $school_id);
   }
   while ($cur_row = $db->db_fetch_array($result)) {
     $major = trim($cur_row["major_code"]);
-    
+
     if ($bool_exclude_tracks && strpos($major, "_")) {
       continue;
     }
-    
+
     if ($bool_only_majors_with_tracks && !$db->get_degree_tracks($major, $current_catalog_year))
     { // only get majors that also have tracks!
       continue;
     }
-    
+
     $description = trim($cur_row["title"]);
     $type = trim($cur_row["degree_type"]);
     $school_id = intval($cur_row['school_id']);
-    
+
     $major_array[$m_a_count]["description"] = $description;
     $major_array[$m_a_count]["major"] = $major;
     $major_array[$m_a_count]["type"] = $type;
@@ -730,9 +730,9 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
 
   $rtn .= "
       <table border='0'>
-      
+
           <td valign='middle'>
-          
+
          <select name='major' id='major'>
          <option value=''>" . $label . "</option>
                       <option value=''>-----------------------------------</option>";
@@ -754,7 +754,7 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
     $rtn .= "<option value='" . $major_array[$t]["major"] . "' $sel>(" . $major_array[$t]["major"] . ")
           " . $major_array[$t]["description"] . " $hyph " . $major_array[$t]["type"] . "
           </option>";
-    
+
     if (module_enabled("schools")) {
       // Create an options array multi-dimentional, organized by school name.
       $options_array[$major_array[$t]["school_name"]][$major_array[$t]["major"]] = "(" . $major_array[$t]["major"] . ") " . $major_array[$t]["description"] . " $hyph " . $major_array[$t]["type"];
@@ -763,7 +763,7 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
       // Just create a "flat" options array
       $options_array[$major_array[$t]["major"]] = "(" . $major_array[$t]["major"] . ") " . $major_array[$t]["description"] . " $hyph " . $major_array[$t]["type"];
     }
-    
+
   }
 
 
@@ -776,9 +776,9 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
   $rtn .= "</table>";
 
   if ($bool_return_options_array) return $options_array;
-  
-  
-  
+
+
+
   return $rtn;
 
 }
@@ -797,21 +797,21 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
  */
 function z__stats_draw_student_cwid_form($path, $student_cwid = "") {
   $rtn = "";
-  
+
   $rtn .= "<form action='" . fp_url($path) . "' method='GET' >
             " . t("Enter a student's CWID to see their courses") . "
             <br>
             <span class='form-element element-type-textfield'>
               <input type='textfield' value='$student_cwid' name='student_cwid'>
             </span>
-            
+
             <span class='buttons form-element element-type-submit'>
               <input type='submit' value='" . t("Submit") . "'>
             </span>
           </form> <hr>
-          ";  
-  
-  
+          ";
+
+
   return $rtn;
 }
 
@@ -820,14 +820,14 @@ function z__stats_draw_student_cwid_form($path, $student_cwid = "") {
 
 
 function stats_select_school_form() {
-  
+
   $form = array();
-  
-  if (isset($_REQUEST['title'])) {  
+
+  if (isset($_REQUEST['title'])) {
     fp_set_title(strip_tags($_REQUEST['title']));
-  }  
+  }
   $redirect_path = $_REQUEST['redirect'];
-  
+
   $options = schools_get_schools_for_fapi();
   $form['school_id'] = array(
     'type' => 'select',
@@ -839,38 +839,38 @@ function stats_select_school_form() {
     'type' => 'hidden',
     'value' => 'yes',
   );
-  
+
   $form['redirect'] = array(
     'type' => 'hidden',
     'value' => base64_encode($redirect_path),
   );
-  
+
   $form['submit_btn'] = array(
     'type' => 'submit',
     'value' => t("Continue"),
   );
-  
+
   // change breadcrumbs based on REQUEST
   if (isset($_REQUEST['crumbs'])) {
     $crumbs = unserialize(base64_decode($_REQUEST['crumbs']));
-        
-    fp_set_breadcrumbs($crumbs);    
+
+    fp_set_breadcrumbs($crumbs);
   }
-  
-   
-  return $form;  
+
+
+  return $form;
 }
 
 
 
 function stats_select_school_form_submit($form, $form_state) {
-  
+
   // We are simply trying to select the school.  Return to the form with our selection.
   $school_id = intval($form_state['values']['school_id']);
   $redirect_path = base64_decode($form_state['values']['redirect']);
   fp_goto($redirect_path, 'school_id=' . $school_id);
   return;
-  
+
 }
 
 
@@ -900,16 +900,16 @@ function stats_report_major_counts() {
   if (module_enabled('schools')) {
     $rtn .= "<th>" . t("School") . "</th>";
   }
-  $rtn .= "          
+  $rtn .= "
           <th>" . t("Major") . "</th>
           <th>" . t("Count") . "</th>
-          <th colspan='2'>" . t("Description") . "</th>          
+          <th colspan='2'>" . t("Description") . "</th>
         </tr>";
-  
+
   $total = 0;
   $res_array = array();
   $result = db_query("SELECT * FROM degrees
-                          GROUP BY major_code 
+                          GROUP BY major_code
                           ORDER BY school_id, major_code, title ");
   while ($cur = db_fetch_array($result)) {
     $count = 0;
@@ -922,22 +922,22 @@ function stats_report_major_counts() {
     if (module_enabled("schools")) {
       $school_code = schools_get_school_code_for_id($school_id);
     }
-    
+
     // Find out how many students have this major code.
 
     $sql = "SELECT count(cwid) AS count FROM students a, student_degrees b
             WHERE b.major_code = ?
             AND a.cwid = b.student_id
             AND rank_code IN %RANKIN%
-            %EXTRA_STUDENTSEARCH_CONDITIONS% ";      
-    
-    $rank_in = "( '" . join("', '", csv_to_array(variable_get("allowed_student_ranks", "FR,SO,JR,SR"))) . "' )";    
-    $sql = str_replace("%RANKIN%", $rank_in, $sql);   
-    $sql = str_replace("%EXTRA_STUDENTSEARCH_CONDITIONS%", variable_get("extra_student_search_conditions",""), $sql);  
-    
+            %EXTRA_STUDENTSEARCH_CONDITIONS% ";
+
+    $rank_in = "( '" . join("', '", csv_to_array(variable_get("allowed_student_ranks", "FR,SO,JR,SR"))) . "' )";
+    $sql = str_replace("%RANKIN%", $rank_in, $sql);
+    $sql = str_replace("%EXTRA_STUDENTSEARCH_CONDITIONS%", variable_get("extra_student_search_conditions",""), $sql);
+
     $res2 = db_query($sql, $major_code);
     $cur2 = db_fetch_array($res2);
-    
+
     if (is_numeric($cur2["count"])) {
      $total += $cur2["count"];
     }
@@ -945,12 +945,12 @@ function stats_report_major_counts() {
     $res_array[$major_code]["desc"] = $title;
     $res_array[$major_code]["type"] = $degree_type;
     $res_array[$major_code]["school_code"] = $school_code;
-    
+
   }
-   
+
   if (count($res_array) > 0) {
     foreach($res_array as $major => $value) {
-  
+
       $rtn .= "<tr>";
       if (module_enabled('schools')) {
         $rtn .= "<td valign='top' class='tenpt'>{$value["school_code"]}</td>";
@@ -967,9 +967,9 @@ function stats_report_major_counts() {
   $rtn .= "</table>
       " . t("Total student records:") . " $total.";
 
-  
+
   watchdog('stats', "report_major_counts", array());
-    
+
   return $rtn;
 }
 
@@ -977,23 +977,23 @@ function stats_report_major_counts() {
 
 /**
  * This report shows common usages in FlightPath by all users.
- * 
+ *
  * This is a helpful report for determining which functionality is most popular
  * in FlightPath
  *
  * @return unknown
  */
 function stats_report_flightpath_use_summary() {
-  $rtn = "";    
+  $rtn = "";
 
   $start_date = @$_REQUEST["start_date"];
   $end_date = @$_REQUEST["end_date"];
 
   $rtn .= stats_draw_date_range_form("stats/reports/flightpath-use-summary", $start_date, $end_date);
-  
+
   if ($start_date == "" || $end_date == "") {
     return $rtn;
-  }  
+  }
   $start_date .= " 00:00:00";  // make it start at midnight of the startDate.
   $end_date .= " 23:59:59";  // make it go through to midnight of the endDate.
   // Okay, now we get our various counts....
@@ -1027,7 +1027,7 @@ function stats_report_flightpath_use_summary() {
       </blockquote>
       ";
   */
-  
+
   // Advisings
   $_REQUEST['report_type'] = 'unique';
   $_REQUEST['is_whatif'] = 'no';
@@ -1045,8 +1045,8 @@ function stats_report_flightpath_use_summary() {
         What If advisings: $wi_advisings
       </blockquote>
     ";
-  
-  
+
+
   // Comments...
   $total = stats_get_log_count("save_comment","",false,$start_date,$end_date,false);
   $unique = stats_get_log_count("save_comment","",true,$start_date,$end_date,false);
@@ -1063,7 +1063,7 @@ function stats_report_flightpath_use_summary() {
   //$um_student = stats_get_log_count("course_search","",true,$start_date,$end_date,true,true);
   $t_student = stats_get_log_count("course_search","",false,$start_date,$end_date,true);
   //$tm_student = stats_get_log_count("course_search","",false,$start_date,$end_date,true, true);
-  
+
   $u_staff = stats_get_log_count("course_search","",true,$start_date,$end_date,false);
   $t_staff = stats_get_log_count("course_search","",false,$start_date,$end_date,false);
   //$tm_staff = stats_get_log_count("course_search","",false,$start_date,$end_date,false, true);
@@ -1077,7 +1077,7 @@ function stats_report_flightpath_use_summary() {
       </blockquote>
       ";
 
-  
+
   // Degree search...
   $u_student = stats_get_log_count("blank_degrees","",true,$start_date,$end_date,true);
   //$um_student = stats_get_log_count("blank_degrees","",true,$start_date,$end_date,true,true);
@@ -1095,22 +1095,22 @@ function stats_report_flightpath_use_summary() {
         Total faculty/staff (and anonymous) uses: $t_staff </span>
       </blockquote>
       ";
-  
-  
+
+
   // View preferences
   $t_student_y = stats_get_log_count("view_by_year","",false,$start_date,$end_date,true);
   //$tm_student_y = stats_get_log_count("view_by_year","",false,$start_date,$end_date,true, true);
   $u_student_y = stats_get_log_count("view_by_year","",true,$start_date,$end_date,true);
   //$um_student_y = stats_get_log_count("view_by_year","",true,$start_date,$end_date,true, true);
-  
+
   $t_staff_y = stats_get_log_count("view_by_year","",false,$start_date,$end_date,false);
 
   $t_student_t = stats_get_log_count("view_by_type","",false,$start_date,$end_date,true);
   //$tm_student_t = stats_get_log_count("view_by_type","",false,$start_date,$end_date,true, true);
   $u_student_t = stats_get_log_count("view_by_type","",true,$start_date,$end_date,true);
   //$um_student_t = stats_get_log_count("view_by_type","",true,$start_date,$end_date,true, true);
-  
-  
+
+
   $t_staff_t = stats_get_log_count("view_by_type","",false,$start_date,$end_date,false);
   $rtn .= "<b>View Preferences</b>
       <blockquote>
@@ -1132,13 +1132,13 @@ function stats_report_flightpath_use_summary() {
         Unique substitutors: $u_staff<br>
         Total substitutions: $t_staff<br>
       </blockquote>
-      ";      
-  
-  
-  
+      ";
+
+
+
   watchdog('stats', "report_flightpath_use_summary start_date:$start_date, end_date:$end_date", array());
-    
-  
+
+
   return $rtn;
 }
 
@@ -1160,7 +1160,7 @@ function stats_report_flightpath_use_summary() {
  */
 function stats_get_log_count($action = "", $action_array = "", $bool_distinct = false, $start_date = '', $end_date = '', $bool_students = true, $bool_mobile_only = false)
 {
-  
+
   $action_line = " `type` = '$action' ";
   if (is_array($action_array) && count($action_array) > 1)
   {
@@ -1191,10 +1191,10 @@ function stats_get_log_count($action = "", $action_array = "", $bool_distinct = 
   if ($bool_mobile_only) {
     $action_line .= "  AND is_mobile = '1' ";
   }
-  
+
   $start_ts = strtotime($start_date);
   $end_ts = strtotime($end_date);
-  
+
   $res = db_query("SELECT $count AS count FROM watchdog
           WHERE
             `timestamp` > '$start_ts' AND `timestamp` < '$end_ts'
@@ -1215,23 +1215,23 @@ function stats_get_log_count($action = "", $action_array = "", $bool_distinct = 
 /**
  * Displays the HTML for the date range form used by several reports.
  * $path is what is the form's ACTION sending to.
- * 
+ *
  * start and end date expected in YYYY-MM-DD format
- * 
+ *
  */
 function stats_draw_date_range_form($path, $start_date = "", $end_date = "", $additional_form_elements = "") {
   $rtn = "";
-  
+
   $rtn .= "<form action='" . fp_url($path) . "' method='GET' >
             " . t("Select a date range to begin:") . "
             <br>
-            " . t("Start date:") . " 
+            " . t("Start date:") . "
               <span class='form-element element-type-date element-size-smaller'>
                 <input type='date' name='start_date' value='$start_date' id='start_date'>
               </span>
             &nbsp; &nbsp;
             " . t("End date:") . "
-            <span class='form-element element-type-date'> 
+            <span class='form-element element-type-date'>
               <input type='date' name='end_date' value='$end_date' id='end_date'>
             </span>
             &nbsp; &nbsp;";
@@ -1243,28 +1243,28 @@ function stats_draw_date_range_form($path, $start_date = "", $end_date = "", $ad
 
   fp_add_css(fp_get_module_path("system") . "/css/style.css");
   fp_add_js(fp_get_module_path("system") . "/js/spinner.js");
-  
+
   $name = fp_get_machine_readable($path);
-    
+
   $rtn .= "
-            
+
             <span class='buttons form-element element-type-submit'>
               <input type='submit' value='" . t("Submit") . "' onclick='$(\".loading-spinner\").show();'>
             </span>
-  
+
             <span class='loading-spinner loading-spinner-$name' style='display:none;'></span>
-            
+
           </form> <hr>
-          ";  
-  
-  
+          ";
+
+
   return $rtn;
 }
 
 
 /**
  * This report shows which advisors are using FlightPath most often.
- * 
+ *
  *
  * @return unknown
  */
@@ -1281,26 +1281,26 @@ function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
   if (isset($_REQUEST['is_whatif'])) {
     $whatif = fp_trim((string) @$_REQUEST['is_whatif']);
   }
-  
+
   $selall = $selunique = "";
   if ($report_type == 'unique') $selunique = 'selected';
-  
+
   $additional_form_elements = t("Report Type:") . "
-            <span class='form-element element-type-select-smaller'> 
+            <span class='form-element element-type-select-smaller'>
               <select name='report_type' id='report_type'>
                 <option value='all' $selall>" . t("All saved advisings") . "</option>
                 <option value='unique' $selunique>" . t("Unique student advisings") . "</option>
               </select>
             </span>
             &nbsp; &nbsp;";
-  
-  
+
+
   $rtn .= stats_draw_date_range_form("stats/reports/advisor-use", $start_date, $end_date, $additional_form_elements);
-  
+
   if ($start_date == "" || $end_date == "") {
     return $rtn;
-  }  
-  
+  }
+
   $start_date .= " 00:00:00";  // make it start at midnight of the startDate.
   $end_date .= " 23:59:59";  // make it go through to midnight of the endDate.
 
@@ -1314,15 +1314,15 @@ function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
   $f_array = array();
   $s_array = array();
   $terms = array();
-  
-  $already_found_student_and_term = array();
-    
-  // TODO: get by school that user belongs to?  
-  $departments = fp_get_departments();
-    
-  $s_array = array();  
 
-  
+  $already_found_student_and_term = array();
+
+  // TODO: get by school that user belongs to?
+  $departments = fp_get_departments();
+
+  $s_array = array();
+
+
   $whatif_line = "";
   if ($whatif == 'yes') {
     $whatif_line = "AND a.is_whatif = 1 ";
@@ -1330,69 +1330,69 @@ function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
   else if ($whatif == 'no') {
     $whatif_line = "AND a.is_whatif != 1 ";
   }
-  
-  
-  $res = db_query("SELECT * 
+
+
+  $res = db_query("SELECT *
                       FROM advising_sessions a, users u, faculty f
-                      WHERE 
-                      (`posted` > ? AND `posted` < ?)                                                
+                      WHERE
+                      (`posted` > ? AND `posted` < ?)
                       AND a.is_empty != 1
                       AND a.is_draft != 1
                       AND a.delete_flag != 1
-                      $whatif_line                                             
+                      $whatif_line
                       AND is_faculty = 1
                       AND a.faculty_id = u.cwid
                       AND u.cwid = f.cwid
-                      ORDER BY l_name, f_name  
+                      ORDER BY l_name, f_name
                       ", array($start_ts, $end_ts));
     while ($cur = db_fetch_array($res)) {
-          
+
       $faculty_id = $cur['faculty_id'];
-      $student_id = $cur['student_id'];  
+      $student_id = $cur['student_id'];
       $term_id = $cur['term_id'];
-      
+
       $is_whatif = intval($cur['is_whatif']);
-      
-      
+
+
       if ($report_type == 'unique') {
         if (in_array("$faculty_id~$student_id~$term_id~$is_whatif", $already_found_student_and_term)) continue;
-        $already_found_student_and_term[] = "$faculty_id~$student_id~$term_id~$is_whatif";     
+        $already_found_student_and_term[] = "$faculty_id~$student_id~$term_id~$is_whatif";
       }
-  
+
       if (!isset($f_array[$faculty_id])) $f_array[$faculty_id] = 0;
-      
-      
+
+
       $school_id = intval($cur['school_id']);
       $dept_name = @$departments[$cur['department_code']];
       if (!$dept_name) $dept_name = $cur['department_code'];
-      
-      
+
+
       $f_array[$faculty_id] = intval($f_array[$faculty_id]); // make it a number.
       $f_array[$faculty_id]++;
-  
+
       $s_array[$faculty_id]["dept_name"] = $dept_name;
       $s_array[$faculty_id]["college_name"] = ucwords(strtolower(trim($cur["college"])));
-      
+
       $s_array[$faculty_id]["school_id"] = $school_id;
       $s_array[$faculty_id]["name"] = ucwords(strtolower(trim($cur["f_name"]) . " " . trim($cur["l_name"]))) . " ($faculty_id)";
-                
-        
-        
-      
-      
+
+
+
+
+
       if (!isset($s_array[$faculty_id][$term_id])) $s_array[$faculty_id][$term_id] = 0;
       $s_array[$faculty_id][$term_id]++;
-      
-      $terms[$term_id] = get_term_description($term_id);      
+
+      $terms[$term_id] = get_term_description($term_id);
     }
-    
-  
-  
-    
-  
+
+
+
+
+
 
   ksort($terms);
-  
+
 
   // Sort based on who has advised the most...
   //arsort($f_array);
@@ -1408,30 +1408,30 @@ function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
                   more than once.  Deleted advising sessions are not counted.</p>";
   }
   else if ($report_type == 'unique') {
-      
-    $rtn .= "<p><b>Note:</b> This Report Type (selected above) shows the number of advising sessions saved by the advisor, 
+
+    $rtn .= "<p><b>Note:</b> This Report Type (selected above) shows the number of advising sessions saved by the advisor,
                   <em>unique to a student AND What If mode</em>. It ignores sessions which were saved
                   more than once, unless the second time was in What If mode.  Deleted advising sessions are not counted.</p>";
   }
-  
+
   $rtn .= "
       <table border='1' cellpadding='10' style='min-width:700px;'>
         <tr>";
-  
+
   if (module_enabled('schools')) {
     $rtn .= "<th>" . t("School") . "</th>";
   }
-        
+
   $rtn .= "<th>" . t("Name") . "</th>
           <th>" . t("Dept") . "</th>
           <th>Total #</th>";
-          
-  // loop through and add in the terms          
+
+  // loop through and add in the terms
   foreach ($terms as $term_id => $term_desc) {
     $rtn .= "<td>$term_desc</td>";
   }
-  
-          
+
+
   $rtn .= "</tr>";
   foreach($f_array as $faculty_id => $value)
   {
@@ -1439,40 +1439,40 @@ function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
     $college_name = $s_array[$faculty_id]["college_name"];
     $dept_name = $s_array[$faculty_id]["dept_name"];
     $school_id = $s_array[$faculty_id]["school_id"];
-    
+
     $grand_total = $grand_total + intval($value);
-    
+
     $rtn .= "<tr>";
-    
+
     if (module_enabled('schools')) {
       $rtn .= "<td valign='top'>" . schools_get_school_name_for_id($school_id) . "</td>";
     }
-    
+
     $rtn .= "
        <td valign='top'>$name</td>
        <td valign='top'>$dept_name</td>
        <td valign='top' align='center'>$value</td>";
 
-    // loop through and add in the terms          
+    // loop through and add in the terms
     foreach ($terms as $term_id => $term_desc) {
       $rtn .= "<td align='center'>" . fp_trim(@$s_array[$faculty_id][$term_id]) . "</td>";
     }
 
 
 
-    $rtn .= "       
+    $rtn .= "
       </tr>
-      
+
       ";
   }
-  $rtn .= "</table>";  
+  $rtn .= "</table>";
   $rtn .= "<p><b>Total in selected date range:</b> $grand_total</p>";
-  
+
   if ($bool_only_return_total_number) {
     return intval($grand_total);
   }
-  
-  
+
+
   return $rtn;
 }
 
@@ -1499,7 +1499,7 @@ function stats_report_access_stats() {
 
   $rtn .= "
       <form action='" . fp_url("stats/reports/access") . "' method='GET'>
-      " . t("Activity over the last") . " 
+      " . t("Activity over the last") . "
       <input type='text' name='min' value='$min' size='2'>
       ";
 
@@ -1518,7 +1518,7 @@ function stats_report_access_stats() {
               <th>" . t("Action") . "</th>
               <th>" . t("Msg") . "</th>
               <th>" . t("Time") . "</th>
-              
+
             </tr>";
 
   $cwid_array = array();
@@ -1528,36 +1528,36 @@ function stats_report_access_stats() {
   $pol = "";
   $res = db_query("SELECT * FROM watchdog
               WHERE `timestamp` > ?
-              ORDER BY `timestamp` DESC 
+              ORDER BY `timestamp` DESC
               ", $interval);
   while ($cur = db_fetch_array($res)) {
     extract ($cur, 3, "db");
     $wid = $cur['wid'];
     $account = fp_load_user($db_user_id);
-    
+
     $pol = ($pol == "even") ? "odd" : "even";
-    
+
     $minago = round((time() - $db_timestamp) / 60, 0);
 
     $vars = @unserialize($db_variables);
     if (!$vars) $vars = '';
-    
+
     $message = strip_tags(t($db_message, $vars));
     if (strlen($message) > 100) {
       $message = trim(substr($message, 0, 100)) . "...";
     }
-    
-    
+
+
     $pretty_date = format_date(convert_time($db_timestamp));
-    
+
     $user_type = "";
     if ($account->is_student) {
       $user_type .= "<span>" . t("Student") . "</span>";
     }
     if ($account->is_faculty) {
-      $user_type .= "<span style='background-color: lightyellow;'>" . t("Faculty") . "</span>";      
+      $user_type .= "<span style='background-color: lightyellow;'>" . t("Faculty") . "</span>";
     }
-    
+
     $rtn .= "<tr class='row-$pol'>
           <td valign='top'>" . l($wid, "admin/config/watchdog/$wid") . "</td>
           <td valign='top'>$account->name</td>
@@ -1586,9 +1586,9 @@ function stats_report_access_stats() {
 
 
   $rtn .= "</table>";
-  
-  
-  return $rtn;  
+
+
+  return $rtn;
 }
 
 
@@ -1598,50 +1598,50 @@ function stats_report_access_stats() {
  * @return unknown
  */
 function stats_report_student_course_list() {
-  
+
   $rtn = "";
 
   $student_cwid = "";
-  
+
   if (isset($_REQUEST["student_cwid"])) {
     $student_cwid = trim(addslashes($_REQUEST["student_cwid"]));
   }
   $student_pidm = 0;
   //$rtn .= stats_draw_student_cwid_form("stats/reports/student-course-list", $student_cwid);
-  
+
   $rtn .= "<form action='" . fp_url("stats/reports/student-course-list") . "' method='GET' >
             " . t("Enter a student's CWID to see their courses:") . "
             <br>
             <span class='form-element element-type-textfield'>
               <input type='textfield' value='$student_cwid' name='student_cwid'>
             </span>
-            
+
             <span class='buttons form-element element-type-submit'>
               <input type='submit' value='" . t("Submit") . "'>
             </span>
           </form> <hr>";
-  
-  
+
+
   if ($student_cwid == "") {
     return $rtn;
-  }    
+  }
 
   // If we have the banner_integration module installed, then get the pidm from banner too
   if (function_exists("banner_integration_get_pidm_for_cwid")) {
     $student_pidm = intval(banner_integration_get_pidm_for_cwid($student_cwid));
-  }  
+  }
   $student_name = fp_get_student_name($student_cwid);
   $student = new Student($student_cwid);
-  
+
   $school_id = db_get_school_id_for_student_id($student_cwid);
   $school_name = "";
-  if (module_enabled("schools")) {    
+  if (module_enabled("schools")) {
     $school_name = schools_get_school_name_for_id($school_id);
   }
-    
-  
+
+
   $rtn .= "
-  
+
   <style>
     .zebra-even {
       background-color: white;
@@ -1650,7 +1650,7 @@ function stats_report_student_course_list() {
       background-color: #eee;
     }
   </style>
-  
+
       <h2>$student_name ($student_cwid)
       ";
   if ($student_pidm > 0) {
@@ -1659,7 +1659,7 @@ function stats_report_student_course_list() {
   if ($school_name) {
     $rtn .= "<br>" . t("School:") . "<em>$school_name</em>";
   }
-  $rtn .= "</h2>  
+  $rtn .= "</h2>
       <table border='0' cellspacing='0' cellpadding='6'>
         <tr>
           <th>Subject</th>
@@ -1669,38 +1669,38 @@ function stats_report_student_course_list() {
           <th>Term</th>
           <th>Transfer?</th>
         </tr>";
-    
 
-  // So that we can sort our list of courses, we will add them to 
+
+  // So that we can sort our list of courses, we will add them to
   // 2 arrays, one for local courses, one for transfer.
   $local_array = array();
   $transfer_array = array();
- 
+
   $pol = "even";
 
   $local_hours = 0;
   $transfer_hours = 0;
-  
-  
-  
+
+
+
   while($student->list_courses_taken->has_more()) {
     $course = $student->list_courses_taken->get_next();
-         
+
     $subjectID = $course->subject_id;
     $courseNum = $course->course_num;
     $grade = $course->grade;
     $hours = $course->get_hours_awarded();
-    
+
     $rnd = mt_rand(0,9999);
-    
+
     if (is_object($course->course_transfer)) {
       $subjectID = $course->course_transfer->subject_id;
       $courseNum = $course->course_transfer->course_num;
       $grade = $course->course_transfer->grade;
       $hours = $course->course_transfer->get_hours_awarded();
-      
+
       $transfer_hours += $hours;
-      
+
     }
     else {
       // local course
@@ -1724,15 +1724,15 @@ function stats_report_student_course_list() {
       // The $rnd makes sure this is unique, in case a course is showing as repeated in the same term.
       $local_array["$course->term_id~$subjectID~$courseNum~$rnd"] = $html_line;
     }
-    
-       
-  }   
-    
-  
+
+
+  }
+
+
   // Okay, now let's sort our arrays and display them.
   ksort($transfer_array);
   ksort($local_array);
-  
+
   foreach($local_array as $line) {
     $rtn .= "<tr class='zebra-$pol'>$line</tr>";
     $pol = ($pol == "even")?"odd":"even";
@@ -1742,34 +1742,34 @@ function stats_report_student_course_list() {
     $rtn .= "<tr class='zebra-$pol'>$line</tr>";
     $pol = ($pol == "even")?"odd":"even";
   }
-  
-  
+
+
 
   $rtn .= "</table>
     <hr>
     ";
-  
+
   $rtn .= "<p>" . count($local_array) . " local courses, with $local_hours hours.</p>";
   $rtn .= "<p>" . count($transfer_array) . " transfer courses, with $transfer_hours hours.</p>";
-  
-  
+
+
   watchdog('stats', "report_student_course_list student_id:$student_cwid, school_id:$school_id, student_name:$student_name", array());
-  
-  
-  return $rtn;  
-  
-  
+
+
+  return $rtn;
+
+
 }
 
 
 
 /**
  * Main menu screen for this module.
- * 
+ *
  * We will simply display the "menu block" for "stats/reports".  That is,
  * any path that begins with stats/reports will show up here.
- * 
- * You can create a report in your custom module, and as long as the url begins 
+ *
+ * You can create a report in your custom module, and as long as the url begins
  * with stats/reports, and the menu item is of type "MENU_TYPE_NORMAL_ITEM"
  * it will appear on this page.  Set the weight to be > 1000 to appear below this list,
  * set weight < 100 to appear above.
@@ -1779,34 +1779,34 @@ function stats_report_student_course_list() {
  */
 function stats_display_main() {
   $rtn = "";
-  
-  
-  
+
+
+
   $rtn .= "<div class='stats-main-menu'>";
   $rtn .= fp_render_menu_block("System Reports", "stats/reports");
   $rtn .= "</div>";
-  
+
   // If we have other reports which have been exposed using the hook_stats_additional_menublocks function,
   // display them here.
-  
+
   $reports = invoke_hook('stats_additional_menublocks');
   if ($reports) {
     foreach ($reports as $module_name => $temp) {
-      $extraclass = "";  
+      $extraclass = "";
 
       $extraclass .= "stats-menublock-path-" . strtolower(fp_get_machine_readable(current($reports[$module_name])));
-      
+
       $rtn .= "<div class='stats-main-menu stats-additional-menublocks $extraclass'>";
       foreach($reports[$module_name] as $title => $menu_block_path) {
-        $rtn .= fp_render_menu_block($title, $menu_block_path);        
+        $rtn .= fp_render_menu_block($title, $menu_block_path);
       }
       $rtn .= "</div>";
     }
   }
-  
-  
-  
-  
-    
+
+
+
+
+
   return $rtn;
 }

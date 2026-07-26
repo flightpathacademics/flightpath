@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-26
+  Modified included .htaccess to make sure any .git repo or other . files are not accessible.
+  Also removed support for Apache 2.2.
+
+
 2026-07-15
   Changed some links from flightpathacademics.com to w2.flightpathacademics.com.
 
