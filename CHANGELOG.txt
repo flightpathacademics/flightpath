@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-29
+  Added new CSS to style.css, to accomodate labels which are explicitly inline.
+
+
 2026-07-26
   Modified included .htaccess to make sure any .git repo or other . files are not accessible.
   Also removed support for Apache 2.2.

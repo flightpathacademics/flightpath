@@ -6,10 +6,10 @@
 
 body
 {
-  font-family: "Segoe UI", Arial, Helvetica, sans-serif;   
+  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
   padding: 0;
-  margin: 0;  
-   z___background-color: #F2F2F2; 
+  margin: 0;
+   z___background-color: #F2F2F2;
   background-color: white;
   color: #555;
   height: 100%;  /* required for modal dialog to work correctly */
@@ -25,8 +25,8 @@ table {
   padding: 0;
 }
 
-/* 
- * Page top banner 
+/*
+ * Page top banner
  */
 
 .top-banner {
@@ -35,7 +35,7 @@ table {
   margin: 0;
   border: 0;
   border-radius: 0;
-  
+
 }
 
 .top-banner img {
@@ -47,7 +47,7 @@ table {
 a.action-link {
   padding-left: 3px;
   padding-right: 3px;
-} 
+}
 
 a.action-link-remove {
   color: indianred;
@@ -71,12 +71,12 @@ table.tabs-search-table {
   border: 0;
   border-spacing: 0;
   border-collapse: collapse;
-  
-  
-  background-color: #F2F2F2;  
-  
-  
-  
+
+
+  background-color: #F2F2F2;
+
+
+
 }
 
 /* Are we in a popup window? */
@@ -91,11 +91,11 @@ table.tabs-search-table td {
 
 table.tabs-table-tabs {
   width: 100%;
-  text-align: left; 
+  text-align: left;
   border: 0;
   border-spacing: 0;
   border-collapse: collapse;
-  
+
 }
 
 .tabs-table-tabs td {
@@ -107,14 +107,14 @@ table.tabs-search-table td.search-td {
   text-align: right;
   width: 100%;
   vertical-align: bottom;
-  padding-right: 30px;  
+  padding-right: 30px;
 }
 
 .tab_left, .tab_left_i {
   display: none;
 }
 
-.tab_right, .tab_right_i { 
+.tab_right, .tab_right_i {
   display: none;
 }
 
@@ -124,49 +124,49 @@ table.tabs-search-table td.search-td {
 .active_tab, .inactive_tab {
   border-collapse: separate;
   position: relative;
-  top: 4px;  
+  top: 4px;
   color: #660000;
-  cursor: default;  
-  
+  cursor: default;
+
   border: 0 !important;
-  border-radius: 0;  
-  padding: 10px 10px 5px 10px;  
-  
+  border-radius: 0;
+  padding: 10px 10px 5px 10px;
+
 }
 
 
 
-.active_tab {  
+.active_tab {
   border-bottom: 3px solid white;
-  background-color: white;    
-  
-  border-top: 2px solid #ccc !important;  
-  
+  background-color: white;
+
+  border-top: 2px solid #ccc !important;
+
 }
 
 
 
 .inactive_tab {
   position: relative;
-  top: 4px;  
-  border-bottom: 1px solid #ccc;  
-  color: #666;  
+  top: 4px;
+  border-bottom: 1px solid #ccc;
+  color: #666;
 }
 
 
-.inactive_tab_over { 
+.inactive_tab_over {
   border-collapse: separate;
-   
+
   cursor: pointer;
   position: relative;
   top: 4px;
-  
+
   border: 0;
   border-radius: 0;
   color: black;
   text-decoration: underline;
-  padding: 10px 10px 5px 10px;  
-     
+  padding: 10px 10px 5px 10px;
+
 }
 
 
@@ -186,20 +186,20 @@ table.tabs-search-table td.search-td {
 
 /* Page content */
 .page-content {
-  width: 800px;  
+  width: 800px;
   min-height: 400px;
   margin-left: auto;
   margin-right: auto;
   background-color: white;
-  
-  border: 0;  
+
+  border: 0;
   padding: 20px;
   padding-bottom: 50px;
   margin-bottom: 2px;
   border-radius: 0;
-  box-shadow: 0px 0px 50px #777;  
-  
-  
+  box-shadow: 0px 0px 50px #777;
+
+
 }
 .page-is-popup .page-content {
   min-height: 250px;
@@ -214,22 +214,22 @@ table.tabs-search-table td.search-td {
   font-size: 0.7em;
   display: table;
   width: 100%;
-  
-  color: white;  
+
+  color: white;
   background-color: #373B44;
-  
-  margin-top: 50px;    
+
+  margin-top: 50px;
   zzmargin-left: auto;
   zzmargin-right: auto;
-  
+
   zzpadding-left: 40px;
   padding-top: 20px;
   padding-bottom: 40px;
-    
+
 
   min-height: 80px;
   border-top: 1px solid #030304;
-    
+
 }
 
 
@@ -307,9 +307,9 @@ img.fpmn-icon {
 }
 
 
-/* 
- * checkboxes.... 
- * 
+/*
+ * checkboxes....
+ *
  * */
 span.advise-checkbox {
   width:14px;
@@ -397,7 +397,7 @@ span.advise-checkbox-retake-checked {
 .sub-tabs .gradbutton-active {
   font-weight: bold;
 }
- 
+
 th {
   text-align: left;
 }
@@ -412,7 +412,7 @@ th {
 
 
 .fp-semester-table {
-  border-collapse: collapse;  
+  border-collapse: collapse;
   width: 100%;
 }
 
@@ -425,7 +425,7 @@ th {
 .currently-advising-box-change-term a {
   color: white;
   padding-right: 20px;
-  background: url('images/popup-t.gif') no-repeat top right;  
+  background: url('images/popup-t.gif') no-repeat top right;
 }
 
 
@@ -442,7 +442,7 @@ th {
   border: 1px solid #FFCC66;
   background-color: #FFFFCC;
   padding: 5px 20px 5px 20px;
-  
+
   margin: 5px;
   margin-bottom: 10px;
   text-align: left;
@@ -453,7 +453,7 @@ th {
 }
 
 .fp-message-warning {
-  color: chocolate;  
+  color: chocolate;
 }
 
 
@@ -469,14 +469,14 @@ th {
 
 
 .fp-render-button
-{  
+{
   background: url('images/buttonbg1.jpg') #fff bottom left repeat-x;
   padding: 5px;
   padding-left: 20px;
   padding-right: 20px;
   border: 1px solid #BBBBBB;
-  display: inline-block;  
-  
+  display: inline-block;
+
   margin-right: 10px;
   /*min-width: 55px;  */
 }
@@ -494,7 +494,7 @@ th {
 
 .selectVariableClassHidden
 {
-  
+
   visibility: hidden;
   overflow: hidden;
   background-color: #FFFFFF;
@@ -531,7 +531,7 @@ div.updateMsg
  {
   font-weight: bold;
  }
- 
+
 
 .tenpt
 {
@@ -600,13 +600,13 @@ div.updateMsg
 
 a
 {
-  text-decoration: none; 
-  color: #0080ff; 
+  text-decoration: none;
+  color: #0080ff;
 }
 
 a:hover
 {
-  text-decoration: underline; 
+  text-decoration: underline;
 }
 
 .falseLink
@@ -618,7 +618,7 @@ a:hover
 
 
 
-.smallinput 
+.smallinput
 {
  font-size: 8pt;
  border-style: solid;
@@ -663,7 +663,7 @@ td.u
 
 .uhand
 {
- background-image:URL('images/underline.gif'); 
+ background-image:URL('images/underline.gif');
  cursor: pointer;
 }
 
@@ -679,13 +679,13 @@ td.u
  */
 .blueTitle
 {
-  color: white; 
-  background-color: #999 !important;  
+  color: white;
+  background-color: #999 !important;
 }
 
 .hypo
 {
-  background-color: #FDFFBB; 
+  background-color: #FDFFBB;
   color: black;
 }
 
@@ -696,11 +696,11 @@ td.u
 
 table.blueBorder
 {
-  border-bottom: solid 2px  #999; 
+  border-bottom: solid 2px  #999;
   border-right: solid 2px #999;
   border-left: solid 2px #999;
-    
-  
+
+
 }
 
 
@@ -724,7 +724,7 @@ table.blueBorder
 {
  color: black;
  text-decoration:none;
- 
+
 }
 
 .d  /*  developmental requirement */
@@ -901,7 +901,7 @@ Main
 /*
 Admin-console related
 */
-.fp-user-management-permission 
+.fp-user-management-permission
 {
   margin-bottom: 15px;
   padding-left: 20px;
@@ -933,7 +933,7 @@ ul.top-menu-links {
 
 ul.top-menu-links li {
   display: inline;
-  padding-right: 20px;  
+  padding-right: 20px;
 }
 
 ul.top-menu-links li.first {
@@ -947,7 +947,11 @@ ul.top-menu-links li.first {
  */
 label {
   display: block;
-  font-weight: bold;  
+  font-weight: bold;
+}
+
+label.label-inline {
+  display: inline;
 }
 
 .form-element {
@@ -964,7 +968,7 @@ label.label-for-checkbox
   font-weight: normal;
 }
 
-.form-element-description {  
+.form-element-description {
   font-size: 0.8em;
   padding-left: 10px;
   margin-top: 5px;
@@ -1008,11 +1012,11 @@ a.form-popup-description {
 .fp-html-print-r-multi-row {
   background-color: #eee;
   border: 1px solid #bbb;
-  padding: 5px;  
+  padding: 5px;
 }
 
 .fp-html-print-r-multi-row .fp-html-print-r-selector {
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 .fp-html-print-r-multi-row > .fp-html-print-r-var-value {
@@ -1107,7 +1111,7 @@ label {
 .element-type-submit input:hover
  {
   background-color: lightskyblue;
-  
+
 }
 
 .element-type-submit input.button-disabled {
@@ -1122,11 +1126,11 @@ label {
 
 
 .element-type-select select {
-  
+
   font-size: 1.0em;
   font-weight: normal;
   border: 1px solid #8E929C;
-  padding: 1rem;  
+  padding: 1rem;
   width: 100%;
   max-width: 500px;
   box-shadow: 0px 1px 2px rgb(0,0,0,0.15);
@@ -1136,11 +1140,11 @@ label {
 
 /* For a smaller (width-wise) select field */
 .element-type-select-smaller select {
-  
+
   font-size: 1.0em;
   font-weight: normal;
   border: 1px solid #8E929C;
-  padding: 1rem;  
+  padding: 1rem;
   width: 100%;
   max-width: 250px;
   box-shadow: 0px 1px 2px rgb(0,0,0,0.15);
@@ -1163,7 +1167,7 @@ label {
 
 
 
-input::placeholder {  
+input::placeholder {
   opacity: 0.7;
 }
 
@@ -1197,7 +1201,7 @@ a.button {
     display: inline-block;
     color: white;
     font-weight: 600;
-    border: 1px solid #1E90FF;    
+    border: 1px solid #1E90FF;
     background-color: #0095ff;
     padding: 9px;
     margin-bottom: 15px;
@@ -1205,8 +1209,8 @@ a.button {
     margin-right: 10px;
 }
 
-a.button:hover {    
-  background-color: lightskyblue;      
+a.button:hover {
+  background-color: lightskyblue;
 }
 
 a.cancel-button {
@@ -1224,7 +1228,7 @@ div.pager-wrapper {
 }
 
 ul.pager {
-  
+
     margin: 1.75em 0 0.75em;
     clear: both;
     text-align: center;
@@ -1291,30 +1295,30 @@ ___page--login{}
 }
 
 .page--login .top-banner {
-  padding-top: 40px;  
+  padding-top: 40px;
 }
 
 .page--login #page-login-user-form {
   float: left;
-  width: 45%;  
-  text-align: center; 
-  
+  width: 45%;
+  text-align: center;
+
 }
 
 .page--login #page-login-page__wallpaper {
   position: relative;
   float: right;
-  width: 55%; 
-    
+  width: 55%;
+
   background: url('images/login_wallpaper.jpg') bottom center no-repeat;
-  background-size: cover; 
+  background-size: cover;
 }
 
 
 .page--login .login-content-div .left-side-content {
   text-align: left;
   display: inline-block;
-  width: 400px; 
+  width: 400px;
   margin-top: 80px;
 }
 
@@ -1340,7 +1344,7 @@ ___page--login{}
 }
 
 .page--login .element-type-submit input {
-  width: 100%;  
+  width: 100%;
 }
 .page--login .login-content-div .element-type-submit {
   margin-bottom: 10px;
@@ -1354,7 +1358,7 @@ ___page--login{}
 }
 
 .page--login #login-form-forgot-password {
-  text-align: right;  
+  text-align: right;
 }
 
 .page--login a {
@@ -1364,7 +1368,7 @@ ___page--login{}
 .page--login #school-logo img {
   width: 200px;
   height: auto;
-   
+
 }
 
 .page--login #school-logo {
@@ -1372,7 +1376,7 @@ ___page--login{}
   position: absolute;
   bottom: 20px;
   right: 20px;
-  
+
 }
 
 
@@ -1385,21 +1389,21 @@ ___top_nav{}
   border-bottom: 1px solid #ddd;
 }
 
-ul.top-nav-ul {  
+ul.top-nav-ul {
   list-style-type: none;
   margin: 0;
   margin-top: 10px;
   padding: 0;
-  float: right;  
-  display: inline-block;  
+  float: right;
+  display: inline-block;
 }
 
 ul.top-nav-ul li {
-  
-  display: table-cell;  
+
+  display: table-cell;
   padding-right: 30px;
   padding-left: 30px;
-  border-right: 1px solid #ccc;  
+  border-right: 1px solid #ccc;
   height: 35px;
   vertical-align: middle;
 }
@@ -1468,7 +1472,7 @@ ul.top-nav-ul li.user-options i {
 
 
 #header #top-nav #tub-user-pulldown .user-pulldown {
-  padding-left: 20px ;  
+  padding-left: 20px ;
   list-style-type: circle;
 }
 
@@ -1488,14 +1492,14 @@ ul.top-nav-ul li.user-options i {
 .tub-icon-element-alert .tub-alert-count {
   position: absolute;
   display: inline-block;
-  
+
   text-align: center;
   top: 8px;
   right: -4px;
   color: indianred;
-  
+
   font-size: 0.7em;
-  
+
 }
 
 
@@ -1518,13 +1522,13 @@ ___sidebar-left{}
 }
 
 
-#sidebar-left {  
-  
+#sidebar-left {
+
   display: inline-block;
   vertical-align: top;
-  
+
   width: 120px;
-  
+
   background-color: #999999;
 }
 
@@ -1538,7 +1542,7 @@ ul.sidebar-left-nav li {
   padding-top: 20px;
   padding-bottom: 20px;
   text-align: center;
-  
+
 }
 
 ul.sidebar-left-nav li .desc {
@@ -1580,7 +1584,7 @@ ___hamburger_menu{}
   top: 50px;
   left: 0px;
   background-color: #999999;
-  width: 170px;  
+  width: 170px;
 }
 
 #mobile-hamburger-menu .logout {
@@ -1596,11 +1600,11 @@ ___hamburger_menu{}
 .mobile-top-nav ul.top-nav-ul{
   display: inline-block;
   float: none;
-  
+
   font-size: 1.9em;
   border-bottom: 1px solid white;
   padding-bottom: 10px;
-  
+
 }
 
 
@@ -1617,7 +1621,7 @@ ___breadcrumbs{}
 #breadcrumb-inner-wrapper {
   float: left;
   display: block;
-    margin-left: 13px;  
+    margin-left: 13px;
 }
 
 
@@ -1675,7 +1679,7 @@ ___tabs{}
   margin-bottom: 20px;
 }
 
-ul.tabs {  
+ul.tabs {
   margin: 0;
   padding: 0;
   padding-left: 20px;
@@ -1687,7 +1691,7 @@ ul.tabs li.tab {
   position: relative;
   top: 1px;
   display: inline-block;
-  padding: 3px 10px 3px 10px;  
+  padding: 3px 10px 3px 10px;
   border-bottom: 1px solid #ccc;
 }
 
@@ -1754,7 +1758,7 @@ ___advising_screens{}
 
 .fp-box-top {
   width: 95%;
-  
+
 }
 
 
@@ -1791,38 +1795,38 @@ table.table-group-select-row {
 }
 
 .fp-semester-table table .w1_1 {
-  width: 10%;  
+  width: 10%;
   text-align: left;
 }
 
 .fp-semester-table table .w1_2 {
-  width: 8%;    
+  width: 8%;
   text-align: left;
 }
 
 .fp-semester-table table .w1_3 {
-  width: 8%;    
+  width: 8%;
   text-align: left;
 }
 
 .fp-semester-table table .w2 {
-  width: 17%;  
+  width: 17%;
   text-align: left;
 }
 
 .fp-semester-table table .w3 {
-  width: 26%;    
+  width: 26%;
   text-align: left;
 }
 
 .fp-semester-table table .w4 {
-  width: 10%;    
+  width: 10%;
   text-align: left;
 }
-  
+
 .fp-semester-table table .w5 {
-  width:10%; 
-  text-align: left; 
+  width:10%;
+  text-align: left;
 }
 
 /*  NOTE:
@@ -1830,7 +1834,7 @@ table.table-group-select-row {
  * mess up the spacing of everything else.  Not sure why it does that,
  * but it has to do with trying to set widths on td elements.
  */
-.fp-semester-table table .w6 {  
+.fp-semester-table table .w6 {
   /* width: 9%; */
   text-align: left;
 }
@@ -1862,7 +1866,7 @@ table.fp-box-top {
 .sub-tabs .subtab-link-wrapper a:hover {
   color: inherit;
 }
- 
+
 .sub-tabs .change-term-link
 {
   padding-left: 30px;
@@ -1879,7 +1883,7 @@ table.fp-box-top {
 }
 
 .sub-tabs .change-what-if-link a {
-  
+
 }
 
 img.advising-course-row-icon {
@@ -1911,7 +1915,7 @@ ___popups_and_dialog{}
 
 
 .page-is-popup #page-content {
-  width: calc(100vw - 30px) !important;  
+  width: calc(100vw - 30px) !important;
   padding-left: 0;
   padding-right: 10px;
 }
@@ -1947,7 +1951,7 @@ ___popups_and_dialog{}
 }
 
 .ui-widget-header button:focus {
-  outline: none;  
+  outline: none;
 }
 
 .ui-widget-overlay {
@@ -1956,11 +1960,11 @@ ___popups_and_dialog{}
 
 
 iframe#fp-iframe-dialog-small-iframe {
-  width: calc(100% - 10px);  
+  width: calc(100% - 10px);
 }
 
 iframe#fp-iframe-dialog-large-iframe {
-  width: calc(100% - 10px);  
+  width: calc(100% - 10px);
 }
 
 
@@ -2016,7 +2020,7 @@ ___student_mini_profile{}
 .student-mini-profile .profile-top-details-wrapper .profile-detail-line-degree .profile-line-content {
   display: inline-block;
   width: 300px;
-  vertical-align: top;  
+  vertical-align: top;
 }
 
 .student-mini-profile .profile-detail-line .multi-degree-title {
@@ -2031,7 +2035,7 @@ ___student_mini_profile{}
 
 #page-student-mini-profile-wrapper  {
   margin-left: 20px;
-  margin-top: 20px;  
+  margin-top: 20px;
   margin-bottom: 0px;
   border-bottom: 1px solid #eee;
 }
@@ -2046,12 +2050,12 @@ ___student_mini_profile{}
 }
 
 .student-mini-profile .catalog-year-alert-early a {
-  color: orange;  
+  color: orange;
   padding-left: 10px;
 }
 
 .student-mini-profile .catalog-year-alert-too-far a {
-  color: orange;  
+  color: orange;
   padding-left: 10px;
 }
 

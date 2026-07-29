@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-At the moment, only the following (checked) versions are supported and receiving security updates:
+At the moment, only the following (checked) versions of FlightPath are supported and receiving security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
