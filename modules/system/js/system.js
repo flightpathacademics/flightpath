@@ -390,6 +390,30 @@ function fpToggleHamburgerMenu() {
 
 
 
+  /**
+   * If 'confirm' is set on a submit button, we use the modal dialog like fp_confirm.
+   */
+  function fp_confirm_form_submit(e, msg) {
+
+    e.preventDefault();
+
+    const myEl = e;
+
+    DayPilot.Modal.confirm(msg).then(function(modal) {
+      if (modal.result) {
+        // they said YES, so perform the submission on the form this element belongs to.
+        myEl.srcElement.form.submit();
+      }
+      else {
+        // they cancelled.  Disable spinner, re-enable button
+        $(".loading-spinner").hide();
+        $("input[type=submit].disable-element").removeClass('disable-element');
+      }
+    });
+
+  }
+
+
 
 
   // Replacememnt for built in confirm(str).  Uses the DayPilot code, like fp_alert().

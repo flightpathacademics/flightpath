@@ -1173,7 +1173,17 @@ input::placeholder {
 
 
 .readonly {
-  background-color: #eee !important;
+  background-color: #eee;
+}
+
+input[type=checkbox].readonly, input[type=radio].readonly {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+input[type=submit].readonly {
+  pointer-events: none;
+  background-color: #ccc;
 }
 
 

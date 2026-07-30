@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-07-30
+  For 'submit' form elements, the 'confirm' property now uses a more attractive modal dialog
+  to capture if the user really wants to submit the form or not.
+
+
 2026-07-29
   Added new CSS to style.css, to accomodate labels which are explicitly inline.
 
