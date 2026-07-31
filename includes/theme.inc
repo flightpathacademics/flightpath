@@ -926,7 +926,7 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
     $bool_legacy_concentrations = (bool) variable_get("enable_legacy_concentrations", FALSE);
     // We are trying to figure out what to display for the Degree field.  If there is only ONE degree plan
     // to worry about, then we will display it.
-    if ($degree_plan == null || $degree_plan->is_combined_dynamic_degree_plan != TRUE || $bool_legacy_concentrations == TRUE) {
+    if ($degree_plan == null || $degree_plan->is_combined_dynamic_degree_plan != TRUE) {
       // This is an ordinary degree plan.
 
       $use_degree_plan = $degree_plan;
@@ -971,6 +971,7 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
 
     }
     else {
+
       // This degree plan is made from combining several other degrees.  let's trot them out and display them as well.
       $t_degree_plan_titles = "";
       $dc = 0;
