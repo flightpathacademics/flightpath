@@ -3098,6 +3098,8 @@ function system_handle_form_submit() {
 
   watchdog('system', "handle_form_submit callback:$callback, form_type:$form_type", array());
 
+  $form = array();
+
   $form_include = @$_REQUEST["form_include"];
   $form_token = @$_REQUEST["form_token"];
   // Make sure the form_token is valid!
@@ -4667,7 +4669,7 @@ function system_display_dashboard_page () {
     while($cur = db_fetch_array($res)) {
 
       $dt = date("n/j/y g:ia",$cur['posted']);
-      $fac_name = fp_get_faculty_name($cur['faculty_id'], FALSE);
+      $fac_name = fp_get_faculty_name($cur['faculty_id']);
       $html = "";
 
       $turl = fp_url("advise/popup-display-summary", "advising_session_id=" . $cur['advising_session_id']);

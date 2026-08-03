@@ -216,6 +216,7 @@ function encryption_settings_form_submit($form, $form_state) {
 function encryption_get_key() {
 
   $encryption_key_path = trim(variable_get("encryption_key_path", ""));
+  $encryption_key_string = '';
 
   if ($encryption_key_path != "") {
     $contents = trim(file_get_contents($encryption_key_path));

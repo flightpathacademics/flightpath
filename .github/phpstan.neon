@@ -22,3 +22,8 @@ parameters:
 
     ignoreErrors:
       - '#Constant WATCHDOG_.* not found#'
+      - '#Function zoomapi_.* not found#'
+      - '#Variable $page_.* might not be defined.#'
+      - '#Variable $theme_location might not be defined.#'
+      - '#Variable $system_name might not be defined.#'
+      - '#Path in include() "custom/settings.php" is not a file.*#'

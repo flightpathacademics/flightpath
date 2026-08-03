@@ -31,6 +31,7 @@ function theme_table_header_sortable($headers = array(), $element_id = "default"
   }
 
   $rtn = "";
+  $link = '';
   $rtn .= "<tr>";
 
   $filter = trim((string) @$_GET['filter']); // if there is an existing filter we need to preserve.
@@ -177,6 +178,7 @@ function theme_table_header_sortable_order_by($headers) {
 function theme_pager($tags = array(), $limit = 10, $element = 0, $parameters = array(), $quantity = 9) {
   global $pager_page_array, $pager_total;
 
+  $items = array();
   // Calculate various markers within this pager piece:
   // Middle is used to "center" pages around the current page.
   $pager_middle = ceil($quantity / 2);
@@ -554,7 +556,7 @@ function format_date($timestamp = 0, $format = "standard", $custom = "") {
  *
  * We want to
  */
-function fp_render_menu_block($title = "Tools", $menu_root = "tools", $bool_reset = FALSE) {
+function fp_render_menu_block($title = "Tools", $menu_root = "tools") {
   $rtn = "";
 
   $is_empty = true;
@@ -568,7 +570,7 @@ function fp_render_menu_block($title = "Tools", $menu_root = "tools", $bool_rese
     if ($item['path'] === $menu_root) continue;   // don't need to duplicate the menu root link itself
 
     if ($item["type"] == MENU_TYPE_NORMAL_ITEM || $item['type'] == MENU_TYPE_DEFAULT_TAB) {
-      $item = menu_get_item($item['path'], $bool_reset);
+      $item = menu_get_item($item['path']);
 
       $rtn .= fp_render_menu_item($item);
       $is_empty = false;

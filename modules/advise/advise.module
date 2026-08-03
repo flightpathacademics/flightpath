@@ -1198,6 +1198,8 @@ function advise_display_popup_group_select() {
 
   $school_id = db_get_school_id_for_student_id($current_student_id);
 
+  $tab_array = array();
+
   // If this is a "blank" degree, make sure we set the degree_id correctly.
   if($blank_degree_id != "") {
     // If req_by_degree_id isn't blank or zero, then use it instead.
@@ -1305,7 +1307,7 @@ function advise_display_popup_group_select() {
 
   }
 
-  if ($tab_array) {
+  if (count($tab_array) > 0) {
     fp_set_page_tabs($tab_array);
   }
 

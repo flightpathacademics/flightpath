@@ -1562,10 +1562,8 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
       return FALSE;
     }
 
-    while($cur = $this->db_fetch_array($res))
-    {
-      extract($cur, 3, "db");
-      $rtn_array[] = $db_track_code;
+    while($cur = $this->db_fetch_array($res)) {
+      $rtn_array[] = $cur['track_code'];
     }
 
     $degree_tracks_data_cache[$catalog_year][$major_code] = $rtn_array;

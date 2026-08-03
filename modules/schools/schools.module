@@ -2,7 +2,7 @@
 /**
  * @file
  * Schools module.
- * 
+ *
  * Lets some of FlightPath's functionality (and the degrees, etc) be separated by "schools" or any other arbitrary
  * separation
 */
@@ -12,9 +12,9 @@
 
 
 function __schools_add_school_id_to_fp5_tables() {
-  
+
   set_time_limit ( 999 );  // might take a while
-  
+
   $tables = array(
     'courses', 'draft_courses', 'degrees', 'draft_degrees', 'groups', 'draft_groups',
     'colleges *',
@@ -27,20 +27,20 @@ function __schools_add_school_id_to_fp5_tables() {
     'transfer_courses',
     'transfer_institutions',
     'users',
-    'watchdog',    
+    'watchdog',
   );
-  
+
   $needs_primary = array();
   $show_create = array();
   foreach ($tables as $table) {
     $bool_primary = FALSE;
-    
-  
+
+
     if (strstr($table, "*")) {
       $table = trim(str_replace("*", "", $table));
       $bool_primary = TRUE;
-    } 
-  
+    }
+
     $show_create[] = $table;
 
     // If we were supposed to ALSO add as a primary key, then we should output a message to the user, so they know to do that.
@@ -48,29 +48,29 @@ function __schools_add_school_id_to_fp5_tables() {
       $needs_primary[] = $table;
     }
 
-  
-  
+
+
     // Does this table already have school_id field?
     $res = db_query("show columns from `$table` WHERE `Field` = 'school_id'");
     $cur = db_fetch_array($res);
     $test = @trim($cur['Field']);
     if ($test == 'school_id') continue;
-    
+
     // Otherwise, we need to add the column to the table, and a key!
     fpm("Adding to $table...");
-   
+
     $q = "ALTER TABLE `$table` ADD COLUMN `school_id` INT NOT NULL DEFAULT 0";
     db_query($q);
-    
-    // Add regular key    
+
+    // Add regular key
     $q = "ALTER TABLE `$table` ADD KEY `school_id` (`school_id`)";
     db_query($q);
-    
-    
+
+
   } // foreach
-  
+
  fpm($needs_primary);
- 
+
  //////////////////////////////////////
  // Set our new primary keys
  foreach ($needs_primary as $table) {
@@ -81,47 +81,47 @@ function __schools_add_school_id_to_fp5_tables() {
      if ($cn == 'school_id') continue;  // already in there.
      $keys[] = $cn;
    }
-   
+
    $keys[] = 'school_id';
-   
+
    $kline = join(", ", $keys);
-   
-   db_query("ALTER TABLE `$table` 
-              DROP PRIMARY KEY, 
+
+   db_query("ALTER TABLE `$table`
+              DROP PRIMARY KEY,
               ADD PRIMARY KEY ($kline)");
-   
+
  }
- 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
+
  $rtn = "";
- 
+
  foreach ($show_create as $table) {
-   
+
    $res = db_query("SHOW CREATE TABLE `$table`");
    $cur = db_fetch_array($res);
    $create = $cur['Create Table'];
-   
+
    $create = str_ireplace("USING BTREE", "", $create);
    $create = str_ireplace("CHARACTER SET latin1", "", $create);
    $create = str_ireplace("COLLATE utf8mb4_unicode_ci", "", $create);
-   
+
    $temp = explode("ENGINE=", $create);
    $create = trim($temp[0]);
-   
-   
+
+
    $rtn .= $create . "; \n\n\n\n";
-   
- } 
- 
- fpm("<textarea>$rtn</textarea>"); 
-  
-  
-  
+
+ }
+
+ fpm("<textarea>$rtn</textarea>");
+
+
+
 } // end function
 
 
@@ -140,18 +140,18 @@ function __schools_add_school_id_to_fp5_tables() {
 function schools_init() {
   // Is there an urgent message to display based on school?
   global $user;
-    
-  $school_id = $user->school_id;    
+
+  $school_id = $user->school_id;
   $defs = schools_get_school_definitions();
-  
+
   $urgent_msg = trim(variable_get("urgent_msg_$school_id", ""));
   if ($urgent_msg) {
     fp_add_message("<b>" . t("Important Message (%school_desc):", array("%school_desc" => @$defs[$school_id])) . "</b> " . $urgent_msg, "status", TRUE);
-  }  
+  }
 
-    
-  
-  
+
+
+
 } // hook_init
 
 
@@ -169,18 +169,18 @@ function schools_init() {
  * Implements hook_menu
  */
 function schools_menu() {
-  
+
   $items = array();
-  
-  $items['admin/config/schools'] = array(  
+
+  $items['admin/config/schools'] = array(
     'title' => 'Schools settings',
     'description' => 'Administer and define the Schools at your institution',
     'page_callback' => 'fp_render_form',
     'page_arguments' => array('schools_administer_schools_form'),
-    'access_arguments' => array('administer_schools'),    
+    'access_arguments' => array('administer_schools'),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_icon" => fp_get_module_path('system') . "/icons/building.png",     
+      "menu_icon" => fp_get_module_path('system') . "/icons/building.png",
       "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
@@ -191,18 +191,18 @@ function schools_menu() {
     ),
     'type' => MENU_TYPE_NORMAL_ITEM,
   );
-  
-  
+
+
   // For each school we have defined, let's create a menu item for configuring
   // school-specific settings.
   $defs = schools_get_school_definitions(TRUE);
   $weight = 0;
   foreach ($defs as $cur) {
-      
+
     $school_name = $cur['name'];
     $school_id = intval($cur['school_id']);
     if ($school_id === 0) continue; // skip default since that wil be there already
-    
+
     $items["admin/config/school-data/$school_id"] = array(
       "title" => $school_name,
       "page_callback" => "fp_render_form",
@@ -211,19 +211,19 @@ function schools_menu() {
       "page_settings" => array(
         "page_hide_report_error" => TRUE,
         "menu_icon" => fp_get_module_path('system') . "/icons/cog_edit.png",
-        "menu_links" => array(         
+        "menu_links" => array(
           0 => array(
             "text" => "Admin Console",
             "path" => "admin-tools/admin",
             "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
           ),
         ),
-      ),    
+      ),
       "type" => MENU_TYPE_TAB,
-      "tab_family" => "config_school_settings",      
-      "weight" => $weight,    
-    );      
-  
+      "tab_family" => "config_school_settings",
+      "weight" => $weight,
+    );
+
 
 
   $items["admin/edit-advising-settings/$school_id"] = array(
@@ -232,20 +232,20 @@ function schools_menu() {
     "page_arguments" => array("admin_advising_settings_form", "system_settings", 2),
     "access_arguments" => array("can_edit_advising_settings"),
       "page_settings" => array(
-        "page_hide_report_error" => TRUE,        
-        "menu_links" => array(         
+        "page_hide_report_error" => TRUE,
+        "menu_links" => array(
           0 => array(
             "text" => "Admin Console",
             "path" => "admin-tools/admin",
             "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
           ),
         ),
-      ),    
+      ),
       "type" => MENU_TYPE_TAB,
-      "tab_family" => "edit_advising_settings",      
-      "weight" => $weight,    
-    );      
-  
+      "tab_family" => "edit_advising_settings",
+      "weight" => $weight,
+    );
+
 
   $items["admin/config/course-search/$school_id"] = array(
     "title" => $school_name,
@@ -253,28 +253,28 @@ function schools_menu() {
     "page_arguments" => array("course_search_settings_form", "system_settings", 3),
     "access_arguments" => array("administer_course_search"),
       "page_settings" => array(
-        "page_hide_report_error" => TRUE,        
-        "menu_links" => array(         
+        "page_hide_report_error" => TRUE,
+        "menu_links" => array(
           0 => array(
             "text" => "Admin Console",
             "path" => "admin-tools/admin",
             "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
           ),
         ),
-      ),    
+      ),
       "type" => MENU_TYPE_TAB,
-      "tab_family" => "course_search_settings",      
-      "weight" => $weight,    
-    );      
+      "tab_family" => "course_search_settings",
+      "weight" => $weight,
+    );
 
 
-  $items["admin/config/appointments/$school_id"] = array(  
-    'title' => $school_name,    
+  $items["admin/config/appointments/$school_id"] = array(
+    'title' => $school_name,
     'page_callback' => 'fp_render_form',
     'page_arguments' => array('calendar_appointment_settings_form', 'system_settings', 3),
-    'access_arguments' => array('administer_appointment_settings'),    
+    'access_arguments' => array('administer_appointment_settings'),
     "page_settings" => array(
-      "page_hide_report_error" => TRUE,     
+      "page_hide_report_error" => TRUE,
       "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
@@ -298,19 +298,19 @@ function schools_menu() {
     "page_arguments" => array("alerts_settings_form", "system_settings", 3),
     "access_arguments" => array("administer_alerts"),
       "page_settings" => array(
-        "page_hide_report_error" => TRUE,        
-        "menu_links" => array(         
+        "page_hide_report_error" => TRUE,
+        "menu_links" => array(
           0 => array(
             "text" => "Admin Console",
             "path" => "admin-tools/admin",
             "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
           ),
         ),
-      ),    
+      ),
       "type" => MENU_TYPE_TAB,
-      "tab_family" => "alerts_settings",      
-      "weight" => $weight,    
-    );      
+      "tab_family" => "alerts_settings",
+      "weight" => $weight,
+    );
 
 
 
@@ -321,33 +321,33 @@ function schools_menu() {
     "page_arguments" => array("audit_settings_form", "system_settings", 3),
     "access_arguments" => array("administer_audit"),
       "page_settings" => array(
-        "page_hide_report_error" => TRUE,        
-        "menu_links" => array(         
+        "page_hide_report_error" => TRUE,
+        "menu_links" => array(
           0 => array(
             "text" => "Admin Console",
             "path" => "admin-tools/admin",
             "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
           ),
         ),
-      ),    
+      ),
       "type" => MENU_TYPE_TAB,
-      "tab_family" => "audit_settings",      
-      "weight" => $weight,    
-    );      
+      "tab_family" => "audit_settings",
+      "weight" => $weight,
+    );
 
 
-  
-  
+
+
     $weight = $weight + 10;
-  
+
   }
-  
-  
-    
-  
-  
+
+
+
+
+
   return $items;
-    
+
 } // hook_menu
 
 
@@ -355,61 +355,61 @@ function schools_menu() {
 
 /**
  * hook_menu_alter
- * 
+ *
  * We want to alter some system menu items, so we can make sure to check
  * our new custom permissions.
  */
 function schools_menu_alter(&$items) {
   if (!is_array($items)) return;
-  
+
   foreach ($items as $path => $item) {
-            
-    if ($path == 'admin/degrees/edit-degree/%/%') {      
-            
+
+    if ($path == 'admin/degrees/edit-degree/%/%') {
+
       // alter access_callback and arguments to make sure
       // the user is able to edit THIS degree.
-      
+
       $items[$path]['access_callback'] = 'schools_check_access';
       $items[$path]['access_arguments'] = array(2, 3, 4);
-       
+
     }
 
 
     // The path for editing a group looks like this:
     //    admin/groups/edit-group?group_id=XXX&de_catalog_year=XXX
     if ($path == 'admin/groups/edit-group') {
-        
+
       $items[$path]['access_callback'] = 'schools_check_access';
       $items[$path]['access_arguments'] = array(2, "request_group_id", "group_catalog_year");
-      
+
     }
 
     // The path for editing a course looks like this:
-    //    admin/courses/edit-course?course_id=XXX&de_catalog_year=XXX    
+    //    admin/courses/edit-course?course_id=XXX&de_catalog_year=XXX
     if ($path == 'admin/courses/edit-course') {
-        
+
       $items[$path]['access_callback'] = 'schools_check_access';
       $items[$path]['access_arguments'] = array(2, "request_course_id", "course_catalog_year");
-      
+
     }
-    
-    
-    // We want to make this a default tab, because we are going to 
+
+
+    // We want to make this a default tab, because we are going to
     // have our other schools have their own tabs as well.
-    if ($path == 'admin/config/school-data') {      
+    if ($path == 'admin/config/school-data') {
       $items[$path]['type'] = MENU_TYPE_DEFAULT_TAB;
       $items[$path]['tab_family'] = 'config_school_settings';
       $items[$path]['page_settings']['tab_title'] = t('Default');
-      unset($items[$path]['tab_parent']);      
-      
+      unset($items[$path]['tab_parent']);
+
     }
-    
+
 
     if ($path == 'admin/edit-advising-settings') {
       $items[$path]['type'] = MENU_TYPE_DEFAULT_TAB;
       $items[$path]['tab_family'] = 'edit_advising_settings';
       $items[$path]['page_settings']['tab_title'] = t('Default');
-      unset($items[$path]['tab_parent']);            
+      unset($items[$path]['tab_parent']);
     }
 
 
@@ -417,7 +417,7 @@ function schools_menu_alter(&$items) {
       $items[$path]['type'] = MENU_TYPE_DEFAULT_TAB;
       $items[$path]['tab_family'] = 'course_search_settings';
       $items[$path]['page_settings']['tab_title'] = t('Default');
-      unset($items[$path]['tab_parent']);            
+      unset($items[$path]['tab_parent']);
     }
 
 
@@ -425,7 +425,7 @@ function schools_menu_alter(&$items) {
       $items[$path]['type'] = MENU_TYPE_DEFAULT_TAB;
       $items[$path]['tab_family'] = 'alerts_settings';
       $items[$path]['page_settings']['tab_title'] = t('Default');
-      unset($items[$path]['tab_parent']);            
+      unset($items[$path]['tab_parent']);
     }
 
 
@@ -433,14 +433,14 @@ function schools_menu_alter(&$items) {
       $items[$path]['type'] = MENU_TYPE_DEFAULT_TAB;
       $items[$path]['tab_family'] = 'audit_settings';
       $items[$path]['page_settings']['tab_title'] = t('Default');
-      unset($items[$path]['tab_parent']);            
+      unset($items[$path]['tab_parent']);
     }
 
     if ($path == 'admin/config/appointments') {
       $items[$path]['type'] = MENU_TYPE_DEFAULT_TAB;
       $items[$path]['tab_family'] = 'appointment_settings';
       $items[$path]['page_settings']['tab_title'] = t('Default');
-      unset($items[$path]['tab_parent']);            
+      unset($items[$path]['tab_parent']);
     }
 
 
@@ -454,35 +454,35 @@ function schools_menu_alter(&$items) {
 
 /**
  * this is our custom access callback.
- * 
+ *
  * op is expected to be 'edit-degree', 'edit-course', or 'edit-group'
  * entity_code is the degree_id for degrees, group_id for groups, and course_id for courses.
- * 
- * 
+ *
+ *
  */
 function schools_check_access($op, $entity_code, $catalog_year) {
-            
+
   // If the user doesn't have this base permission, they can't edit anything
-  // at all.          
+  // at all.
   if (!user_has_permission("can_edit_data_entry")) {
     return FALSE;
-  }      
-    
+  }
+
 
   $school_id = $entity_type = "";
   $db = get_global_database_handler();
 
   /////////////////////
   if ($op == 'edit-degree') {
-    
+
     $entity_type = 'degree';
-    $school_id = db_result(db_query("SELECT school_id FROM draft_degrees 
+    $school_id = db_result(db_query("SELECT school_id FROM draft_degrees
                                      WHERE degree_id = ?
                                      AND catalog_year = ?", $entity_code, $catalog_year));
-    
+
   }
-  
-     
+
+
 
   ///////////////////////
   // The path for editing a group looks like this:
@@ -490,43 +490,43 @@ function schools_check_access($op, $entity_code, $catalog_year) {
   if ($op == 'edit-group') {
     $entity_type = "group";
     $group_id = $_REQUEST['group_id'];
-    
-    if ($group_id == 'new') return TRUE;    
-  
+
+    if ($group_id == 'new') return TRUE;
+
     $school_id = intval(db_result(db_query("SELECT school_id FROM draft_groups WHERE group_id = ?", $group_id)));
-    
+
   }
-  
-  
+
+
   ///////////////////////
   // The path for editing a course looks like this:
-  //    admin/courses/edit-course?course_id=XXX&de_catalog_year=XXX    
+  //    admin/courses/edit-course?course_id=XXX&de_catalog_year=XXX
   if ($op == 'edit-course') {
     $entity_type = "course";
     $course_id = $_REQUEST['course_id'];
-    
-    if ($course_id == 'new') return TRUE;    
-    $school_id = intval(db_result(db_query("SELECT school_id FROM draft_courses WHERE course_id = ?", $course_id)));      
-    
-    
-  }
-      
 
-  
-  
-  
+    if ($course_id == 'new') return TRUE;
+    $school_id = intval(db_result(db_query("SELECT school_id FROM draft_courses WHERE course_id = ?", $course_id)));
+
+
+  }
+
+
+
+
+
   // Actually check the permission, IF there is a school_id set.
   if ($school_id != "" && $entity_type != "") {
     if (!user_has_permission('administer_' . $school_id . '_' . $entity_type . '_data')) {
       return FALSE;
     }
   }
-  
-  
-  
+
+
+
   // If we got here, then we didn't fail any permission checks, so we can let the user proceed.
   return TRUE;
-  
+
 } // schools_check_access
 
 
@@ -534,26 +534,26 @@ function schools_check_access($op, $entity_code, $catalog_year) {
 /**
  * Return a list of schools in an array, for use in the "options" of
  * a select list in the Form API.
- * 
+ *
  * If $bool_check_perm is true, then we will check permissions before adding it to the array.
  */
 function schools_get_schools_for_fapi($bool_include_default = TRUE, $bool_check_perm = FALSE, $check_perm_type = "degree", $bool_include_school_code = FALSE) {
-    
-  $rtn = array();  
+
+  $rtn = array();
   $defs = schools_get_school_definitions(TRUE);
-  
-  
-  if ($bool_include_default) {  
+
+
+  if ($bool_include_default) {
     $rtn[0] = t(' - Default -');
   }
-  
+
   foreach ($defs as $school_id => $val) {
 
     $title = $val['name'];
     if ($bool_include_school_code) {
       $title = $val['school_code'] . ' - ' . $val['name'];
     }
-    
+
     if ($bool_check_perm) {
       if (user_has_permission('administer_' . $school_id . '_' . $check_perm_type . '_data') || user_has_permission('manage_' . $school_id . '_' . $check_perm_type . '_data')) {
         $rtn[$school_id] = $title;
@@ -562,101 +562,101 @@ function schools_get_schools_for_fapi($bool_include_default = TRUE, $bool_check_
     else {
       $rtn[$school_id] = $title;
     }
-    
+
   }
-  
-  
+
+
   return $rtn;
-  
-  
+
+
 }
 
 
 
 function schools_content_alter(&$render, $render_id) {
 
-  $defs = schools_get_school_definitions(TRUE);  
+  $defs = schools_get_school_definitions(TRUE);
 
-    
+
   if ($render_id == 'admin_display_degrees') {
-    
+
     //fpm($render);
     // Add the school to the table.
     $v = $render['degrees_table_top']['value'];
     $v = str_replace("</tr>", "<th>School</th></tr>", $v);
     $render['degrees_table_top']['value'] = $v;
-    
+
     foreach ($render as $key => $val) {
       if (strstr($key, 'degree_row_')) {
         // Find out the school_id for this degree, if it exists.
         $school_id = intval($val['data']['db_row']['school_id']);
-      
+
         $school_code = "-";
         if ($school_id != 0) {
           $school_code = $defs[$school_id]['school_code'];
         }
-      
+
         // Fill in the school code as the last td in the table row.
         $render[$key]['value'] = str_replace('</tr>', "<td class='degree-school'>$school_code</td></tr>", $render[$key]['value']);
-      
-      
+
+
         if ($school_id == 0) continue;  // Everyone can edit school_id 0
-        
-        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.          
+
+        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.
         if (!user_has_permission('administer_' . $school_id . '_degree_data')) {
           // No, so let's remove it.
           unset($render[$key]);
-        }          
-        
-        
+        }
+
+
       }
     } // foreach
-    
+
   } // admin_display_degrees
 
-  
-  /////////////////////////////////  
-  
+
+  /////////////////////////////////
+
   if ($render_id == 'admin_display_groups') {
-       
+
     // Add school to our table top.
     $v = $render['groups_table_top']['value'];
     $v = str_replace("</tr>", "<th>School</th></tr>", $v);
-    $render['groups_table_top']['value'] = $v;    
-    
+    $render['groups_table_top']['value'] = $v;
+
     foreach ($render as $key => $val) {
       if (strstr($key, 'group_row_')) {
-        // Find out the school_id for this group, if it exists.        
+        // Find out the school_id for this group, if it exists.
         $school_id = intval($val['data']['db_row']['school_id']);
-        
-        
+
+
         $school_code = "-";
         if ($school_id != 0) {
           $school_code = $defs[$school_id]['school_code'];
-        }        
-        
+        }
+
         // Fill in the school code as the last td in the table row.
         $render[$key]['value'] = str_replace('</tr>', "<td class='group-school'>$school_code</td></tr>", $render[$key]['value']);
-              
-        
-        
+
+
+
         if ($school_id == 0) continue; // everyone can edit school_id 0
-       
-        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.          
+
+        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.
         if (!user_has_permission('administer_' . $school_id . '_group_data')) {
           // No, so let's hide it.
           unset($render[$key]);
-        }          
-       
-        
+        }
+
+
       }
     } // foreach
-  
-  
-  
-  } // admin_display_groups 
 
-  
+
+
+  } // admin_display_groups
+
+
   ///////////////////////////////
 
   if ($render_id == 'admin_display_courses') {
@@ -664,7 +664,7 @@ function schools_content_alter(&$render, $render_id) {
     // Add school to our table top.
     $v = $render['courses_table_top']['value'];
     $v = str_replace("</tr>", "<th>School</th></tr>", $v);
-    $render['courses_table_top']['value'] = $v;    
+    $render['courses_table_top']['value'] = $v;
 
 
     foreach ($render as $key => $val) {
@@ -672,81 +672,81 @@ function schools_content_alter(&$render, $render_id) {
         // Find out the school_id for this degree, if it exists.
 
         $school_id = intval($val['data']['db_row']['school_id']);
-        
-        
+
+
         $school_code = "-";
         if ($school_id != 0) {
           $school_code = $defs[$school_id]['school_code'];
-        }        
+        }
 
-        
+
         // Fill in the school code as the last td in the table row.
         $render[$key]['value'] = str_replace('</tr>', "<td class='course-school'>$school_code</td></tr>", $render[$key]['value']);
-        
-        
-        if ($school_id == 0) continue; // everyone can edit school id 0        
-        
-        
-        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.          
+
+
+        if ($school_id == 0) continue; // everyone can edit school id 0
+
+
+        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.
         if (!user_has_permission('administer_' . $school_id . '_course_data')) {
           // No, so let's hide it.
           unset($render[$key]);
-        }          
+        }
 
-        
+
       }
     } // foreach
-  
-  
-  
-  } // admin_display_courses   
-  
-  
-  
-  
-  
+
+
+
+  } // admin_display_courses
+
+
+
+
+
   if ($render_id == 'user_display_users') {
     // Add school to our table top.
     $v = $render['users_table_top']['value'];
     $v = str_replace("</tr>", "<th>School</th></tr>", $v);
-    $render['users_table_top']['value'] = $v;    
-    
+    $render['users_table_top']['value'] = $v;
+
     foreach ($render as $key => $val) {
       if (strstr($key, 'user_row_')) {
         // Find out the school_id for this degree, if it exists.
 
         $school_id = intval($val['data']['db_row']['school_id']);
-        
-        
+
+
         $school_code = "-";
         if ($school_id != 0) {
           $school_code = $defs[$school_id]['school_code'];
-        }        
+        }
 
-        
+
         // Fill in the school code as the last td in the table row.
         $render[$key]['value'] = str_replace('</tr>', "<td class='course-school'>$school_code</td></tr>", $render[$key]['value']);
-        
-        
-        if ($school_id == 0) continue; // everyone can edit school id 0        
-        
-        
-        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.          
+
+
+        if ($school_id == 0) continue; // everyone can edit school id 0
+
+
+        // A school id has indeed been set, so we need to see if this user is allowed to edit it or not.
         if (!user_has_permission('manage_' . $school_id . '_user_data')) {
           // No, so let's hide it.
           unset($render[$key]);
-        }          
+        }
 
-        
+
       }
-    } // foreach    
-    
-    
+    } // foreach
+
+
   } // user_display_users
-  
-  
-    
-   
+
+
+
+
 } // hook_content_alter
 
 
@@ -759,28 +759,29 @@ function schools_content_alter(&$render, $render_id) {
  * Implements hook_form_alter
  */
 function schools_form_alter(&$form, $form_id) {
-      
-      
+
+
   $forms_to_alter = array(
     'admin_edit_degree_form',
     'admin_edit_group_form',
     'admin_edit_course_form',
     'user_edit_user_form',
-    'user_edit_student_user_form',    
+    'user_edit_student_user_form',
   );
-    
-      
+
+
+  $school_id = 0; // default
   // Add "school" dropdown to the degrees, groups, and courses form
   if (in_array($form_id, $forms_to_alter)) {
-        
-    fp_add_js(fp_get_module_path("schools") . '/js/schools.js');  
-    
-  
+
+    fp_add_js(fp_get_module_path("schools") . '/js/schools.js');
+
+
     $db = get_global_database_handler();
-    $school_id = 0; // default
     $entity_id = 0;  // default
-        
-    
+    $entity_type = '';
+    $weight = '';
+
     if ($form_id == 'admin_edit_degree_form') {
       $entity_type = 'degree';
       $degree_id = @intval($form['degree_id']['value']);
@@ -788,39 +789,39 @@ function schools_form_alter(&$form, $form_id) {
       if ($degree_id) {
         $school_id = $db->get_school_id_for_degree_id($degree_id, TRUE);
       }
-      $weight = 1120;    
-      
+      $weight = 1120;
+
       @$catalog_year = $form['de_catalog_year']['value'];
       if ($catalog_year == "") {
         @$catalog_year = $form['catalog_year']['value'];
-      }      
+      }
     }
-    
-    
-    
+
+
+
     // Is this a "group" we are editing?
-    if ($form_id == "admin_edit_group_form") {      
+    if ($form_id == "admin_edit_group_form") {
       $entity_type = 'group';
-      $weight = 45;      
+      $weight = 45;
       $group_id = @$form['group_id']['value'];
       $entity_id = $group_id;
       $school_id = $db->get_school_id_for_group_id($group_id, TRUE);
-      
+
     }
-    
-    
+
+
     if ($form_id == 'admin_edit_course_form') {
-      $entity_type = 'course';      
+      $entity_type = 'course';
       $course_id = @intval($form['course_id']['value']);
       $entity_id = $course_id;
       $weight = 55;
       $school_id = $db->get_school_id_for_course_id($course_id, TRUE);
-            
-      // We also want to adjust the description for the "update for all years" checkbox.      
+
+      // We also want to adjust the description for the "update for all years" checkbox.
       $form['all_years']['options']['yes'] = t('Update title, description, hour info, and school selection for all years of this course.');
     }
-    
-    
+
+
     if ($form_id == 'user_edit_user_form' || $form_id == 'user_edit_student_user_form') {
       $entity_type = 'user';
       $user_id = intval($form['user_id']['value']);
@@ -829,14 +830,14 @@ function schools_form_alter(&$form, $form_id) {
       $weight = 95;
     } // user edit form
 
-    
-    
-    
-    
+
+
+
+
     $options = schools_get_schools_for_fapi(TRUE, TRUE, $entity_type, TRUE);
-    
-    
-        
+
+
+
     $form['schools_school'] = array(
       'type' => 'select',
       'label' => t('School:'),
@@ -850,7 +851,7 @@ function schools_form_alter(&$form, $form_id) {
     );
 
 
-    
+
     $form['schools_entity_type'] = array(
       'type' => 'hidden',
       'value' => $entity_type,
@@ -861,38 +862,38 @@ function schools_form_alter(&$form, $form_id) {
       'value' => $entity_id,
     );
 
-    
+
     // We also need to add our custom submit handler so that our selection gets saved correctly.
     // Also, use unshift so it's the first thing we do.
     //$form['#submit_handlers'][] = 'schools_data_form_submit';
     if (!isset($form['#submit_handlers'])) $form['#submit_handlers'] = array();
     array_unshift($form['#submit_handlers'], 'schools_data_form_submit');
-    
-    
-    // If this is a NEW group, then don't show them anything!    
-    if (($entity_type == 'group' && @$form['group_id']['value'] === 'new') || ($entity_type == 'course' && @$form['course_id']['value'] === 'new') || ($entity_type == 'user' && @intval($form['user_id']['value']) === 0)) {      
-      $form['schools_school'] = array( 
+
+
+    // If this is a NEW group, then don't show them anything!
+    if (($entity_type == 'group' && @$form['group_id']['value'] === 'new') || ($entity_type == 'course' && @$form['course_id']['value'] === 'new') || ($entity_type == 'user' && @intval($form['user_id']['value']) === 0)) {
+      $form['schools_school'] = array(
         'type' => 'markup',
         'label' => t('School:'),
         'value' => t('<b>Please save this @dt at least once (to establish an ID in the database).  Once you have done this,
                           the School selection box will appear.</b>', array('@dt' => $entity_type)),
         'weight' => $weight,
       );
-            
-      
-    }    
-    
+
+
+    }
+
   } // if in_array forms to alter
 
 
 
- 
+
   // When we copy a degree, make sure we have a chance to interact (so we can
   // indicate the degree as well.
   if ($form_id == "admin_copy_degree_form") {
-    
-    $options = schools_get_schools_for_fapi(TRUE, TRUE, 'degree', TRUE);      
-    
+
+    $options = schools_get_schools_for_fapi(TRUE, TRUE, 'degree', TRUE);
+
     $form['school_id'] = array(
       'type' => 'select',
       'label' => 'Source School:',
@@ -901,7 +902,7 @@ function schools_form_alter(&$form, $form_id) {
       'weight' => 25,
       'popup_description' => t('Please select a school which this degree belongs to.  Schools are defined under the Admin Console -> Configure Schools.'),
       'description' => t("This must match the source degree.  If you do not know the source degree's school, or are unsure what to select, set to Default."),
-    );    
+    );
 
     $form['destination_school_id'] = array(
       'type' => 'select',
@@ -911,35 +912,35 @@ function schools_form_alter(&$form, $form_id) {
       'weight' => 35,
       'popup_description' => t('Please select a school which you wish to save the new degree into.  Schools are defined under the Admin Console -> Configure Schools.'),
       'description' => t("Please select a school which you wish to save the new degree into.  If you are unsure what to select, set to Default."),
-    );    
-    
-        
-        
+    );
+
+
+
     //if (!isset($form['#validate_handlers'])) $form['#validate_handlers'] = array();
-    //array_unshift($form['#validate_handlers'], 'schools_admin_copy_degree_form_validate');    
+    //array_unshift($form['#validate_handlers'], 'schools_admin_copy_degree_form_validate');
   }
-   
-    
+
+
   if ($form_id == 'admin_add_degree_form') {
-    $options = schools_get_schools_for_fapi(TRUE, TRUE, 'degree', TRUE);      
-    
+    $options = schools_get_schools_for_fapi(TRUE, TRUE, 'degree', TRUE);
+
     $form['school_id'] = array(
       'type' => 'select',
       'label' => 'School:',
-      'options' => $options,      
+      'options' => $options,
       'value' => $school_id,
       'hide_please_select' => TRUE,
       'weight' => 15,
       'popup_description' => t('Please select a school which this degree belongs to.  Schools are defined under the Admin Console -> Configure Schools.'),
       'description' => t("This must match the source degree.  If you do not know the source degree's school, or are unsure what to select, set to Default."),
-    );        
-  }    
+    );
+  }
 
 
   // Alter the "urgent message" form, to include new verbiage about how the main one is "global", and add new
   // boxes for each school.
   if ($form_id == 'admin_urgent_message_form') {
-    
+
     $form["mark_school"] = array(
       'value' => '<br><hr><p>' . t('<h2>Schools</h2>The following boxes are provided by the Schools module, so that you may display
                                   urgent messages to <b>students</b> and <b>faculty/staff</b>, based on the school they have been assigned to.') . "</p>",
@@ -960,111 +961,111 @@ function schools_form_alter(&$form, $form_id) {
       );
 
     }
-    
+
     $form['mark_below_school'] = array(
       'value' => '<br><hr><br>',
     );
-    
+
   } // form is admin_urgent_message_form
 
-  
+
   // Forms for which we should allow override values per school.
-  $oforms = array('alerts_settings_form',"system_school_data_form",'admin_advising_settings_form',"course_search_settings_form",'audit_settings_form','calendar_appointment_settings_form');    
-  if (in_array($form_id,$oforms)) {    
-    // We want to add a "use default" checkbox at the top, which, if set, will disable all of the form elements.        
+  $oforms = array('alerts_settings_form',"system_school_data_form",'admin_advising_settings_form',"course_search_settings_form",'audit_settings_form','calendar_appointment_settings_form');
+  if (in_array($form_id,$oforms)) {
+    // We want to add a "use default" checkbox at the top, which, if set, will disable all of the form elements.
     fp_add_js(fp_get_module_path('schools') . '/js/schools.js');
     fp_add_css(fp_get_module_path('system') . '/css/style.css');
     fp_add_css(fp_get_module_path('schools') . '/css/style.css');
 
     $school_id = intval($form['school_id']['value']);
-    
+
     if ($school_id !== 0) {
-      
+
       $school_name = schools_get_school_name_for_id($school_id);
-      
-      $form['markup_school_use_default_school_values'] = array(   
-        'type' => 'markup',     
-        'value' => "<div>" . t("Since this is not the Default school, you have the option to <em>override</em> the Default school's values for each field.  
-                                <br>If <strong>checked</strong>, the value you enter will be used for students, degrees, etc, belonging to this school (%school).  
+
+      $form['markup_school_use_default_school_values'] = array(
+        'type' => 'markup',
+        'value' => "<div>" . t("Since this is not the Default school, you have the option to <em>override</em> the Default school's values for each field.
+                                <br>If <strong>checked</strong>, the value you enter will be used for students, degrees, etc, belonging to this school (%school).
                                 <br>If <strong>unchecked</strong>, the value you enter will be ignored, and the Default school's value will be used instead.
                                 <br><br>If unsure what to do, leave these 'Override' boxes unchecked.
                             ", array("%school" => $school_name)) . "</div>",
         'weight' => -100,
-      );   
-      
-    
-    
+      );
+
+
+
       // Add a checkbox to every form element!
       $fields_to_edit = array('textfield', 'textarea', 'select', 'checkboxes');
       $fields_to_check_override = "";
       foreach ($form as $fieldname => $element) {
         if (in_array($element['type'], $fields_to_edit)) {
-          // Add an "override" checkbox for this field.           
+          // Add an "override" checkbox for this field.
           $checked = "";
           if (variable_get("school_override__$fieldname", "") === "yes") {
             $checked = "checked=checked";
           }
-                   
+
           if (!isset($form[$fieldname]['prefix'])) $form[$fieldname]['prefix'] = "";
-          
+
           $n_fieldname = $fieldname;
           if ($element['type'] == 'checkboxes') {
             $n_fieldname = 'inner-wrapper-' . $fieldname;
           }
-          
+
           $css_id = md5($fieldname) . mt_rand(9,9999);
-          
+
           $form[$fieldname]['prefix'] .= "<span class='schools-override-cb'>
                               <label><input type='checkbox' name='school_override__$n_fieldname' class='school-override-cb' id='school_override__$css_id' value='yes' $checked>" . t("Override Default school value?") . "</label></span>";
           // Also add this fieldname to our "fields_to_check_override" string, so we can put it in a hidden textarea for later use in the _submit function.
           $fields_to_check_override .= $fieldname . ",";
         }
       } // foreach
-    
+
       $form['markup_fields_to_override'] = array(
         'value' => "<textarea name='fields_to_check_override' style='display:none;'>$fields_to_check_override</textarea>",
         'weight' => 999,
       );
-    
+
       // We also need to add a custom submit handler, so we can save the "override" values.
       $form['#submit_handlers'][] = 'schools_override_elements_form_submit';
-    
+
     } // school != 0
-    
+
   } // system_school_data_form
-  
-  
-    
-  
+
+
+
+
 } // hook_form_alter
 
 
 function schools_override_elements_form_submit($form, $form_state) {
-  
+
   // our override values will be in the POST, not the regular "values" area.
   $school_id = intval($form_state['values']['school_id']);
   $fields_to_check_override = explode(",", $form_state['POST']['fields_to_check_override']);
-  
-  
+
+
   foreach($fields_to_check_override as $fieldname) {
     if ($fieldname == "") continue;
-    
+
     // get the base fieldname (minus any school designation).
     $temp = explode("~~", $fieldname);
     $base_fieldname = $temp[0];
-    
+
     if (@$form_state['POST']["school_override__$fieldname"] === 'yes') {
       // We are overriding the fieldname.
-      variable_set("school_override__$fieldname", "yes");   
-                              
+      variable_set("school_override__$fieldname", "yes");
+
     } // if override == yes
     else {
-      // We are NOT overriding it.      
+      // We are NOT overriding it.
       variable_set("school_override__$fieldname", "no");
     }
   } //foreach
-  
-  
+
+
 }
 
 
@@ -1075,7 +1076,7 @@ function schools_get_school_code_for_id($school_id) {
     return $GLOBALS["fp_cache_school_code_for_id"][intval($school_id)];
   }
 
-  
+
   $defs = schools_get_school_definitions(TRUE);
   $rtn = @$defs[$school_id]['school_code'];
   if ($rtn == "") {
@@ -1089,23 +1090,23 @@ function schools_get_school_code_for_id($school_id) {
   $GLOBALS["fp_cache_school_code_for_id"][intval($school_id)] = $rtn;
 
   return $rtn;
-  
+
 }
 
 function schools_get_school_name_for_id($school_id) {
-  
+
   if (isset($GLOBALS["fp_cache_school_name_for_id"][intval($school_id)])) {
     return $GLOBALS["fp_cache_school_name_for_id"][intval($school_id)];
   }
-  
+
   $defs = schools_get_school_definitions(FALSE);
   $rtn = @$defs[$school_id];
   if ($rtn == "") {
     $rtn .= t("School ID# ") . $school_id;
   }
-  
+
   $GLOBALS["fp_cache_school_name_for_id"][intval($school_id)] = $rtn;
-  
+
   return $rtn;
 }
 
@@ -1113,11 +1114,11 @@ function schools_get_school_name_for_id($school_id) {
 
 function z__schools_admin_copy_degree_form_validate($form, &$form_state) {
   $values = $form_state['values'];
-    
+
   $source_major_code = $values['source_major_code'];
   $school_id = $values['schools_school'];
-  $form_state['values']['school_id'] = intval($school_id);  
-  
+  $form_state['values']['school_id'] = intval($school_id);
+
   // Make sure that this major code exists for this school.
   $res = db_query("SELECT * FROM draft_degrees WHERE major_code = ? AND school_id = ?", array($source_major_code, $school_id));
   $cur = db_fetch_array($res);
@@ -1125,32 +1126,32 @@ function z__schools_admin_copy_degree_form_validate($form, &$form_state) {
     form_error("source_major_code", t("Sorry, but the source major code could not be found for the selected school.  Please verify the school that the source degree belongs to."));
     form_error("schools_school", "");
   }
-      
-} 
+
+}
 
 
 
 
 
 function schools_data_form_submit($form, &$form_state) {
-    
+
   $schools_entity_type = $form_state['values']['schools_entity_type'];
   $entity_id = $form_state['values']['schools_entity_id'];
-  
-  @$degree_id = intval($form_state['values']['degree_id']);  
-  @$group_id = intval($form_state['values']['group_id']);  
-  @$course_id = intval($form_state['values']['course_id']);  
-  @$user_id = intval($form_state['values']['user_id']);  
+
+  @$degree_id = intval($form_state['values']['degree_id']);
+  @$group_id = intval($form_state['values']['group_id']);
+  @$course_id = intval($form_state['values']['course_id']);
+  @$user_id = intval($form_state['values']['user_id']);
   @$catalog_year = $form_state['values']['de_catalog_year'];
   if ($catalog_year == "") {
     @$catalog_year = $form_state['values']['catalog_year'];
   }
-    
-  
-  $school_id = intval($form_state['values']['schools_school']);  
+
+
+  $school_id = intval($form_state['values']['schools_school']);
   $form_state['values']['school_id'] = $school_id;
-    
-  
+
+
   // Update the table in question.
   $table_name = 'draft_degrees';
   $field_name = "degree_id";
@@ -1166,15 +1167,15 @@ function schools_data_form_submit($form, &$form_state) {
     $table_name = "users";
     $field_name = "user_id";
   }
-      
-      
+
+
   db_query("UPDATE `$table_name` SET school_id = ? WHERE $field_name = ?", array($school_id, $entity_id));
-      
 
 
 
 
- 
+
+
 }
 
 
@@ -1189,29 +1190,29 @@ function schools_data_form_submit($form, &$form_state) {
 // NOTE:  We no longer need to do anything when we apply draft changes.
 /**
  * Implements hook_apply_draft_changes
- * 
+ *
  * This runs when the user "applies draft changes".  We want to
  * copy from our draft_ table to our production table.
  */
 function z__schools_apply_draft_changes() {
-  
-  
-    
+
+
+
   /*
   $table_name = "schools_data";
   $draft_table_name = "draft_$table_name";
-  
+
   // First, truncate existing...
   $query = "truncate table $table_name";
   $res = db_query($query);
-  
+
   // Now, copy in draft changes...
   $query = "INSERT INTO $table_name
           SELECT * FROM $draft_table_name ";
   $res = db_query($query);
   */
-  
-  
+
+
 } // hook_apply_draft_changes
 
 
@@ -1220,61 +1221,61 @@ function z__schools_apply_draft_changes() {
 
 
 
-function schools_administer_schools_form() {  
+function schools_administer_schools_form() {
   $form = array();
-  
-  
+
+
   $form = array();
-  
+
   $m = 0;
-  
+
   fp_add_css(fp_get_module_path("alerts") . "/css/style.css");
   fp_add_css(fp_get_module_path("user") . "/css/user.css");
   fp_add_js(fp_get_module_path("admin") . "/js/admin.js");
-  
-  
-  
+
+
+
   $form["mark" . $m++] = array(
     "type" => "markup",
     "value" => t("Schools can be divisions within your institution (ex: School of Nursing, School of Pharmacy, etc), distinct campuses
                   (ex:  Washington Campus, South Campus, etc), or divisions of graduate level (Undergrad, Graduate).
-                  The default school is simply called 'Default' and all users and degree data will be placed under the Default school unless otherwise specified.  
+                  The default school is simply called 'Default' and all users and degree data will be placed under the Default school unless otherwise specified.
                   <br>If you are unsure what to do, <b>leave this page blank</b>.") . "
                   <br><br>
                   <a href='https://getflightpath.com/node/11879' target='_blank'>" . t("For a more thorough explanation of Schools, view this help page (loads in a new window)") . "</a>"
                 . "<br><br><b>" . t("Schools:") . "</b>
-                
+
                 <table class='advisees-alerts' style='margin-left: 10px;' cellpadding=5>
                 <tr>
                   <th width='10%'>" . t("Actions") . "</th>
                   <th width='10%'>" . t("Internal ID") . "</th>
                   <th width='10%'>" . t("Code") . "</th>
-                  <th>" . t("Name") . "</th>                  
+                  <th>" . t("Name") . "</th>
                 </tr>",
   );
 
 
   $form["mark" . $m++] = array(
     "type" => "markup",
-    "value" => "<tr><td>-</td><td>0</td><td>-</td><td>" . t("Default") . "</td></tr>", 
-  );    
+    "value" => "<tr><td>-</td><td>0</td><td>-</td><td>" . t("Default") . "</td></tr>",
+  );
 
 
 
   $res = db_query("SELECT * FROM schools ORDER BY school_id");
   while ($cur = db_fetch_array($res)) {
-    
+
     $school_id = $cur["school_id"];
     $code = $cur["school_code"];
     $value = $cur["name"];
-    
+
     $prompt_link = fp_get_js_prompt_link("Enter a new code (up to 5 chars) and name separated by tilda ~ \\n(ex: ULM ~ University of Louisiana Monroe)\\nto change this school to:", "$code ~ $value", "document.getElementById(\"element-perform_action2\").value=\"edit~_~$school_id~_~\" + response; document.getElementById(\"fp-form-schools_administer_schools_form\").submit(); ", "<i class='fa fa-pencil'></i>");
     $confirm_link = fp_get_js_confirm_link(t("Are you sure you wish to delete this school_id?\\nNo data will be deleted, but the record connecting the id $school_id to this school will be removed from the 'schools' database table.\\n\\nProceed?"), "document.getElementById(\"element-perform_action2\").value=\"del~_~$school_id\"; document.getElementById(\"fp-form-schools_administer_schools_form\").submit(); ", "<i class='fa fa-remove'></i>", "action-link-remove");
-    
+
     if ($school_id == 0 ) {
       $prompt_link = $confirm_link = "";
     }
-     
+
     $form["mark" . $m++] = array(
       "type" => "markup",
       "value" => "<tr>
@@ -1282,59 +1283,59 @@ function schools_administer_schools_form() {
                       <td>$school_id</td>
                       <td>$code</td>
                       <td>$value</td>
-                  </tr>", 
-    );    
+                  </tr>",
+    );
   }
-  
+
   $form["mark" . $m++] = array(
     "type" => "markup",
     "value" => "</table>
                   <br><div style='border: 1px solid gold; padding: 10px;'><strong>" . t("Important:") . "</strong> " . t("Even if you are not overriding any settings per school, you must still visit each school's <em>Configure school settings</em>
                       screen from the Admin Console and press the Submit button.  Otherwise, some features in FlightPath may not function correctly.</div>"),
   );
-  
+
   $form["perform_action2"] = array(
     "type" => "hidden",
   );
-  
+
   $form["new_school"] = array(
     "type" => "textfield",
-    "label" => t("Add a new school as <i>code ~ name</i>:"),    
+    "label" => t("Add a new school as <i>code ~ name</i>:"),
     "description" => t("Enter a unique, 1 to 5 character, code for this school, then the name, separated by a tilda (~).
                         <br> Ex:  ULM ~ University of Louisiana Monroe"),
-                        
+
   );
-  
-  
+
+
   $form['schools_allow_courses_from_default_school'] = array(
     'type' => 'select',
     'label' => t("Allow courses (in degrees and groups) from the Default school as well as their assigned school?"),
     'options' => array('yes' => t('Yes (default)'), 'no' => t('No')),
     'hide_please_select' => TRUE,
     'value' => variable_get('schools_allow_courses_from_default_school', 'yes'),
-    'description' => t("This setting has a <b>very powerful</b> implication.  
+    'description' => t("This setting has a <b>very powerful</b> implication.
                         <br>&bull; If set to 'No', it means that degrees and groups must <b>only</b> use
-                        courses belonging to the same school as them.  For example, this is useful if you have multiple institutions within FlightPath, 
+                        courses belonging to the same school as them.  For example, this is useful if you have multiple institutions within FlightPath,
                         each with a course named ENGL 101, and you need to be explicit about <em>which</em> ENGL 101 you mean.
-                        
+
                         <br>&bull; If set to 'Yes', it means that degrees and groups will allow courses from their same school <b>as well as</b> courses
                         from the Default school.  This is good if you keep the majority of your courses under Default, and have <em>no duplicates
                         across schools</em>.  For example, if you have separate schools for 'School of Business' and 'School of Nursing' at the same institution, then
                         a course like ENGL 101 might be used by degrees in both schools.  So, ENGL 101 would be placed in the Default school.
-                                                
+
                         <br>
                         If you are unsure what to select, choose 'Yes'."),
-                        
+
   );
-    
-  
+
+
   $form["submit"] = array(
     "type" => "submit",
     "value" => t("Submit"),
-  );  
-  
+  );
+
   return $form;
-  
+
 } // administer_schools_form
 
 
@@ -1342,56 +1343,56 @@ function schools_administer_schools_form_submit($form, $form_state) {
   $values = $form_state["values"];
 
   variable_set("schools_allow_courses_from_default_school", $values["schools_allow_courses_from_default_school"]);
-  
+
   fp_add_message(t("Settings saved successfully."));
-  
+
   if (trim($values["new_school"]) != "") {
     $new_school = trim($values["new_school"]);
-    
+
     if (!strstr($new_school, "~")) {
       form_error("new_school", t("Sorry, but the format you entered was not correct. Plase enter a unique 1 to 5 character code for this school, tilda (~), then the name.
                                   <br> Ex:  ULM ~ University of Louisiana Monroe"));
       return;
     }
-    
+
     $temp = explode("~", $new_school);
     $code = trim(strtoupper($temp[0]));
     $new_school = trim($temp[1]);
-    
+
     // Clean up any trouble chars
-    $new_school = preg_replace("/[^a-zA-Z0-9_\-]/", " ", $new_school);    
+    $new_school = preg_replace("/[^a-zA-Z0-9_\-]/", " ", $new_school);
     $code = preg_replace("/[^a-zA-Z0-9_]/", "", $code);
-        
+
     if ($code == "" || strlen($code) > 5) {
       form_error("new_school", t("Sorry, but the format you entered was not correct. Plase enter a unique 1 to 5 character code for this school, tilda (~), then the name.
                                   <br> Ex:  ULM ~ University of Louisiana Monroe"));
       return;
     }
-    
+
     // Check that code is not already in use.
     $temp = schools_get_school_id_from_school_code($code);
     if ($temp) {
       form_error("new_school", t("Sorry, but the code you specified is already in use."));
-      return;      
-    }    
-    
+      return;
+    }
+
     // Okay, add to the roles table.
     db_query("INSERT INTO schools (school_code, name) VALUES (?,?) ", strtoupper($code), $new_school);
-        
-    fp_add_message(t("The new school has been added successfully."));       
+
+    fp_add_message(t("The new school has been added successfully."));
   }
-    
-  
+
+
   if (strstr($values["perform_action2"], "del~_~")) {
     $temp = explode("~_~", $values["perform_action2"]);
-    $i = trim($temp[1]);  
+    $i = trim($temp[1]);
     // Remove this rid from the table.
-    db_query("DELETE FROM schools WHERE school_id = ? ", $i);      
-    fp_add_message(t("The school has been deleted successfully.  All data linking to this school id (%i) still exists.", array("%i" => $i)));    
-            
+    db_query("DELETE FROM schools WHERE school_id = ? ", $i);
+    fp_add_message(t("The school has been deleted successfully.  All data linking to this school id (%i) still exists.", array("%i" => $i)));
+
   }
-  
-  
+
+
   if (strstr($values["perform_action2"], "edit~_~")) {
     $temp = explode("~_~", $values["perform_action2"]);
     $i = trim($temp[1]);
@@ -1401,13 +1402,13 @@ function schools_administer_schools_form_submit($form, $form_state) {
       form_error("", t("Sorry, but the format you entered was not correct. Plase enter a unique 1 to 5 character code for this school, tilda (~), then the name.
                                   <br> Ex:  ULM ~ University of Louisiana Monroexxx"));
       return;
-    }    
-    
-       
+    }
+
+
     $temp = explode("~", $new_school);
     $code = trim(strtoupper($temp[0]));
-    $new_school = trim($temp[1]);    
-            
+    $new_school = trim($temp[1]);
+
     $new_school = preg_replace("/[^a-zA-Z0-9_\-]/", " ", $new_school);
     $code = preg_replace("/[^a-zA-Z0-9_]/", "", $code);
 
@@ -1416,31 +1417,31 @@ function schools_administer_schools_form_submit($form, $form_state) {
     if ($temp) {
       if ($temp != $i) {  // meaning, it's not the school we are editing.
         form_error("new_school", t("Sorry, but the code you specified is already in use."));
-        return;      
+        return;
       }
-    }    
-    
+    }
+
     if ($code == "" || strlen($code) > 5) {
       form_error("", t("Sorry, but the format you entered was not correct. Plase enter a unique 1 to 5 character code for this school, tilda (~), then the name.
                                   <br> Ex:  ULM ~ University of Louisiana Monroe"));
       return;
     }
-            
-    if (trim($new_school) != "") {  
-      
+
+    if (trim($new_school) != "") {
+
       // Let's update the table.
-      db_query("UPDATE schools SET name = ?, school_code = ? 
+      db_query("UPDATE schools SET name = ?, school_code = ?
                 WHERE school_id = ? ", $new_school, strtoupper($code), $i);
-  
-      fp_add_message(t("The school has been edited successfully."));    
+
+      fp_add_message(t("The school has been edited successfully."));
     }
-    
+
   } // if edit
-  
+
   // Rebuild the menu cache, since other modules have tabs and/other menu items based on schools
   menu_rebuild_cache(FALSE);
-  
-  
+
+
 } // _submit
 
 
@@ -1460,9 +1461,9 @@ function schools_get_school_id_for_user($user_id) {
 // Return an array of school_ids to their names
 function schools_get_school_definitions($bool_return_db_rows = FALSE) {
   $rtn = array();
-  
+
   $rtn[0] = t("Default");
-  
+
   if ($bool_return_db_rows) {
     $rtn[0] = array(
       'school_id' => 0,
@@ -1470,20 +1471,20 @@ function schools_get_school_definitions($bool_return_db_rows = FALSE) {
       'name' => t('Default'),
     );
   }
-  
+
   $res = db_query("SELECT * FROM schools ORDER BY school_id");
-  while ($cur = db_fetch_array($res)) {    
+  while ($cur = db_fetch_array($res)) {
     $key = intval($cur["school_id"]);
-    $value = $cur["name"];  
-    
+    $value = $cur["name"];
+
     $rtn[$key] = $value;
     if ($bool_return_db_rows) {
       $rtn[$key] = $cur;
     }
-    
+
   }
-  
-  
+
+
   return $rtn;
 }
 
@@ -1493,46 +1494,46 @@ function schools_get_school_definitions($bool_return_db_rows = FALSE) {
 
 
 function schools_perm() {
-  $rtn = array();  
+  $rtn = array();
   $rtn['administer_schools'] = array('title' => 'Administer schools module', 'description' => 'Only give to admin role.');
-  
-  
+
+
   // Add in permissions per school.
   $defs = schools_get_school_definitions();
-  
+
   $types = array('degree', 'group', 'course');
-  
+
   foreach ($types as $type) {
-        
-      
- 
+
+
+
     foreach ($defs as $school_id => $school_desc) {
-      $rtn['administer_' . $school_id . '_' . $type . '_data'] = array('title' => t('Administer %school_desc @type data', array('%school_desc' => $school_desc, '@type' => $type)), 
+      $rtn['administer_' . $school_id . '_' . $type . '_data'] = array('title' => t('Administer %school_desc @type data', array('%school_desc' => $school_desc, '@type' => $type)),
                                                                   'description' => t('The user is allowed to edit @type data for %school_desc.
-                                                                      Note: The user MUST also be given the Edit Data Entry permission under Admin module.', 
+                                                                      Note: The user MUST also be given the Edit Data Entry permission under Admin module.',
                                                                         array('%school_desc' => $school_desc, '@type' => $type)));
 
-     
-      $rtn['manage_' . $school_id . '_user_data'] = array('title' => t('Administer %school_desc users', array('%school_desc' => $school_desc)), 
+
+      $rtn['manage_' . $school_id . '_user_data'] = array('title' => t('Administer %school_desc users', array('%school_desc' => $school_desc)),
                                                                   'description' => t('The user is allowed to edit and create users for %school_desc.
                                                                         Note: the user MUST also be given the Manage users permission under the User module.
-                                                                        ',array('%school_desc' => $school_desc, '@type' => $type)));      
-          
+                                                                        ',array('%school_desc' => $school_desc, '@type' => $type)));
 
-      
- 
-  
-      $rtn['search_students_' . $school_id] = array('title' => t('Search for students in %school_desc', array('%school_desc' => $school_desc)), 
+
+
+
+
+      $rtn['search_students_' . $school_id] = array('title' => t('Search for students in %school_desc', array('%school_desc' => $school_desc)),
                                                                   'description' => t('The user is allowed to search for students belonging to %school_desc.
-                                                                      Note: To advise, the user will need additional permissions.', 
+                                                                      Note: To advise, the user will need additional permissions.',
                                                                         array('%school_desc' => $school_desc)));
-      
-  
+
+
     }
-  
+
   }
-   
-  
+
+
   return $rtn;
 }
 
