@@ -18,8 +18,8 @@ class Substitution extends stdClass
 	public $outdated_note; // will contain information about WHY this was outdated.
   public $assigned_to_degree_id = 0;
   public $school_id = 0;
-	
-		
+
+
 	function __construct()
 	{
 
@@ -33,8 +33,8 @@ class Substitution extends stdClass
 	function to_string()
 	{
 		$rtn = "";
-		if ($this->bool_group_addition)
-		{
+		$ga = '';
+		if ($this->bool_group_addition) {
 			$ga = "group addition ";
 		}
 		$rtn .= "Substitution: $ga " . $this->course_requirement->to_string() . " fulfilled by ";
@@ -47,5 +47,5 @@ class Substitution extends stdClass
 
 		return $rtn;
 	}
-  
+
 } // end class Substitution

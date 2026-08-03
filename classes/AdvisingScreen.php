@@ -199,7 +199,7 @@ function draw_c_fieldset($content, $legend = "Click to expand/collapse", $bool_s
 function draw_menu_item($url, $target, $icon_img, $title, $description = "") {
 
   $rtn = "";
-
+  $extra_class = '';
   if (!$description) $extra_class = "fp-menu-item-tight";
 
   $rtn .= "<div class='fp-menu-item $extra_class'>
@@ -2334,9 +2334,8 @@ function draw_menu_items($menu_array) {
           ";
 
 
-
-    if ($bool_padd)
-    {
+    $padd = '';
+    if ($bool_padd) {
       $padd = "&nbsp; &nbsp;";
     }
 
@@ -2564,7 +2563,7 @@ function draw_menu_items($menu_array) {
 
     $course->fix_title();
 
-    $initials = variable_get("school_initials", "DEMO", $school_id);
+    $initials = variable_get_for_school("school_initials", "DEMO", $school_id);
 
     $pC .= "<!--EQV1-->";
     $bool_transferEqv = true;
@@ -3132,7 +3131,7 @@ function draw_menu_items($menu_array) {
 
       if (user_has_permission("can_advise_students"))
       {
-        $html .= fp_render_button(t("Select Course"), $group_js_select, TRUE, "style='font-size: 10pt;'");
+        $html .= fp_render_button(t("Select Course"), $group_js_select);
       }
     }
     else if ($show_advising_buttons == false && $course->has_variable_hours() == true && $course->grade == "" && user_has_permission("can_advise_students") && !$this->bool_blank) {
@@ -6001,7 +6000,7 @@ function draw_menu_items($menu_array) {
           <div style='margin-top: 20px;'>
 
 
-        " . fp_render_button(t("Select Course"), "popupAssignSelectedCourseToGroup(\"$place_group->assigned_to_semester_num\", \"$group->group_id\",\"$advising_term_id\",\"-1\");", true, "style='font-size: 10pt;'") . "
+        " . fp_render_button(t("Select Course"), "popupAssignSelectedCourseToGroup(\"$place_group->assigned_to_semester_num\", \"$group->group_id\",\"$advising_term_id\",\"-1\");") . "
           </div>
         ";
       }

@@ -143,6 +143,7 @@ class FlightPath extends stdClass
     //  to create a single DegreePlan object, made out of all the options.
     //  We need a loop here.
     $degree_plans = array();
+    $degree_plan = NULL;
     $temparr = explode(",", $major_code_csv);
 
     foreach ($temparr as $major_code) {

@@ -381,7 +381,9 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
 
     $array_valid_names = array();
 
-
+    // Init our vars
+    $description = $title = $course_num = $subject_id = $cache_catalog_year = $min_hours = $max_hours = $repeat_hours = '';
+    $db_exclude = $db_school_id = $db_track_code = '';
 
     if ($course_id != 0)
     {

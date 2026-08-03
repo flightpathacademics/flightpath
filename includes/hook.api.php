@@ -80,6 +80,7 @@ function hook_sidebar_left_links_alter($bool_for_hamburger_menu, &$links) {
  */
 function hook_get_user_image_url($cwid, $type = 'student') {
 
+  $url = '';
   if ($type == 'student') {
     $url = "https://myschool.edu/student-data/" . $cwid . ".jpg";
   }

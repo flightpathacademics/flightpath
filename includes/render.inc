@@ -453,6 +453,7 @@ function clear_session_form_values($callback) {
  */
 function form_basic_validate($form, $form_state) {
 
+  $label = '';
   foreach ($form as $name => $element) {
     if (is_array($element) && @$element["required"]) {
       // Okay, this is a required field.  So, check that it has a non-blank value
@@ -582,7 +583,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
 
 
 
-  $attributes = @$element["attributes"];
+  $attributes = $element["attributes"] ?? array();
   if (!is_array($attributes)) {
     $attributes = array();
     $attributes['style'] = '';
@@ -627,9 +628,6 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
 
 
   if ($type == "markup" && $element_error_css) {
-    if (!isset($attributes)) {
-      $attributes = array();
-    }
     if (is_array($attributes)) {
       $attributes['class'] .= $element_error_css;
     }

@@ -519,7 +519,7 @@ class DegreePlan extends stdClass
 
     // Degrees we should exclude from the "appears in" counts.  Used later...
     $exclude_degree_ids = NULL;
-
+    $obj_semester = new stdClass();
 
     $res = $this->db->db_query("SELECT * FROM $table_name1 a, $table_name2 b
                           WHERE a.degree_id = ?
