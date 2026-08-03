@@ -141,7 +141,7 @@ class FlightPath extends stdClass
     //  Okay folks.  So this is basically where we will be iterating through all
     //  of the student's major_codes (if they have more than one), and squishing them together,
     //  to create a single DegreePlan object, made out of all the options.
-    //  We need like a loop here.
+    //  We need a loop here.
     $degree_plans = array();
     $temparr = explode(",", $major_code_csv);
 
@@ -654,8 +654,7 @@ class FlightPath extends stdClass
 
 
 
-  function assign_courses_to_list(ObjList $list_requirements, Student $student, $bool_perform_assignment = true, Group $group = null, $bool_check_significant_courses = false, $assign_to_semester_num = -1)
-  {
+  function assign_courses_to_list(ObjList $list_requirements, Student $student, $bool_perform_assignment = true, Group $group = null, $bool_check_significant_courses = false, $assign_to_semester_num = -1) {
 
     $count = 0;
     $school_id = 0;
@@ -697,6 +696,7 @@ class FlightPath extends stdClass
 
     // If the group has min_hours, then we should allow the user to get at least the min hours before we stop trying to fill.
     if ($group->has_min_hours_allowed() && variable_get_for_school("group_full_at_min_hours", "yes", $school_id) == "yes") {
+
       $meet_min_hours = $group->min_hours_allowed;
     }
 

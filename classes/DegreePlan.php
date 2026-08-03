@@ -3,13 +3,13 @@
 
 class DegreePlan extends stdClass
 {
-  
+
   const DEGREE_ID_FOR_COMBINED_DEGREE = -1001;
   const SEMESTER_NUM_FOR_COURSES_ADDED = -88;
   const GROUP_ID_FOR_COURSES_ADDED = -88;
   const SEMESTER_NUM_FOR_DEVELOPMENTALS = -55;
-  
-  
+
+
   public $major_code, $title, $degree_type, $degree_level, $degree_class, $short_description, $long_description;
   public $list_semesters, $list_groups, $db, $degree_id, $catalog_year, $is_combined_dynamic_degree_plan, $combined_degree_ids_array;
   public $track_code, $track_title, $track_description, $student_array_significant_courses;
@@ -27,12 +27,12 @@ class DegreePlan extends stdClass
                                     // looks like: required_course_id_array[$course_id][$degree_id][$group_id] = TRUE;
 
   public $gpa_calculations, $bool_calculated_progess_hours;
-  
-  
+
+
   public $bool_use_draft, $bool_loaded_descriptive_data;
-  
+
   public $extra_data_array;  // This is an array meant for any generic "extra data" we want to include, from custom modules.
-  
+
 
   /**
   * $major_code   ACCT, CSCI, etc.
@@ -81,19 +81,19 @@ class DegreePlan extends stdClass
 
     if ($degree_id != "")
     {
-    
+
       $this->degree_id = $degree_id;
-      $this->load_descriptive_data();      
+      $this->load_descriptive_data();
       if (!$bool_load_minimal)
-      {            
-        $this->load_degree_plan();                 
+      {
+        $this->load_degree_plan();
       }
       // Add the "Add a Course" semester to the semester list.
       $this->add_semester_courses_added();
 
     }
 
-     
+
     if ($this->degree_level == "") {
       $this->degree_level = "UG";  // undergrad by default
     }
@@ -102,61 +102,61 @@ class DegreePlan extends stdClass
   } // __construct
 
 
-  
+
   /**
    * Given a group_id, find out if this group contains a course which appears in other degrees.  Return the max number.
    */
   function get_max_course_appears_in_degrees_count($test_group_id) {
-    
+
     // array is sectioned like:  course_id | degree_id | group_id.    Group id = 0 means "on the bare degree plan"
-    // ex:  $this->required_course_id_array[$course_c->course_id][$this->degree_id][0] = TRUE;      
-    
+    // ex:  $this->required_course_id_array[$course_c->course_id][$this->degree_id][0] = TRUE;
+
     $exclude_degree_ids = system_get_exclude_degree_ids_from_appears_in_counts($this->school_id);
-    
+
     $courses = array();
-    
+
     foreach ($this->required_course_id_array as $course_id => $temp1) {
       foreach ($this->required_course_id_array[$course_id] as $degree_id => $temp2) {
-        
+
         // Is this an excluded degree?  If so, skip it.
         if (in_array($degree_id, $exclude_degree_ids)) continue;
-        
+
         foreach ($this->required_course_id_array[$course_id][$degree_id] as $group_id => $val) {
-          
+
           // Is this the group we are looking for?
           if ($group_id != $test_group_id) continue;
-          
-          // Otherwise, yes, we are in the right group.  Let's keep track of what courses we have in this group:                    
+
+          // Otherwise, yes, we are in the right group.  Let's keep track of what courses we have in this group:
           $courses[$course_id] = TRUE;
-          
+
         }
       }
     }
-    
+
     $course_count = array();
 
     // Okay, now what we want to do is find out, how many different degrees do these courses appear in?
     foreach ($this->required_course_id_array as $course_id => $temp1) {
-      
+
       if (!isset($courses[$course_id])) continue; // wasn't in our list, so skip.
       $course_count[$course_id] = 0;
-      
+
       foreach ($this->required_course_id_array[$course_id] as $degree_id => $temp2) {
-        
+
         $course_count[$course_id]++;
-                
+
       }
     }
-    
-    
-        
+
+
+
     // Okay, coming out of this, we can sort the courses_degrees array, and return the highest number.
-    rsort($course_count);        
-    
+    rsort($course_count);
+
     //fpm($course_count);
-    
+
     return @$course_count[0];  // first element should be the highest value.
-    
+
   } //get_max_course_appears_in_degrees_count
 
 
@@ -164,16 +164,16 @@ class DegreePlan extends stdClass
 
   /**
    * Calculate and store progress hour information.  Stores in the $this->gpa_calculations array.
-   * 
-   * 
+   *
+   *
    * @param $bool_get_local_only_hours - If set to TRUE, then "local" courses (non-transfer) will be separated into their own indexes.
    * @param $types - the type codes we care about.  If left as an emtpy array, it will get all the types defined + "degree" for degree total.
    *                 The array structure should be "code" => "code".  Ex:  array('a' => 'a')
-   * 
+   *
    */
   function calculate_progress_hours($bool_get_local_only_hours = FALSE, $types = array())
   {
-    
+
     // Let's go through our requirement types by code, and collect calcuations on them
     // in the gpa_calculations array.
     if (count($types) == 0) {
@@ -186,48 +186,48 @@ class DegreePlan extends stdClass
 
     // We want to do this for all possible degrees.
     $all_degree_ids = array();
-    
+
     $all_degree_ids[0] = 0;  // Add in the default "0" degree, meaning, don't look for a specific degree_id.
-    
+
     if ($this->degree_id != DegreePlan::DEGREE_ID_FOR_COMBINED_DEGREE) {
-      
+
       // Not a combined degree, just use the current degree_id.
       // $all_degree_ids[] = $this->degree_id;  // comment out... not needed?
     }
     else {
-        
-      // Add in all the degrees we are combined with.      
+
+      // Add in all the degrees we are combined with.
       $all_degree_ids = array_merge($all_degree_ids, $this->combined_degree_ids_array);
     }
-        
-        
-    foreach ($all_degree_ids as $degree_id) {        
-        
+
+
+    foreach ($all_degree_ids as $degree_id) {
+
       foreach ($types as $code => $desc) {
-        // Make sure to skip appropriate codes we don't care about.      
-        
-        if ($code == 'x') continue;      
-        
-        $this->gpa_calculations[$degree_id][$code]["total_hours"] = $this->get_progress_hours($code, TRUE, FALSE, FALSE, $degree_id);      
-        $this->gpa_calculations[$degree_id][$code]["fulfilled_hours"] = $this->get_progress_hours($code, FALSE, FALSE, FALSE, $degree_id);      
-        $this->gpa_calculations[$degree_id][$code]["qpts_hours"] = $this->get_progress_hours($code, FALSE, TRUE, FALSE, $degree_id);      
-        
-        
+        // Make sure to skip appropriate codes we don't care about.
+
+        if ($code == 'x') continue;
+
+        $this->gpa_calculations[$degree_id][$code]["total_hours"] = $this->get_progress_hours($code, TRUE, FALSE, FALSE, $degree_id);
+        $this->gpa_calculations[$degree_id][$code]["fulfilled_hours"] = $this->get_progress_hours($code, FALSE, FALSE, FALSE, $degree_id);
+        $this->gpa_calculations[$degree_id][$code]["qpts_hours"] = $this->get_progress_hours($code, FALSE, TRUE, FALSE, $degree_id);
+
+
         if ($bool_get_local_only_hours) {
           // Get ONLY local hours, too....
           $this->gpa_calculations[$degree_id][$code . "_local"]["total_hours"] = $this->get_progress_hours($code, TRUE, FALSE, TRUE, $degree_id);
           $this->gpa_calculations[$degree_id][$code . "_local"]["fulfilled_hours"] = $this->get_progress_hours($code, FALSE, FALSE, TRUE, $degree_id);
-          $this->gpa_calculations[$degree_id][$code . "_local"]["qpts_hours"] = $this->get_progress_hours($code, FALSE, TRUE, TRUE, $degree_id);     
+          $this->gpa_calculations[$degree_id][$code . "_local"]["qpts_hours"] = $this->get_progress_hours($code, FALSE, TRUE, TRUE, $degree_id);
         }
-        
+
       } // foreach types as code
-    
+
     } //foreach all_degree_ids
-    
-      
+
+
     // Note that we have run this function for this degree.
     $this->bool_calculated_progess_hours = TRUE;
-     
+
   }// calculate progress hours
 
   /**
@@ -235,48 +235,48 @@ class DegreePlan extends stdClass
    * that to figure out GPA.
    *
    */
-  function calculate_progress_quality_points($bool_get_local_only_hours = FALSE, $types = array()) {      
-    
+  function calculate_progress_quality_points($bool_get_local_only_hours = FALSE, $types = array()) {
+
     // Let's go through our requirement types by code, and collect calcuations on them
     // in the gpa_calculations array.
     if (count($types) == 0) {
       $types = fp_get_requirement_types($this->school_id);
     }
-    
+
     // Add a pseudo-code in for "degree", which the functions will convert into a blank.
     $types["degree"] = "Degree (total)";
-    
+
     // We want to do this for all possible degrees.
     $all_degree_ids = array();
     $all_degree_ids[0] = 0;  // Add in the default "0" degree, meaning, don't look for a specific degree_id.
-    
+
     if ($this->degree_id != DegreePlan::DEGREE_ID_FOR_COMBINED_DEGREE) {
       // Not a combined degree, just use the current degree_id.
       // $all_degree_ids[] = $this->degree_id;   // Not needed?
     }
     else {
       $all_degree_ids = array_merge($all_degree_ids, $this->combined_degree_ids_array);
-    }    
-    
+    }
+
     foreach ($all_degree_ids as $degree_id) {
       foreach ($types as $code => $desc) {
         // Make sure to skip appropriate codes we don't care about.
         if ($code == 'x') continue;
-        
+
         $this->gpa_calculations[$degree_id][$code]["qpts"] = $this->get_progress_quality_points($code, FALSE, $degree_id);
-        
+
         if ($bool_get_local_only_hours) {
           // Get only local courses, too...
           $this->gpa_calculations[$degree_id][$code . "_local"]["qpts"] = $this->get_progress_quality_points($code, TRUE, $degree_id);
         }
       } //foreach types as code
-      
+
     } //foreach all_degree_ids
-            
-                
-    
+
+
+
   } // calculate progess quality points
-  
+
 
   /**
    * Returns the number of hours required (or fulfilled) in a degree plan
@@ -284,20 +284,20 @@ class DegreePlan extends stdClass
    * ex:  "m", "s", etc.  leave blank for ALL required hours.
    * if boolRequiredHours is FALSE, then we will only look for the courses
    * which got fulfilled.
-   * 
-   * 
-   *  
+   *
+   *
+   *
    */
   function get_progress_hours($requirement_type = "", $bool_required_hours_only = TRUE, $bool_qpts_grades_only = FALSE, $bool_exclude_all_transfer_credits = FALSE, $req_by_degree_id = 0)
   {
-    
-    
+
+
     if ($requirement_type == "degree") $requirement_type = "";
 
-        
-    
+
+
     $hours = 0;
-    
+
     $this->list_semesters->reset_counter();
     while ($this->list_semesters->has_more())
     {
@@ -305,23 +305,23 @@ class DegreePlan extends stdClass
 
       if ($bool_required_hours_only == TRUE)
       {
-                
+
         $hours += $sem->list_courses->count_hours($requirement_type, TRUE, FALSE, FALSE, FALSE, $req_by_degree_id);  // do not exclude transfer credits, since this is for required hours only.
-        
+
       } else {
         $temp = $sem->list_courses->count_credit_hours($requirement_type, TRUE, TRUE, $bool_qpts_grades_only, $bool_exclude_all_transfer_credits, $req_by_degree_id);
-                
+
         $hours += $temp;
       }
-    }                       
+    }
 
-    
+
     // Also, add in groups matching this requirement type.
     $this->list_groups->reset_counter();
     while ($this->list_groups->has_more())
     {
       $g = $this->list_groups->get_next();
-      if ($g->group_id < 0)                           
+      if ($g->group_id < 0)
       { // Skip Add a course group.
         continue;
       }
@@ -329,34 +329,34 @@ class DegreePlan extends stdClass
       // Make sure the group doesn't have a type of 'x' assigned to it, which means we should
       // skip it.
       if ($g->requirement_type == 'x') continue;
-      
+
       // If req_by_degree_id is set, make sure this group is assigned to that degree.
       if ($req_by_degree_id != 0 && $g->req_by_degree_id != $req_by_degree_id) continue;
 
 
       $g_hours = $g->hours_required;
-      
+
       // use the min hours if it is set.
       if ($g->min_hours_allowed > 0) {
         $g_hours = $g->min_hours_allowed;
       }
-      
+
       if ($bool_required_hours_only == false)
-      { // only count the fulfilled hours, then.        
-        $g_hours = $g->get_fulfilled_hours(true, false, true, -1, true, $bool_qpts_grades_only, $requirement_type, $bool_exclude_all_transfer_credits);        
+      { // only count the fulfilled hours, then.
+        $g_hours = $g->get_fulfilled_hours(true, false, true, -1, true, $bool_qpts_grades_only, $requirement_type, $bool_exclude_all_transfer_credits);
 
       }
 
       if ($requirement_type == "")
       {
         $hours += $g_hours;
-      } 
+      }
       else {
         // A requirement is specified, so make sure
         // the group is of this requirement.
 
         if (!isset($g->hours_required_by_type[$requirement_type])) $g->hours_required_by_type[$requirement_type] = 0;
-        
+
         if ($bool_required_hours_only == true)
         {  // make sure it's of the right type.
           //$g_hours = $g->hours_required_by_type[$requirement_type]*1;
@@ -364,34 +364,34 @@ class DegreePlan extends stdClass
           // it should just be any hours_required, instead of by type, since a group can only have 1 type.
           if ($g->requirement_type == $requirement_type) {
             $g_hours = $g->hours_required;
-            
+
             // use the min hours if it is set.
             if ($g->min_hours_allowed > 0) {
               $g_hours = $g->min_hours_allowed;
-            }            
-              
+            }
+
             $hours += $g_hours;
             continue;
           }
-          
+
         }
-        
+
         if ($g->requirement_type == $requirement_type)
-        {            
+        {
           $hours += $g_hours;
         }
-        
-      
-        
-        
+
+
+
+
       }
     }
-    
+
     return $hours;
 
   }
-  
-  
+
+
   /**
    * Similar to get_progress_hours, this will return back the quality points a student has earned
    * towards this degree.  It can then be used to calculate GPA.
@@ -408,7 +408,7 @@ class DegreePlan extends stdClass
     // which got fulfilled.
 
     if ($requirement_type == "degree") $requirement_type = "";
-    
+
     $points = 0;
 
     $this->list_semesters->reset_counter();
@@ -418,10 +418,10 @@ class DegreePlan extends stdClass
 
       $p = $sem->list_courses->count_credit_quality_points($requirement_type, true, true, $bool_exclude_all_transfer_credits, $req_by_degree_id);
       $points = $points + $p;
-      
+
     }
 
-    
+
     // Also, add in groups matching this requirement type.
     $this->list_groups->reset_counter();
     while ($this->list_groups->has_more())
@@ -431,29 +431,29 @@ class DegreePlan extends stdClass
       { // Skip Add a course group.
         continue;
       }
-            
+
       // Make sure the group doesn't have a type of 'x' assigned to it, which means we should
       // skip it.
       if ($g->requirement_type == 'x') continue;
-      
+
       // if req_by_degree_id is set, make sure the group belongs to that degree id!
-      if ($req_by_degree_id != 0 && $g->req_by_degree_id != $req_by_degree_id) continue;      
-      
-      
+      if ($req_by_degree_id != 0 && $g->req_by_degree_id != $req_by_degree_id) continue;
+
+
       $g_points = $g->get_fulfilled_quality_points(TRUE, -1, TRUE, TRUE, $requirement_type, $bool_exclude_all_transfer_credits);
-      $points = $points + $g_points;       
+      $points = $points + $g_points;
 
-      
+
     }
-    
 
-    
+
+
     return $points;
 
-  }  
-  
-  
-  
+  }
+
+
+
   /**
    * Loads the "ancillary" information about our degree plan, including advising weight, track selection config, etc.
    *
@@ -461,7 +461,7 @@ class DegreePlan extends stdClass
   function load_degree_plan_ancillary() {
     $degree_id = $this->degree_id;
 
-    
+
     $old_semester = "";
     $table_name1 = "degrees";
     $table_name2 = "degree_requirements";
@@ -469,42 +469,42 @@ class DegreePlan extends stdClass
       $table_name1 = "draft_$table_name1";
       $table_name2 = "draft_$table_name2";
     }
-    
-    
+
+
     // We want to get some of the data for this degree.
     $res = db_query("SELECT * FROM $table_name1 WHERE degree_id = ?", $this->degree_id);
     if ($res) {
       $cur = db_fetch_array($res);
-  
+
       $this->title = @$cur["title"];
       $this->major_code = @$cur["major_code"];
       $this->degree_level = @strtoupper(trim($cur["degree_level"]));
-      
+
       if ($this->degree_level == "") {
         $this->degree_level = "UG";  // undergrad by default
-      }      
-      
+      }
+
       $this->degree_class = @$cur["degree_class"];
       $this->db_override_degree_hours = @$cur["override_degree_hours"];
       $this->db_advising_weight = @intval($cur["advising_weight"]);
       $data_entry_value = @trim($cur['data_entry_value']);
-  
+
       $this->db_track_selection_config = @trim($cur["track_selection_config"]);
       $this->parse_track_selection_config();  // load into the track_selection_config_array as needed.
     }
-    
+
   }  // load_degree_plan_ancillary
-  
-  
-  
-  
+
+
+
+
   /**
    * Load our complete degree plan, including all courses and groups.
    *
    */
   function load_degree_plan() {
-    
-        
+
+
     // Load this degree plan from the database and fully
     // assemble it.
     $degree_id = $this->degree_id;
@@ -523,7 +523,7 @@ class DegreePlan extends stdClass
 
     $res = $this->db->db_query("SELECT * FROM $table_name1 a, $table_name2 b
                           WHERE a.degree_id = ?
-                          AND a.degree_id = b.degree_id 
+                          AND a.degree_id = b.degree_id
                           ORDER BY semester_num ", array($this->degree_id));
     while ($cur = $this->db->db_fetch_array($res))
     {
@@ -533,11 +533,11 @@ class DegreePlan extends stdClass
       if (!$exclude_degree_ids) {
         $exclude_degree_ids = system_get_exclude_degree_ids_from_appears_in_counts($this->school_id);
       }
-      
+
       $this->degree_level = strtoupper(trim($cur["degree_level"]));
       if ($this->degree_level == "") {
         $this->degree_level = "UG";  // undergrad by default
-      }      
+      }
       $this->degree_class = $cur["degree_class"];
       $this->db_override_degree_hours = $cur["override_degree_hours"];
       $this->db_advising_weight = intval($cur["advising_weight"]);
@@ -559,47 +559,46 @@ class DegreePlan extends stdClass
         $this->list_semesters->add($obj_semester);
       }
 
-      if ($cur["course_id"]*1 > 0)
+      if (intval($cur["course_id"] ?? 0) > 0)
       {
         // A course is the next degree requirement.
-        
-        //if ($this->bool_use_draft) $cat_year = $this->catalog_year;        
-        $cat_year = $this->catalog_year;        
-        
+
+        //if ($this->bool_use_draft) $cat_year = $this->catalog_year;
+        $cat_year = $this->catalog_year;
+
         $course_c = new Course($cur["course_id"], false, $this->db, false, $cat_year, $this->bool_use_draft);
         $course_c->assigned_to_semester_num = $semester_num;
         $course_c->min_grade = trim(strtoupper($cur["course_min_grade"]));
         if ($course_c->min_grade == "")
         { // By default, all courses have a
-          // min grade requirement of the lowest passing grade.          
+          // min grade requirement of the lowest passing grade.
           $course_c->min_grade = strtoupper(variable_get_for_school("minimum_passing_grade", "D", $this->school_id));
-          
+
         }
         $course_c->requirement_type = trim($cur["course_requirement_type"]);
 
         // Set which degree_id this course is a requirement of (for multiple degrees)
         $course_c->req_by_degree_id = $this->degree_id;
-        $course_c->db_degree_requirement_id = $cur['id']; 
+        $course_c->db_degree_requirement_id = $cur['id'];
 
         //adminDebug($course_c->to_string() . $course_c->getCatalogHours());
-        
+
         $obj_semester->list_courses->add($course_c);
-        
+
         if (!in_array($this->degree_id, $exclude_degree_ids)) {
           // array is sectioned like:  course_id | degree_id | group_id.    Group id = 0 means "on the bare degree plan"
           $this->required_course_id_array[$course_c->course_id][$this->degree_id][0] = TRUE;
-        }        
-        
+        }
+
       } // if course_id > 0
 
-      
-      
-      
-      if ($cur["group_id"]*1 > 0)
+
+
+
+      if (intval($cur["group_id"] ?? 0) > 0)
       {
         // A group is the next degree requirement.
-                
-        
+
         $title = "";
         $icon_filename = "";
         // Add the real Group (with all the courses, branches, etc)
@@ -607,32 +606,34 @@ class DegreePlan extends stdClass
         // First, see if this group already exists.  If it does,
         // simply add the number of hours required to it.  If not,
         // create it fresh.
-        
+
         if ($new_group = $this->find_group($cur["group_id"] . '_' . $this->degree_id))   // group_id's will always have db_group_id _ degree_id from now on...
         {
           // Was already there (probably in another semester),
           // so, just increment the required hours.
-          
+
           if (!isset($new_group->hours_required_by_type[$cur["group_requirement_type"]])) {
             $new_group->hours_required_by_type[$cur["group_requirement_type"]] = 0;
           }
-          
+
           $new_group->hours_required = $new_group->hours_required + ($cur["group_hours_required"] * 1);
           $new_group->hours_required_by_type[$cur["group_requirement_type"]] += ($cur["group_hours_required"] * 1);
+          $new_group->min_hours_allowed = $cur['group_min_hours_allowed'] * 1;
           //Set which degree_id this is required by.
           $new_group->req_by_degree_id = $this->degree_id;
-          
+
           $title = $new_group->title;
           $icon_filename = $new_group->icon_filename;
-        } 
-        else {          
+        }
+        else {
           // Was not already there; insert it.
           $group_n = new Group($cur["group_id"] . '_' . $this->degree_id, $this->db, $semester_num, $this->student_array_significant_courses, $this->bool_use_draft, $cur["group_requirement_type"]);
-          
-          $group_n->hours_required = $cur["group_hours_required"] * 1;          
-          
+
+          $group_n->hours_required = $cur["group_hours_required"] * 1;
+
           if (!isset($group_n->hours_required_by_type[$cur["group_requirement_type"]])) $group_n->hours_required_by_type[$cur["group_requirement_type"]] = 0;
           $group_n->hours_required_by_type[$cur["group_requirement_type"]] += $group_n->hours_required;
+          $group_n->min_hours_allowed = $cur['group_min_hours_allowed'] * 1;
           $group_n->set_req_by_degree_id($this->degree_id);
           if (trim($cur["group_min_grade"]) != "")
           {
@@ -640,7 +641,7 @@ class DegreePlan extends stdClass
           }
           $title = $group_n->title;
           $icon_filename = $group_n->icon_filename;
-          
+
           $this->list_groups->add($group_n);
         }
 
@@ -661,21 +662,23 @@ class DegreePlan extends stdClass
         $group_g->icon_filename = $icon_filename;
         $group_g->hours_required = floatval($cur["group_hours_required"]);
         $group_g->min_hours_allowed = floatval($cur["group_min_hours_allowed"]);
-        $group_g->bool_placeholder = true;
+        $group_g->bool_placeholder = TRUE;
+
+
         $obj_semester->list_groups->add($group_g);
-        
+
       }// if group_id > 0
 
     } // while db results
 
 
     $this->list_groups->sort_priority();
-    
+
     if (!is_array($exclude_degree_ids)) $exclude_degree_ids = array();
-    
+
     if (!in_array($this->degree_id, $exclude_degree_ids)) {
       $group_course_id_array = $this->list_groups->get_group_course_id_array();
-      // Add to our required_course_id_array.      
+      // Add to our required_course_id_array.
       foreach($group_course_id_array as $group_id => $details) {
         foreach ($group_course_id_array[$group_id] as $course_id => $val) {
           $this->required_course_id_array[$course_id][$this->degree_id][$group_id] = $val;
@@ -683,20 +686,20 @@ class DegreePlan extends stdClass
       }
     }
 
-      
-      
-      
-      
+
+
+
+
     // When we load this degree plan, let's also check for any hooks.
     // Since this class might be used outside of FP, only do this if we know
     // that the bootstrap.inc file has been executed.
-    if ($GLOBALS["fp_bootstrap_loaded"] == TRUE) {      
+    if ($GLOBALS["fp_bootstrap_loaded"] == TRUE) {
       invoke_hook("degree_plan_load", array(&$this));
-    }         
-      
-      
-      
-      
+    }
+
+
+
+
   } // load_degree_plan
 
 
@@ -704,34 +707,34 @@ class DegreePlan extends stdClass
    * Add another degree's required_course_id_array onto this one's.
    */
   function add_to_required_course_id_array($req_course_id_array) {
-    
+
     foreach ($req_course_id_array as $course_id => $details) {
       foreach ($req_course_id_array[$course_id] as $degree_id => $details2) {
         foreach ($req_course_id_array[$course_id][$degree_id] as $group_id => $val) {
-            
+
           $this->required_course_id_array[$course_id][$degree_id][$group_id] = $val;
         }
       }
     }
-    
-    
+
+
   } // add_to_required_course_id_array
 
 
   /**
    * This function will parse through the db_track_selection_config string and
    * populate the track_selection_config_array.
-   * 
+   *
    * We assume the string looks like this:
-   * 
+   *
    * CLASS ~ MIN ~ MAX ~ DEFAULT_CSV
-   * 
+   *
    * ex:
    * CONCENTRATION ~ 0 ~ 1 ~
    * EMPHASIS ~ 1 ~ 1 ~ ART|_SCULT, ART|_PAINT
-   * 
-   * 
-   * 
+   *
+   *
+   *
    */
   function parse_track_selection_config() {
     $lines = explode("\n", $this->db_track_selection_config);
@@ -739,26 +742,26 @@ class DegreePlan extends stdClass
       $line = trim($line);
       if ($line == "") continue;  // blank line, skip it.
       if (substr($line, 0, 1) == "#") continue; // this is a comment, skip it.
-      
+
       $temp = explode("~", $line);
       $machine_name = @trim($temp[0]);
       $min = @intval($temp[1]);
       $max = @intval($temp[2]);
       $default_csv = @trim($temp[3]);
-      
+
       $this->track_selection_config_array[$machine_name] = array(
         "machine_name" => $machine_name,
         "min_tracks" => $min,
         "max_tracks" => $max,
         "default_tracks" => $default_csv,
       );
-      
-      
-      
-    }      
-        
-      
-    
+
+
+
+    }
+
+
+
   } // parse... config
 
 
@@ -786,39 +789,39 @@ class DegreePlan extends stdClass
    */
   function get_major_code_csv() {
     if (!$this->is_combined_dynamic_degree_plan) return $this->major_code;  // just a basic single non-combined degree.
-    
+
     // Otherwise, we should assume this is a combined dynamic degree.
     $rtn = "";
-    
+
     foreach ($this->combined_degree_ids_array as $degree_id) {
       $t_degree_plan = new DegreePlan($degree_id);
       $rtn .= $t_degree_plan->major_code . ",";
     }
-    
+
     $rtn = rtrim($rtn, ","); // remove last comma, if its there.
-    
+
     return $rtn;
-    
+
   }
 
 
 
   function get_track_title($bool_include_classification = FALSE) {
     $this->load_descriptive_data();
-    
+
     $ttitle = fp_trim($this->track_title);
     if ($ttitle == "") return FALSE;  // there is no track?
-            
+
     if ($bool_include_classification) {
-      
+
       $details = fp_get_degree_classification_details($this->degree_class);
-      
+
       $ttitle .= " (" . $details["title"] . ")";
     }
 
     return $ttitle;
 
-            
+
   }
 
 
@@ -832,14 +835,14 @@ class DegreePlan extends stdClass
     if (!$this->bool_loaded_descriptive_data) {
       $this->load_descriptive_data();
     }
-    
+
     $dtitle = "";
 
     if ($this->title) {
       $dtitle = $this->title;
       if ($bool_include_html) {
         $dtitle = "<span class='deg-title'>$this->title</span>";
-      }      
+      }
     }
     else {
 
@@ -849,9 +852,9 @@ class DegreePlan extends stdClass
       $this->title = '';
       $table_name = "degrees";
       if ($this->bool_use_draft) {$table_name = "draft_$table_name";}
-  
+
       $res = $this->db->db_query("SELECT title FROM $table_name
-                              WHERE major_code = ? 
+                              WHERE major_code = ?
                               ORDER BY catalog_year DESC LIMIT 1", $this->major_code);
       $cur = $this->db->db_fetch_array($res);
       if ($cur) {
@@ -867,15 +870,15 @@ class DegreePlan extends stdClass
 
 
     if ($bool_include_track_title && $this->track_title != "") {
-      if ($bool_include_html && $this->title) {  
+      if ($bool_include_html && $this->title) {
         $dtitle .= "<span class='level-3-raquo'>&raquo;</span>";
         $dtitle .= "<span class='deg-track-title'>$this->track_title</span>";
       }
-      else {        
+      else {
         $dtitle .= $this->track_title;
       }
     }
-    
+
     if ($bool_include_classification && $this->degree_class != "") {
       $details = fp_get_degree_classification_details($this->degree_class);
       if ($bool_include_html) {
@@ -893,11 +896,11 @@ class DegreePlan extends stdClass
 
   function load_descriptive_data()
   {
-    
+
     $this->bool_loaded_descriptive_data = TRUE;
-   
-    
-    // If we already have this in our cache, then look there... 
+
+
+    // If we already have this in our cache, then look there...
     $cache_name = 'degreeplan_cache';
     if ($this->bool_use_draft) {
       $cache_name = 'degreeplan_cache_draft';
@@ -913,11 +916,11 @@ class DegreePlan extends stdClass
       $this->degree_class = $GLOBALS[$cache_name][$this->degree_id]['degree_class'];
       $this->degree_level = $GLOBALS[$cache_name][$this->degree_id]['degree_level'];
       $this->school_id = $GLOBALS[$cache_name][$this->degree_id]['school_id'];
-      
+
       if ($this->degree_level == "") {
         $this->degree_level = "UG";  // undergrad by default
-      }      
-      
+      }
+
       $this->degree_type = $GLOBALS[$cache_name][$this->degree_id]['degree_type'];
       $this->major_code = $GLOBALS[$cache_name][$this->degree_id]['major_code'];
       $this->public_notes_array = $GLOBALS[$cache_name][$this->degree_id]['public_notes_array'];
@@ -926,14 +929,14 @@ class DegreePlan extends stdClass
       $this->track_description = $GLOBALS[$cache_name][$this->degree_id]['track_description'];
       $this->track_title = $GLOBALS[$cache_name][$this->degree_id]['track_title'];
       return;
-    }    
-    
-    
-    
+    }
+
+
+
     $table_name = "degrees";
     if ($this->bool_use_draft) {$table_name = "draft_$table_name";}
 
-   
+
     $res = $this->db->db_query("SELECT * FROM $table_name
                                WHERE degree_id = ? ", $this->degree_id);
 
@@ -945,11 +948,11 @@ class DegreePlan extends stdClass
 
       if ($this->degree_level == "") {
         $this->degree_level = "UG";  // undergrad by default
-      }      
-      
+      }
+
       $this->degree_class = $cur["degree_class"];
       $this->db_override_degree_hours = $cur["override_degree_hours"];
-      
+
       $this->title = $cur["title"];
       $this->school_id = intval($cur['school_id']);
       $this->public_notes_array[$this->degree_id] = $cur["public_note"];
@@ -964,20 +967,20 @@ class DegreePlan extends stdClass
       $this->array_semester_titles = explode(",",$temp);
 
       $just_major_code = $this->major_code;
-      
+
       if (strstr($this->major_code, "_"))
       {
         // This means that there is a track.  Get all the information
         // you can about it.
         $temp = explode("_", $this->major_code);
         $this->track_code = trim($temp[1]);
-        
+
         $just_major_code = trim($temp[0]);  // Don't change major_code value-- causes a bug in FP5
 
         // The major_code might now have a | at the very end.  If so,
         // get rid of it.
         $just_major_code = rtrim($just_major_code, "|");
-        
+
         // Now, look up information on the track.
         $table_name = "degree_tracks";
         if ($this->bool_use_draft) {$table_name = "draft_$table_name";}
@@ -987,7 +990,7 @@ class DegreePlan extends stdClass
         $cur = null;
         if (isset($degree_track_cache[$table_name][$this->major_code][$this->track_code][$this->catalog_year])) {
           $cur = $degree_track_cache[$table_name][$this->major_code][$this->track_code][$this->catalog_year];
-        } 
+        }
         else {
               $res = $this->db->db_query("SELECT track_title, track_description FROM $table_name
                                       WHERE major_code = ?
@@ -1010,7 +1013,7 @@ class DegreePlan extends stdClass
 
     }
 
-    
+
     // Add to our GLOBALS cache for this degree's descriptive data.
     $GLOBALS[$cache_name][$this->degree_id] = array(
       'array_semester_titles' => $this->array_semester_titles,
@@ -1030,7 +1033,7 @@ class DegreePlan extends stdClass
       'track_description' => $this->track_description,
       'track_title' => $this->track_title,
       'school_id' => $this->school_id,
-    );    
+    );
 
 
 
@@ -1067,7 +1070,7 @@ class DegreePlan extends stdClass
         return $sem;
       }
     }
-    
+
     return FALSE;
   }
 
@@ -1092,7 +1095,7 @@ class DegreePlan extends stdClass
 
     $res = db_query("SELECT track_code, track_title, track_description FROM $table_name
                               WHERE major_code = ?
-                              AND catalog_year = ? 
+                              AND catalog_year = ?
                               AND school_id = ?
                               ORDER BY track_title ", $this->major_code, $this->catalog_year, $this->school_id);
     while($cur = db_fetch_array($res))
@@ -1101,16 +1104,16 @@ class DegreePlan extends stdClass
       $track_code = $cur["track_code"];
       $track_title = $cur["track_title"];
       $track_description = $cur["track_description"];
-      
+
 
       // Let's also get the degree_id for this particular track.
       $track_degree_id = $this->db->get_degree_id($this->major_code . "|_" . $track_code, $this->catalog_year, $this->bool_use_draft, $this->school_id);
-      
+
       // Also find out what is the degree_class for this degree_id.
       $degree_class = @trim(db_result(db_query("SELECT degree_class FROM $table_name2
-                        WHERE degree_id = ?", $track_degree_id))); 
-  
-      
+                        WHERE degree_id = ?", $track_degree_id)));
+
+
       $rtn_array[] = "$track_code ~~ $track_title ~~ $track_description ~~ $track_degree_id ~~ $degree_class";
     }
 
@@ -1135,7 +1138,7 @@ class DegreePlan extends stdClass
     $sem->title = variable_get_for_school("developmentals_title", t("Developmental Requirements", $this->school_id));
     $is_empty = true;
 
-    
+
     $temp_array = $this->db->get_developmental_requirements($student_id, $this->school_id);
     // We expect this to give us back an array like:
     // 0 => ART~101
@@ -1146,10 +1149,10 @@ class DegreePlan extends stdClass
       $c->min_grade = "C";
       $c->requirement_type = "dev";
       $sem->list_courses->add($c);
-      
-      $is_empty = false;      
+
+      $is_empty = false;
     }
-    
+
     $sem->notice = variable_get_for_school("developmentals_notice", t("According to our records, you are required to complete the course(s) listed above. For some transfer students, your record may not be complete. If you have any questions, please ask your advisor.", $this->school_id));
 
     if (!$is_empty)
@@ -1187,7 +1190,7 @@ class DegreePlan extends stdClass
   }
 
 
-  
+
 
   function find_group($group_id)
   {
@@ -1286,7 +1289,7 @@ class DegreePlan extends stdClass
     $new_course = new Course($course_id);
     $new_semester = new Semester($semester_num);
     $rtn_course_list = new CourseList();
-    
+
     // Okay, if the course is within a group, then
     // we can first use the find_group method.
     if ($group_id != "" && $group_id != 0 && $group_id != NULL)
@@ -1334,14 +1337,14 @@ class DegreePlan extends stdClass
 
         if ($cL = $semester->list_courses->find_all_matches($new_course))
         {
-            
+
           if ($degree_id != 0) {
             // Trim $cL of any courses NOT in our supplied degree_id.
             $cL->remove_courses_not_in_degree($degree_id);
             if ($cL->get_size() == 0) return FALSE;  // we removed them all!
           }
-          
-          $rtn_course_list->add_list($cL); 
+
+          $rtn_course_list->add_list($cL);
           return $rtn_course_list;
         }
       }

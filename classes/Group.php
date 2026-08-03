@@ -2,11 +2,12 @@
 
 class Group extends stdClass
 {
-  
-  const GROUP_COURSE_INFINITE_REPEATS = 9999;
-  const GROUP_COURSE_INFINITE_REPEATS_THRESHOLD = 50;
-  
-  
+
+  public const GROUP_COURSE_INFINITE_REPEATS = 9999;
+  public const GROUP_COURSE_INFINITE_REPEATS_THRESHOLD = 50;
+  public const GROUP_MIN_HOURS_NOT_SET = -999;
+
+
 	public $title, $icon_filename, $group_id, $requirement_type, $min_grade, $group_name;
 	public $hours_required, $min_hours_allowed, $hours_remaining, $hours_fulfilled, $hours_fulfilled_for_credit;
 	public $hours_required_by_type, $req_by_degree_id;
@@ -50,7 +51,7 @@ class Group extends stdClass
 		$this->assigned_to_semester_num = $semester_num;
 		$this->count_of_matches = 0;
 		$this->hours_assigned = 0;
-    $this->min_hours_allowed = 0;
+    $this->min_hours_allowed = Group::GROUP_MIN_HOURS_NOT_SET;
     $this->school_id = 0;
 		$this->list_courses = new CourseList();
 		$this->list_groups = new GroupList();
@@ -62,20 +63,20 @@ class Group extends stdClass
 			$this->bool_use_draft = true;
 		}
 
-		
+
 		$this->db = $db;
-		if ($db == NULL || !is_object($db) || !is_resource($db->pdo)) {		  
-			$this->db = get_global_database_handler();			
+		if ($db == NULL || !is_object($db) || !is_resource($db->pdo)) {
+			$this->db = get_global_database_handler();
 		}
 
 
 		if ($group_id != "")
-		{		  
-			$this->bool_placeholder = false;
+		{
+			$this->bool_placeholder = FALSE;
 			$this->load_group(true, $array_significant_courses);
       $this->set_requirement_type($this->requirement_type);
 		}
-    
+
 	}
 
 
@@ -105,9 +106,9 @@ class Group extends stdClass
 	function assign_min_grade($min_grade)
 	{
 		// Assign every course in the group to have this particular min grade.
-		
+
 		$min_grade = strtoupper($min_grade);
-		
+
 		$this->min_grade = $min_grade;
 
 		$this->list_courses->assign_min_grade($min_grade);
@@ -121,20 +122,20 @@ class Group extends stdClass
    * // Key = course_id, val = TRUE.
    */
   function get_course_id_array($bool_exclude_assigned_courses = FALSE) {
-    
+
     $rtn = array();
-    
+
     $this->list_courses->reset_counter();
     while($this->list_courses->has_more()) {
       $c = $this->list_courses->get_next();
-      
+
       if (!$bool_exclude_assigned_courses) {
-        $rtn[$c->course_id] = TRUE;  
+        $rtn[$c->course_id] = TRUE;
       }
       else {
         // Look to see if this course has already been assigned or not. If it has, then we
         // should skip it. If it has NOT, then it's OK to add.
-        
+
         if ($c->course_list_fulfilled_by->is_empty == TRUE) {
           $rtn[$c->course_id] = TRUE;
         }
@@ -143,32 +144,38 @@ class Group extends stdClass
           //fpm("Not doing $c->subject_id $c->course_num");
         }
       }
-      
-      
-      
+
+
+
     }
 
     // Also get any sub-group's courses...
     $this->list_groups->reset_counter();
     while($this->list_groups->has_more()) {
       $g = $this->list_groups->get_next();
-      
-      // $rtn = array_merge($rtn, $g->get_course_id_array());      
+
+      // $rtn = array_merge($rtn, $g->get_course_id_array());
       // Fix by Logan Buth: https://bytetask.com/node/2456
       $rtn = $rtn + $g->get_course_id_array();
-      
+
     }
 
     return $rtn;
-    
+
   } // get_course_id_array.
 
 
-  
+  /**
+   * Returns TRUE or FALSE if this group has a concept of min hours.  This
+   * is basically checking if there is a min_hours_allowed set, and if so, is it less than the hours_required.
+   * @return boolean
+   */
   function has_min_hours_allowed() {
-    
-    return ($this->min_hours_allowed > 0 && $this->min_hours_allowed != $this->hours_required);
-    
+
+    if ($this->min_hours_allowed === Group::GROUP_MIN_HOURS_NOT_SET) return FALSE;
+
+    return ($this->min_hours_allowed !== Group::GROUP_MIN_HOURS_NOT_SET && $this->min_hours_allowed < $this->hours_required);
+
   }
 
 
@@ -183,17 +190,21 @@ class Group extends stdClass
    * Return TRUE or FALSE if we've fulfilled the min hour allowed value, if it's set.
    */
   function get_is_min_hours_allowed_fulfilled($semester_num = -1) {
-    if (floatval($this->min_hours_allowed) == 0) return TRUE;
-    
+
+    // TODO: Could call this->has_min_hours_allowed() instead if these lines?
+    if ($this->min_hours_allowed === Group::GROUP_MIN_HOURS_NOT_SET) return TRUE;  // Wasn't set, so return TRUE
+    if (floatval($this->min_hours_allowed) == 0) return TRUE;  // Either wasn't set or it's set to zero, so return TRUE  (possibly delete this line?)
+
+
     $v = $this->get_fulfilled_hours(true, true, false, $semester_num);
-    
-    if ($v >= $this->min_hours_allowed) return TRUE;
-    
+
+    if ($v >= $this->min_hours_allowed) return TRUE;  // Our fulfilled number of hours is >= the min_hours of this group.
+
     return FALSE;
-    
+
   }
 
- 
+
   /**
    * We expect the group_id to be our db_group_id + _ + degree_id, to ensure
    * that groups are unique to a degree.  Let's return just the database group_id portion (the number
@@ -203,8 +214,8 @@ class Group extends stdClass
     // We expect our group_id to actually be the db_group_id + _ + degree_id.
     $temp = explode("_", $this->group_id);
     $db_group_id = trim($temp[0]);
-    
-    return $db_group_id;    
+
+    return $db_group_id;
   }
 
 
@@ -229,20 +240,20 @@ class Group extends stdClass
 			// not missing.
 
 			$array_group_requirement_ids = $this->list_courses->get_group_requirement_id_array();
-			
+
 		}
 
 		$table_name = "group_requirements";
 		if ($this->bool_use_draft) {$table_name = "draft_$table_name";}
-		
+
 		$res = db_query("SELECT * FROM `$table_name`
 							WHERE group_id = ?	", $this->get_db_group_id());
 		while ($cur = db_fetch_array($res))
 		{
 
-			$id = $cur["id"];      
-			$course_id = intval($cur["course_id"]); 
-      
+			$id = $cur["id"];
+			$course_id = intval($cur["course_id"]);
+
       // The group requirements table doesn't have a school_id.
       //$this->school_id = intval($cur['school_id']);
 
@@ -252,7 +263,7 @@ class Group extends stdClass
 				{
 					// If this course_id is NOT in the array of significant courses
 					// (that the student took or has transfer credit or subs for)
-					// then skip it.  Never add it to the group.					
+					// then skip it.  Never add it to the group.
 					if (isset($array_significant_courses[$cur["course_id"]]) && $array_significant_courses[$cur["course_id"]] != true)
 					{// course was not in there, so skip!
 						continue;
@@ -263,16 +274,16 @@ class Group extends stdClass
 
 
 				// A course is the next requirement.
-				
+
 				// Is this more than XX repeats?  If so, we consider it "infinite"
 				if ($cur['course_repeats'] <= Group::GROUP_COURSE_INFINITE_REPEATS_THRESHOLD) {
 				  // Less than XX repeats, so treat it like a normal course.
   				for ($t = 0; $t <= $cur["course_repeats"]; $t++)
   				{ // Add in the specified repeats for this group...
   					// This will usually only go through the loop once.
-  
+
   					$use_id = $id . "_rep_$t";
-  
+
   					if ($bool_reload_missing_only == true)
   					{
   						// Only load this course if it is missing from the group.
@@ -281,13 +292,13 @@ class Group extends stdClass
   						// Basically, check all the courses in the current
   						// list_courses object for a db_group_requirement_id of $id.
   						// Only proceed if $id was NOT found.
-  
+
   						if (@$array_group_requirement_ids[$use_id] == true)
   						{
   							continue;
   						}
   					}
-            
+
   					$course_c = new Course();
   					$course_c->bool_use_draft = $this->bool_use_draft;
   					$course_c->course_id = $cur["course_id"];
@@ -297,22 +308,22 @@ class Group extends stdClass
   					$course_c->catalog_year = $this->catalog_year;
   					$course_c->assigned_to_group_id = $this->group_id;
   					$course_c->assigned_to_semester_num = $this->assigned_to_semester_num;
-  					
-  
+
+
   					$course_c->specified_repeats = $cur["course_repeats"];
   					if ($cur["course_repeats"] > 0)
   					{
   						$course_c->bool_specified_repeat = true;
   					}
-  
+
   					$course_c->min_grade = trim(strtoupper($cur["course_min_grade"]));
   					if ($course_c->min_grade == "")
   					{ // By default, all courses have a
   						// min grade requirement of D.
   						$course_c->min_grade = "D";
   					}
-  
-  
+
+
   					$this->list_courses->add($course_c);
   				} // for t <= cur['course_repeats']
 				}
@@ -343,11 +354,11 @@ class Group extends stdClass
           $course_c->catalog_year = $this->catalog_year;
           $course_c->assigned_to_group_id = $this->group_id;
           $course_c->assigned_to_semester_num = $this->assigned_to_semester_num;
-          
+
 
           $course_c->specified_repeats = Group::GROUP_COURSE_INFINITE_REPEATS;
           $course_c->bool_specified_repeat = true;
-          
+
           $course_c->min_grade = trim(strtoupper($cur["course_min_grade"]));
           if ($course_c->min_grade == "")
           { // By default, all courses have a
@@ -357,19 +368,19 @@ class Group extends stdClass
 
 
           $this->list_courses->add($course_c);
-                    
+
         }
 
 
 
 			} // if cur['course_id']
-			
-			
+
+
 			if ($cur["child_group_id"]*1 > 0)
 			{
-			  
+
         $temp_add_as_new_group = FALSE;
-			  
+
 				// Another group is the next requirement (its a branch)
 				if ($bool_reload_missing_only == true)
 				{ // Since we are reloading courses, this subgroup is (probably) already
@@ -381,43 +392,43 @@ class Group extends stdClass
 					$temp_g->group_id = $cur["child_group_id"] . '_' . $this->req_by_degree_id;
 					$temp_g->requirement_type = $this->requirement_type;
 					if ($group_g = $this->list_groups->find_match($temp_g)) {
-						$group_g->reload_missing_courses();						
-					} 
+						$group_g->reload_missing_courses();
+					}
 					else {
 					  // We didn't find the child group, possibly because this is the first time we are loading it.  If that is
-					  // the case, then we should just add it fresh.   
+					  // the case, then we should just add it fresh.
 				    $temp_add_as_new_group = TRUE;
 					}
-				} 
+				}
 				else {
           $temp_add_as_new_group = TRUE;
         }
-        
-        
-        if ($temp_add_as_new_group) {        
+
+
+        if ($temp_add_as_new_group) {
   				// Add this as a brand-new sub group, so create it
   				// and add it to this group.
   				$group_g = new Group($cur["child_group_id"] . "_" . $this->req_by_degree_id,null,$this->assigned_to_semester_num, $array_significant_courses, $this->bool_use_draft);
   				$group_g->requirement_type = $this->requirement_type;
   				$this->list_groups->add($group_g);
         }
-        
-        
+
+
 			} // if child_group_id > 0
-			
+
 		} // while cur = db_fetch_array(res)
 
-						
+
     // When we load this group, let's also check for any hooks.
     // Since this class might be used outside of FP, only do this if we know
     // that the bootstrap.inc file has been executed.
-    if ($GLOBALS["fp_bootstrap_loaded"] == TRUE) {      
+    if ($GLOBALS["fp_bootstrap_loaded"] == TRUE) {
       invoke_hook("group_load", array(&$this));
-    }         
-				
-		
-    
-		
+    }
+
+
+
+
 	} // load_group
 
 
@@ -494,7 +505,7 @@ class Group extends stdClass
     $this->req_by_degree_id = $degree_id;
     $this->list_courses->reset_counter();
     $this->list_courses->set_req_by_degree_id($degree_id);
-    
+
     // go through sub-groups and do the same...
     $this->list_groups->reset_counter();
     while($this->list_groups->has_more())
@@ -502,7 +513,7 @@ class Group extends stdClass
       $g = $this->list_groups->get_next();
       $g->set_req_by_degree_id($degree_id);
     }
-    
+
   }
 
 
@@ -513,35 +524,35 @@ class Group extends stdClass
     $this->requirement_type = $requirement_type;
     $this->list_courses->reset_counter();
     $this->list_courses->set_requirement_type($requirement_type);
-    
+
     // go through sub-groups and do the same...
     $this->list_groups->reset_counter();
     while($this->list_groups->has_more())
     {
       $g = $this->list_groups->get_next();
       $g->set_requirement_type($requirement_type);
-    }    
+    }
   }
 
 
 	function load_descriptive_data()
-	{	  
+	{
     $cur = null;
     static $group_descriptive_data_cache = array();
     if (isset($group_descriptive_data_cache[$this->get_db_group_id()])) {
       $cur = $group_descriptive_data_cache[$this->get_db_group_id()];
-    } 
+    }
     else {
       $table_name = "groups";
       if ($this->bool_use_draft) {$table_name = "draft_$table_name";}
       // Load information about the group's title, icon, etc.
-      $res = db_query("SELECT * 
+      $res = db_query("SELECT *
                        FROM `$table_name`
                        WHERE group_id = ? ", $this->get_db_group_id());
       $cur = db_fetch_array($res);
       $group_descriptive_data_cache[$this->get_db_group_id()] = $cur;
-    }    
-       
+    }
+
     if ($cur) {
 
   		$this->title = trim($cur["title"]);
@@ -556,7 +567,7 @@ class Group extends stdClass
   		$this->catalog_year = trim($cur["catalog_year"]);
   		$this->public_note = trim((string) $cur["public_note"]);
   		$this->school_id = intval($cur["school_id"]);
-      
+
     }
 
 		if ($this->group_id == DegreePlan::GROUP_ID_FOR_COURSES_ADDED)
@@ -574,11 +585,11 @@ class Group extends stdClass
 		// course fulfillments for this group...
 		$count = 0;
 		// if onlyCountSemesterNum != -1, then we will only count courses
-		// who have their "assigned_to_semester_num" = $only_count_semester_num.		
-		
-		
-		
-		
+		// who have their "assigned_to_semester_num" = $only_count_semester_num.
+
+
+
+
 		//print_pre($this->to_string());
 		$this->list_courses->reset_counter();
 		while($this->list_courses->has_more())
@@ -590,7 +601,7 @@ class Group extends stdClass
 				continue;
 			}
 
-			
+
 			if (is_object($c->course_list_fulfilled_by) && !($c->course_list_fulfilled_by->is_empty))
 			{
 				if ($bool_ignore_enrolled == true)
@@ -605,20 +616,20 @@ class Group extends stdClass
 
 
 				if (!$bool_require_has_been_displayed)
-				{ // The course does not have to have been displayed on the page yet.					
+				{ // The course does not have to have been displayed on the page yet.
 					$count = $count + $c->course_list_fulfilled_by->count_credit_hours($requirement_type, false, false, $bool_qpts_grades_only, $bool_exclude_all_transfer_credits);
 				} else {
 					if ($c->course_list_fulfilled_by->get_first()->get_has_been_displayed() == true)
 					{
-						
+
 						$h = $c->course_list_fulfilled_by->count_credit_hours($requirement_type, false, false, $bool_qpts_grades_only, $bool_exclude_all_transfer_credits);
 						$count = $count + $h;
-						
+
 					}
 				}
 			} else if ($c->bool_advised_to_take && $bool_count_advised == true)
 			{
-        $h = $c->get_hours(); 
+        $h = $c->get_hours();
 				$count = $count + $h;
 			}
 
@@ -638,22 +649,22 @@ class Group extends stdClass
 			}
 		}
 
-		
+
 		//if ($this->group_id == 533404) {
 		  //fpm($this);
 		  //fpm("returning $count for group $this->group_id, $this->title");
 		//}
-		
-		
+
+
 		return $count;
 
 	}
 
-	
-  
-  
-  
-  
+
+
+
+
+
 
 	/**
 	 * Returns the quality points earned for all of the courses in this group
@@ -675,7 +686,7 @@ class Group extends stdClass
 				continue;
 			}
 
-			
+
 			if (is_object($c->course_list_fulfilled_by) && !($c->course_list_fulfilled_by->is_empty))
 			{
 				if ($bool_ignore_enrolled == true)
@@ -688,17 +699,17 @@ class Group extends stdClass
 				}
 
 				$p = 0;
-				
+
 				// Are we requiring that the course has been displayed?
         if (!$bool_require_has_been_displayed || ($bool_require_has_been_displayed && $c->course_list_fulfilled_by->get_first()->get_has_been_displayed() == TRUE))
 				{
 					$p = $c->course_list_fulfilled_by->count_credit_quality_points($requirement_type, TRUE, TRUE, $bool_exclude_all_transfer_credits);
-				}				
-  		  
+				}
+
   		  $points = $points + $p;
-  				    					
+
 			}
-			
+
 		}
 
 		if ($bool_check_subgroups == TRUE)
@@ -714,26 +725,26 @@ class Group extends stdClass
 				$points = $points + $gp;
 			}
 		}
-		
+
 
 		return $points;
 
-	}	
-	
-	
-	
+	}
+
+
+
 
 	function equals(Group $group, $bool_ignore_degree_id = FALSE)
 	{
-	  
+
     $our_group_id = $this->group_id;
     $test_group_id = $group->group_id;
-    
+
     if ($bool_ignore_degree_id) {
       $our_group_id = $this->get_db_group_id();
-      $test_group_id = $group->get_db_group_id();      
+      $test_group_id = $group->get_db_group_id();
     }
-    
+
 		if ($our_group_id == $test_group_id)
 		{
 			return true;
@@ -771,7 +782,7 @@ class Group extends stdClass
 		// Return a CourseList of all the Course objects
 		// which are in this group that match
 		$rtn_course_list = new CourseList();
-		
+
 		if ($obj_list = $this->list_courses->find_all_matches($course))
 		{
 			$obj_list->reset_counter();
