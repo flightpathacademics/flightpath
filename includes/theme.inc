@@ -45,7 +45,7 @@ function theme_table_header_sortable($headers = array(), $element_id = "default"
 
     $label = $header['label'];
     $field = @$header['field'];
-    $init_dir = @$hader['init_dir'];
+    $init_dir = @$header['init_dir'];
 
     if (!$field) {
       $rtn .= $label;

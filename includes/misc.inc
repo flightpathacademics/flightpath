@@ -4,13 +4,13 @@
  * This file contains misc functions for FlightPath
  */
 
- 
+
 
  /**
   * Returns back the "friendly" timezone string if we have one.
   */
 function friendly_timezone($str) {
-  
+
   $arr = array(
                 'America/Chicago' => 'Central Time - US & Canada',
                 'America/Los_Angeles' => 'Pacific Time - US & Canada',
@@ -19,16 +19,16 @@ function friendly_timezone($str) {
                 'America/Phoenix' => 'Arizona Time',
                 'America/Anchorage' => 'Alaska Time',
                 'America/Adak' => 'Hawaii Time',
-                'Pacific/Honolulu' => 'Hawaii Time no DST',        
-              ); 
-  
-  
+                'Pacific/Honolulu' => 'Hawaii Time no DST',
+              );
+
+
   if (isset($arr[$str])) return $arr[$str];
-  
+
   return $str;
-  
-  
-} 
+
+
+}
 
 
 
@@ -36,7 +36,7 @@ function friendly_timezone($str) {
 
 
 
- 
+
 
 // From https://php.watch/versions/8.2/utf8_encode-utf8_decode-deprecated
 // In PHP 8.2, utf8_encode and _decode are deprecated.  This code replicates
@@ -57,7 +57,7 @@ function fp_utf8_encode(string $s) {
 }
 
 /**
- * @see fp_utf8_encode for an explanation of why this function exists. 
+ * @see fp_utf8_encode for an explanation of why this function exists.
  */
 function fp_utf8_decode(string $string) {
     $s = (string) $string;
@@ -89,10 +89,10 @@ function fp_utf8_decode(string $string) {
 }
 
 
- 
- 
- 
-// source: Laravel Framework  
+
+
+
+// source: Laravel Framework
 // (helper functions if we are not running PHP 8.)
 // https://github.com/laravel/framework/blob/8.x/src/Illuminate/Support/Str.php
 if (!function_exists('str_starts_with')) {
@@ -109,44 +109,44 @@ if (!function_exists('str_contains')) {
     function str_contains($haystack, $needle) {
         return $needle !== '' && mb_strpos($haystack, $needle) !== false;
     }
-} 
- 
- 
+}
+
+
 
 
 /**
- * Returns back a FAPI-compatible array of all term codes for the specified years, inclusive 
+ * Returns back a FAPI-compatible array of all term codes for the specified years, inclusive
  */
 function fp_get_terms_by_year_range($start_year, $end_year, $school_id = 0, $bool_include_term_id_in_description = TRUE) {
-  
+
   // Let the user select a term for this school (starting at now - $min years, and going out to now + max years)
-  $options = array();    
+  $options = array();
   $temp = get_term_structures($school_id);
-    
+
   for ($year = $start_year; $year <= $end_year; $year++) {
     foreach ($temp as $k => $details) {
       $term_id = $year . $k;
-      
+
       // Adding year as the first element causes it to separate out the terms by year in the pulldown.  Makes it cleaner.
       $options[$year][$term_id] = "[$term_id] &nbsp;" . get_term_description($term_id, FALSE, $school_id);
-      
+
       if (!$bool_include_term_id_in_description) {
         $options[$year][$term_id] = get_term_description($term_id, FALSE, $school_id);
       }
-      
+
     }
-    
+
   } //for t
-  
+
   ksort($options);
-    
+
   return $options;
 
-  
-  
-  
-  
-} 
+
+
+
+
+}
 
 
 
@@ -155,62 +155,62 @@ function fp_get_terms_by_year_range($start_year, $end_year, $school_id = 0, $boo
  * faculty/staff can be members of.
  */
 function fp_get_departments($school_id = 0, $bool_get_all_by_schools = FALSE) {
-    
+
   $rtn = array();
-  
-  
+
+
   $cache_key = md5(serialize(func_get_args()));
-  
+
   // Get from cache if already loaded once this page load
-  if (isset($GLOBALS['fp_cache_departments'][$cache_key])) {    
+  if (isset($GLOBALS['fp_cache_departments'][$cache_key])) {
     return $GLOBALS['fp_cache_departments'][$cache_key];
   }
-    
-  
+
+
   if (!$bool_get_all_by_schools) {
-    $val = variable_get_for_school('departments', '', $school_id);  
+    $val = variable_get_for_school('departments', '', $school_id);
     $lines = explode("\n", $val);
     foreach ($lines as $line) {
       $line = trim($line);
       if (!$line) continue;
-      
-      $temp = explode("~", $line);    
-      $rtn[trim($temp[0])] = trim($temp[1]);    
+
+      $temp = explode("~", $line);
+      $rtn[trim($temp[0])] = trim($temp[1]);
     }
   }
   else if (module_enabled('schools') && $bool_get_all_by_schools == TRUE) {
     // We should return a multi-dimensional array where the school name is first, followed by dept_code.
     // Ex: $rtn['SCHOOL_ABC']['ENGL'] = "English";
-    // We would need to go through all of our schools in a for loop first.    
+    // We would need to go through all of our schools in a for loop first.
     $schools = schools_get_school_definitions();
     foreach ($schools as $school_id => $throw_away) {
       $school_code = schools_get_school_code_for_id($school_id);
-      
+
       if ($school_id == 0) $school_code = "- Default -";
-      
-      $val = variable_get_for_school('departments', '', $school_id);  
+
+      $val = variable_get_for_school('departments', '', $school_id);
       $lines = explode("\n", $val);
       foreach ($lines as $line) {
         $line = trim($line);
         if (!$line) continue;
-        
-        $temp = explode("~", $line);    
-        $rtn[$school_code][trim($temp[0])] = trim($temp[1]);    
+
+        $temp = explode("~", $line);
+        $rtn[$school_code][trim($temp[0])] = trim($temp[1]);
       }
-      
-      
-    }  
-    
-  }   
-    
-  
-  
-  
-  
+
+
+    }
+
+  }
+
+
+
+
+
   $GLOBALS['fp_cache_departments'][$cache_key] = $rtn;  // store in cache
-  
-  return $rtn;  
-  
+
+  return $rtn;
+
 }
 
 
@@ -219,8 +219,8 @@ function fp_get_departments($school_id = 0, $bool_get_all_by_schools = FALSE) {
 
 
 
- 
- 
+
+
 
 /**
  * This function will use the "Numeric to Letter Grade" setting in the School settings to
@@ -228,25 +228,25 @@ function fp_get_departments($school_id = 0, $bool_get_all_by_schools = FALSE) {
  * the grade as-is.
  */
 function fp_translate_numeric_grade($grade, $school_id = 0) {
-  
-  
+
+
   $only_grade = $grade;
-  
+
   // We may have included MID at the end of our numeric grade, and if so, it's a midterm grade.
-  
+
   $bool_midterm = FALSE;
   if (strstr($grade, "MID")) {
     $bool_midterm = TRUE;
     $only_grade = trim(str_replace("MID", "", $grade));
   }
-    
-    
+
+
   if (!is_numeric($only_grade)) return $grade; // already a letter, return the original grade.
 
-  
+
   $translate = array();
-  
-      
+
+
   // Get our translation array from globals cache, if there.
   if (isset($GLOBALS['fp_translate_numeric_grade'][$school_id])) {
     $translate = $GLOBALS['fp_translate_numeric_grade'][$school_id];
@@ -254,53 +254,53 @@ function fp_translate_numeric_grade($grade, $school_id = 0) {
   else {
     $temp = trim(variable_get_for_school("numeric_to_letter_grades", "", $school_id));
     if ($temp === '') return $grade;
-    
+
     $temp = explode("\n", $temp);
     foreach ($temp as $line) {
       $line = trim($line);
       if ($line == "") continue;
-  
+
       $tokens = explode("~", $line);
       $low = floatval(trim($tokens[0]));
       $high = floatval(trim($tokens[1]));
       $letter = trim($tokens[2]);
-      
+
       $translate[$low][$high] = $letter;
-          
+
     } // foreach
-    
+
     $GLOBALS['fp_translate_numeric_grade'][$school_id] = $translate;
   }
-  
-  
+
+
   // Okay, now that we have our "translate" array, we can do that with the grade.
-  $grade = floatval($grade);  
+  $grade = floatval($grade);
   foreach ($translate as $low => $details) {
-    foreach ($translate[$low] as $high => $letter) {      
+    foreach ($translate[$low] as $high => $letter) {
       if ($grade >= $low && $grade <= $high) {
         if ($bool_midterm) $letter .= "MID";
         return $letter;
       }
     }
   }
-  
+
   // Else, return back the original grade.
   return $grade;
 }
 
 
- 
- 
- 
- 
+
+
+
+
 /**
  * Re-order the _FILES array for multiple files, to make it easier to work with.  From:
  * http://php.net/manual/en/features.file-upload.multiple.php
- * 
+ *
  * To use:
  *   $myfiles = fp_re_array_files($_FILES['fieldname'])
- * 
- * 
+ *
+ *
  */
 function fp_re_array_files($file_post) {
 
@@ -315,9 +315,9 @@ function fp_re_array_files($file_post) {
   }
 
   return $file_ary;
-} 
- 
- 
+}
+
+
 // From: https://www.php.net/manual/en/function.timezone-offset-get.php
 /**    Returns the offset from the origin timezone to the remote timezone, in seconds.
 *    @param $remote_tz;
@@ -336,14 +336,14 @@ function get_timezone_offset($remote_tz, $origin_tz = null) {
     $remote_dt = new DateTime("now", $remote_dtz);
     $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
     return $offset;
-} 
- 
- 
- 
+}
+
+
+
 /**
- * 
+ *
  * From:  https://stackoverflow.com/questions/1369936/check-to-see-if-a-string-is-serialized
- * 
+ *
  *
  * Check if a string is serialized
  *
@@ -354,8 +354,8 @@ function get_timezone_offset($remote_tz, $origin_tz = null) {
 function is_serialized_string($string)
 {
     return ($string == 'b:0;' || @unserialize($string) !== false);
-} 
- 
+}
+
 
 
 
@@ -363,58 +363,58 @@ function is_serialized_string($string)
 /**
  * The point of this function is to convert between UTC (what we expect all times to start with.).  If we're coming
  * from the the database or a time() function, it's UTC.  The "end_timezone_string" should be the user's preferred timezone.
- * 
+ *
  * if end_timezone_string == null, then we will use the user's selected timezone.  If that isn't set, we use they system's.
- * 
- * As a convenenience, if the data_format we will get back a formatted date.  Otherwise we'll get back a timestamp. 
+ *
+ * As a convenenience, if the data_format we will get back a formatted date.  Otherwise we'll get back a timestamp.
  */
 function convert_time($time_to_convert = 0, $start_timezone_string = "UTC", $end_timezone_string = NULL, $date_format = null ) {
-  
+
   // We require a start time
   if( empty( $time_to_convert ) ){
     return false;
   }
-  
+
   if ($end_timezone_string == NULL) {
     $end_timezone_string = fp_get_user_timezone();
   }
-    
+
   // If the two timezones are different, find the offset
   if( $start_timezone_string != $end_timezone_string ) {
     // Create two timezone objects, one for the start and one for
     // the end
     $dateTimeZoneStart = new DateTimeZone( $start_timezone_string );
     $dateTimeZoneEnd = new DateTimeZone( $end_timezone_string );
-    
+
     // Create two DateTime objects that will contain the same Unix timestamp, but
     // have different timezones attached to them.
     $dateTimeStart = new DateTime("now", $dateTimeZoneStart );
     $dateTimeEnd = new DateTime("now", $dateTimeZoneEnd );
-    
+
     // Calculate the UTC offset for the date/time contained in the $dateTimeStart
     // object, but using the timezone rules as defined for the end timezone ($dateTimeEnd)
     $timeOffset = $dateTimeZoneEnd->getOffset($dateTimeStart);
-    
+
     // If we are converting FROM non-utc TO UTC, then this logic doesn't work!
     // We need to basically grab the reverse logic...
     if ($start_timezone_string != 'UTC' && $end_timezone_string == 'UTC') {
-      $x = $dateTimeZoneStart->getOffset($dateTimeEnd);      
+      $x = $dateTimeZoneStart->getOffset($dateTimeEnd);
       $timeOffset = -$x;
     }
-        
+
   } else {
-    // If the timezones are the same, there is no offset    
+    // If the timezones are the same, there is no offset
     $timeOffset = 0;
   }
-  
+
   // Convert the time by the offset
   $converted_time = $time_to_convert + $timeOffset;
-  
+
   // If we have no given format, just return the time
   if( empty( $date_format ) ) {
     return $converted_time;
   }
-  
+
   // Convert to the given date format
   return date( $date_format, $converted_time );
 }
@@ -425,15 +425,15 @@ function convert_time($time_to_convert = 0, $start_timezone_string = "UTC", $end
 /**
  * Returns an array of all timezones PHP recognizes.
  * Inspired by code from: https://stackoverflow.com/questions/1727077/generating-a-drop-down-list-of-timezones-with-php
- * 
+ *
  * This code will return the common US timezones first, followed by the rest of the timezones that PHP is aware of.
- * 
+ *
  */
 function get_timezones($bool_include_offset = FALSE) {
 
   $timezones = array();
-  
-  // These are the common names for the US timezones.  
+
+  // These are the common names for the US timezones.
   $us_desc_timezones = array(
     'America/New_York' => 'Eastern',
     'America/Chicago' => 'Central',
@@ -442,19 +442,19 @@ function get_timezones($bool_include_offset = FALSE) {
     'America/Los_Angeles' => 'Pacific',
     'America/Anchorage' => 'Alaska',
     'America/Adak' => 'Hawaii',
-    'Pacific/Honolulu' =>  'Hawaii no DST',  
+    'Pacific/Honolulu' =>  'Hawaii no DST',
   );
-  
-  
+
+
   $us_timezones = array_keys($us_desc_timezones);
-  
+
 
   $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
 
   // Place the US timezones at the top of the list.
-  $timezones = array_merge($us_timezones, $timezones);   
+  $timezones = array_merge($us_timezones, $timezones);
 
-       
+
   $timezone_offsets = array();
   foreach( $timezones as $timezone )
   {
@@ -475,66 +475,66 @@ function get_timezones($bool_include_offset = FALSE) {
     if (isset($us_desc_timezones[$timezone])) {
       $extra = "  - (" . $us_desc_timezones[$timezone] . ")";
     }
-    
+
     $disp_timezone = str_replace("_", " ", $timezone);
     $timezone_list[$timezone] = "$pretty_offset$disp_timezone$extra";
   }
 
-  return $timezone_list;  
+  return $timezone_list;
 }
 
 
- 
- 
+
+
 /**
  * This is our custom error handler, which will intercept PHP warnings, notices, etc, and let us
  * display them, log them, etc.
- * 
+ *
  * See https://www.php.net/manual/en/function.set-error-handler.php
- */ 
+ */
 function _fp_error_handler($error_level, $message, $filename, $line, $context = array()) {
   global $user;
 
-  // In case we have not loaded bootstrap.inc yet.  
+  // In case we have not loaded bootstrap.inc yet.
   @define ('WATCHDOG_NOTICE', 5);
   @define ('WATCHDOG_ALERT', 1);
   @define ('WATCHDOG_ERROR', 3);
-  @define ('WATCHDOG_DEBUG', 7);  
-  
+  @define ('WATCHDOG_DEBUG', 7);
+
   $PHP_8_0_SUPPRESSED_ERROR = E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE;
   $er = error_reporting();
   if ($er === 0 || $er === $PHP_8_0_SUPPRESSED_ERROR) { return false;} // suppressed with @-operator  (0 for pre-php8, the variable for 8.0)
-  
-  
-   
-  $err_name = _fp_map_php_error_code($error_level); 
-  if (is_string($err_name) && stristr($err_name, 'notice')) return FALSE; // don't care about Notices. 
+
+
+
+  $err_name = _fp_map_php_error_code($error_level);
+  if (is_string($err_name) && stristr($err_name, 'notice')) return FALSE; // don't care about Notices.
 
   $watchdog_type = "php_error";
   $watchdog_severity = WATCHDOG_ERROR;
-    
-  
+
+
   if (is_string($err_name) && stristr($err_name, 'warning')) {
     $watchdog_type = "php_warning";
     $watchdog_severity = WATCHDOG_ALERT;
-  } 
+  }
 
   if (is_string($err_name) && stristr($err_name, 'recoverable error')) {
     $watchdog_type = "php_warning";
     $watchdog_severity = WATCHDOG_ALERT;
-  } 
-  
+  }
+
   $arr = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 10);  // limit of 10 levels deep so as not to eat up all the memory.
-  
+
   // fpm() only displays for privileged users
-  
+
   // We don't want to bother repeating the same message more than once for errors.  The following code
   // will prevent that.
   // TODO: Make this a setting?
   $errmsg = $err_name . ": $message<br>... ($line) $filename";
   $errmsg_hash = hash('sha256', $errmsg);
-  
-  if (!isset($GLOBALS['fp_error_handler__already_shown_error'][$errmsg_hash])) {  
+
+  if (!isset($GLOBALS['fp_error_handler__already_shown_error'][$errmsg_hash])) {
     fpm($errmsg);
     fpm($arr);
     $GLOBALS['fp_error_handler__already_shown_error'][$errmsg_hash] = TRUE;
@@ -542,8 +542,8 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
   else {
     return;  // we've already displayed this error message; we can harmlessly return.
   }
-  
-  
+
+
 
   // Before we watchdog or mail this backtrace, make sure no field called "password" is in plain text.
   foreach ($arr as $c => $trace) {
@@ -559,20 +559,20 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
       }
     }
   }
-  
+
 
   $hostname = php_uname('n') . ' - ' . $GLOBALS['fp_system_settings']['base_url'];
-  
+
   $user_name = '';
   $user_id = 0;
   if (!$user) {
-    $user_name = 'Anonymous';    
+    $user_name = 'Anonymous';
   }
   else {
     $user_name = $user->name;
     $user_id = $user->id;
   }
-  
+
   $msg = "";
   $msg .= "USER:   $user_name ($user_id) \n";
   $msg .= "SERVER:   $hostname \n";
@@ -581,9 +581,9 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
   $msg .= "--------------------------\n\n";
   $msg .= "$err_name: $message \n\n";
   $msg .= "... ($line) $filename\n\n";
-  
+
   $emsg = $msg;   // We don't need the full backtrace for our "email" message.
-  
+
   $msg .= "Backtrace: <pre>\n";
   $msg .= print_r($arr, TRUE);
   $msg .= "\n\n</pre>";
@@ -595,16 +595,16 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
   }
 
   watchdog($watchdog_type, $msg, array(), $watchdog_severity);
-  
+
   if (@intval($user_id) !== 1) {
     // We are NOT the admin user (user id 1).  (No need to email, since it would appear on screen with the fpm() calls earlier.
-    
+
     // Should we email someone of php errors?
     $tomail = trim(variable_get("notify_php_error_email_address", ""));
-      
+
     if ($tomail != "") {
       //fp_mail($tomail, "PHP Error in FlightPath", $msg);
-      
+
       // We should add this to our "to email" file, which will get emailed to this mail address later on.
       $error_files_dir = fp_get_files_path() . "/private";
 
@@ -613,15 +613,15 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
         watchdog('system', "Unable to write PHP error to email log file", array(), WATCHDOG_ERROR);
       }
 
-                  
+
     }
-    
+
   }
-  
+
 } // _fp_error_handler
-  
- 
- 
+
+
+
 
 /**
 * Map an error code into an Error word
@@ -637,73 +637,73 @@ function _fp_map_php_error_code($code) {
         case E_CORE_ERROR:
         case E_COMPILE_ERROR:
         case E_USER_ERROR:
-            $error = 'Fatal Error';            
+            $error = 'Fatal Error';
             break;
         case E_WARNING:
         case E_USER_WARNING:
-        case E_COMPILE_WARNING:                      
+        case E_COMPILE_WARNING:
         case E_RECOVERABLE_ERROR:
-            $error = 'Warning';            
-            break;          
+            $error = 'Warning';
+            break;
         case E_NOTICE:
         case E_USER_NOTICE:
-            $error = 'Notice';            
+            $error = 'Notice';
             break;
         case E_STRICT:
-            $error = 'Strict';            
+            $error = 'Strict';
             break;
         case E_DEPRECATED:
         case E_USER_DEPRECATED:
             $error = 'Deprecated';
-            
+
             break;
         default :
             break;
     }
-    
+
     return $error;
 }
 
- 
- 
+
+
 
 /**
  * Send an email.  Drop-in replacement for PHP's mail() command,
  * but can use SMTP protocol if enabled.
- * 
+ *
  * For attachments (only for use in SMTP), the array can be one of two methods:
- * 
+ *
  * (1)
  *   $arr["full_filename"] => "filename"
  * or
  * (2)
  *   $arr['filename'] = "string that makes up attachment"
- * 
- * For method #2, $bool_string_attachment must be set to TRUE. 
- * 
+ *
+ * For method #2, $bool_string_attachment must be set to TRUE.
+ *
  */
 function fp_mail($to, $subject, $msg, $bool_html = FALSE, $attachments = array(), $bool_string_attachment = FALSE) {
-  
-    
+
+
   // TODO: In the future, check to see if there are any other modules which invoke a hook to intercept mail.
-  
-  
+
+
   // The reason we do this md5 check is so that we don't try to send identical emails over and over.  This can happen if we are trying
   // to email regarding the mysql server being down, and when we try to do a "watchdog", which has to use the mysql server,
-  // we try to send ANOTHER error, then we are right back here and try to send ANOTHER email, etc, etc.  
+  // we try to send ANOTHER error, then we are right back here and try to send ANOTHER email, etc, etc.
   $md5_check = md5($to . $subject . $msg . time());
   if (isset($_SESSION['fp_mail_last_sent_md5'])) {
     if ($_SESSION['fp_mail_last_sent_md5'] == $md5_check) {
       return;
     }
-  }  
+  }
   $_SESSION['fp_mail_last_sent_md5'] = $md5_check;
-  
-  
+
+
   watchdog('fp_mail', t("Sending mail to @to, subject: @subject.  Last sent md5: @md5", array("@to" => $to, "@subject" => $subject, "@md5" => $md5_check)), array(), WATCHDOG_DEBUG);
-    
+
   // Before actually sending an email, make sure IF the recipient belongs a user, then that user is not "disabled".
-  $res = db_query("SELECT * FROM users 
+  $res = db_query("SELECT * FROM users
                     WHERE email = ?
                     ORDER BY is_disabled
                     LIMIT 1", array(strtolower(trim($to))));
@@ -714,59 +714,59 @@ function fp_mail($to, $subject, $msg, $bool_html = FALSE, $attachments = array()
       return;
     }
   }
-  
-  
-  
+
+
+
   if (module_enabled('smtp')) {
     smtp_mail($to, $subject, $msg, $bool_html, $attachments, $bool_string_attachment);
     return;
   }
   else {
-    
+
     $headers = array();
     if ($bool_html) {
       // To send HTML mail, the Content-type header must be set
       $headers[] = 'MIME-Version: 1.0';
-      $headers[] = 'Content-type: text/html; charset=iso-8859-1';      
-    }    
-    
+      $headers[] = 'Content-type: text/html; charset=iso-8859-1';
+    }
+
     mail($to, $subject, $msg, implode("\r\n", $headers));
   }
-  
-  
-  
+
+
+
 } // fp_mail
 
- 
- 
- 
+
+
+
 /**
  * Returns the component of the page's path.
- * 
+ *
  * When viewing a page at the path "admin/structure/types", for example, arg(0) returns "admin", arg(1) returns "structure", and arg(2) returns "types".
- * 
- */ 
+ *
+ */
 function arg($index) {
-  
+
   $q = $_REQUEST["q"];
   $temp = explode("/", $q);
 
   $rtn = fp_trim(@$temp[$index]);
-  
+
   return $rtn;
-  
-} 
- 
- 
+
+}
+
+
 
 /**
  * This function uses CURL to get the simple contents of a URL, whether http or https.
  */
 function fp_url_get_contents($url) {
-  
+
   /*
   $ch = curl_init();
-  
+
   curl_setopt( $ch, CURLOPT_AUTOREFERER, TRUE );
   curl_setopt( $ch, CURLOPT_HEADER, 0 );
   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1 );
@@ -776,40 +776,40 @@ function fp_url_get_contents($url) {
   $data = curl_exec( $ch );
   curl_close( $ch );
 
-  return $data;  
+  return $data;
   */
-  
+
   // Make use of the superior fp_http_request instead.
-  
+
   $res = fp_http_request($url);
   if (is_object($res) && isset($res->data)) {
     return $res->data;
   }
-  
+
   return FALSE;
-  
+
 }
 
 
 
 /**
- * This function is borrowed from Backdrop version 1.x.  We use it to convert the $data (which is in the form of an assoc 
+ * This function is borrowed from Backdrop version 1.x.  We use it to convert the $data (which is in the form of an assoc
  * array of keys and values) into an HTTP query string.
- * 
- * 
+ *
+ *
  * @param array $data
  * @param string $parent
  * @return string
  */
 function fp_http_build_query(array $data, $parent = '') {
   $params = array();
-  
+
   foreach ($data as $key => $value) {
     $key = $parent ? $parent . rawurlencode('[' . $key . ']') : rawurlencode($key);
-    
+
     // For better readability of paths in query strings, we decode slashes.
     $key = str_replace('%2F', '/', $key);
-    
+
     // Recurse into children.
     if (is_array($value)) {
       $params[] = fp_http_build_query($value, $key);
@@ -823,16 +823,16 @@ function fp_http_build_query(array $data, $parent = '') {
       $params[] = $key . '=' . str_replace('%2F', '/', rawurlencode($value));
     }
   }
-  
+
   return implode('&', $params);
 }
 
 
-  
- 
+
+
 /**
  * Send a request through the Internet and return the result as an object.
- * 
+ *
  * This is a modified copy of the Drupal 6 function drupal_http_request(),
  * taken from here: http://api.drupal.org/api/drupal/includes!common.inc/function/drupal_http_request/6
  */
@@ -841,13 +841,13 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
 
   $result = new stdClass();
   $errno = $errstr = '';
-  
+
   // If we are trying to POST something, make sure content-type header is set.
   if ($method == 'POST' && !isset($headers['Content-Type']) && !isset($headers['Content-type']) && !isset($headers['content-type'])) {
     $headers['Content-type'] = "application/x-www-form-urlencoded";
   }
-  
-  
+
+
   // Parse the URL and make sure we can handle the schema.
   $uri = parse_url($url);
 
@@ -892,7 +892,7 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
     $result->error = trim($errstr);
 
     // Log that this failed.
-    watchdog("http_request", "fp_http_request failed!  Request URL: @url, Method: @method, 
+    watchdog("http_request", "fp_http_request failed!  Request URL: @url, Method: @method,
                               Error code: @ec, Error msg: @em", array('@ec' => $errno, '@em' => $errstr, '@url' => $url, '@method' => $method), WATCHDOG_ERROR);
 
     return $result;
@@ -909,7 +909,7 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
     // RFC 2616: "non-standard ports MUST, default ports MAY be included".
     // We don't add the port to prevent from breaking rewrite rules checking the
     // host that do not take into account the port number.
-    'Host' => "Host: $host", 
+    'Host' => "Host: $host",
     'User-Agent' => 'User-Agent: FlightPath (+https://getflightpath.com/)',
   );
 
@@ -917,13 +917,13 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   // or PUT request. Some non-standard servers get confused by Content-Length in
   // at least HEAD/GET requests, and Squid always requires Content-Length in
   // POST/PUT requests.
-  
+
   // Convert $data to a query string, if it's an array.
   if (is_array($data)) {
     $data = fp_http_build_query($data);
   }
-  
-  
+
+
   $content_length = 0;
   if ($data) {
     $content_length = strlen($data);
@@ -997,45 +997,45 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   }
 
   $responses = array(
-    100 => 'Continue', 
-    101 => 'Switching Protocols', 
-    200 => 'OK', 
-    201 => 'Created', 
-    202 => 'Accepted', 
-    203 => 'Non-Authoritative Information', 
-    204 => 'No Content', 
-    205 => 'Reset Content', 
-    206 => 'Partial Content', 
-    300 => 'Multiple Choices', 
-    301 => 'Moved Permanently', 
-    302 => 'Found', 
-    303 => 'See Other', 
-    304 => 'Not Modified', 
-    305 => 'Use Proxy', 
-    307 => 'Temporary Redirect', 
-    400 => 'Bad Request', 
-    401 => 'Unauthorized', 
-    402 => 'Payment Required', 
-    403 => 'Forbidden', 
-    404 => 'Not Found', 
-    405 => 'Method Not Allowed', 
-    406 => 'Not Acceptable', 
-    407 => 'Proxy Authentication Required', 
-    408 => 'Request Time-out', 
-    409 => 'Conflict', 
-    410 => 'Gone', 
-    411 => 'Length Required', 
-    412 => 'Precondition Failed', 
-    413 => 'Request Entity Too Large', 
-    414 => 'Request-URI Too Large', 
-    415 => 'Unsupported Media Type', 
-    416 => 'Requested range not satisfiable', 
-    417 => 'Expectation Failed', 
-    500 => 'Internal Server Error', 
-    501 => 'Not Implemented', 
-    502 => 'Bad Gateway', 
-    503 => 'Service Unavailable', 
-    504 => 'Gateway Time-out', 
+    100 => 'Continue',
+    101 => 'Switching Protocols',
+    200 => 'OK',
+    201 => 'Created',
+    202 => 'Accepted',
+    203 => 'Non-Authoritative Information',
+    204 => 'No Content',
+    205 => 'Reset Content',
+    206 => 'Partial Content',
+    300 => 'Multiple Choices',
+    301 => 'Moved Permanently',
+    302 => 'Found',
+    303 => 'See Other',
+    304 => 'Not Modified',
+    305 => 'Use Proxy',
+    307 => 'Temporary Redirect',
+    400 => 'Bad Request',
+    401 => 'Unauthorized',
+    402 => 'Payment Required',
+    403 => 'Forbidden',
+    404 => 'Not Found',
+    405 => 'Method Not Allowed',
+    406 => 'Not Acceptable',
+    407 => 'Proxy Authentication Required',
+    408 => 'Request Time-out',
+    409 => 'Conflict',
+    410 => 'Gone',
+    411 => 'Length Required',
+    412 => 'Precondition Failed',
+    413 => 'Request Entity Too Large',
+    414 => 'Request-URI Too Large',
+    415 => 'Unsupported Media Type',
+    416 => 'Requested range not satisfiable',
+    417 => 'Expectation Failed',
+    500 => 'Internal Server Error',
+    501 => 'Not Implemented',
+    502 => 'Bad Gateway',
+    503 => 'Service Unavailable',
+    504 => 'Gateway Time-out',
     505 => 'HTTP Version not supported',
   );
   // RFC 2616 states that all unknown HTTP codes must be treated the same as the
@@ -1071,7 +1071,7 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   $result->code = $code;
   return $result;
 }
- 
+
 
 /**
  * Begin a microtime timer for later use.
@@ -1108,7 +1108,7 @@ function timer_read($name) {
  * Returns a random string of length len.
  */
 function fp_get_random_string($len = 7, $alpha = TRUE, $numeric = TRUE, $symbols = FALSE) {
-  
+
   $base = "";
   if ($alpha) {
     $base .= "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1119,19 +1119,19 @@ function fp_get_random_string($len = 7, $alpha = TRUE, $numeric = TRUE, $symbols
   if ($symbols) {
     $base .= "!@#$%^&*()_+!@#$%^&*()-=";
   }
-  
+
   $str = "";
   for ($t = 0; $t < $len; $t++) {
     $base = str_shuffle($base);
     $str .= $base[0];
   }
-  
+
   return $str;
-  
+
 }
 
 
- 
+
 /**
  * Call all modules which implement hook_clear_cache
  */
@@ -1140,27 +1140,27 @@ function fp_clear_cache() {
   $modules = modules_implement_hook("clear_cache");
   foreach ($modules as $module) {
     call_user_func($module . '_clear_cache');
-  }  
-} 
- 
- 
- 
- 
- 
- 
- 
+  }
+}
+
+
+
+
+
+
+
 /**
 Remove any possiblilty of a malicious attacker trying to inject
 nonsense.
 From:  https://paragonie.com/blog/2015/06/preventing-xss-vulnerabilities-in-php-everything-you-need-know
 */
 function fp_no_html_xss($string) {
-  return htmlentities($string, ENT_QUOTES, 'UTF-8');  
-} 
- 
- 
+  return htmlentities($string, ENT_QUOTES, 'UTF-8');
+}
 
- 
+
+
+
 // From: https://gist.github.com/hubgit/1322324
 function repair_html($html){
   // hide DOM parsing errors
@@ -1178,15 +1178,15 @@ function repair_html($html){
   foreach ($dom->getElementById('repair' . $rnd)->childNodes as $child) {
     $doc->appendChild($doc->importNode($child, true));
   }
-  
+
   // output the new document as HTML
   $doc->encoding = 'UTF-8'; // output UTF-8
   $doc->formatOutput = false;
   return trim($doc->saveHTML());
 }
 
- 
- 
+
+
 /**
  * Convenience function for @see filter_markup($str, "plain")
  */
@@ -1199,22 +1199,22 @@ function filter_plain($str, $bool_trim = TRUE) {
 }
 
 
- 
+
 /**
  * Filter string with possible HTML, allowing only certain tags, and removing dangerous attributes.
- * 
+ *
  * $type can be:
  *    - "plain" - No HTML tags are allowed. Safest.
  *    - "basic" - Only certain tags allowed, no attributes. Safest. New lines are converted to HTML break tags.
  *    - "full" - All HTML is allowed through.
- * 
+ *
  */
 function filter_markup($str, $type = "basic") {
 
   if (!$str) return $str;
 
   if (!is_string($str)) {
-    return $str;  
+    return $str;
   }
 
   if ($type == 'plain') {
@@ -1224,41 +1224,41 @@ function filter_markup($str, $type = "basic") {
 
   // If we are here, we're doing something with HTML...
 
-  
+
   // Fix mismatched HTML (without adding new tags).
-  $str = repair_html($str);   
-  
+  $str = repair_html($str);
+
   if ($type == "basic") {
-    
+
     // To reduce extra newlines, remove any newline which is at the END of an existing <br> tag.
     $str = str_ireplace("<br>\n", "<br>", $str);
     $str = str_ireplace("<br />\n", "<br>", $str);
-     
-    $allowed_tags = array('a', 'em', 'strong', 'cite', 
-                          'blockquote', 'code', 'ul', 'ol', 'li', 
-                          'dl', 'dt', 'dd', 'span', 'div', 
-                          'b', 'i', 'u', 'br', 'p', 'table', 'tr', 
+
+    $allowed_tags = array('a', 'em', 'strong', 'cite',
+                          'blockquote', 'code', 'ul', 'ol', 'li',
+                          'dl', 'dt', 'dd', 'span', 'div',
+                          'b', 'i', 'u', 'br', 'p', 'table', 'tr',
                           'td', 'th', 'tbody', );
-    
+
     $str = filter_xss($str, $allowed_tags);
-    
-        
+
+
     $str = trim($str);
-        
+
   }
-  
+
   if ($type == "full") {
-    
+
     // Essentially, do nothing. All HTML is allowed through.
-    
+
   }
-  
-  
-  
+
+
+
   return $str;
-  
-} 
- 
+
+}
+
 
 /**
  * When receiving certain input from the user, filter out potential trouble characters
@@ -1266,12 +1266,12 @@ function filter_markup($str, $type = "basic") {
  *                the input should exclude any characters not normally found in a major_code.
  */
 function filter_untrusted_input($string, $type = 'major_code') {
-  
+
   if (!$string) $string = '';
-  
+
   if ($type == 'major_code') {
     $string = filter_xss($string, array());
-   
+
     $string = str_replace('"', '', $string);
     $string = str_replace("'", '', $string);
     $string = str_replace("(", '', $string);
@@ -1280,9 +1280,9 @@ function filter_untrusted_input($string, $type = 'major_code') {
     $string = str_replace("=", '', $string);
     $string = str_replace(" ", '', $string);
     $string = str_replace(";", '', $string);
-   
-  } 
-  
+
+  }
+
   return $string;
 } // filter_untrusted_input
 
@@ -1291,16 +1291,16 @@ function filter_untrusted_input($string, $type = 'major_code') {
  * This function is taken almost directly from Drupal 7's core code.  It is used to help us filter out
  * dangerous HTML which the user might type.
  * From the D7 documentation:
- * 
+ *
  * Filters HTML to prevent cross-site-scripting (XSS) vulnerabilities.
  * Based on kses by Ulf Harnhammar, see http://sourceforge.net/projects/kses. For examples of various XSS attacks, see: http://ha.ckers.org/xss.html.
  * This code does four things:
  *     Removes characters and constructs that can trick browsers.
  *     Makes sure all HTML entities are well-formed.
- *     Makes sure all HTML tags and attributes are well-formed.    
+ *     Makes sure all HTML tags and attributes are well-formed.
  *     Makes sure no HTML tags contain URLs with a disallowed protocol (e.g. javascript:).
- * 
- */ 
+ *
+ */
 function filter_xss($string, $allowed_tags = array('a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'span', 'div')) {
   // Only operate on valid UTF-8 strings. This is necessary to prevent cross
   // site scripting issues on Internet Explorer 6.
@@ -1337,9 +1337,9 @@ function filter_xss($string, $allowed_tags = array('a', 'em', 'strong', 'cite', 
     |                 # or
     >                 # just a >
     )%x', 'filter_xss_split', $string);
-    
-} 
- 
+
+}
+
 /**
  * Like the filter_xss function, this is taken from D7's
  * _filter_xss_split function
@@ -1502,7 +1502,7 @@ function filter_xss_attributes($attr) {
     $attrarr[] = $attrname;
   }
   return $attrarr;
-} 
+}
 
 function filter_xss_bad_protocol($string) {
   // Get the plain text representation of the attribute value (i.e. its meaning).
@@ -1541,7 +1541,7 @@ function fp_strip_dangerous_protocols($uri) {
   return $uri;
 }
 
- 
+
 function fp_validate_utf8($text) {
   if (strlen($text) == 0) {
     return TRUE;
@@ -1550,11 +1550,11 @@ function fp_validate_utf8($text) {
   // containing invalid UTF-8 byte sequences. It does not reject character
   // codes above U+10FFFF (represented by 4 or more octets), though.
   return (preg_match('/^./us', $text) == 1);
-} 
- 
+}
+
 /**
  * Simple function to convert a string into a machine-readable string.
- * 
+ *
  * Useful for making possibly unsafe text work as an array index, a CSS class, etc.  Replaces
  * "bad" characters, or characters which might not be allowed for variables, for example,
  * into underscores (_).
@@ -1564,10 +1564,10 @@ function fp_validate_utf8($text) {
  */
 function fp_get_machine_readable($str) {
  if (!$str) return (string) $str;
- return preg_replace('@[^a-zA-Z0-9_]+@', '_', $str);  
+ return preg_replace('@[^a-zA-Z0-9_]+@', '_', $str);
 }
 
- 
+
 /////////////////////////////////////////////////////////////////////
 
 /**
@@ -1575,7 +1575,7 @@ function fp_get_machine_readable($str) {
  */
 function fp_get_degree_classifications() {
   $rtn = array();
-  
+
   // Level 1
   $temp = explode("\n", variable_get("degree_classifications_level_1", "MAJOR ~ Major"));
   foreach ($temp as $line) {
@@ -1588,7 +1588,7 @@ function fp_get_degree_classifications() {
       $rtn["machine_name_to_level_num"][$machine_name] = 1;
     }
   }
-  
+
   // Level 2
   $temp = explode("\n", variable_get("degree_classifications_level_2", "MINOR ~ Minor"));
   foreach ($temp as $line) {
@@ -1601,8 +1601,8 @@ function fp_get_degree_classifications() {
       $rtn["machine_name_to_level_num"][$machine_name] = 2;
     }
   }
-  
-  
+
+
   // Level 3
   $temp = explode("\n", variable_get("degree_classifications_level_3", "CONC ~ Concentration"));
   foreach ($temp as $line) {
@@ -1615,9 +1615,9 @@ function fp_get_degree_classifications() {
       $rtn["machine_name_to_level_num"][$machine_name] = 3;
     }
   }
-  
-  
-  
+
+
+
   return $rtn;
 }
 
@@ -1626,30 +1626,30 @@ function fp_get_degree_classifications() {
  * Returns back an assoc array for the supplied code.  Looks like:
  * $arr["level_num"] = number
  * $arr["title"] = the title
- * 
- * 
+ *
+ *
  */
 function fp_get_degree_classification_details($degree_class = "MAJOR", $bool_return_class_code_as_title_if_not_found = TRUE) {
   $rtn = array();
-  
+
   if ($bool_return_class_code_as_title_if_not_found) {
     // Use the degree_class as title for default, if we can't find it otherwise.
     $rtn["level_num"] = 0;
     $rtn["title"] = $degree_class;
     $rtn["degree_class"] = $degree_class;
   }
-  
+
   $degree_classifications = fp_get_degree_classifications();
   foreach ($degree_classifications["levels"] as $num => $details) {
     if (isset($details[$degree_class])) {
       $rtn["level_num"] = $num;
       $rtn["title"] = $details[$degree_class];
-      $rtn["degree_class"] = $degree_class;   
-      break;   
+      $rtn["degree_class"] = $degree_class;
+      break;
     }
   }
-  
-  
+
+
   return $rtn;
 }
 
@@ -1664,32 +1664,32 @@ function get_term_structures($school_id = 0) {
 
   $temp = trim(variable_get_for_school("term_id_structure", "", $school_id));
   if ($temp == '') return array();  // return an empty array, as this isn't filled out yet.
-  
+
   $structures = explode("\n", $temp);
-  
-  foreach ($structures as $structure) {      
+
+  foreach ($structures as $structure) {
     $tokens = explode(",", $structure);
     $term_def = trim($tokens[0] ?? '');
-    
+
     // Get rid of the replacement pattern.
     // Looks like:  [Y4]40.  We want the 40.
     // Simply explode on "]"
     $temp = explode("]", $term_def);
-    
+
     $term_suffix = trim($temp[1] ?? '');
-    
+
     $rtn[$term_suffix] = array(
       "term_suffix" => $term_suffix,
       "term_def" => $term_def,
-      "short" => trim($tokens[1] ?? ''),      
+      "short" => trim($tokens[1] ?? ''),
       "full" => trim($tokens[2] ?? ''),
       "abbr" => trim($tokens[3] ?? ''),
       "disp_adjust" => trim($tokens[4] ?? ''),
     );
-  
+
   }
-  
-  
+
+
   return $rtn;
 }
 
@@ -1701,44 +1701,44 @@ function get_term_structures($school_id = 0) {
  */
 function fp_get_requirement_types($school_id) {
   $rtn = array();
-  
+
   if (isset($GLOBALS['fp_temp_cache']['fp_get_requirement_types'][$school_id])) {
     return $GLOBALS['fp_temp_cache']['fp_get_requirement_types'][$school_id];
   }
-  
-  
+
+
   $temp = explode("\n", variable_get_for_school("requirement_types", "g ~ General Requirements\nc ~ Core Requirements\ne ~ Electives\nm ~ Major Requirements\ns ~ Supporting Requirements\nx ~ Additional Requirements", $school_id));
   foreach ($temp as $line) {
     $line = trim($line);
     if ($line == "") continue;
-    
+
     $temp = explode("~", $line);
     $code = trim(strtolower($temp[0]));
     $desc = trim($temp[1]);
 
-    $rtn[$code] = $desc;   
-    
+    $rtn[$code] = $desc;
+
   }
-  
+
   // Make sure that code 'x' is set.
   if (!isset($rtn["x"])) {
     $rtn["x"] = t("Additional Requirements");
   }
-  
+
   // Make sure code 'e' for Electives is set.
   if (!isset($rtn["e"])) {
     $rtn["e"] = t("Electives");
   }
-  
+
   // Make sure code 'm' is set, for Major Requirements, our default type.
   if (!isset($rtn["m"])) {
     $rtn["m"] = t("Major Requirements");
   }
-  
+
   $GLOBALS['fp_temp_cache']['fp_get_requirement_types'][$school_id] = $rtn;
-  
+
   return $rtn;
-  
+
 }
 
 
@@ -1747,23 +1747,23 @@ function fp_get_requirement_types($school_id) {
  * However, it allows for quick caching look-up, so it should be used when possible instead of $x = new DegreePlan.
  */
 function fp_load_degree($degree_id = "", DatabaseHandler $db = NULL, $bool_load_minimal = false, $array_significant_courses = false, $bool_use_draft = false) {
-  
+
   // Create a "cache key" based on the arguments, so we can look this degree up faster later.
   $cache_key = md5(serialize(func_get_args()));
   //fpm("degree_id: $degree_id . cache key:" . $cache_key . "+++++++++++++");
   if (isset($GLOBALS['fp_temp_cache']['fp_load_degree'][$cache_key])) {
-    $degree = $GLOBALS['fp_temp_cache']['fp_load_degree'][$cache_key];    
+    $degree = $GLOBALS['fp_temp_cache']['fp_load_degree'][$cache_key];
     //fpm(" ...  returning cache");
     return $degree;
   }
-    
+
   $degree = new DegreePlan($degree_id, $db, $bool_load_minimal, $array_significant_courses, $bool_use_draft);
-  
+
   // Save to our cache
   $GLOBALS['fp_temp_cache']['fp_load_degree'][$cache_key] = $degree;
-  
+
   return $degree;
-  
+
 }
 
 
@@ -1796,7 +1796,7 @@ function fp_set_page_sub_tabs($tab_array) {
  */
 function fp_set_standard_advising_breadcrumbs() {
   global $screen, $current_student_id;
-  
+
   // Let's set our breadcrumbs
   $db = get_global_database_handler();
   $crumbs = array();
@@ -1817,29 +1817,29 @@ function fp_set_standard_advising_breadcrumbs() {
 
 /**
  * Set our breadcrumbs array.
- * 
+ *
  * We expect the array to look like this:
  * [0]['text'] = "Alerts";
  * [0]['path'] = "my/alerts";
  * [0]['query'] (optional)
  * [0]['attributes']  (optional.  Used exactly as in the l() function.  @see l() )
- * 
+ *
  * [1] .... etc.
  * @see fp_render_breadcrumbs();
- * 
- * 
+ *
+ *
  * Here is a practical example of how to call this function:
- * 
+ *
  *    $crumbs = array();
  *    $crumbs[] = array(
  *      'text' => 'Alerts',
  *      'path' => 'alerts',
  *    );
- * 
+ *
  *    fp_set_breadcrumbs($crumbs);
- * 
+ *
  */
-function fp_set_breadcrumbs($arr = array()) {  
+function fp_set_breadcrumbs($arr = array()) {
   $GLOBALS['fp_breadcrumbs'] = $arr;
 }
 
@@ -1848,7 +1848,7 @@ function fp_set_breadcrumbs($arr = array()) {
  *
  * @param unknown_type $title
  */
-function fp_set_title($title) {  
+function fp_set_title($title) {
   $GLOBALS["fp_set_title"] = $title;
   if ($title == "") {
     fp_show_title(FALSE);  // No title to show!
@@ -1864,7 +1864,7 @@ function fp_set_title($title) {
  * @param String $class
  */
 function fp_add_body_class($class) {
-  
+
   // Let's sanitize the "class" to make sure it doesn't contain any trouble characters.
   $class = str_replace("'", '', $class);
   $class = str_replace('"', '', $class);
@@ -1878,7 +1878,7 @@ function fp_add_body_class($class) {
   $class = str_replace('\\', '', $class);
   $class = str_replace('#', '', $class);
   $class = str_replace('&', '', $class);
-  
+
   @$GLOBALS["fp_add_body_classes"] .= " " . $class;
 }
 
@@ -1895,9 +1895,9 @@ function fp_token() {
     $site_token = md5("" . time() . rand(1,9999));
     variable_set("site_token", $site_token);
   }
-  
+
   return $site_token;
-  
+
 }
 
 
@@ -1908,65 +1908,65 @@ function fp_token() {
  */
 function fp_get_session_str() {
   $session_id = session_id();  // Get the PHP session_id
-  
+
   // TODO: don't use IP as part of this, as it can change if the user switches networks.
-  
+
   $ip = @$_SERVER["REMOTE_ADDR"];
   if ($ip == "") $ip = "000";
-  
+
   // NOTE: We cannot use fp_token() here, since the get function (below) is called before the various bootstrap files are loaded.
-    
+
   // Create a string where we can confirm the ip and server name the session came from.
-  // TODO: Might be able to add more entropy later on, as long as it does not involve the database, since bootstrap isn't loaded yet when validating.  
-  $str = $session_id . "~_" . md5($session_id . $ip . php_uname('n')); 
-  
-    
-  return $str;  
+  // TODO: Might be able to add more entropy later on, as long as it does not involve the database, since bootstrap isn't loaded yet when validating.
+  $str = $session_id . "~_" . md5($session_id . $ip . php_uname('n'));
+
+
+  return $str;
 }
 
-  
- 
+
+
 /**
  * This will validate the session str (@see fp_get_session_str()) and return back either FALSE
  * or the session_id.
  */
 function fp_get_session_id_from_str($str) {
-  
+
   // We expect $str to look like this:
   // session_id~_md5(session_id . ip . php_uname('n'))
 
   $temp = explode("~_", $str);
-    
+
   $session_id = trim($temp[0]);
   $hash = trim($temp[1]);
-    
+
   $ip = @$_SERVER["REMOTE_ADDR"];
-  if ($ip == "") $ip = "000";  
-  
-  
+  if ($ip == "") $ip = "000";
+
+
   $test_hash = md5($session_id . $ip . php_uname('n'));
-  
+
   if ($test_hash === $hash) {
     // Success!
     return $session_id;
   }
-  
+
   return FALSE;
-    
+
 }
 
 
 /**
  * Simple function that adds spaces after commas in CSV strings.  Makes them easier to read.
  */
-function fp_space_csv($str) {  
+function fp_space_csv($str) {
   $str = str_replace(",", ", ", $str);
   // Get rid of double spaces we might have introduced.
   $str = str_replace(",  ", ", ", $str);
   $str = str_replace(",  ", ", ", $str);
   $str = str_replace(",  ", ", ", $str);
-    
-  
+
+
   $str = trim($str);
   return $str;
 }
@@ -1986,19 +1986,19 @@ function csv_to_array($csv_string) {
  * Splits a basic csv but returns an array suitable for the form_api, retuns assoc array.
  */
 function csv_to_form_api_array($csv_string, $delimeter = ",", $bool_make_keys_machine_readable = TRUE) {
-  $rtn = array();  
+  $rtn = array();
   $temp = explode($delimeter, $csv_string);
   foreach ($temp as $line) {
     $line = trim($line);
     if (!$line) continue;
-    
+
     $key = strtolower(fp_get_machine_readable($line));
     $rtn[$key] = $line;
-    
-  }  
-  
+
+  }
+
   return $rtn;
-  
+
 }
 
 
@@ -2009,7 +2009,7 @@ function csv_to_form_api_array($csv_string, $delimeter = ",", $bool_make_keys_ma
 function csv_multiline_to_array($csv_str, $bool_first_row_is_headers = TRUE) {
   $csv = array_map('str_getcsv', explode("\n", trim($csv_str)));
   array_walk($csv, function(&$a) use ($csv) {
-    if (count($a) == count($csv[0])) {  
+    if (count($a) == count($csv[0])) {
       $a = array_combine($csv[0], $a);
     }
     else {
@@ -2019,9 +2019,9 @@ function csv_multiline_to_array($csv_str, $bool_first_row_is_headers = TRUE) {
   if (!$bool_first_row_is_headers) {
     array_shift($csv); # remove column header
   }
-    
-  return $csv;    
-      
+
+  return $csv;
+
 }
 
 
@@ -2035,11 +2035,11 @@ function csv_multiline_to_array($csv_str, $bool_first_row_is_headers = TRUE) {
  *          The "type" of message.  This string is added as a CSS class to the message, for theming later.
  *          Examples: "status", "warning", "error"
  * @param boolean $bool_no_repeat
- *          Boolean.  Should the message show more than once per page view?  Set to TRUE if it should NOT.  
+ *          Boolean.  Should the message show more than once per page view?  Set to TRUE if it should NOT.
  */
 function fp_add_message($msg, $type = "status", $bool_no_repeat = FALSE) {
 
-  $md5 = md5($type . $msg);  
+  $md5 = md5($type . $msg);
 
   if ($bool_no_repeat && isset($_SESSION["fp_messages"]) && is_array($_SESSION["fp_messages"])) {
     // Make sure this message isn't already in the session.
@@ -2048,7 +2048,7 @@ function fp_add_message($msg, $type = "status", $bool_no_repeat = FALSE) {
     }
   }
 
-    
+
   $_SESSION["fp_messages"][] = array("type" => $type, "msg" => $msg, "md5" => $md5);
 }
 
@@ -2069,11 +2069,11 @@ function fp_str_ends_with ($haystack, $needle) {
  * @param String $path_to_css
  */
 function fp_add_css($path_to_css) {
-  
+
   // Init if needed
-  if (!isset($GLOBALS['fp_extra_css'])) $GLOBALS['fp_extra_css'] = array();  
-  
-  
+  if (!isset($GLOBALS['fp_extra_css'])) $GLOBALS['fp_extra_css'] = array();
+
+
   if (!in_array($path_to_css, $GLOBALS['fp_extra_css'])) {
     $GLOBALS["fp_extra_css"][] = $path_to_css;
   }
@@ -2083,41 +2083,41 @@ function fp_add_css($path_to_css) {
 
 /**
  * Add extra javascript to the page.
- * 
+ *
  * - type = file... $js is expected to be the path to a javascript file.
  * - type = setting... $js is expected to be an associative array of settings.
  *            For example:  array("my_path" => "blah", "my_color" => "red").
  *            They will be available in javascript in the object FlightPath like so:
  *              FlightPath.settings.my_color;
- * 
+ *
  * Ex: fp_add_js(fp_get_module_path("admin") . '/js/admin.js');
- * 
+ *
  * @see fp_add_css()
- * 
+ *
  */
 function fp_add_js($js, $type = "file") {
-  
+
   // Init if needed
-  if (!isset($GLOBALS['fp_extra_js'])) $GLOBALS['fp_extra_js'] = array();  
-    
-    
+  if (!isset($GLOBALS['fp_extra_js'])) $GLOBALS['fp_extra_js'] = array();
+
+
   if ($type == "file") {
     if (!in_array($js, $GLOBALS['fp_extra_js'])) {
       $GLOBALS["fp_extra_js"][] = $js;
     }
   }
-  
+
   if ($type == "setting") {
     if (!isset($GLOBALS["fp_extra_js_settings"])) $GLOBALS["fp_extra_js_settings"] = array();
-    
-    // Instead of using array_merge_recursive, this guarantees that keys are not re-used.    
+
+    // Instead of using array_merge_recursive, this guarantees that keys are not re-used.
     foreach ($js as $key => $val) {
       $GLOBALS["fp_extra_js_settings"][$key] = $val;
     }
-    
-    
+
+
   }
-  
+
 }
 
 
@@ -2125,49 +2125,49 @@ function fp_add_js($js, $type = "file") {
  * This function will create a string from a 1 dimensional assoc array.
  * Ex:   arr = array("pet" => "dog", "name" => "Rex")
  *      will return:    pet_S-dog,name_S-Rex    under the default settings.
- * 
+ *
  * The separator is meant to be a string extremely unlikely to be used in the key or values.
- * 
+ *
  * Use the fp_explode_assoc function to piece it back together.
  * @see fp_explode_assoc
  */
 function fp_join_assoc($arr, $glue = ",", $assign_sep = "_S-") {
   $rtn = "";
-  
+
   foreach ($arr as $key => $val) {
     $rtn .= $key . $assign_sep . $val . $glue;
   }
-  
+
   // Should be an extra glue character at the end we need to trim off.
   $rtn = rtrim($rtn, $glue);
-  
+
   return $rtn;
 }
 
 /**
  * Takes a string (created by fp_join_assoc()) and re-creates the 1 dimensional assoc array.
- * 
+ *
  * The separator is meant to be a string extremely unlikely to be used in the key or values.
- * 
+ *
  * @see fp_join_assoc()
  */
 function fp_explode_assoc($string, $delim = ",", $assign_sep = "_S-") {
   $rtn = array();
-  
+
   $temp = explode($delim, $string);
   foreach($temp as $line) {
     $line = trim($line);
     if ($line == "") continue;
-    
+
     $temp2 = explode($assign_sep, $line);
     if (is_numeric($temp2[1])) {
-      $temp2[1] = $temp2[1] * 1;  // if its numeric anyway, make it have a numeric type.      
+      $temp2[1] = $temp2[1] * 1;  // if its numeric anyway, make it have a numeric type.
     }
-    
+
     $rtn[$temp2[0]] = $temp2[1];
-    
+
   }
-  
+
   return $rtn;
 }
 
@@ -2182,13 +2182,13 @@ function fp_explode_assoc($string, $delim = ",", $assign_sep = "_S-") {
  * @return unknown
  */
 function fp_get_module_path($module, $bool_include_file_system_path = FALSE, $bool_include_base_path = TRUE) {
-  
+
   $p = menu_get_module_path($module, $bool_include_file_system_path);
-  
+
   if ($bool_include_file_system_path == FALSE && $bool_include_base_path == TRUE) {
     $p = base_path() . "/" . $p;
   }
-    
+
   return $p;
 }
 
@@ -2200,7 +2200,7 @@ function fp_get_module_path($module, $bool_include_file_system_path = FALSE, $bo
  */
 function fp_get_files_path() {
   $p = $GLOBALS["fp_system_settings"]["file_system_path"] . "/custom/files";
-  
+
   return $p;
 }
 
@@ -2209,7 +2209,7 @@ function fp_get_files_path() {
  * Convenience function to return the temporary directory path. Does NOT end with a trailing slash.
  * Ex:  /tmp
  */
-function fp_get_tmp_path() {  
+function fp_get_tmp_path() {
   return variable_get("tmp_path", "/tmp");
 }
 
@@ -2217,7 +2217,7 @@ function fp_get_tmp_path() {
 
 /**
  * Simply returns TRUE or FALSE if the user is a student.  (has the is_student == 1
- * 
+ *
  * If account is null, the global user will be used.
  */
 function fp_user_is_student($account = null) {
@@ -2225,9 +2225,9 @@ function fp_user_is_student($account = null) {
   if ($account == NULL) {
     $account = $user;
   }
-  
+
   return (bool)$account->is_student;
-  
+
 }
 
 
@@ -2239,7 +2239,7 @@ function fp_user_is_student($account = null) {
  * @param unknown_type $module
  */
 function fp_get_module_details($module) {
-  
+
   // Special case if we are looking up flightpath itself
   if ($module == "flightpath") {
     $rtn = array(
@@ -2248,13 +2248,13 @@ function fp_get_module_details($module) {
     );
     return $rtn;
   }
-  
+
   $res = db_query("SELECT * FROM modules WHERE name = '?' ", $module);
   $cur = db_fetch_array($res);
   if ($test = unserialize($cur["info"])) {
     $cur["info"] = $test;
   }
-  
+
   return $cur;
 }
 
@@ -2262,32 +2262,31 @@ function fp_get_module_details($module) {
 
 /**
  * This function will facilitate translations by using hook_translate()
- * 
+ *
  * Allows variable replacements.  Use like this:
  * t("@name's blob", array("@name" => "Richard"));
  * or simply
  * t("My blob");  if you don't need replacements.
- * 
+ *
  * Not implimented yet.
  */
 function t($str, $vars = array()) {
 
-  // Note: at the moment, this isn't being used, but should one day be set.  
-  @$langcode = isset($langcode) ? $langcode : $GLOBALS["fp_system_settings"]["language"]; 
-  
+  $langcode = $GLOBALS["fp_system_settings"]["language"] ?? 'en';
+
   // First, change $str if any other modules implement hook_translate().
   invoke_hook("translate", array(&$str, $langcode, $vars));  // str is passed by ref, so no return needed.
-    
+
   if (is_array($vars) && count($vars) > 0) {
     foreach ($vars as $var => $val) {
-      
+
       // If var begins with %, it means we want to italicize the val.
       if (strstr($var, "%")) {
         $val = "<em>$val</em>";
       }
-      
+
       if ($val === NULL || $val === FALSE) $val = "";  // change to empty string for PHP 8x
-      
+
       $str = str_replace($var, $val, $str);
     }
   }
@@ -2298,23 +2297,23 @@ function t($str, $vars = array()) {
 
 /**
  * Provides translation functionality when database is not available.
- * 
+ *
  * TODO: Not implemented yet
  */
 function st($str, $vars = array()) {
   // Not implemented yet.  For now, just replicate t().
   if (is_array($vars) && count($vars) > 0) {
     foreach ($vars as $var => $val) {
-      
+
       // If var begins with %, it means we want to italicize the val.
       if (strstr($var, "%")) {
         $val = "<em>$val</em>";
       }
-      
+
       $str = str_replace($var, $val, $str);
     }
   }
-    
+
   return $str;
 }
 
@@ -2323,7 +2322,7 @@ function st($str, $vars = array()) {
  */
 function base_url() {
   $p = $GLOBALS["fp_system_settings"]["base_url"];
- 
+
   return $p;
 }
 
@@ -2332,19 +2331,19 @@ function base_url() {
  */
 function base_path() {
   $p = $GLOBALS["fp_system_settings"]["base_path"];
-  
+
   // the base_path setting isn't set, so just use '.', meaning, start
   // at the currect directory by default.
   if ($p == "") {
     $p = ".";
   }
-  
+
   // if our base_path is simply "/" (meaning, we are hosted on a bare domain), then we should
   // actually return nothing, so as not to cause errors with other systems.
   if ($p == "/") {
     $p = "";
   }
-  
+
   return $p;
 }
 
@@ -2376,24 +2375,24 @@ function get_term_description($term_id, $bool_abbreviate = FALSE, $school_id = 0
     $year4 = intval(trim(substr($term_id, 0, 4)));
     $year2 = intval(trim(substr($term_id, 2, 2)));
     $ss = trim(substr($term_id, 4, strlen($term_id) - 4));
-    
+
     $year4p1 = $year4 + 1;
     $year4m1 = $year4 - 1;
-    
+
     // left-pad these with 0's if needed.
     $year2p1 = @fp_number_pad($year2 + 1, 2);
     $year2m1 = @fp_number_pad($year2 - 1, 2);
-        
+
     // Let's look at the term_idStructure setting and attempt to match
     // what we have been supplied.
     // We expect this structure to look something like:
     // [Y4]60, Spring, Spring of [Y4], Spr '[Y2]
     // [Y4]40, Fall, Fall of [Y4-1], Fall '[Y2-1]
-    
+
     $temp = @variable_get_for_school("term_id_structure", '', $school_id);
     $structures = explode("\n", $temp);
-    
-    foreach ($structures as $structure) {      
+
+    foreach ($structures as $structure) {
       // Perform the necessary replacement patterns on the structure.
       $structure = str_replace("[Y4]", $year4, $structure);
       $structure = str_replace("[Y2]", $year2, $structure);
@@ -2401,13 +2400,13 @@ function get_term_description($term_id, $bool_abbreviate = FALSE, $school_id = 0
       $structure = str_replace("[Y2-1]", $year2m1, $structure);
       $structure = str_replace("[Y4+1]", $year4p1, $structure);
       $structure = str_replace("[Y2+1]", $year2p1, $structure);
-      
+
       // Now, break up the structure to make it easier to work with.
       $tokens = explode(",", $structure);
       $term_def = @trim($tokens[0]);
       $full_description = @trim($tokens[2]);
       $abbr_description = @trim($tokens[3]);
-      
+
       // Does our term_id match the termDef?
       if ($term_def == $term_id) {
         if ($bool_abbreviate) {
@@ -2417,7 +2416,7 @@ function get_term_description($term_id, $bool_abbreviate = FALSE, $school_id = 0
           return $full_description;
         }
       }
-      
+
     }
 
     // No descr could be found, so just display the term_id itself.
@@ -2437,10 +2436,10 @@ function get_term_description($term_id, $bool_abbreviate = FALSE, $school_id = 0
 
 /**
  * Redirect the user's browser to the specified internal path + query.
- * 
+ *
  * We will automatically add the current_student_id variable, if it is not present
  * in the query.
- * 
+ *
  * Example uses:
  *  - fp_goto("admin");
  *  - fp_goto("test/1234");
@@ -2448,16 +2447,16 @@ function get_term_description($term_id, $bool_abbreviate = FALSE, $school_id = 0
  */
 function fp_goto($path, $query = "") {
   global $current_student_id;
-  
-  
+
+
   // Were we sent an array instead of separate values?  That's OK if so, let's separate them back out.
   if (is_array($path)) {
-    $path = @$path[0];  
+    $path = @$path[0];
     $query = (string) @$path[1];
-    
+
   }
-  
-    
+
+
   if ($current_student_id != "" && !strstr($query, "current_student_id=")) {
     // If the query doesn't contain the current_student_id, then add it in.
     $query .= "&current_student_id=$current_student_id";
@@ -2465,14 +2464,14 @@ function fp_goto($path, $query = "") {
 
   // Close the seesion before we try to redirect.
   session_write_close();
-  
+
   if ($path == "<front>") {
     $path = variable_get("front_page", "main");
   }
 
   $location = fp_url($path, $query);
-  
-  
+
+
   if (str_starts_with($path, "http://") || str_starts_with($path, "https://")) {
     // We are going to an external address.
     if (str_starts_with($query, "&")) {
@@ -2481,11 +2480,11 @@ function fp_goto($path, $query = "") {
     }
     $location = $path . $query;
   }
-  
-      
+
+
   header('Location: ' . $location);
   exit();
-  
+
 }
 
 /**
@@ -2502,23 +2501,23 @@ function l($text, $path, $query = "", $attributes = array()) {
     $path = variable_get("front_page", "main");
   }
 
-  
+
   // Does the path contain possible replacement patterns? (look for %)
   if (strpos($path, "%") !== 0) {
-    $path = menu_convert_replacement_pattern($path);    
+    $path = menu_convert_replacement_pattern($path);
   }
-  
+
   // Does the query contain possible replacement patterns? (look for %)
   if (strpos($query, "%") !== 0) {
-    $query = menu_convert_replacement_pattern($query);    
+    $query = menu_convert_replacement_pattern($query);
   }
-  
+
   $rtn .= '<a href="' . fp_url($path, $query) . '" ';
-  
+
   foreach ($attributes as $key => $value) {
     $rtn .= $key . '="' . $value . '" ';
   }
-  
+
   $rtn .= ">$text</a>";
 
 
@@ -2549,50 +2548,50 @@ function fp_url_absolute($path, $query = "") {
  * And join them together, respecting whether or not clean URL's are enabled.
  */
 function fp_url($path, $query = "", $include_base_path = TRUE) {
-  
+
   if (!$query) $query = "";  // For compatibility with PHP 8.2, make sure it isn't NULL or FALSE
-  
-  if ($path == "<front>") {    
+
+  if ($path == "<front>") {
     $path = variable_get("default_home_path", "main");
   }
-  
-  
+
+
   // If clean URLs are enabled, we should begin with a ?, if not, use an &
-  
+
   $rtn = "";
   if ($include_base_path) {
     $rtn .= base_path() . "/";
-  }  
- 
- 
+  }
+
+
   // Make sure that $rtn isn't now "//".  This can happen if our
   // site is hosted on a bare domain.  Ex:  http://fp.example.com
   // And we have set the base_path to simply "/"
   if ($rtn == "//") $rtn = "/";
- 
+
   $bool_clean_urls = variable_get("clean_urls", FALSE);
   if (!$bool_clean_urls) {
     // Clean URLs are NOT enabled!  Let's make sure the URL contains "index.php?q="
-    $rtn .= "index.php?q=";    
+    $rtn .= "index.php?q=";
   }
- 
- 
+
+
   $rtn .= $path;
-  
+
   if ($query != "") {
     // Is there a ? already in the $rtn?  If not, add a ?.  If so, use a &.
-    if (!strstr($rtn, "?")) {  
-      $rtn .= "?";  
+    if (!strstr($rtn, "?")) {
+      $rtn .= "?";
     }
     else {
       $rtn .= "&";
     }
-    
+
     $rtn .= $query;
   }
- 
+
   return $rtn;
-          
+
 }
 
 
@@ -2605,39 +2604,39 @@ function fp_url($path, $query = "", $include_base_path = TRUE) {
    *
    */
 function fp_screen_is_mobile(){
-  
+
   depricated_message("calling fp_screen_is_mobile is no longer used as of FP 6.x");
-  
+
   if (isset($GLOBALS["fp_page_is_mobile"])) {
     return $GLOBALS["fp_page_is_mobile"];
   }
-  
-  $user_agent = $_SERVER['HTTP_USER_AGENT']; 
+
+  $user_agent = $_SERVER['HTTP_USER_AGENT'];
 
   $look_for = array(
-    "ipod", 
-    "iphone", 
-    "android", 
-    "opera mini", 
+    "ipod",
+    "iphone",
+    "android",
+    "opera mini",
     "blackberry",
     "(pre\/|palm os|palm|hiptop|avantgo|plucker|xiino|blazer|elaine)",
     "(iris|3g_t|windows ce|opera mobi|windows ce; smartphone;|windows ce; iemobile)",
     "(smartphone|iemobile)",
     );
-  
+
   $is_mobile = FALSE;
-  
-  foreach ($look_for as $test_agent) {   
+
+  foreach ($look_for as $test_agent) {
     if (preg_match('/' . $test_agent . '/i',$user_agent)) {
        $is_mobile = TRUE;
       break;
     }
-  }  
-  
-  
+  }
+
+
   $GLOBALS["fp_page_is_mobile"] = $is_mobile;
   return $is_mobile;
-  
+
 } // ends function mobile_device_detect
 
 
@@ -2647,59 +2646,59 @@ function fp_screen_is_mobile(){
 
 /**
  * Simple function that returns TRUE if the module is enabled, FALSE otherwise.
- * 
- * We also will use our existing GLOBALS cache. 
+ *
+ * We also will use our existing GLOBALS cache.
  */
 function module_enabled($module_name) {
-    
+
   return (isset($GLOBALS["fp_system_settings"]["modules"][$module_name]));
-  
+
 }
 
 
 
- 
+
 /**
  * Return an array of enabled modules which implement the provided hook.
  * Do not include the preceeding "_" on the hook name!
- * 
+ *
  * We can optionally provide the names of modules to skip.  Ex:  array('my_module', 'other_module', ... etc)
- *  
+ *
  */
 function modules_implement_hook($hook = "example_hook_here", $skip_modules = array()) {
-  
-  // Going to use a global array to keep track of what hooks exist.  
-  if (!isset($GLOBALS['hook_cache'])) $GLOBALS['hook_cache'] = array();  
-  
+
+  // Going to use a global array to keep track of what hooks exist.
+  if (!isset($GLOBALS['hook_cache'])) $GLOBALS['hook_cache'] = array();
+
   // Have we already cached this list previously?
-  if (isset($GLOBALS['hook_cache'][$hook])) return $GLOBALS['hook_cache'][$hook];  
-    
-  // We have not already cached this, so let's look for it fresh...  
-    
+  if (isset($GLOBALS['hook_cache'][$hook])) return $GLOBALS['hook_cache'][$hook];
+
+  // We have not already cached this, so let's look for it fresh...
+
   $rtn = array();
 
   // If we are in the install script, the GLOBALS array won't be set up, since there is no
   // settings file yet.  If that's the case, create a blank array so we don't have an issue.
   if (!isset($GLOBALS['fp_system_settings'])) $GLOBALS['fp_system_settings'] = array();
   if (!isset($GLOBALS['fp_system_settings']['modules'])) $GLOBALS['fp_system_settings']['modules'] = array();
-   
+
 
   foreach ($GLOBALS["fp_system_settings"]["modules"] as $module => $value) {
     if (isset($value["enabled"]) && $value["enabled"] != "1") {
       // Module is not enabled.  Skip it.
       continue;
     }
-    
+
     if (in_array($module, $skip_modules)) continue;
-    
+
     if (function_exists($module . '_' . $hook)) {
       $rtn[] = $module;
     }
   }
-  
+
   $GLOBALS['hook_cache'][$hook] = $rtn;
-  
-  return $rtn;  
+
+  return $rtn;
 }
 
 
@@ -2710,14 +2709,14 @@ function modules_implement_hook($hook = "example_hook_here", $skip_modules = arr
  */
 function fp_recalculate_alert_count_by_type($account = NULL) {
   global $user;
-  if ($account === NULL) $account = $user;  
-  
+  if ($account === NULL) $account = $user;
+
   if ($account->id == 0) return FALSE;
-  
-    
-  $res = invoke_hook("get_alert_count_by_type", array($account));  
-  $_SESSION['fp_alert_count_by_type'] = $res;  
-  $_SESSION['fp_alert_count_by_type_last_check'] = time();  
+
+
+  $res = invoke_hook("get_alert_count_by_type", array($account));
+  $_SESSION['fp_alert_count_by_type'] = $res;
+  $_SESSION['fp_alert_count_by_type_last_check'] = time();
 }
 
 
@@ -2725,12 +2724,12 @@ function fp_recalculate_alert_count_by_type($account = NULL) {
 /**
  * This is a simple function which attempts to trim a String.  However, if $val is NOT a string, it will
  * cast it to string.
- * 
+ *
  * This is to prevent deprecated warnings in PHP 8+, and can be used as
  * a drop-in replacement in place of trim()
  */
 function fp_trim($val = NULL) {
-  
+
   if (is_string($val)) {
     return trim($val);
   }
@@ -2739,15 +2738,15 @@ function fp_trim($val = NULL) {
     $val = "" . $val;
     return trim($val);
   }
-  
+
   if ($val === NULL || $val === FALSE) {
     return '';
   }
 
 
   // if $val is an array or object, intentionally return the trim() so it will cause a warning.
-  return trim($val);  
-      
+  return trim($val);
+
 }
 
 
@@ -2765,19 +2764,19 @@ function fp_get_alert_count_by_type($account = NULL) {
     $_SESSION['fp_alert_count_by_type_last_check'] = 0;
   }
 
-  // Should we recalculate again?  
+  // Should we recalculate again?
   $test = time() - intval(variable_get('recalculate_alert_badge_seconds', 30));
 
   if ($_SESSION['fp_alert_count_by_type_last_check'] < $test) {
-    unset($_SESSION['fp_alert_count_by_type']);  // this will force us to recalculate.    
+    unset($_SESSION['fp_alert_count_by_type']);  // this will force us to recalculate.
   }
 
   if (!isset($_SESSION['fp_alert_count_by_type'])) {
     fp_recalculate_alert_count_by_type($account);
   }
-  
+
   return $_SESSION['fp_alert_count_by_type'];
-  
+
 }
 
 
@@ -2787,7 +2786,7 @@ function fp_get_alert_count_by_type($account = NULL) {
  */
 function invoke_hook($hook = "example_hook_here", $params = array()) {
   $rtn = array();
-  $modules = modules_implement_hook($hook);  
+  $modules = modules_implement_hook($hook);
   foreach($modules as $module) {
     $rtn[$module] = call_user_func_array($module . "_" . $hook, $params);
   }
@@ -2798,8 +2797,8 @@ function invoke_hook($hook = "example_hook_here", $params = array()) {
 
 /**
  * This is a convenience function which simply passes through to fpm(), due entirely because
- * of typos with fpm().  
- * 
+ * of typos with fpm().
+ *
  * @see fpm()
  */
 function dpm($var, $max_levels = 15) {
@@ -2810,48 +2809,48 @@ function dpm($var, $max_levels = 15) {
 /**
  * Uses fp_add_message, but in this case, it also adds in the filename and line number
  * which the message came from!
- * 
+ *
  * Most useful for developers, tracking down issues.  It's also only visible to administrators
  * with the "view_fpm_debug" permission. So if you need to display a message only to admins,
  * you can use fpm() as a shortcut.
- * 
+ *
  * Note: If you attempt to fpm() an array
  * or object with too many levels of nesting, it may run out of memory and your script will die.
  */
 function fpm($var, $max_levels = 15) {
-  
+
   if (!user_has_permission("view_fpm_debug")) {
     return;
   }
-  
+
   // Complex variable?  Change it to print_r.
   $str = $var;
   if (is_array($str) || is_object($str)) {
     $str = "<div class='fp-html-print-r-wrapper'>" . fp_html_print_r($str, "", 0, $max_levels) . "</div>";
-  }    
+  }
 
   $arr = debug_backtrace();
   //pretty_print($arr);
-  
+
   $t = 0;
-  
+
   if (@$arr[1]['function'] == 'fpmct') {
     $t = 1;
   }
-  
+
   $file = $arr[$t]["file"];
   if (strlen($file) > 70) {
     $file = "..." . substr($file, strlen($file) - 70);
   }
   $str .= "<div class='fp-message-backtrace'>line {$arr[$t]["line"]}: $file</div>";
-    
+
   fp_add_message("&bull; " . $str);
 
-    
+
 }
 
 /**
- * Displays a depricated message on screen.  Useful for tracking down 
+ * Displays a depricated message on screen.  Useful for tracking down
  * when depricated functions are being used.
  */
 function depricated_message($str = "A depricated function has been called.") {
@@ -2875,9 +2874,9 @@ function fpmct($val, $var = "") {
  * Similar to print_r, this will return an HTML-friendly
  * click-to-open system similar in design to Krumo.
  */
-function fp_html_print_r($var, $name = "", $cnt = 0, $max_levels = 20) {  
+function fp_html_print_r($var, $name = "", $cnt = 0, $max_levels = 20) {
   $rtn = "";
-  
+
   if ($cnt > $max_levels) {
     // Max levels deep.  Deeper, and PHP might run
     // out of memory or complain.
@@ -2887,30 +2886,30 @@ function fp_html_print_r($var, $name = "", $cnt = 0, $max_levels = 20) {
              </div>";
     return $rtn;
   }
-  
+
   $type = gettype($var);
   $rnd = md5(mt_rand(0, 999999) . microtime() . $type . $name);
-  
+
   if ($type == "boolean") {
     $var = ($var == TRUE) ? "TRUE" : "FALSE";
-  }  
-  
+  }
+
   $count = "";
   if ($type == "string") {
     $count = " - " . strlen($var) . " " . t("chars");
   }
-  
+
   if ($type == "array" || $type == "object") {
-      
-    
+
+
     if ($type == "array") {
       $count = " - " .  count($var) . " " . t("elements");
     }
-    
+
     if ($type == "object") {
       $count = " - " . get_class($var);
     }
-    
+
     $rtn .= "<div class='fp-html-print-r-multi-row'>
                <div class='fp-html-print-r-selector'
                   onClick='\$(\"#fp-html-print-r-var-value-$rnd\").toggle(\"medium\");'
@@ -2922,7 +2921,7 @@ function fp_html_print_r($var, $name = "", $cnt = 0, $max_levels = 20) {
     foreach ($var as $key => $value) {
       $rtn .= fp_html_print_r($value, $key, ($cnt + 1), $max_levels);
     }
-    
+
     $rtn .= "</div>
              </div>";
   }
@@ -2939,22 +2938,22 @@ function fp_html_print_r($var, $name = "", $cnt = 0, $max_levels = 20) {
                <div class='fp-html-print-r-var-value' id='fp-html-print-r-var-value-$rnd' style='display: none;'>
                ";
     $rtn .= htmlentities($var);
-    $rtn .= "</div></div>";    
+    $rtn .= "</div></div>";
   }
-  else { 
-    
+  else {
+
     $html_val = $var;
     if ($type != "resource") {
       $html_val = htmlentities("" . $var);
     }
-    
-    $rtn .= "<div class='fp-html-print-r-single-row'>                
+
+    $rtn .= "<div class='fp-html-print-r-single-row'>
                 <span class='fp-html-print-r-var-name'>$name</span>
                 <span class='fp-html-print-r-var-type'>($type$count)</span>
                 <span class='fp-html-print-r-var-value'>$html_val</span>
            </div>";
-  }  
-  
+  }
+
   return $rtn;
 }
 
@@ -2964,24 +2963,24 @@ function fp_html_print_r($var, $name = "", $cnt = 0, $max_levels = 20) {
  * This is used usually when being viewed by a mobile device.
  * It will shorten a catalog year range of 2008-2009 to just
  *  "08-09" or "2008-09"  or even "09-2009".
- *  
+ *
  *
  * @param string $cat_range - Ex:  2006-2007
  */
 function get_shorter_catalog_year_range($cat_range, $abbr_first = true, $abbr_second = true) {
-  
+
   $temp = explode("-", $cat_range);
-  
+
   $first = $temp[0];
   $second = $temp[1];
-  
+
   if ($abbr_first) {
     $first = substr($first, 2, 2);
   }
   if ($abbr_second) {
     $second = substr($second, 2, 2);
   }
-  
+
   return "$first-$second";
 }
 
@@ -2989,7 +2988,7 @@ function get_shorter_catalog_year_range($cat_range, $abbr_first = true, $abbr_se
 
 /**
  * This will find and include the module in question, calling
- * it's hook_init() function if it has one.  
+ * it's hook_init() function if it has one.
  *
  * Will return TRUE or FALSE for success or failure to include
  * the module.
@@ -2997,28 +2996,28 @@ function get_shorter_catalog_year_range($cat_range, $abbr_first = true, $abbr_se
  * If the use_module_path is set to some value, we will not attempt to use
  * the setting for this module's path.  Useful if we do not have the module in our
  * modules table yet.
- * 
+ *
  * Example use:  include_module("course_search");
- * 
+ *
  * @param string $module
  */
 function include_module($module, $bool_call_init = TRUE, $use_module_path = "") {
 
   $system_path = trim($GLOBALS["fp_system_settings"]["file_system_path"]);
-  
-  $module_path = "";  
-  if (isset($GLOBALS["fp_system_settings"]["modules"][$module])) {  
+
+  $module_path = "";
+  if (isset($GLOBALS["fp_system_settings"]["modules"][$module])) {
     $module_path = $GLOBALS["fp_system_settings"]["modules"][$module]["path"];
   }
-  
+
   if ($use_module_path != "") {
     $module_path = $use_module_path;
   }
-  
+
   if ($module_path != "") {
     $path = $module_path . "/$module.module";
-    
-        
+
+
     if (file_exists($system_path . "/" . $path)) {
       require_once($system_path . "/" . $path);
     }
@@ -3026,15 +3025,15 @@ function include_module($module, $bool_call_init = TRUE, $use_module_path = "") 
       print "<br><b>Could not find module '$module' at '$system_path/$path'</b><br>";
     }
     // Now that we have included it, call the module's hook_init() method.
-    if ($bool_call_init) {      
+    if ($bool_call_init) {
       if (function_exists($module . "_init")) {
         call_user_func($module . "_init");
       }
-    }    
+    }
     return TRUE;
   }
-  
-  return FALSE;  
+
+  return FALSE;
 }
 
 
@@ -3044,14 +3043,14 @@ function include_module($module, $bool_call_init = TRUE, $use_module_path = "") 
  */
 function include_module_install($module, $path) {
   $system_path = trim($GLOBALS["fp_system_settings"]["file_system_path"]);
-    
+
   $install_path = $path . "/$module.install";
   if (file_exists($system_path . "/" . $install_path)) {
     require_once($system_path . "/" . $install_path);
     return TRUE;
   }
-  
-  return FALSE;  
+
+  return FALSE;
 }
 
 
@@ -3062,106 +3061,106 @@ function include_module_install($module, $path) {
  * my t() function. (do it when you call this function)
  */
 function fp_get_js_confirm_link($question, $action_if_yes, $link_text, $extra_class = "", $link_title = "") {
-  
-  $rtn = "";  
+
+  $rtn = "";
 
   $question = fp_reduce_whitespace($question);
-  
+
   //$question = htmlentities($question, ENT_QUOTES);
   //$question = str_replace("\n", "\\n", $question);
-  
+
   $question = str_replace("\\n", "<br>", $question);
   $question = str_replace("\n", "<br>", $question);
   $question_64 = base64_encode($question);  // convert to base_64 so we can have HTML
-  
-  
+
+
   $link_title = htmlentities($link_title, ENT_QUOTES);
-  
+
   //$rtn .= "<a href='javascript: if(fp_confirm(\"$question\")) { $action_if_yes;  }' class='$extra_class' title='$link_title'>$link_text</a>";
-  
+
   // Using new fp_confirm code
   $action_if_yes_64 = base64_encode($action_if_yes);
   $rtn .= "<a href='javascript: fp_confirm(\"$question_64\",\"base64\",\"$action_if_yes_64\");' class='$extra_class' title='$link_title'>$link_text</a>";
 
-      
+
   return $rtn;
 }
 
 /**
  * Creates a javascript "prompt" link, which will ask the user a question.
- * 
+ *
  * Similar to the fp_get_js_confirm_link function, but this is a prompt box
  * which lets the user type in a response.
- * 
- * 
+ *
+ *
  * @see fp_get_js_confirm_link
  */
 function fp_get_js_prompt_link($question, $default, $action_if_yes, $link_text, $extra_class = "") {
-  
-  $rtn = "";  
+
+  $rtn = "";
 
   $question = fp_reduce_whitespace($question);
-  
+
   $question = htmlentities($question, ENT_QUOTES);
   $question = str_replace("\n", "\\n", $question);
-  
+
   $rtn .= "<a href='javascript: var response = prompt(\"$question\", \"$default\");
-                                if (response != null) 
+                                if (response != null)
                                 {
-                                   $action_if_yes ;  
+                                   $action_if_yes ;
                                 }
                                 ' class='$extra_class'>$link_text</a>";
 
-      
+
   return $rtn;
 }
 
 
 /**
  * Creates a javascript "alert" link, which tells the user some message with javascript alert().
- * 
+ *
  * Similar to the fp_get_js_confirm_link function, but this is a simple alert message,
  * with no user input.
- * 
- * 
+ *
+ *
  * @see fp_get_js_confirm_link
  */
 function fp_get_js_alert_link($message, $link_text = NULL, $extra_css_class = "", $link_title = "View help for this item") {
-  
-  $rtn = "";  
+
+  $rtn = "";
 
   if ($link_text == "" || $link_text == NULL) {
 
     $link_text = "<span class='pop-q-mark'><i class='fa fa-question-circle'></i></span>";
   }
-  
+
   $message = str_replace("\n", " ", $message);
   $message = fp_reduce_whitespace($message);
 
 
   $rtn .= "<a href='javascript: fp_alert(\"" . base64_encode($message) . "\",\"base64\");' title='$link_title' class='fp-alert-link $extra_css_class'>$link_text</a>";
-  
-      
-  return $rtn;  
-  
+
+
+  return $rtn;
+
 }
 
 
 /**
- * Simple helper function to reduce whitespace (like double-spaces) 
+ * Simple helper function to reduce whitespace (like double-spaces)
  *
  * @param string $str
  */
 function fp_reduce_whitespace($str) {
-  // Cheap hack to get rid of whitespace    
+  // Cheap hack to get rid of whitespace
   for ($t = 0; $t < 5; $t++) {
     $str = str_replace("  ", " ", $str);
     $str = str_replace("\n ", "\n", $str);
-  }  
+  }
 
 
 
-  return $str;  
+  return $str;
 }
 
 
@@ -3171,17 +3170,17 @@ function fp_reduce_whitespace($str) {
  */
 function user_has_role($role, $account = NULL) {
   global $user;
-  
+
   if ($account == NULL) $account = $user;
-  
+
   // Admin always = TRUE
   if ($account->id == 1) return TRUE;
-  
+
   // Check for other users...
   if (in_array($role, $account->roles)) return TRUE;
-  
+
   return FALSE;
-  
+
 }
 
 
@@ -3192,30 +3191,30 @@ function user_has_role($role, $account = NULL) {
  * @param String $permission
  */
 function user_has_permission($permission = "", $account = NULL) {
-  global $user;  
-  
+  global $user;
+
   if ($account == NULL) $account = $user;
   //fpm("checking permission $permission");
-  
+
   if ($account == NULL) {
     // The account is STILL null, so return FALSE.
     // Most likely anonymous user.
     return FALSE;
   }
-  
+
   // If the user is admin (id == 1) then they always have access.
   if ($account->id == 1) return TRUE;
-  
+
   if (!isset($account->permissions) || !is_array($account->permissions)) return FALSE;   // not set up yet; anonymous user most likely.
-  
+
   // Otherwise, simply check their permissions array.
   if (in_array($permission, $account->permissions)) {
     return TRUE;
   }
-  
-    
+
+
   return FALSE;
-  
+
 }
 
 
@@ -3229,21 +3228,21 @@ function user_has_permission($permission = "", $account = NULL) {
  */
 function get_modules_permissions() {
   $rtn = array();
-  
-  
+
+
   foreach ($GLOBALS["fp_system_settings"]["modules"] as $module => $value) {
-    
+
     if (isset($value["disabled"]) && $value["disabled"] == "yes") {
       // Module is not enabled.  Skip it.
       continue;
     }
-    
-    
+
+
     if (function_exists($module . "_perm")) {
       $rtn[$module][] = call_user_func($module . "_perm");
     }
   }
-    
+
   return $rtn;
 }
 
@@ -3256,18 +3255,18 @@ function get_modules_permissions() {
  *
  */
 function get_modules_menus() {
-  
+
   $menus = array();
-  foreach ($GLOBALS["fp_system_settings"]["modules"] as $module => $value) {    
+  foreach ($GLOBALS["fp_system_settings"]["modules"] as $module => $value) {
     if (isset($value["disabled"]) && $value["disabled"] == "yes") {
       // Module is not enabled.  Skip it.
       continue;
-    }    
+    }
     if (function_exists($module . "_menu")) {
-      $menus[] = call_user_func($module . "_menu");      
+      $menus[] = call_user_func($module . "_menu");
     }
   }
-  
+
   // Let's re-order based on weight...
   // Convert to a single dimensional array for easier sorting.
   $temp = array();
@@ -3275,40 +3274,40 @@ function get_modules_menus() {
     foreach ($menus[$c] as $d => $menu_data) {
       $w = $menu_data["weight"];
       if ($w == "") $w = "0";
-    
+
       // We need to front-pad $w with zeros, so it is the same length
       // for every entry.  Otherwise it will not sort correctly.
-      $w = fp_number_pad($w, 10);      
-      
-      $temp[] = "$w~~$c~~$d";    
+      $w = fp_number_pad($w, 10);
+
+      $temp[] = "$w~~$c~~$d";
     }
   }
-  
+
   //var_dump($temp);
   // Now, sort $temp...
   sort($temp);
   //var_dump($temp);
   // Now, go back through $temp and get our new array...
   $new_array = array();
-  
+
   foreach ($temp as $t) {
     $vals = explode("~~", $t);
     $c = $vals[1];
     $d = $vals[2];
-    
+
     // Place them into subarrays indexed by location
-    $new_array[$menus[$c][$d]["location"]][] = $menus[$c][$d];    
+    $new_array[$menus[$c][$d]["location"]][] = $menus[$c][$d];
   }
-  
+
   return $new_array;
-  
+
 }
 
 
 /**
  * Simple function to left padd numbers with 0's.
  * 1 becomes 001
- * 20 becomes 020 
+ * 20 becomes 020
  * and so on.
  *
  * @param int $number
@@ -3324,33 +3323,33 @@ function fp_number_pad($number, $len) {
  * This simple function will take a number and truncate the number of decimals
  * to the requested places.  This can be used in place of number_format(), which *rounds*
  * numbers.
- * 
+ *
  * For example, number_format(1.99999, 2) gives you 2.00.
  * But THIS function gives:
  *   fp_truncate_decimals(1.999999, 2) = 1.99
- * 
+ *
  *
  * @param unknown_type $places
  */
 function fp_truncate_decimals($num, $places = 2) {
-    
+
   // does $num contain a .?  If not, add it on.
   if (!strstr("" . $num, ".")) {
     $num .= ".0";
   }
-  
+
   // Break it by .
   $temp = explode (".", "" . $num);
-  
+
   // Get just the decimals and trim 'em
   $decimals = trim(substr($temp[1], 0, $places));
   if (strlen($decimals) < $places) {
     // Padd with zeros on the right!
     $decimals = str_pad($decimals, $places, "0", STR_PAD_RIGHT);
   }
-  
-  $new_num = $temp[0] . "." . $decimals; 
-  
+
+  $new_num = $temp[0] . "." . $decimals;
+
   return $new_num;
 }
 
@@ -3382,7 +3381,7 @@ function fp_query_string_encode($query, $exclude = array(), $parent = '') {
 
 /**
  * Shortcut to fp_debug_current_time_millis()
- * 
+ *
  * @see fp_debug_current_time_millis()
  *
  * @param unknown_type $debug_val
@@ -3400,12 +3399,12 @@ function fp_debug_ct($debug_val = "", $var = "")
  * When called repeatedly, this function will display a message along with a milisecond count
  * out to the side.  Very useful for developers to time function calls or queries, to see how long they
  * are taking.
- * 
+ *
  * For example:
  * fp_debug_ct("starting query");
  * db_query(".........") // whatever
  * fp_debug_ct("finished query");
- * 
+ *
  * On screen, that would display our messages, with time values, so we can see how many milliseconds
  * it took to execute between calls of fp_debug_ct().
  *
@@ -3425,9 +3424,9 @@ function fp_debug_current_time_millis($debug_val = "", $show_current_time = true
   // this function was called.  This helps programmers tell how
   // long a particular function takes to run.  Just place a call
   // to this function before and after the function call.
-  
+
   $rtn = "";
-  
+
   $debug_string = $debug_val;
   if (is_array($debug_val) || is_object($debug_val)) {
     $debug_string = "<pre>" . print_r($debug_val, true) . "</pre>";

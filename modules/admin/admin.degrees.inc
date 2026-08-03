@@ -512,9 +512,6 @@ function admin_add_degree_form() {
 
 
 
-  $desc = "Enter the Level-1 or -2 Major Code here.
-           Do not enter any Level 3 codes (ex: Tracks or Concentrations).
-           <br>For example, enter ACCT or ENGL.  <i><b>But not ENGL|_TRKA, etc</b></i>";
 
   /*
   if ($bool_legacy_concentrations) {
@@ -532,7 +529,6 @@ function admin_add_degree_form() {
     "type" => "textfield",
     "size" => 15,
     "label" => t("Level-1 or -2 Major Code:"),
-    "description" => t($desc),
     "required" => TRUE,
     "weight" => 20,
     "description" => t("Enter only letters, numbers, or dash (-).  NO other symbols of any kind."),
@@ -555,8 +551,6 @@ function admin_add_degree_form() {
     "type" => "textfield",
     "size" => 15,
     "label" => t("Level-3 / Track code:"),
-    "description" => t("Leave blank if you selected None above.  This code must not contain spaces,
-                        and combined with the major code it must not exceed 18 characters."),
     "weight" => 40,
     "description" => t("Enter only letters, numbers, or dash (-).  NO other symbols of any kind."),
   );

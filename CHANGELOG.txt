@@ -5,6 +5,8 @@ FlightPath 7.x Changelog
   Fixed a bug where groups with min hours were not correctly showing as fulfilled even
   when the min hours were indeed fulfilling the group.
 
+  Various small fixes pointed out by phpstan
+  
 
 2026-07-30
   For 'submit' form elements, the 'confirm' property now uses a more attractive modal dialog

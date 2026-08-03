@@ -1129,6 +1129,8 @@ class FlightPath extends stdClass
       return trim($cur["title"]);
     }
 
+    return '';
+
   }
 
 

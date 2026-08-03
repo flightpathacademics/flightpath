@@ -35,23 +35,6 @@ class DatabaseHandler extends stdClass
   }
 
 
-
-
-
-  /**
-   * Sets the maintenance mode.  $val should be either 0 (off) or 1 (on)
-   *
-   * @param integer $val
-   */
-  function set_maintenance_mode($val)
-  {
-    // Convenience function for setting maintenance mode. 0 = off, 1 = on.
-    $this->set_settings_variable("maintenance_mode", $val);
-  }
-
-
-
-
   function get_substitution_details($sub_id)
   {
     // Simply returns an associative array containing
@@ -188,6 +171,8 @@ class DatabaseHandler extends stdClass
       $this->db_error($ex);
     }
 
+
+    return NULL;
 
   } // db_query
 
