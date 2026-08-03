@@ -1,35 +1,18 @@
-name: PHPStan
+parameters:
+    level: 0
 
-on:
-  push:
-    branches:
-      - flightpath-7.x
-  pull_request:
-    branches:
-      - flightpath-7.x
+    paths:
+        - .
 
-permissions:
-  contents: read
+    fileExtensions:
+        - php
+        - inc
+        - module
+        - install
 
-jobs:
-  phpstan:
-    name: PHPStan Analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-
-      - name: Download PHPStan
-        run: |
-          wget https://github.com/phpstan/phpstan/releases/latest/download/phpstan.phar
-          php phpstan.phar --version
-
-      - name: Run PHPStan
-        run: |
-          php phpstan.phar analyse --configuration=.github/phpstan.neon
+    excludePaths:
+        analyse:
+            - vendor/*
+            - libraries/*
+            - node_modules/*
+            - tests/*
