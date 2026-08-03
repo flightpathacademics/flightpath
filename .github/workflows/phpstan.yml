@@ -32,4 +32,4 @@ jobs:
 
       - name: Run PHPStan
         run: |
-          php phpstan.phar analyse --configuration=.github/phpstan.neon
+          php phpstan.phar analyse . --configuration=.github/phpstan.neon
