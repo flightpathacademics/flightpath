@@ -3960,7 +3960,7 @@ function calendar_content_alter(&$render, $render_id) {
       unset($render['field__video_data']);
       if ($render['#content_object'] && $render['#content_object']->field__video_data['value'] != "") {
         // Meaning, we have video meeting data to display!
-
+        $video_info = '';
         // create new markup field which renders out the video links and such.
         $decoded = json_decode($render['#content_object']->field__video_data['value']);
 

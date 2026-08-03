@@ -4,10 +4,10 @@
  * This is the main module file for the encryption module.
  */
 
- 
+
 /**
  * Implements hook_perm
- */ 
+ */
 function encryption_perm() {
   return array(
     "administer_encryption" => array(
@@ -24,7 +24,7 @@ function encryption_perm() {
  */
 function encryption_menu() {
   $items = array();
-  
+
   $items["admin/config/encryption"] = array(
     "title" => "Encryption settings",
     "description" => "Configure settings related to the encryption module.",
@@ -33,18 +33,18 @@ function encryption_menu() {
     "access_arguments" => array("administer_encryption"),
     "page_settings" => array(
       "menu_icon" => fp_get_module_path('system') . "/icons/lock.png",
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
-    "tab_parent" => "admin-tools/admin",        
+    "tab_parent" => "admin-tools/admin",
   );
-  
+
   return $items;
 }
 
@@ -52,13 +52,13 @@ function encryption_menu() {
 
 function encryption_settings_form() {
   $form = array();
-  
+
   $hash = encryption_get_hash_protocol();
   $cipher = encryption_get_cipher_algorithm();
-  
-  if ($hash) {  
+
+  if ($hash) {
     $form["encryption_markup_1"] = array(
-      "value" => t("<br><br><b>The hash protocol your system supports is: %hash.</b>  
+      "value" => t("<br><br><b>The hash protocol your system supports is: %hash.</b>
                     <br>This hash will be used
                     to convert your key (specified below) into a uniform and unique string.  If you ever switch servers,
                     you must ensure the same hash protocol is available and being used, or your
@@ -75,10 +75,10 @@ function encryption_settings_form() {
     return $form;
   }
 
-  
-  if ($hash) {  
+
+  if ($hash) {
     $form["encryption_markup_2"] = array(
-      "value" => t("<b>The cipher algorithm your system supports is: %cipher.</b>  
+      "value" => t("<b>The cipher algorithm your system supports is: %cipher.</b>
                     <br>This cipher will be used
                     to actually encrypt and decrypt data.  If you ever switch servers,
                     you must ensure the same cipher is available and being used, or your
@@ -94,16 +94,16 @@ function encryption_settings_form() {
                       attempting to use this module!"), "error");
     return $form;
   }
-    
-  
-    
+
+
+
   $form['mark_encryption_key_string'] = array(
     'value' => t("<p><b>Encryption Key</b><br>
                     To add an encryption key string, edit your settings.php file and add a variable like so:
                     <br> &nbsp; &nbsp; <code>\$GLOBALS['encryption_key_string'] = 'random text goes here';</code>
                     <br> Make your random text at least 32 characters long.</p>"),
   );
-  
+
   if (!isset($GLOBALS['encryption_key_string'])) {
     $form['mark_encryption_key_string__notice'] = array(
       'value' => t("<br><p><b>NOTE:</b> <u>No encryption key found</u> in your settings.php file.  This module will not function correctly without either
@@ -115,15 +115,15 @@ function encryption_settings_form() {
       'value' => t("<p><b>NOTE:</b> <u>Encryption key WAS found</u> in your settings.php file.  Make sure to store the key in a safe place.  If you lose the key,
                     you will not be able to decrypt encrypted values or files.</p>"),
     );
-    
-    
+
+
   }
-  
-  
+
+
   $form["encryption_key_path"] = array(
     "label" => t("Encryption Key File Absolute Path:"),
     "type" => "textfield",
-    "maxlength" => 255,    
+    "maxlength" => 255,
     "value" => variable_get("encryption_key_path", ""),
     "description" => t("If you prefer, you may enter your key string into a file, then store that file somewhere on your server.  Enter
                         the absolute path to the file here.  Ex: /var/misc/key/my-key.txt.  It should be in a location outside of the webroot,
@@ -132,16 +132,16 @@ function encryption_settings_form() {
                         <br><br><b>WARNING: DO NOT CHANGE THE KEY VALUE</b> once you have decided
                         on a key.  Doing so will cause <b>all previously encrypted files or values to be unreadable.</b>"),
   );
-  
-  
-    
-  
+
+
+
+
   $form["encryption_files_encryption"] = array(
     "type" => "select",
     "label" => "Encrypt uploaded files?",
     "options" => array("yes" => t("Yes"), "no" => t("No")),
     "value" => variable_get("encryption_files_encryption", "yes"),
-    "description" => t("When files are uploaded or attached to a piece of content (for example, an email attachment or text message attachment) 
+    "description" => t("When files are uploaded or attached to a piece of content (for example, an email attachment or text message attachment)
                         they can be automatically encrypted before being saved to the server.  Do you wish
                         to do this?  If so, the extension \".enc\" will be added to the end of encrypted files.
                         When files are downloaded through the Encryption module, they will be automatically decrypted
@@ -152,10 +152,10 @@ function encryption_settings_form() {
     "prefix" => "<fieldset><legend>" . t("Encryption Settings") . "</legend>",
     "suffix" => "</fieldset>",
   );
-    
- 
-  
-  
+
+
+
+
   $form["encryption_confirm"] = array(
     "label" => "Are you sure you want to save changes?",
     "type" => "textfield",
@@ -163,14 +163,14 @@ function encryption_settings_form() {
     "required" => TRUE,
     "description" => t("If you are certain you wish to save changes to this form, enter YES (all caps)."),
   );
-  
-  
+
+
   $form["submit_btn"] = array(
     "type" => "submit",
     "value" => "Submit",
-  );  
-  
-  
+  );
+
+
   return $form;
 }
 
@@ -181,11 +181,11 @@ function encryption_settings_form_validate($form, $form_state) {
     form_error("encryption_confirm", t("To submit this form, you must enter YES (all caps) in the confirmation box."));
     return;
   }
-  
-  
+
+
   // If they entered a path to the file, make sure it exists and we can read it.
-  if ($encryption_key_path != "") {
-    $contents = file_get_contents($encryption_key_path);
+  if (trim($form_state['values']['encryption_key_path'] ?? '') != "") {
+    $contents = file_get_contents($form_state['values']['encryption_key_path']);
     if (!$contents) {
       form_error("encryption_key_path", t("You entered a path to a key file, but either that file doesn't exist, is empty, or is unreadable by the
                                            web user on your system.  Please correct the issue and try again."));
@@ -198,11 +198,11 @@ function encryption_settings_form_validate($form, $form_state) {
  * The submit handler
  */
 function encryption_settings_form_submit($form, $form_state) {
-  $encryption_key_path = trim($form_state["values"]["encryption_key_path"]);
-  
+  $encryption_key_path = trim($form_state["values"]["encryption_key_path"] ?? '');
+
   // We made it here, so its safe to save everything.
-  variable_set("encryption_key_path", $encryption_key_path);  
-  
+  variable_set("encryption_key_path", $encryption_key_path);
+
   fp_add_message(t("Your encryption settings have been saved.  A reminder: if you change these settings after encrypting
                         files or values, those files will no longer be readable.  Save your encryption key value (whether in a file
                         or in settings.php as a string) in a safe place."));
@@ -210,13 +210,13 @@ function encryption_settings_form_submit($form, $form_state) {
 
 /**
  * Returns back a suitable key, either from our string or file location.
- * 
+ *
  * We are going to convert either one into a SHA1 string
  */
 function encryption_get_key() {
-          
-  $encryption_key_path = trim(variable_get("encryption_key_path", ""));  
-      
+
+  $encryption_key_path = trim(variable_get("encryption_key_path", ""));
+
   if ($encryption_key_path != "") {
     $contents = trim(file_get_contents($encryption_key_path));
     if ($contents) {
@@ -228,48 +228,48 @@ function encryption_get_key() {
       fp_add_message("No encryption key has been set.  The encrypt module will cause unforseen problems.", "error");
       return FALSE;
     }
-    $encryption_key_string = openssl_digest($GLOBALS['encryption_key_string'], "sha256", TRUE);  
+    $encryption_key_string = openssl_digest($GLOBALS['encryption_key_string'], "sha256", TRUE);
   }
-  
-  
+
+
   if (!$encryption_key_string) {
     fp_add_message("No encryption key has been set.  The encrypt module will cause unforseen problems.  Do not proceed until this issue is corrected.", "error");
-    return FALSE;    
+    return FALSE;
   }
-  
-  
+
+
   /*
   //I don't think this is true anymore...
   // The key must be a smaller size than the hash algorithm we have chosen.  This is because our AES encryption is 128 bit, meaning
-  // they key must be 256 bits or less (32 characters).  We will take a substring for 32 chars in this case. 
+  // they key must be 256 bits or less (32 characters).  We will take a substring for 32 chars in this case.
   //$encryption_key_string = substr($encryption_key_string, 0, 32);
   */
-  
-    
+
+
   return $encryption_key_string;
-  
+
 }
 
 
 /**
  * This looks at the hash_algos() return to see if we can use SHA256, else return FALSE.
- * 
+ *
  * You can override which hash is used by adding
  *    $GLOBALS["encryption_hash"] = "PROTOCOL HERE";
  * to the settings.php file.
- * 
- * 
+ *
+ *
  */
 function encryption_get_hash_protocol() {
-  if (isset($GLOBALS["encryption_hash"])) return $GLOBALS["encryption_hash"]; 
-      
-    
+  if (isset($GLOBALS["encryption_hash"])) return $GLOBALS["encryption_hash"];
+
+
   $arr = openssl_get_md_methods();
-  
+
   if (in_array("sha256", $arr)) return "sha256";
-    
+
   return FALSE;
-  
+
 }
 
 
@@ -280,19 +280,19 @@ function encryption_get_hash_protocol() {
  */
 function encryption_get_cipher_algorithm() {
   if (isset($GLOBALS["encryption_cipher"])) return $GLOBALS["encryption_cipher"];
-  
-    
+
+
   $arr = openssl_get_cipher_methods();
   if (in_array('aes-256-cbc', $arr)) return 'aes-256-cbc';
-  if (in_array('aes-256-ctr', $arr)) return 'aes-256-ctr';  
+  if (in_array('aes-256-ctr', $arr)) return 'aes-256-ctr';
   if (in_array('aes-256-cfb', $arr)) return 'aes-256-cfb';
-    
-  if (in_array('aes-128-cbc', $arr)) return 'aes-128-cbc';
-  if (in_array('aes-128-ctr', $arr)) return 'aes-128-ctr';  
-  if (in_array('aes-128-cfb', $arr)) return 'aes-128-cfb';
-  
 
-  
+  if (in_array('aes-128-cbc', $arr)) return 'aes-128-cbc';
+  if (in_array('aes-128-ctr', $arr)) return 'aes-128-ctr';
+  if (in_array('aes-128-cfb', $arr)) return 'aes-128-cfb';
+
+
+
   return FALSE;
 }
 
@@ -303,23 +303,23 @@ function encryption_get_cipher_algorithm() {
 // Credit:  Some of this code is based on answers on this StackOverflow page:
 // https://stackoverflow.com/questions/48017856/correct-way-to-use-php-openssl-encrypt
 function encryption_encrypt($plain_contents) {
-    
-  $cipher = encryption_get_cipher_algorithm();  
+
+  $cipher = encryption_get_cipher_algorithm();
   $key = encryption_get_key();
-  
-    
+
+
   $plaintext = base64_encode($plain_contents);  // convert to base64 so binary will work as well as text files.
-  $ivlen = openssl_cipher_iv_length($cipher);  
+  $ivlen = openssl_cipher_iv_length($cipher);
   $iv = openssl_random_pseudo_bytes($ivlen);
-  
+
   // replace OPENSSL_RAW_DATA & $iv with 0 & bin2hex($iv) for hex cipher (eg. for transmission over internet)
   $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $key, OPENSSL_RAW_DATA, $iv);
-  
+
   // increase security with hashed cipher; (hex or base64 printable eg. for transmission over internet)
-  $hmac = hash_hmac("sha256", $ciphertext_raw, $key, true);  
+  $hmac = hash_hmac("sha256", $ciphertext_raw, $key, true);
   return base64_encode($iv . $hmac . $ciphertext_raw);
-    
-    
+
+
 }
 
 
@@ -330,17 +330,17 @@ function encryption_decrypt($ciphertext) {
 
   $c = base64_decode($ciphertext);
 
-  $cipher = encryption_get_cipher_algorithm();  
+  $cipher = encryption_get_cipher_algorithm();
   $key = encryption_get_key();
 
   $ivlen = openssl_cipher_iv_length($cipher);
-  
+
   $iv = substr($c, 0, $ivlen);
   $hmac = substr($c, $ivlen, $sha2len = 32);
   $ciphertext_raw = substr($c, $ivlen + $sha2len);
   $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $key, OPENSSL_RAW_DATA, $iv);
 
-  
+
   $calcmac = hash_hmac("sha256", $ciphertext_raw, $key, true);
   if ($calcmac && $hmac) {
     if (hash_equals($hmac, $calcmac)) return base64_decode($original_plaintext);
