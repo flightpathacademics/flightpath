@@ -12,7 +12,9 @@ parameters:
 
     excludePaths:
         analyse:
-            - vendor/*
-            - libraries/*
-            - node_modules/*
-            - tests/*
+            - '**/vendor/**'
+            - '**/lib/**'
+            - '**/libs/**'
+            - '**libraries/**'
+            - '**/tests/**'
+            - '**/.git/**'
