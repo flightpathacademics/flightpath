@@ -31,5 +31,7 @@ jobs:
           php phpstan.phar --version
 
       - name: Run PHPStan
-        run: |
-          php phpstan.phar analyse . --configuration=.github/phpstan.neon
+        run: |          
+          php phpstan.phar analyse . \
+                --configuration=.github/phpstan.neon \
+                --error-format=github
