@@ -35,4 +35,5 @@ jobs:
           php phpstan.phar analyse . \
                 --configuration=.github/phpstan.neon \
                 --memory-limit=-1 \
+                --debug \
                 --error-format=table
