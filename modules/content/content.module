@@ -7,7 +7,7 @@ define('CONTENT_PUBLIC_FILE', 1);   // publicly (anonymous) can view with URL
 
 
 /**
- *  This module lets administrators create content, when then appear can appear in a block.  
+ *  This module lets administrators create content, when then appear can appear in a block.
 */
 
 function content_menu() {
@@ -17,12 +17,12 @@ function content_menu() {
   $items["admin-tools/content"] = array(
     "title" => "Content",
     "description" => "Manage content in " . variable_get("system_name", "FlightPath") . ". Ex: Announcements.",
-    "page_callback" => "content_display_content_admin_list",    
+    "page_callback" => "content_display_content_admin_list",
     "access_arguments" => array("admin_content"),
     "page_settings" => array(
-      "menu_icon" => fp_get_module_path('content') . "/icons/application_edit.png",      
+      "menu_icon" => fp_get_module_path('content') . "/icons/application_edit.png",
       "page_show_title" => TRUE,
-      "menu_links" => array(          
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
@@ -31,19 +31,19 @@ function content_menu() {
       ),
     ),
     'type' => MENU_TYPE_DEFAULT_TAB,
-    'tab_family' => 'content_man_tabs',    
-    "weight" => 0,    
-  );     
+    'tab_family' => 'content_man_tabs',
+    "weight" => 0,
+  );
 
 
   $items["admin-tools/content/files"] = array(
-    "title" => "Public Files",    
+    "title" => "Public Files",
     "page_callback" => 'fp_render_form',
-    'page_arguments' => array('content_public_files_form'),    
+    'page_arguments' => array('content_public_files_form'),
     "access_arguments" => array("admin_public_files"),
-    "page_settings" => array(            
+    "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_links" => array(          
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
@@ -52,12 +52,12 @@ function content_menu() {
       ),
     ),
     'type' => MENU_TYPE_TAB,
-    'tab_family' => 'content_man_tabs',    
-    "weight" => 10,    
-  );     
+    'tab_family' => 'content_man_tabs',
+    "weight" => 10,
+  );
 
- 
-  
+
+
 
   // content/add/TYPE
   $items["content/add/%"] = array(
@@ -67,7 +67,7 @@ function content_menu() {
     "access_arguments" => array("add", 2),
     "type" => MENU_TYPE_NORMAL_ITEM,
     "page_settings" => array(
-      "menu_links" => array(          
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
@@ -77,11 +77,11 @@ function content_menu() {
           "text" => "Content",
           "path" => "admin-tools/content",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
-        ),          
+        ),
       ),
-        
+
     ),
-      
+
   );
 
 
@@ -104,7 +104,7 @@ function content_menu() {
     "access_arguments" => array("view", 1),
     "page_settings" => array(
       "page_show_title" => TRUE,
-      "menu_links" => array(          
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
@@ -114,16 +114,16 @@ function content_menu() {
           "text" => "Content",
           "path" => "admin-tools/content",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
-        ),          
-      ),      
+        ),
+      ),
     ),
     "type" => MENU_TYPE_TAB,
-    "tab_family" => "content",    
-    "weight" => 10,      
+    "tab_family" => "content",
+    "weight" => 10,
   );
-  
 
-  
+
+
   $items["content/%/edit"] = array(
     "title" => "Edit",
     "page_callback" => "fp_render_form",
@@ -131,10 +131,10 @@ function content_menu() {
     "access_callback" => "content_user_access",
     "access_arguments" => array("edit", 1),
     "page_settings" => array(
-      
-      
+
+
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(          
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
@@ -144,25 +144,25 @@ function content_menu() {
           "text" => "Content",
           "path" => "admin-tools/content",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
-        ),          
+        ),
       ),
     ),
-    "type" => MENU_TYPE_TAB,    
+    "type" => MENU_TYPE_TAB,
     "tab_family" => "content",
-    "weight" => 20,      
+    "weight" => 20,
   );
-  
+
 
   $items["content/%/devel"] = array(
     "title" => "Devel",
     "page_callback" => "content_display_devel",
-    "page_arguments" => array(1),    
+    "page_arguments" => array(1),
     "access_arguments" => array("view_fpm_debug"),
     "page_settings" => array(
-      
-      
+
+
       "page_hide_report_error" => TRUE,
-      "menu_links" => array(          
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
@@ -172,57 +172,57 @@ function content_menu() {
           "text" => "Content",
           "path" => "admin-tools/content",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
-        ),          
+        ),
       ),
     ),
-    "type" => MENU_TYPE_TAB,    
+    "type" => MENU_TYPE_TAB,
     "tab_family" => "content",
-    "weight" => 30,      
+    "weight" => 30,
   );
 
-  
-  
+
+
   $items['content/%/remove'] = array(
     "page_callback" => "fp_render_form",
     "page_arguments" => array("content_unpublish_content_form", "", 1),
     "access_callback" => "content_user_access",
-    "access_arguments" => array("edit", 1),  // since we are editing the published field, we simply check for "edit"     
-  );  
-  
-  
-  
+    "access_arguments" => array("edit", 1),  // since we are editing the published field, we simply check for "edit"
+  );
+
+
+
   $items["content-files/handle-download/%"] = array(
     "page_callback" => "content_files_handle_download",
     "page_arguments" => array(2),
     "access_callback" => "content_files_user_may_download_file",
-    "access_arguments" => array(2),  
+    "access_arguments" => array(2),
     "type" => MENU_TYPE_CALLBACK,
   );
-    
-  
-  
-  
-  
+
+
+
+
+
   /**
    * Generic screen which, if we have saved content from within an iframe dialog,
    * we want to display a "success" message, then just refresh the screen.
    */
-  $items["content-dialog-handle-after-save"] = array(     
+  $items["content-dialog-handle-after-save"] = array(
     "page_callback" => "content_dialog_handle_after_save",
     "access_callback" => TRUE,
     "page_settings" => array (
       "display_currently_advising" => FALSE,
       "screen_mode" => "not_advising",
       "page_is_popup" => TRUE,
-    ),    
+    ),
     "type" => MENU_TYPE_CALLBACK,
-  );  
-    
-  
-  
+  );
 
-  
-    
+
+
+
+
+
   return $items;
 }
 
@@ -232,20 +232,20 @@ function content_menu() {
  */
 function content_files_user_may_download_file($fid) {
   global $user;
-  
+
   $file = content_get_uploaded_file($fid);
-  
+
   if ($user->id == 1) return TRUE; // this is the admin user.
-  
+
   // Get cid of original piece of content this file belonged to.
   $cid = intval($file['cid']);
-  
+
   if ($cid === 0) return TRUE; // no CID attached, so we can assume they can view it.
-  
+
   // Otherwise, see if the user is allowed to "view" this piece of content.  If so, that means they
   // can view any files attached as well.
-  return content_user_access('view', $cid);  
-  
+  return content_user_access('view', $cid);
+
 }
 
 
@@ -254,22 +254,22 @@ function content_files_user_may_download_file($fid) {
  * This actually finds and downloads the file for the user, decrypting if necessary.
  */
 function content_files_handle_download($fid) {
-  
-  
+
+
   $file = content_get_uploaded_file($fid);
-  
+
   if (!$file) {
     display_not_found();
     die;
   }
-  
+
   // Otherwise, now we proceed.
   $file_contents = @file_get_contents($file["full_filename"]);
-  
+
   if ($file_contents && intval($file["is_encrypted"]) === 1 && function_exists("encryption_decrypt")) {
     $file_contents = encryption_decrypt($file_contents);
   }
-  
+
   // Okay, now let's spit it out to the browser for download.
   if (isset($file['filetype'])) {
     header('Content-type: ' . $file["filetype"]);
@@ -277,8 +277,8 @@ function content_files_handle_download($fid) {
   header('Content-Disposition: attachment; filename="' . $file["original_filename"]  . '"');
   print $file_contents;
 
-  die;      
-  
+  die;
+
 }
 
 
@@ -287,18 +287,18 @@ function content_files_handle_download($fid) {
  * This screen lets the user upload/manage/delete "public files" stored at custom/files/content_uploads/public_uploads/
  */
 function content_public_files_form() {
-  
-  fp_add_css(fp_get_module_path('content') . '/css/content.css');  
-    
-  $form = array();  
+
+  fp_add_css(fp_get_module_path('content') . '/css/content.css');
+
+  $form = array();
   fp_set_title('');
-  
-  
+
+
   // Did we receive a request to delete a file?
   if (isset($_GET['del']) && is_numeric($_GET['del'])) {
     $del_fid = intval($_GET['del']);
     $del_file = content_get_uploaded_file($del_fid);
-        
+
     // Make sure the file is a "public" file.
     if (intval($del_file['attributes']) === CONTENT_PUBLIC_FILE) {
       // Double-check the user has access to delete
@@ -314,19 +314,19 @@ function content_public_files_form() {
           fp_add_message(t("File deleted successfully."));
         }
       }
-      
+
     } // if public file
     // Use fp_goto() to avoid issue with user hitting "refresh"
     fp_goto("admin-tools/content/files");
   } // trying to delete file
-  
-  
-  
-  
-  
+
+
+
+
+
   $form["#attributes"] = array("enctype" => 'multipart/form-data');  // allow the form itself to submit files.
-  
-  
+
+
   $form['mark_top'] = array(
     'value' => '<p>' . t("This form allows you to upload files which are publicly accessible (without needing to log in) through the web.
                           For example, you may wish to upload image files, css, etc, for use in other settings.
@@ -334,94 +334,94 @@ function content_public_files_form() {
                           <strong>Note:</strong> These files will not be encrypted, and will be publicly available.  Do not upload sensitive
                                                  information, like student records or any personally-identifying details.") . "</p><hr>",
   );
-  
+
   $form['upload_file'] = array(
     'type' => 'file',
     'label' => t("Upload file:"),
-    'description' => t("Allowed file extensions: %ext", array('%ext' => strtolower(variable_get("public_files_allowed_extensions", "css, txt, pdf, doc, docx, csv, xls, xlsx, ppt, pptx, rtf, odt, jpg, jpeg, png, gif, zip, 7z")))),  
+    'description' => t("Allowed file extensions: %ext", array('%ext' => strtolower(variable_get("public_files_allowed_extensions", "css, txt, pdf, doc, docx, csv, xls, xlsx, ppt, pptx, rtf, odt, jpg, jpeg, png, gif, zip, 7z")))),
   );
 
   $overwrite_val = FALSE;
   if (isset($_SESSION['public_file_form_overwrite_val'])) {
     $overwrite_val = (bool) $_SESSION['public_file_form_overwrite_val'];
   }
-  
+
   $form['overwrite'] = array(
     'type' => 'checkbox',
     'label' => t('Keep original filename and overwrite existing file by the same name?'),
     'value' => $overwrite_val,
     'prefix' => t("<strong>Important:</strong> By default, files are given randomized names when uploaded, so as not to overwrite an existing file with the same name.
-                   <br>If you would prefer to overwrite files with the same name, check the box below:"), 
+                   <br>If you would prefer to overwrite files with the same name, check the box below:"),
   );
-  
-  
-  
+
+
+
   $form['upload_btn'] = array(
     'type' => 'submit',
     'value' => t("Upload"),
   );
-  
+
   $form['mark_below_upload'] = array(
     'value' => "<hr>",
   );
-  
+
   ///////////////////////////////////////////////////////////
-  
+
   $html = "";
-  
+
   $pol = "";
-  
+
   $table_headers = array();
-  $table_headers[] = array("label" => "Actions");  
-  $table_headers[] = array("label" => "FID", "field" => "fid");  
+  $table_headers[] = array("label" => "Actions");
+  $table_headers[] = array("label" => "FID", "field" => "fid");
   $table_headers[] = array("label" => "Filename", "field" => "original_filename");
   $table_headers[] = array("label" => "Link");
   $table_headers[] = array("label" => "Uploaded", "field" => "posted");
-     
-  // Set our initial sort, if none is already set.   
-  theme_table_header_sortable_set_initial_sort("posted", 'DESC');  
-  
+
+  // Set our initial sort, if none is already set.
+  theme_table_header_sortable_set_initial_sort("posted", 'DESC');
+
   $html .= "<table class='public-files-table' cellspacing='0' cellpadding='4'>";
   // Draw our our table headers, with links....
-  $html .= theme_table_header_sortable($table_headers);      
-  
-  // Get our order by clause based on selected table header, if any.    
-  $order_by = theme_table_header_sortable_order_by($table_headers);  
-  
+  $html .= theme_table_header_sortable($table_headers);
+
+  // Get our order by clause based on selected table header, if any.
+  $order_by = theme_table_header_sortable_order_by($table_headers);
+
   $res = pager_query("SELECT * FROM content_files WHERE `attributes` = ?
-                      $order_by", array(CONTENT_PUBLIC_FILE), 10, 0);  
-  
-  while ($cur = db_fetch_object($res)) {    
+                      $order_by", array(CONTENT_PUBLIC_FILE), 10, 0);
+
+  while ($cur = db_fetch_object($res)) {
     $pol = (@$pol == "even") ? "odd" : "even";
-    
+
     $posted = format_date(convert_time($cur->posted), "short");
-            
+
     $abs = base_url() . "/custom/files/content_uploads/public_uploads/$cur->filename";
     $rel = base_path() . "/custom/files/content_uploads/public_uploads/$cur->filename";
-    $absolute_link = "<a href='$abs' title='Link to file' class='abs-link' target='_blank'><i class='fa fa-link'></i></a>";    
+    $absolute_link = "<a href='$abs' title='Link to file' class='abs-link' target='_blank'><i class='fa fa-link'></i></a>";
 
     $del_link = fp_get_js_confirm_link("Are you sure you want to delete this file?\\n\\nThis action cannot be undone.", "window.location=\"" . fp_url("admin-tools/content/files", "del=$cur->fid") . "\";", "<i class='fa fa-remove' title='" . t("Delete?") . "'></i>", "delete-link");
-            
-    $html .= "<tr class='row-$pol'>                
+
+    $html .= "<tr class='row-$pol'>
                 <td valign='top'>$del_link</td>
                 <td valign='top'>$cur->fid</td>
                 <td valign='top'>$cur->original_filename</td>
                 <td valign='top'>$absolute_link</td>
-                <td valign='top'>$posted</td> 
-              </tr>    
-    
-            ";    
-    
+                <td valign='top'>$posted</td>
+              </tr>
+
+            ";
+
   } // while
-  
+
   $html .= "</table>";
   $html .= theme_pager();
-  
+
   $form['mark_files_table'] = array(
     'value' => $html,
   );
-  
-  
+
+
   return $form;
 } // content_public_files_form
 
@@ -430,58 +430,58 @@ function content_public_files_form() {
 
 
 function content_public_files_form_validate($form, $form_state) {
-  
+
   if (isset($form_state['values']['upload_btn']) && $form_state['values']['upload_btn'] != "") {
     // The user is trying to upload a file.
-    
-        
+
+
     // Make sure there is something there.
     if (!isset($_FILES['upload_file']) || trim($_FILES['upload_file']['name'][0]) == '') {
       form_error('upload_file', t('Please select a file from your computer to upload.'));
       return;
     }
-    
-    
-    
+
+
+
     // Make sure it's the correct extension.
     $original_filename = $_FILES['upload_file']['name'][0];
     // Figure out the extension of the original filename.
     $temp = explode(".", $original_filename);
     $ext = $temp[count($temp) - 1];
-    
+
     // Make sure that this extension is allowed.
     $allowed_extensions = csv_to_array(strtolower(variable_get("public_files_allowed_extensions", "css, txt, pdf, doc, docx, csv, xls, xlsx, ppt, pptx, rtf, odt, jpg, jpeg, png, gif, zip, 7z")));
     if (!in_array(strtolower($ext), $allowed_extensions)) {
       // Meaning, this extension is not allowed!
       form_error('upload_file', t("Sorry, the file's type/extension (%ext) is not allowed.  Please rename or select another file, then try again.", array("%ext" => $ext)));
-      return;    
-    } 
-     
+      return;
+    }
+
     // If we made it here, then there's nothing wrong and we can continue to the _submit function.
-    
-    
-  } // upload file 
-     
-  
+
+
+  } // upload file
+
+
 } // ... validate
 
 
 function content_public_files_form_submit($form, $form_state) {
   if (isset($form_state['values']['upload_btn']) && $form_state['values']['upload_btn'] != "") {
     // The user is trying to upload a file.
-    
+
     $file = $_FILES["upload_file"];
     $temp = fp_re_array_files($file);
-    $file = $temp[0];    
-    
+    $file = $temp[0];
+
     $_SESSION['public_file_form_overwrite_val'] = $form_state['values']['overwrite'];
-        
+
     content_add_new_uploaded_file($file, 0, !$form_state['values']['overwrite'], CONTENT_PUBLIC_FILE, TRUE);
-        
+
     fp_add_message("File uploaded successfully.");
-    
-    
-  }  
+
+
+  }
 } // ... submit
 
 
@@ -490,7 +490,7 @@ function content_public_files_form_submit($form, $form_state) {
 
 
 function content_unpublish_content_form($cid) {
-    
+
   $content = content_load($cid);
 
   fp_add_css(fp_get_module_path("content") . "/css/content.css");
@@ -501,18 +501,18 @@ function content_unpublish_content_form($cid) {
 
   $types = content_get_types();
   $type = $content->type;
-  
-    
+
+
   // We want to redirect correctly based on this type's options....
   // Are there any special settings for the title?
   if (isset($types[$type]['settings']) && isset($types[$type]['settings']['title'])) {
-    
+
     if (is_array($types[$type]['settings']['#redirect'])) {
       $form['#redirect'] = $types[$type]['settings']['#redirect'];
     }
-    
-  }    
-  
+
+  }
+
   $form['cid'] = array(
     'type' => 'hidden',
     'value' => $cid,
@@ -523,40 +523,40 @@ function content_unpublish_content_form($cid) {
     'value' => "<h2>" . t("Are you sure you wish to remove <em>$content->title</em>?") . "</h2>
                 <p>" . t("This action will cause the content to not appear in reports, and not be easily accessible. It can only be restored by an administrator.") . "</p>
                 <hr>",
-    
+
   );
 
-  
+
   $form['submit_confirm'] = array(
     'type' => 'submit',
-    'value' => 'Confirm & Remove',    
+    'value' => 'Confirm & Remove',
     'spinner' => TRUE,
     'attributes' => array('class' => 'content-submit-btn'),
   );
-  
+
   $form['submit_cancel'] = array(
     'type' => 'submit',
     'value' => 'Cancel',
     'attributes' => array('class' => 'content-delete-btn'),
   );
 
-  
-  return $form;  
+
+  return $form;
 }
 
 
 
 
 function content_unpublish_content_form_submit(&$form, &$form_state) {
-  
+
   $values = $form_state['values'];
-  
+
   if (isset($values['submit_cancel']) && trim($values['submit_cancel']) != '') {
     // We want to CANCEL this operation!
 
     // find out if we should redirect anywhere in particular for this cancelation
     if (isset($form['#redirect'])) {
-      fp_add_message(t("The operation was cancelled."));  
+      fp_add_message(t("The operation was cancelled."));
       $form['#redirect']['query'] .= "&cancel=yes";
     }
     else {
@@ -564,21 +564,21 @@ function content_unpublish_content_form_submit(&$form, &$form_state) {
       fp_add_message(t("The operation was cancelled."));
     }
     return;
-    
-  }  
-  
-  
-      
+
+  }
+
+
+
   $cid = $form_state['values']['cid'];
   $content = content_load($cid);
   $content->published = 0;
-    
+
   content_save($content);
-  
+
   watchdog('content', "Content with cid $cid was removed/unpublished.");
-  
+
   fp_add_message("Content has been removed.");
-  
+
 }
 
 
@@ -599,15 +599,15 @@ function content_unpublish_content_form_submit(&$form, &$form_state) {
  */
 function content_display_devel($cid) {
   $rtn = "";
-  
+
   $content = content_load($cid);
-  
+
   $rtn .= "&nbsp; &nbsp;";
-  
+
   fpm($content);
-  
+
   return $rtn;
-} 
+}
 
 
 
@@ -617,11 +617,11 @@ function content_display_devel($cid) {
 function content_get_last_access($cid, $account = null) {
   global $user;
   if ($account == NULL) $account = $user;
-  
+
   $res = db_result(db_query("SELECT last_access FROM content_last_access WHERE cid = ? AND user_id = ?", array($cid, $account->id)));
-  
+
   return intval($res);
-  
+
 }
 
 /**
@@ -631,96 +631,96 @@ function content_get_last_access($cid, $account = null) {
 function content_set_last_access($cid, $account = NULL) {
   global $user;
   if ($account == NULL) $account = $user;
-  
+
   db_query("DELETE FROM content_last_access WHERE cid = ? AND user_id = ?", array($cid, $account->id));
   db_query("INSERT INTO content_last_access(cid, user_id, last_access)
               VALUES (?, ?, ?)", array($cid, $account->id, time()));
-  
+
   // We need to re-calculate our alerts count just in case now.
   fp_recalculate_alert_count_by_type($account);
-    
+
 }
 
 
 
 /**
  * Custom user access function to determine if the user can add, edit, etc, the content
- * 
+ *
  * $op can equal:   "add"   (adding a new piece of content)  $var will be the content_type.  Ex:  "engagement"
  *                  "view"  (attempting to view the content as a full page)
  *                  "edit"  (trying to edit an existing piece of content
  *                  "delete"   (trying to delete the content)
- * 
  *
- * @param unknown_type $op
- * @param unknown_type $var
+ *
+ * @param string $op
+ * @param string $var
  */
 function content_user_access($op, $var) {
   global $user;
-      
+
   if ($user->id == 1) return TRUE;  // the admin user.
-  
-      
-  $cid = intval($var);  
+
+
+  $cid = intval($var);
   $content = NULL;
-  
+
   if ($op != "add") {
     $content = content_load($cid);
   }
-      
-  // Simply trying to view the content.  Do we have permission to view published content of this type?  
+
+  // Simply trying to view the content.  Do we have permission to view published content of this type?
   if ($op == 'view' && is_object($content) && user_has_permission("view_" . $content->type . "_content")) {
     if (intval($content->published) === 1) {
-      
-      
+
+
       // If the user is a student, we must take special considerations into account, like if
       // the visibility is set to faculty/staff only, and if the content is not ABOUT the student.
       if ($user->is_student == TRUE) {
-              
+
         // Is this a faculty only file, and the user is a student?
         if (isset($content->field__visibility) && $content->field__visibility['value'] == "faculty") {
           return FALSE;  // nope, can't view it.
         }
-            
+
         // Is the user a student, and is the content ABOUT this student?  If not, then they cannot view it.  In other words,
-        // a student can't see another student's engagements, etc.          
+        // a student can't see another student's engagements, etc.
         if (isset($content->field__student_id) && $content->field__student_id['value'] != $user->cwid) {
           return FALSE;   // nope, can't view it.
         }
-          
-      }      
-      
-      
+
+      }
+
+
       return TRUE;
     }
   }
-  
-  
+
+
   // Trying to add new content of the type specified in $var.  Do we have permission?
   if ($op == 'add' && user_has_permission("add_" . $var . "_content")) {
     return TRUE;
   }
-  
-  
-  // Trying to edit or delete this content.  
+
+
+  // Trying to edit or delete this content.
   if ($op == "edit" || $op == "delete") {
-    
+
     // Does the user have permission to edit/delete ANY of this type?
     if (user_has_permission($op . "_any_" . $content->type . "_content")) {
       return TRUE;
     }
-    
+
     // Otherwise, does the content belong the the user, and do they have permission to edit/delete their OWN content?
     if ($content->user_id == $user->id && user_has_permission($op . "_own_" . $content->type . "_content")) {
       return TRUE;
     }
-    
-    
+
+
   } // op == edit or delete
-  
-  
-  
-  // Failed all of the previous tests, so return false.  
+
+
+
+  // Failed all of the previous tests, so return false.
   return FALSE;
 }
 
@@ -732,7 +732,7 @@ function content_user_access($op, $var) {
  * It will search for and replace replacement patterns which we are aware of it in $str.
  */
 function content_menu_handle_replacement_pattern($str) {
-  
+
   $cid = @$_REQUEST["cid"];
   if ($cid) {
     $content = content_load($cid);
@@ -741,14 +741,14 @@ function content_menu_handle_replacement_pattern($str) {
         // It contains this replacement pattern!
         $str = str_replace("%CONTENT_CID%", $cid, $str);
       }
-      
+
       if (strpos($str, "%CONTENT_TYPE%") !== 0) {
         // It contains this replacement pattern!
         $str = str_replace("%CONTENT_TYPE%", $content["type"], $str);
       }
     }
   }
-  
+
   return $str;
 }
 
@@ -758,29 +758,29 @@ function content_menu_handle_replacement_pattern($str) {
 /**
  * This is the URL we redirect to after saving a piece of content in a dialog,
  * so all we really want to do is close the dialog and reload the parent page.
- * 
+ *
  * Remember, we are inside an iframe.
  */
 function content_dialog_handle_after_save() {
-  
+
   $rtn = "";
-  
+
   $rtn = "";
-  
+
   $timeout = 1000;
-  
+
   if (isset($_REQUEST['del']) && $_REQUEST['del'] != '') {
     $rtn .= "<h2 class='dialog-handle-after-save'>" . t("The content has been deleted successfully.<br><br>Closing window...") . "</h2>";
   }
   else if (isset($_REQUEST['cancel']) && $_REQUEST['cancel'] != '') {
-    $rtn .= "<h2 class='dialog-handle-after-save'>" . t("Cancellation successful.<br><br>Closing window...") . "</h2>";    
+    $rtn .= "<h2 class='dialog-handle-after-save'>" . t("Cancellation successful.<br><br>Closing window...") . "</h2>";
   }
-  else {  
+  else {
     $rtn .= "<h2 class='dialog-handle-after-save'>" . t("Your submission has been saved correctly!<br><br>Closing window...") . "</h2>";
   }
-  
+
   $rtn .= "<br><br><p>" . t("If this windows doesn't close within 3 seconds,") . " <a href='javascript:window.parent.location.reload();'>" . t("click here") . "</a>.</p>";
-  
+
   // Add this javascript code to when the page loads.
   ///*  DEV: comment out while testing
 
@@ -788,15 +788,15 @@ function content_dialog_handle_after_save() {
       <script type='text/javascript'>
         $(document).ready(function() {
           setTimeout(function() {
-            
+
             window.parent.location.reload();
-          
-          }, $timeout);  
+
+          }, $timeout);
         });
       </script>
-  "; 
+  ";
   //*/
-  
+
   return $rtn;
 }
 
@@ -808,18 +808,18 @@ function content_dialog_handle_after_save() {
  *
  */
 function content_view_content($cid) {
-  
-  $render = array();  
+
+  $render = array();
   $render["#id"] = "content_" . $cid;  // We will be doing this as a render array, so other modules can alter.
   $render['#cid'] = intval($cid);
-  
+
   fp_add_css(fp_get_module_path('content') . '/css/content.css');
-    
+
   if (isset($_GET['content_tabs']) && $_GET['content_tabs'] == 'false') { // the string "false", not FALSE
     fp_add_body_class('content-tabs-false');
-  }    
-    
-      
+  }
+
+
   $content = content_load($cid);  // assumed to be path/content/CID  So, arg(1) == the cid
   if (!$content) {
     // Couldn't find it!  Show page not found.
@@ -830,29 +830,29 @@ function content_view_content($cid) {
   $type = $content->type;
   $types = content_get_types();
   $author = fp_load_user($content->user_id);
-  
+
   $render['#content-type'] = $type;
-  
+
   $render['#class'] = "content-type-" . $type;
-  
+
   $weight = 0;
-  
-    
+
+
   if (!strstr($content->title, "[hide]")) {
     fp_set_title($content->title);
-  }  
+  }
   fp_add_body_class("content-type-" . $content->type);
-  
+
   //$rtn .= "<div class='content-view content-view-{$content->type}'>";
-    
+
   $render['content_title'] = array(
     'type' => 'markup',
     'value' => "<div class='content-title'>" . $content->title . "</div>",
     'weight' => $weight,
   );
-  
-  
-  
+
+
+
   $render['content_submitted'] = array(
     'type' => 'markup',
     'value' => "<div class='content-submitted'>" . t("Submitted by") . " " . $author->name . " " . t("on") . " " . format_date(convert_time($content->updated), 'short') . "</div>",
@@ -865,16 +865,16 @@ function content_view_content($cid) {
       'value' => "<div class='content-deleted'>" . t("NOTE: This content has been marked as deleted, and is scheduled for permanent removal.") . "</div>",
       'weight' => $weight += 10,
     );
-    
+
   }
 
 
   // Display all the various fields
   if (is_array($types[$type]['fields'])) {
-    foreach($types[$type]["fields"] as $field_name => $field_details) {      
-            
+    foreach($types[$type]["fields"] as $field_name => $field_details) {
+
       $display_value = $content->{"field__$field_name"}['display_value'];
-      
+
       if ($field_details['type'] != 'hidden' && $field_details['type'] != 'cfieldset') {
         $render['field__' . $field_name] = array(
           'type' => 'markup',
@@ -882,39 +882,39 @@ function content_view_content($cid) {
           'value' => "<div class='field-value'>$display_value</div>",
           'weight' => $weight += 10,
         );
-        
+
       }
-      
+
       if ($field_details['type'] == 'cfieldset') {
         // TODO:  make this appear within a fieldset?
         foreach ($field_details['elements'] as $c => $v) {
           foreach ($field_details['elements'][$c] as $efield_name => $edetails) {
-          
+
             $display_value = $content->{"field__$efield_name"}['display_value'];
-            
+
             if ($edetails['type'] != 'hidden' && $edetails['type'] != 'cfieldset') {
               $render['field__' . $efield_name] = array(
                 'type' => 'markup',
                 'label' => $edetails['label'],
                 'value' => "<div class='field-value'>$display_value</div>",
                 'weight' => $weight += 10,
-              );          
+              );
             }
           }
         }
-        
+
       } // its a fieldset
-      
-      
-      
-      
-    }    
-  }  
-  
-  
+
+
+
+
+    }
+  }
+
+
   content_set_last_access($cid);
-  
-  
+
+
   if (isset($_GET['content_crumbs'])) {
     if ($_GET['content_crumbs'] == 'alerts') {
       $crumbs = array();
@@ -925,12 +925,12 @@ function content_view_content($cid) {
       fp_set_breadcrumbs($crumbs);
     }
   }
-  
-  
+
+
   watchdog("content", "view cid:$cid, type:$type", array());
-  
+
   return fp_render_content($render);
-  
+
 }
 
 
@@ -939,36 +939,36 @@ function content_view_content($cid) {
  */
 function _content_generate_create_table_sql($type) {
   $rtn = "";
-  
+
   $keys = "";
-  
+
   $types = content_get_types();
   fpm($types);
-  
+
   $rtn .= "CREATE TABLE `content__$type` (
             `cid` int unsigned NOT NULL,
             `vid` int NOT NULL, \n";
 
   foreach ($types[$type]['fields'] as $name => $element) {
     if ($element['type'] == '' || strstr($element['type'], 'markup')) continue;
-     
+
     fpm($name);
-    
+
     $rtn .= "  `field__$name` varchar(255) DEFAULT NULL, \n";
-    
+
     $keys .= " KEY `field__$name` (`field__$name`), \n";
-              
-    
+
+
   } //foreach
 
   $keys = "PRIMARY KEY (`vid`),
           KEY `cid` (`cid`),
           $keys";
-    
-  $rtn .= rtrim($keys, ", \n") . "\n);";            
-  
+
+  $rtn .= rtrim($keys, ", \n") . "\n);";
+
   fpm(ppm($rtn, TRUE));
-  
+
 } // _content_generate_create_table_sql
 
 
@@ -979,26 +979,26 @@ function _content_generate_create_table_sql($type) {
  */
 function content_edit_content_form($type = "", $cid = "") {
   global $user;
-  
+
   $form = array();
   $m = 0;
-  
+
   if (@$_GET['content_tabs'] === 'false') { // the string "false", not FALSE
     fp_add_body_class('content-tabs-false');
   }
-  
+
   fp_add_css(fp_get_module_path("content") . "/css/content.css");
   fp_add_js(fp_get_module_path("content") . "/js/content.js");
-  
-  
+
+
   if ($type == "") {
-    @$type = strip_tags($_REQUEST["type"]);  // strip_tags to make it safer.    
+    @$type = strip_tags($_REQUEST["type"]);  // strip_tags to make it safer.
   }
-  
+
   if ($cid == "") {
-    @$cid = strip_tags($_REQUEST["cid"]);  
+    @$cid = strip_tags($_REQUEST["cid"]);
   }
-  
+
   $types = content_get_types();
 
   if ($cid != "new") {
@@ -1011,9 +1011,9 @@ function content_edit_content_form($type = "", $cid = "") {
     // Re-set $type, just in case the user put the wrong type in the
     // URL
     $type = $content->type;
-    
-    
-  } 
+
+
+  }
   else {
     // New piece of content
     $content = new stdClass();
@@ -1021,56 +1021,56 @@ function content_edit_content_form($type = "", $cid = "") {
     $content->title = "";
     $content->delete_flag = 0;
     fp_set_title(t("Add new") . " " . $types[$type]["title"]);
-    
+
   }
 
-  
+
   fp_add_body_class('content-edit-type--' . $type);
-    
-  
+
+
   // For simplicity, and because it causes no harm except a small amount of extra bandwidth, we will
   // state that all "content" forms are multipart (so they can handle file uploads) even if there
   // are no files being uploaded.
   $form["#attributes"] = array("enctype" => 'multipart/form-data');
-  
-  
+
+
   $form["type"] = array(
     "type" => "hidden",
-    "value" => $type,    
+    "value" => $type,
   );
-  
+
   $form["cid"] = array(
     "type" => "hidden",
-    "value" => $cid,    
+    "value" => $cid,
   );
-  
+
   $form["title"] = array(
     "type" => "textfield",
     "label" => t("Title:"),
     "value" => $content->title,
-    "required" => TRUE,     
+    "required" => TRUE,
   );
-  
+
   // Are there any special settings for the title?
-  if (isset($types[$type]['settings']) && isset($types[$type]['settings']['title'])) {    
+  if (isset($types[$type]['settings']) && isset($types[$type]['settings']['title'])) {
     if (is_array($types[$type]['settings']['title'])) {
       // Use array_merge to just override with whatever we have in our settings for the title.
       $form['title'] = array_merge($form['title'], $types[$type]['settings']['title']);
-      
+
       //$form['title']['value'] = $content->title;  // Add this back in, in case it was erased.
-      
-      
-      
-      if (isset($form['title']['auto']) && $form['title']['auto'] == TRUE) {        
+
+
+
+      if (isset($form['title']['auto']) && $form['title']['auto'] == TRUE) {
         // We will set the form to an automatic title, and hide.
         $form['title']['value'] = $type . ' content saved on ' . format_date(convert_time(time()));
         $form['title']['type'] = 'hidden';
-        
+
       }
-      
+
     }
-    
-  }  
+
+  }
 
 
   if (isset($types[$type]['settings']['#redirect'])) {
@@ -1082,18 +1082,18 @@ function content_edit_content_form($type = "", $cid = "") {
     $form['#validate_handlers'] = $types[$type]['settings']['#validate_handlers'];
   }
 
-  
+
   if (isset($types[$type]['settings']['#submit_handlers'])) {
     $form['#submit_handlers'] = $types[$type]['settings']['#submit_handlers'];
-  }  
-  
-  
+  }
+
+
   // If a #redirect has not been set, then we'll go back to this content's "view"...
   if (!isset($form['#redirect'])) {
-    $form['#redirect'] = array('path' => 'content/' . $cid);      
+    $form['#redirect'] = array('path' => 'content/' . $cid);
   }
-      
-  
+
+
   // Any js or css to add for this form, defined in the settings?
   if (isset($types[$type]['settings']['js'])) {
     fp_add_js($types[$type]['settings']['js']);
@@ -1102,71 +1102,71 @@ function content_edit_content_form($type = "", $cid = "") {
     fp_add_css($types[$type]['settings']['css']);
   }
 
-  
-  
+
+
   if ($content->delete_flag == 1) {
     $form['mark_content_deleted'] = array(
       'type' => 'markup',
       'value' => "<div class='content-deleted'>" . t("NOTE: This content has been marked as deleted, and is scheduled for permanent removal.") . "</div>",
-      'weight' => -999, 
+      'weight' => -999,
     );
-    
+
   }
-  
-  
+
+
   // Are there extra fields?  If so, add their values in as well.
   if (is_array($types[$type]['fields'])) {
     foreach($types[$type]["fields"] as $field_name => $field_details) {
-                  
+
       $form[$field_name] = $field_details;
       if (isset($field_details['type']) && $field_details['type'] != 'cfieldset') {
-      
+
         $value = NULL;
         if (isset($content->{"field__$field_name"}['value'])) {
           $value = $content->{"field__$field_name"}['value'];
-        }        
+        }
         if ($cid == 'new') {
           // value won't be anything.  Use value attr from the form as the initial value
           $value = @$form[$field_name]['value'];
         }
-        
-        if (!$value && $value !== 0 && $value !== '0') {  // Make sure if value is zero, it is still saved correctly.          
+
+        if (!$value && $value !== 0 && $value !== '0') {  // Make sure if value is zero, it is still saved correctly.
           $value = '';
         }
-        
+
         $form[$field_name]['value'] = $value;
-        
-        // If this is a datetime-local field, then the value needs to be adjusted for it to work correctly. (it was stored as UTC in database)             
+
+        // If this is a datetime-local field, then the value needs to be adjusted for it to work correctly. (it was stored as UTC in database)
         if (isset($form[$field_name]['type']) && $form[$field_name]['type'] == 'datetime-local') {
           if (trim($value) != '') {
-            $form[$field_name]["value"] = date('Y-m-d\TH:i', convert_time(strtotime($value)));  
+            $form[$field_name]["value"] = date('Y-m-d\TH:i', convert_time(strtotime($value)));
           }
         }
-        
+
         // Similar to datetime-local, if this is a "time" field, then it has been stored as UTC in the database, and now
         // needs to be converted to local timezone.
         if (isset($form[$field_name]['type']) && $form[$field_name]['type'] == 'time') {
           if ($value) {
-            $form[$field_name]["value"] = date('H:i', convert_time(strtotime($value)));            
+            $form[$field_name]["value"] = date('H:i', convert_time(strtotime($value)));
           }
         }
-                
-        
+
+
         // If this is a file, we want to have a way to REMOVE the file, so we can upload a different one, or simply to
         // have no file there at all.
         if (isset($form[$field_name]['type']) && $form[$field_name]['type'] == 'file') {
           $limit = intval(@$form[$field_name]['limit']);
-          
+
           $allowed = @$form[$field_name]['allowed'];
           if (!$allowed) {
             $allowed = "txt, pdf, doc, docx, xls, xlsx, ppt, pptx, rtf, odt, jpg, jpeg, png, gif, zip, 7z";  // default safe files
           }
-          
+
           $form['file_allowed_ext_' . $field_name] = array(
             'type' => 'hidden',
             'value' => $allowed,
           );
-          
+
           $file_count = 0;
           if ($limit == 0) $limit = 1;
           $form['file_limit_' . $field_name] = array(
@@ -1178,62 +1178,62 @@ function content_edit_content_form($type = "", $cid = "") {
           $ofids = $value;
           $fids = explode(",", $value);
           $bool_is_empty = TRUE;
-          foreach ($fids as $fid) {            
+          foreach ($fids as $fid) {
             if ($fid == '' || intval($fid) == 0) continue;
-            $fid = intval($fid);          
+            $fid = intval($fid);
             $file = content_get_uploaded_file($fid);
             if ($file) {
-              $bool_is_empty = FALSE;        
-              $file_count++;    
+              $bool_is_empty = FALSE;
+              $file_count++;
               // create a markup field, including a delete option, with the filename listed.
-              $url = $file['url'];                         
-              $delete_link = "<a href='javascript:contentDeleteFile(\"$field_name\",\"$fid\");'>Delete</a>";            
+              $url = $file['url'];
+              $delete_link = "<a href='javascript:contentDeleteFile(\"$field_name\",\"$fid\");'>Delete</a>";
               $html .= "<div class='file-field-line-$fid'><a href='$url' target='_blank'>" . $file['original_filename'] . "</a>  - $delete_link</div>";
             } // we already had a file.
-          } // foreach          
+          } // foreach
           if (!$bool_is_empty) {
             $html = "<label>" . t("(Existing)") . " " . $form[$field_name]['label'] . "</label>" . $html;
           }
-          
+
           $form["markup_$field_name"] = array(
             'type' => 'markup',
             'value' => $html,
             'weight' => @intval($form[$field_name]['weight']) - 1,
           );
-                
+
           // Add a hidden field to note that we have already uploaded this file.
           $form["previous_upload_$field_name"] = array(
             'type' => 'hidden',
             'value' => $ofids,
             'weight' => @$form[$field_name]['weight'],
-          );            
-          
-                    
+          );
+
+
           $form["file_count_" . $field_name] = array(
             'type' => 'hidden',
             'value' => $file_count,
           );
-          
+
           if ($file_count >= $limit) {
             // hide the original field using CSS.
-            $form[$field_name]['attributes'] = array("class" => 'hidden');            
+            $form[$field_name]['attributes'] = array("class" => 'hidden');
           }
-          
+
           if ($allowed) {
             if (!isset($form[$field_name]['description'])) $form[$field_name]['description'] = '';
             $form[$field_name]['description'] .= "<div class='content-allowed-ext'><strong>" . t("Allowed file extensions:") . "</strong> " . $allowed . "</div>";
           }
-          
+
           if ($limit > 1 && $file_count <= $limit) {
             $add_link = "<a href='javascript:contentAddMoreFile(\"$field_name\");' class='add-more-link add-more-link-$field_name'><i class='fa fa-plus'></i> " . t("Add More") . "</a>";
             if (!isset($form[$field_name]['suffix'])) $form[$field_name]['suffix'] = '';
             $form[$field_name]['suffix'] .= $add_link;
           }
-          
-          
+
+
         } // type == file
-        
-                        
+
+
       } // is not cfieldset
       else {
         // If this is a fieldset, then we need to assign values to its ELEMENTS.  If not empty, then OPEN the cfieldset!
@@ -1241,85 +1241,85 @@ function content_edit_content_form($type = "", $cid = "") {
           foreach ($form[$field_name]['elements'] as $c => $efields) {
             foreach ($efields as $efield_name => $efield_details) {
               $value = (string) @$content->{"field__$efield_name"}['value'];
-              
+
               if ($cid == 'new') {
                 // value won't be anything.  Use value attr from the form as the initial value
                 $value = (string) @$efield_details['value'];
-              }            
-              
-              if (!$value && $value !== 0 && $value !== '0') {  // Make sure if value is zero, it is still saved correctly.          
+              }
+
+              if (!$value && $value !== 0 && $value !== '0') {  // Make sure if value is zero, it is still saved correctly.
                 $value = '';
-              }              
-              
+              }
+
               $efield_details['value'] = $value;
-              
+
               // If this is a datetime-local field, then the value needs to be adjusted for it to work correctly.
               if ($efield_details['type'] == 'datetime-local') {
                 if (trim($value) != '') {
                   $value = date('Y-m-d\TH:i', convert_time(strtotime($value)));
                 }
               }
-  
+
               // Similar to datetime-local, if this is a "time" field, then it has been stored as UTC in the database, and now
               // needs to be converted to local timezone.
               if ($efield_details['type'] == 'time') {
                 if (trim($value) != '') {
-                  $value = date('H:i', convert_time(strtotime($value)));            
+                  $value = date('H:i', convert_time(strtotime($value)));
                 }
               }
-  
-              
+
+
               $form[$field_name]['elements'][$c][$efield_name]["value"] = $value;
-              
-              
-              
+
+
+
               if ($value) {
                 $form[$field_name]['start_closed'] = FALSE;
               }
             } // foreach (inner)
-          } //foreach (outer) 
-          
+          } //foreach (outer)
+
         } // if isset 'elements'
-        
+
       } // else is fieldset
-    }    
+    }
   }
 
-  
+
   // We never show the published option, since we will always give the user a way to "remove" and "restore" content.
   $form['published'] = array(
     'type' => 'hidden',
     'value' => intval($content->published),
   );
-  
-  
-  // Draw the controls (buttons)  
+
+
+  // Draw the controls (buttons)
   $form["submit_submit"] = array(
     "type" => "submit",
     "value" => t("Submit"),
     "spinner" => TRUE,
-    'weight' => 9920,    
-    'attributes' => array('class' => 'content-submit-btn'),        
+    'weight' => 9920,
+    'attributes' => array('class' => 'content-submit-btn'),
   );
-  
+
   if ($cid != 'new') {
-    
+
     // Only display the delete button if we have permission
-    if (content_user_access('delete', $content->cid)) {     
+    if (content_user_access('delete', $content->cid)) {
       $form["submit_delete"] = array(
         "type" => "submit",
-        "value" => t("Delete"),    
+        "value" => t("Delete"),
         "confirm" => t('Are you sure you wish to delete this?\nThis action cannot be undone.'),
         'weight' => 9930,
         //'spinner' => TRUE,
-        'attributes' => array('class' => 'content-delete-btn'),    
+        'attributes' => array('class' => 'content-delete-btn'),
       );
     }
   }
-  
+
   watchdog('content', "edit_content_form cid:$cid, type:$type", array(), WATCHDOG_DEBUG);
-  
-  
+
+
   return $form;
 }
 
@@ -1329,21 +1329,21 @@ function content_get_uploaded_file($fid) {
   $cur = db_fetch_array($res);
 
   if ($cur) {
-    
+
     $temp = explode(".", $cur['filename']);
     $ext = $temp[count($temp) - 1]; // get the extension.
-    
-    $cur['full_filename'] = fp_get_files_path() . '/content_uploads/' . $cur['filename']; 
+
+    $cur['full_filename'] = fp_get_files_path() . '/content_uploads/' . $cur['filename'];
     // also get the URL for downloading this file.
-                
+
     // *** Always handle downloads through FlightPath, for security reasons. ***
     $cur['url'] = fp_url('content-files/handle-download/' . $cur['fid']);
-    
+
     $cur['ext'] = $ext;
   }
-  
+
   return $cur;
-  
+
 }
 
 
@@ -1377,17 +1377,17 @@ function content_get_fontawesome_icon_for_mimetype($mime_type, $ext = "") {
     'application/gzip' => 'fa-file-archive-o',
     'application/zip' => 'fa-file-archive-o',
   );
-  
+
   $rtn = "";
-  
+
   foreach ($icon_classes as $text => $icon) {
     if (strpos($mime_type, $text) === 0) {
       $rtn = $icon;
     }
   }
-  
+
   if ($rtn) return $rtn;
-  
+
   // else, we search by file extension now....
   $ext_array = array(
     'png' => 'fa-file-image-o',
@@ -1397,7 +1397,7 @@ function content_get_fontawesome_icon_for_mimetype($mime_type, $ext = "") {
     "mp3" => "fa-file-audio-o",
     "mpg" => "fa-file-video-o",
     "mpeg" => "fa-file-video-o",
-    "mp4" => "fa-file-video-o",    
+    "mp4" => "fa-file-video-o",
     'pdf' => 'fa-file-pdf-o',
     'doc' => 'fa-file-word-o',
     'pages' => 'fa-file-word-o',
@@ -1417,9 +1417,9 @@ function content_get_fontawesome_icon_for_mimetype($mime_type, $ext = "") {
     'json' => 'fa-file-code-o',
     // Archives
     'gzip' => 'fa-file-archive-o',
-    'zip' => 'fa-file-archive-o',  
+    'zip' => 'fa-file-archive-o',
   );
-  
+
   foreach ($ext_array as $text => $icon) {
     if (strpos($ext, $text) === 0) {
       $rtn = $icon;
@@ -1427,10 +1427,10 @@ function content_get_fontawesome_icon_for_mimetype($mime_type, $ext = "") {
   }
 
   if ($rtn) return $rtn;
-  
-  
+
+
   return 'fa-file-o';
-  
+
 }
 
 
@@ -1438,53 +1438,53 @@ function content_get_fontawesome_icon_for_mimetype($mime_type, $ext = "") {
 
 
 function content_edit_content_form_validate(&$form, &$form_state) {
-  
+
   // If we are submitting any files, make sure they have allowed extensions.
-  $values = $form_state['values'];  
+  $values = $form_state['values'];
   $type = $values["type"];
   $types = content_get_types();
-  
+
   foreach ($types[$type]['fields'] as $fieldname => $details) {
     if ($details['type'] != 'cfieldset') {
-      
+
       // If this field type is "file" then we are going to do something special with it
       // don't need to do this if we are just editing an existing content node and hitting "save"
       if ($details['type'] == 'file') {
-        
+
         $uploaded_files = fp_re_array_files($_FILES[$fieldname]);  // makes them easier to work with.
 
         $allowed = '';
-        
+
         if (isset($details['allowed'])) {
           $allowed = trim($details['allowed']);
         }
         if (!$allowed) {
           $allowed = "txt, pdf, doc, docx, xls, xlsx, ppt, pptx, rtf, odt, jpg, jpeg, png, gif, zip, 7z";
         }
-        
+
         $allowed = str_replace(".", "", strtolower($allowed));  // get rid of dots and make lowercase.
         $allowed = str_replace(" ", "", $allowed);
         $allowed_csv = csv_to_array($allowed);
-                
-        $fid = "";        
+
+        $fid = "";
         foreach ($uploaded_files as $file) {
           if (trim($file['name']) == "") continue; // blank, so skip it.
           // Get the extension for the file.
           $temp = explode(".", $file['name']);
           $ext = strtolower(trim($temp[count($temp) - 1]));
-                  
+
           if (!in_array($ext, $allowed_csv)) {
             form_error($fieldname, t("Sorry, but the file %file is not allowed to be uploaded (file extension \"%ext\" not allowed).  Please see the list of allowed file types/extensions.", array("%file" => $file['name'], "%ext" => $ext)));
             return;
           }
-          
-            
+
+
         } // foreach uploaded files
       } // if a file
     } // if not a cfieldset
   } // foreach
-  
-  
+
+
 } // ... validate
 
 
@@ -1493,41 +1493,41 @@ function content_edit_content_form_validate(&$form, &$form_state) {
 /**
  * Submit handler for the edit content form.
  *
- * @param unknown_type $form
- * @param unknown_type $form_state
+ * @param array $form
+ * @param array $form_state
  */
 function content_edit_content_form_submit(&$form, &$form_state) {
   global $user;
-  
+
   $values = $form_state["values"];
   $cid = $values['cid'];
   $type = $values["type"];
-  
+
   // are we trying to delete?
   if (isset($values['submit_delete']) && trim($values['submit_delete']) != '') {
     // Yes, we are deleting!
-    
+
     $content = content_load($cid);
-    
-    
+
+
     if (!content_user_access('delete', $content->cid)) {
       fp_add_message(t("Sorry, you do not have permission to delete this content."));
       fp_goto("<front>");
       return;
     }
-    
-    
-                
+
+
+
     $content->delete_flag = 1;
     content_save($content);
-    
-    
-    
+
+
+
     watchdog("content", "delete cid:$cid, type:$type", array());
-        
+
     // find out if we should redirect anywhere in particular for this deletion.
     if (isset($form['#redirect'])) {
-      fp_add_message(t("The content was deleted successfully."));  
+      fp_add_message(t("The content was deleted successfully."));
       if (!isset($form['#redirect']['query'])) $form['#redirect']['query'] = "";
       $form['#redirect']['query'] .= "&del=" . $content->cid;
     }
@@ -1537,166 +1537,166 @@ function content_edit_content_form_submit(&$form, &$form_state) {
       $form['#redirect']['path'] = "<front>";
     }
     return;
-    
+
   }
 
 
   $now = time();
-  
+
   $types = content_get_types();
-    
-  
-  // Does the user have permission to edit/add this content?  
+
+
+  // Does the user have permission to edit/add this content?
   $access_action = "add";
   $var = $type;
   if ($cid !== "new") {
     $access_action = "edit";
     $var = $cid;
   }
-    
-  if (!content_user_access($access_action, $var)) {  
+
+  if (!content_user_access($access_action, $var)) {
     fp_add_message(t("Sorry, you do not have permission to @action that content type.", array("@action" => $access_action)));
     fp_goto("admin-tools/content");
     return;
-  }  
-  
+  }
+
   // Assemble into a content object, then call content_save();
   if ($values['cid'] == 'new') {
     // This is a NEW content obj!
     $content = new stdClass();
     $content->type = $type;
-    $content->cid = "new";    
+    $content->cid = "new";
     $content->published = 1;
     $content->delete_flag = 0;
-    content_save($content);  // Do an initial save, so we get its cid back.    
+    content_save($content);  // Do an initial save, so we get its cid back.
   }
   else {
     // This is an EXISTING content.  Load it.
     $content = content_load($values['cid']);
   }
-  
+
   $cid = $content->cid;
-  
+
   // Clean the title of any XSS attempts
-  $title = filter_plain($values['title']);  
+  $title = filter_plain($values['title']);
   $content->title = $title;  // required
-  
+
   // set published status.  0 for not, 1 for published
   $content->published = (bool) $values['published'];
-  
-  // Add in our new field values.  
+
+  // Add in our new field values.
   foreach ($types[$type]['fields'] as $fieldname => $details) {
     if ($details['type'] != 'cfieldset') {  // NOT a fieldset. Normal form element.
-      
+
       if ($details['type'] == 'datetime-local') {
         // Since this is datetime-local, the value is actually already in the user's timezone.
         // We want to CHANGE THIS TO UTC, so it saves in the database as UTC.
         $val_ts = @strtotime($values[$fieldname]);
-        $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');        
-        $values[$fieldname] = date('Y-m-d H:i:s', $utc_ts);               
+        $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');
+        $values[$fieldname] = date('Y-m-d H:i:s', $utc_ts);
       }
-      
+
       // Do the same for "time" field type.  We need to convert to UTC from the user's timezone.
       if ($details['type'] == 'time') {
         // Since this is time, the value is actually already in the user's timezone.
         // We want to CHANGE THIS TO UTC, so it saves in the database as UTC.
         $val_ts = @strtotime("2000-01-01 " . $values[$fieldname]);  // give a bogus date just so our times make since.
-        $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');        
-        $values[$fieldname] = date('H:i', $utc_ts);               
+        $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');
+        $values[$fieldname] = date('H:i', $utc_ts);
       }
 
 
       // If this field type is "file" then we are going to do something special with it
       // don't need to do this if we are just editing an existing content node and hitting "save"
       if ($details['type'] == 'file') {
-        
+
         $uploaded_files = fp_re_array_files($_FILES[$fieldname]);  // makes them easier to work with.
 
-        $fid = "";        
+        $fid = "";
         foreach ($uploaded_files as $file) {
-          
+
           if ($file && $file['name'] != '') {
             // Now, save to the content_files table.
             $fid .= content_add_new_uploaded_file($file, $cid) . ",";
           }
-          
+
         } // foreach
-        
+
         // Do we have any previously uploaded files we need to include?
         if (@$form_state['values']['previous_upload_' . $fieldname] != "") {
           $fid .= "," . $form_state['values']['previous_upload_' . $fieldname] . ",";
         }
-        
+
         $fid = ltrim($fid, ",");
         for ($t = 0; $t < 10; $t++) {
           $fid = str_replace(",,", ",", $fid);  // get rid of any duplicate commas
         }
         $fid = rtrim($fid, ","); // trim any extra commas
-        $values[$fieldname] = $fid;        
-        
-         
+        $values[$fieldname] = $fid;
+
+
       } // if details = file
 
-      // Was a filter (plain, basic, full) specified?  If not, assume PLAIN.  Else, use the selected filter.                      
+      // Was a filter (plain, basic, full) specified?  If not, assume PLAIN.  Else, use the selected filter.
       if (!isset($details['filter']) || $details['filter'] == 'plain') {
         $values[$fieldname] = filter_plain($values[$fieldname]);
       }
       else if (isset($details['filter']) && $details['filter'] != 'plain') {
         $values[$fieldname] = filter_markup($values[$fieldname], $details['filter']);
       }
-      
-      
-      $content->{'field__' . $fieldname}['value'] = @$values[$fieldname];      
+
+
+      $content->{'field__' . $fieldname}['value'] = @$values[$fieldname];
     }
     else {  // We are within a fieldset.
       foreach ($details['elements'] as $c => $v) {
         foreach ($details['elements'][$c] as $fieldname => $edetails) {
-          
+
           if ($edetails['type'] == 'datetime-local') {
             // Since this is datetime-local, the value is actually already in the user's timezone.
             // We want to CHANGE THIS TO UTC, so it saves in the database as UTC.
             $val_ts = @strtotime($values[$fieldname]);
-            $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');        
-            $values[$fieldname] = date('Y-m-d H:i:s', $utc_ts);               
-          }          
+            $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');
+            $values[$fieldname] = date('Y-m-d H:i:s', $utc_ts);
+          }
 
           // Do the same for "time" field type.  We need to convert to UTC from the user's timezone.
           if ($edetails['type'] == 'time') {
             // Since this is time, the value is actually already in the user's timezone.
             // We want to CHANGE THIS TO UTC, so it saves in the database as UTC.
             $val_ts = @strtotime("2000-01-01 " . $values[$fieldname]);  // give a bogus date just so our times make since.
-            $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');        
-            $values[$fieldname] = date('H:i', $utc_ts);               
+            $utc_ts = convert_time($val_ts, fp_get_user_timezone(), 'UTC');
+            $values[$fieldname] = date('H:i', $utc_ts);
           }
 
 
           // If this field type is "file" then we are going to do something special with it
           // don't need to do this if we are just editing an existing content node and hitting "save"
           if ($edetails['type'] == 'file') {
-            
+
             $uploaded_files = fp_re_array_files($_FILES[$fieldname]);  // makes them easier to work with.
-    
-            $fid = "";        
+
+            $fid = "";
             foreach ($uploaded_files as $file) {
-              
+
               if ($file && $file['name'] != '') {
                 // Now, save to the content_files table.
                 $fid .= content_add_new_uploaded_file($file, $cid) . ",";
               }
-              
+
             } // foreach
-            
+
             // Do we have any previously uploaded files we need to include?
             if (@$form_state['values']['previous_upload_' . $fieldname] != "") {
               $fid .= "," . $form_state['values']['previous_upload_' . $fieldname] . ",";
             }
-            
+
             $fid = ltrim($fid, ",");
             for ($t = 0; $t < 10; $t++) {
               $fid = str_replace(",,", ",", $fid);  // get rid of any duplicate commas
             }
             $fid = rtrim($fid, ","); // trim any extra commas
-            $values[$fieldname] = $fid; 
+            $values[$fieldname] = $fid;
           } // if edetails = file
 
 
@@ -1708,46 +1708,46 @@ function content_edit_content_form_submit(&$form, &$form_state) {
           }
 
 
-         
+
           $content->{'field__' . $fieldname}['value'] = @$values[$fieldname];
         }
       }
     }
   }
-  
+
   content_save($content);
   $form_state['content_object'] = $content;
-  
+
   watchdog("content", "edited/saved cid:$cid, type:$type", array());
-  
+
   if (isset($form['#redirect'])) {
     if ($form['#redirect']['path'] == 'content/new') {
       $form['#redirect']['path'] = 'content/' . $content->cid;
     }
   }
-  
+
   fp_add_message(t('Saved successfully.'));
-  
-    
-  
+
+
+
 } // ... submit
 
 
 /**
  * bool_replace_existing means should we replace an existing file (based on filename) with this new one?  Instead of creating an INSERT, that is.
- * 
+ *
  * $file is expected to be an array containing these elements:
  *  [
  *    "name"   (original filename)
  *    "type"   (the mimetime)
  *    "tmp_name"   (the system filepath to the file)
  *  ]
- * 
+ *
  */
 function content_add_new_uploaded_file($file, $cid = 0, $bool_override_original_filename = TRUE, $attributes = CONTENT_ENCRYPTED_FILE, $bool_replace_exsting_filename = FALSE, $filename_prefix = "file__") {
   // Store the file information in the content_files table, and then THIS field contains the fid reference number.
   $original_filename = @$file["name"];
-  $type = @$file["type"]; 
+  $type = @$file["type"];
   $tmp_name = @$file["tmp_name"];
 
   if (!strstr($tmp_name, "/")) {
@@ -1757,28 +1757,28 @@ function content_add_new_uploaded_file($file, $cid = 0, $bool_override_original_
 
   // Figure out the extension of the original filename.
   $temp = explode(".", $original_filename);
-  $ext = $temp[count($temp) - 1];                     
-  
+  $ext = $temp[count($temp) - 1];
+
   $filename = $original_filename;
   if ($bool_override_original_filename) {
     $filename = $filename_prefix . time() . '' . mt_rand(9,9999) . '_' . fp_get_machine_readable($original_filename);
   }
-  
+
   // If the filename is too long, shorten it.  Linux won't allow more than 255 bytes (usually corresponds to chars, depending on file system
-  // it might be as low as ), 
+  // it might be as low as ),
   // Windows its 260 chars.  Let's be safe and stop at 100 chars + ext.
   if (strlen($filename) > 100) {
     $filename = substr($filename, 0, 100) . ".$ext";
   }
-    
+
   $extra = "";
   if ($attributes === CONTENT_PUBLIC_FILE) {
     // If this is a "public" file, then put in the correct public files dir.
-    $extra .= "public_uploads/";    
-  }  
-    
-  $full_filename = fp_get_files_path() . '/content_uploads/' . $extra . $filename;              
-      
+    $extra .= "public_uploads/";
+  }
+
+  $full_filename = fp_get_files_path() . '/content_uploads/' . $extra . $filename;
+
   $is_encrypted = 0;
   // If we should be encrypting files, so do here, and set the is_encrypted value correctly.
   if (module_enabled('encryption') && variable_get("encryption_files_encryption", "yes") === 'yes' && encryption_get_key() && $attributes == CONTENT_ENCRYPTED_FILE) {
@@ -1801,30 +1801,30 @@ function content_add_new_uploaded_file($file, $cid = 0, $bool_override_original_
     }
 
     $is_encrypted = 1;
-  
-    
+
+
   } // encryption module is enabled and we should be encrypting.
   else {
     // No encryption, just copy the normal way.
-    
+
     $is_encrypted = 0;
-    
+
     if (!copy($tmp_name, $full_filename)) {
       fp_add_message(t("Could not upload file.  Possibly because of permission issues on the destination directory,
                         the disk is full, or some other reason."), "error");
-                        
+
       watchdog('content', "Could not upload and copy file to destination.  Possibly because of permission issues on the destination directory,
                         the disk is full, or some other reason.", array(), WATCHDOG_ERROR);
-                        
+
       return FALSE;
-                        
-    }                    
-        
+
+    }
+
   }
-  
-  
+
+
   if ($bool_replace_exsting_filename) {
-    $fid = db_result(db_query("SELECT fid FROM content_files 
+    $fid = db_result(db_query("SELECT fid FROM content_files
                                WHERE filename = ?
                                AND cid = ?
                                AND `attributes` = ?", array($filename, $cid, $attributes)));
@@ -1836,20 +1836,20 @@ function content_add_new_uploaded_file($file, $cid = 0, $bool_override_original_
       // File wasn't in there.  Just do nothing here and proceed to a normal insert.
     }
   }
-  
-      
+
+
   // Add to the content_files table.
   db_query("INSERT INTO content_files (cid, original_filename, filename, mimetype, is_encrypted, posted, `attributes`)
             VALUES (?, ?, ?, ?, ?, ?, ?)", array($cid, $original_filename, $filename, $type, $is_encrypted, time(), $attributes));
   return db_insert_id();
-  
+
 }
 
 
 /**
  * Save the content to the database.
  *
- * @param unknown_type $cid
+ * @param int $cid
  */
 function content_save(&$content) {
 
@@ -1857,21 +1857,21 @@ function content_save(&$content) {
   if ($content->cid != 'new') {
     unset($GLOBALS['content_cache'][$content->cid]);
   }
-  
+
   // First, see if any modules want to make changes before we save to the database.
   $modules = modules_implement_hook("content_save", array("content"));
   foreach ($modules as $module) {
-    call_user_func_array($module . "_content_save", array(&$content));    
+    call_user_func_array($module . "_content_save", array(&$content));
   }
 
   // Last, call content_content_save to finally write to the database.
   call_user_func_array("content_content_save", array(&$content));
-  
+
 
   // Save to globals cache
   $GLOBALS['content_cache'][$content->cid] = $content;
 
-      
+
 }
 
 
@@ -1880,18 +1880,18 @@ function content_save(&$content) {
  */
 function content_content_save(&$content) {
   global $user;
-  
+
   $types = content_get_types();
   $type = $content->type;
-  
+
   if (!isset($content->title) || !$content->title || $content->title === NULL || $content->title === FALSE) {
     $content->title = t("Content") . " " . time();  // give a default title, since title cannot be null.
   }
 
-  // Force $content->title to be plain (no html tags allowed)  
+  // Force $content->title to be plain (no html tags allowed)
   $content->title = filter_markup($content->title, 'plain');
 
-  
+
   $log = @trim($content->log);
 
   // If this is a NEW content, then insert once into content table to get cid.  Then, insert into content_versions to get vid.  Then update content table with vid.
@@ -1899,21 +1899,21 @@ function content_content_save(&$content) {
     db_query('INSERT INTO content (user_id, `type`, title, posted, updated, published, delete_flag, `log`)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array($user->id, $type, $content->title, time(), time(), $content->published, 0, $log));
     $content->cid = db_insert_id();
-    
+
     // insert into content_versions to get the vid.
     db_query("INSERT INTO content_versions (cid, `user_id`) VALUES (?,?)", array($content->cid, $user->id));
     $content->vid = db_insert_id();
-    
+
   }
   else {
-    // If this is an EXISTING content, then insert once into content_versions to get new vid.  Update title and vid in content table.    
+    // If this is an EXISTING content, then insert once into content_versions to get new vid.  Update title and vid in content table.
     // insert into content_versions to get the vid.
     db_query("INSERT INTO content_versions (`cid`, `user_id`) VALUES (?,?)", array($content->cid, $user->id));
     $content->vid = db_insert_id();
   }
-  
+
   if (!$content->delete_flag) $content->delete_flag = 0;  // force content->delete_flag to equal a value.
-  
+
 
   // Now we should have a fully created $content object.  Let's update the title and other values in the content table.
   db_query("UPDATE content SET vid = ?, title = ?, updated = ?, published = ?, delete_flag = ?, `log` = ? WHERE
@@ -1922,40 +1922,40 @@ function content_content_save(&$content) {
 
   // TODO:  If deleting, should we delete associated files too?  Maybe we do this on a cron after X number of months?
 
-  
+
   // Now we are going to insert all of the field values.  We assume there is a table ALREADY CREATED with our field names
   // as field__the_name.
-    
+
   // Insert new row into content__$type table, including all the extra fields and such.  It should
   //        look like  cid | vid | field__name | field__name | and so on.
-  //   
+  //
 
   // Add in our new field values.
-  $params = array();  
+  $params = array();
   $all_fields = array();
   $param_names = array();
-  
+
   $all_fields[] = 'cid';
   $all_fields[] = 'vid';
-  
+
   $param_names[] = ':cid';
   $param_names[] = ':vid';
-  
+
   $params[':cid'] = $content->cid;
   $params[':vid'] = $content->vid;
-  
+
   foreach ($types[$type]['fields'] as $fieldname => $details) {
-    
+
     if ($details['type'] != 'cfieldset' && $details['type'] != '' && !strstr($details['type'], 'markup')) { // skip markup and fieldsets
-    
-      $db_field_name = "field__$fieldname";  
+
+      $db_field_name = "field__$fieldname";
       $all_fields[] = $db_field_name;
       $param_names[] = ":$db_field_name";
       $val = NULL;
       if (isset($content->{$db_field_name}) && isset($content->{$db_field_name}['value'])) {
         $val = $content->{$db_field_name}['value'];
       }
-      
+
       if ($details['type'] == 'checkboxes' && is_array($val)) {
         // Since we came from "checkboxes", and val is an array, we will save the following way:
         // ~~key~~key~~key~~.  This lets us query like so:  LIKE '%~~key~~%' to find elements with that key.  Not the most
@@ -1965,32 +1965,32 @@ function content_content_save(&$content) {
           $new_val .= $k . "~~";  // always end with ~~.
         }
         $val = $new_val;
-      }            
+      }
       else if (is_array($val)) {
         // Not sure what this is, but we will serialize it.
         $val = serialize($val);
-      }            
+      }
 
 
-   
+
       $params[":field__$fieldname"] = $val;
-    
+
     }
     else if ($details['type'] == 'cfieldset'){
       // This is a fieldset, so now we need to descend into its elements to find the fields we need to save.
       foreach($details['elements'] as $c => $v) {
         foreach ($details['elements'][$c] as $fieldname => $edetails) {
           if (strstr($edetails['type'], 'markup') || $edetails['type'] == '') continue; // skip markup
-            
-          $db_field_name = "field__$fieldname";  
+
+          $db_field_name = "field__$fieldname";
           $all_fields[] = $db_field_name;
-          $param_names[] = ":$db_field_name";      
-          
+          $param_names[] = ":$db_field_name";
+
           $val = NULL;
           if (isset($content->{$db_field_name}) && isset($content->{$db_field_name}['value'])) {
             $val = $content->{$db_field_name}['value'];
-          }          
-                            
+          }
+
           if ($edetails['type'] == 'checkboxes' && is_array($val)) {
             // Since we came from "checkboxes", and val is an array, we will save the following way:
             // ~~key~~key~~key~~.  This lets us query like so:  LIKE '%~~key~~%' to find elements with that key.  Not the most
@@ -2000,38 +2000,38 @@ function content_content_save(&$content) {
               $new_val .= $k . "~~";  // always end with ~~.
             }
             $val = $new_val;
-          }            
+          }
           else if (is_array($val)) {
             // Not sure what this is, but we will serialize it.
             $val = serialize($val);
-          }            
-                            
-          
+          }
+
+
           $params[":field__$fieldname"] = $val;
-          
+
         }
       }
     } //else/if
-    
-    
-  } // foreach  
+
+
+  } // foreach
 
   $sql = "INSERT INTO content__$type
               (" . join(", " , $all_fields) . ")
               VALUES (" . join(", " , $param_names) . ")";
-  
-  db_query($sql, $params);    
-  
-  
+
+  db_query($sql, $params);
+
+
   // Re-calc our alert counts.
   fp_recalculate_alert_count_by_type();
-  
-  
+
+
   watchdog('content', "content_save cid:$content->cid");
-  
-  
-    
-  
+
+
+
+
 } // content_content_save
 
 
@@ -2043,36 +2043,36 @@ function content_content_save(&$content) {
 /**
  * Load the content from the database and return an array, by calling hook_content_load.
  *
- * @param unknown_type $cid
+ * @param int $cid
  */
 function content_load($cid, $reset = FALSE) {
   if (!$cid) return null;
-    
+
   if ($reset) {
     unset($GLOBALS['content_cache'][$cid]);
-  }  
+  }
 
   if (isset($GLOBALS['content_cache'][$cid])) {
     return $GLOBALS['content_cache'][$cid];
   }
 
-    
+
   $content = new stdClass();
   $content->cid = $cid;
-  
+
   // First, always call content_content_load.
   call_user_func_array("content_content_load", array(&$content));
-  
+
   // Next, go through all other modules (NOT "content") that might implement this hook.
   $modules = modules_implement_hook("content_load", array('content'));
   foreach ($modules as $module) {
-    call_user_func_array($module . "_content_load", array(&$content));    
+    call_user_func_array($module . "_content_load", array(&$content));
   }
-  
-  
+
+
   // Add to our globals cache
   $GLOBALS['content_cache'][$cid] = $content;
-  
+
   return $content;
 }
 
@@ -2084,30 +2084,30 @@ function content_load($cid, $reset = FALSE) {
  * Hook form alter, to set some defaults.
  */
 function content_form_alter(&$form, $form_id) {
-  
+
 if ($form_id == 'content_edit_content_form') {
 
-    // This is a NEW form.      
+    // This is a NEW form.
     if ($form['cid']['value'] === 'new') {
-      
-      // Always set the published = TRUE, and hide.        
+
+      // Always set the published = TRUE, and hide.
       $form['published']['value'] = TRUE;
       $form['published']['attributes'] = array('class' => 'hidden');
-      
-      
+
+
       // Set visibility to 'faculty' by default, if it exists.
       if (isset($form['visibility'])) {
-        $form['visibility']['value'] = 'faculty';      
-      }        
-      
-    } // if "new"
-    
-        
-    
+        $form['visibility']['value'] = 'faculty';
+      }
 
-  } // if form_id   
-  
-  
+    } // if "new"
+
+
+
+
+  } // if form_id
+
+
 } // hook_form_alter
 
 
@@ -2133,28 +2133,28 @@ if ($form_id == 'content_edit_content_form') {
  */
 function content_get_content_for_faculty_id($content_type, $faculty_id, $order_by = "title ASC", $bool_published_only = TRUE) {
   $rtn = array();
-  
+
   $published_line = " AND n.published = 1 ";
   if (!$bool_published_only) $published_line = "";
-  
-  
-  
+
+
+
   // Display all of the event types for this faculty member.
   $res = db_query("SELECT DISTINCT(a.cid) FROM content__$content_type a, content n
                    WHERE field__faculty_id = ?
                    AND a.vid = n.vid
                    AND a.cid = n.cid
                    AND n.delete_flag = 0
-                   $published_line                                                                          
+                   $published_line
                    ORDER BY $order_by, a.vid DESC", array($faculty_id));
   while ($cur = db_fetch_object($res)) {
-    $cid = $cur->cid;      
-    $content = content_load($cid);  
+    $cid = $cur->cid;
+    $content = content_load($cid);
     $rtn[$cid] = $content;
   }
-  
+
   return $rtn;
-  
+
 }
 
 
@@ -2163,16 +2163,16 @@ function content_get_content_for_faculty_id($content_type, $faculty_id, $order_b
 
 /**
  * Implementation of content's hook_content_load
- * 
+ *
  * We simply wish to load from our db table.  The cid is in
  * $content->cid.
  *
- * @param unknown_type $content
+ * @param object $content
  */
 function content_content_load(&$content) {
-  
-  $res = db_query("SELECT * FROM content WHERE cid = ? 
-                    ORDER BY vid DESC 
+
+  $res = db_query("SELECT * FROM content WHERE cid = ?
+                    ORDER BY vid DESC
                     LIMIT 1", array( $content->cid));
   $content = db_fetch_object($res);
 
@@ -2184,39 +2184,39 @@ function content_content_load(&$content) {
   $fieldvals = db_fetch_array($res);
 
   $types = content_get_types();
-  
+
   // This condition can occur if we have content from a module which is no longer enables.
   if (!isset($types[$content->type])) {
     return;
   }
 
   foreach ($types[$content->type]['fields'] as $fieldname => $details) {
-    
+
     if ($details['type'] != 'cfieldset') {
       $val = (string) @$fieldvals['field__' . $fieldname];
-      
+
       if (is_serialized_string($val)) {
         $val = unserialize($val);
       }
-      
-           
+
+
       $content->{'field__' . $fieldname} = array('value' => $val, 'field' => $details);
-      
+
       $display_value = $val;
 
-      // Figure out or clean up the "display_value" for this field.        
-      if (isset($details['filter']) && $details['filter'] != 'plain') {          
-        $display_value = filter_markup(trim($display_value), $details['filter']);        
+      // Figure out or clean up the "display_value" for this field.
+      if (isset($details['filter']) && $details['filter'] != 'plain') {
+        $display_value = filter_markup(trim($display_value), $details['filter']);
       }
-      else {        
+      else {
         // Always assumed to be "plain" if no filter is set.
         if (is_string($display_value)) {
-          $display_value = filter_markup($display_value, "plain");                
+          $display_value = filter_markup($display_value, "plain");
           // Need to add in line breaks if this was plain.
           $display_value = nl2br(trim($display_value));
-        }        
+        }
       }
-      
+
       // If this is a datetime-local field, then the value needs to be adjusted for it to work correctly.
       if ($details['type'] == 'datetime-local') {
         if (trim($display_value) != '') {
@@ -2227,23 +2227,23 @@ function content_content_load(&$content) {
           }
           $display_value = format_date(convert_time(strtotime($display_value)), $format);
         }
-      }      
-       
+      }
+
       // if this is a "time" field, then similar to datetime-local, it needs to be adjusted.  That's because
       // in the database we saved it as UTC.  We ned to now convert into the user's timezone.
       if ($details['type'] == 'time') {
-        if (trim($display_value) != '') {          
+        if (trim($display_value) != '') {
           $format = 'standard';
           if (isset($details['format_date'])) {
             $format = $details['format_date'];
           }
           $display_value = format_date(convert_time(strtotime("2001-01-01 $display_value")), 'custom', 'g:ia');
         }
-      }            
-      
-       
-       
-        
+      }
+
+
+
+
       // if this is a select list, we want to display the option label this value went with.
       if ($details['type'] == 'select'  || $details['type'] == 'radios') {
         $temp = @$details['options'][$val];
@@ -2253,64 +2253,64 @@ function content_content_load(&$content) {
       // If this is a single checkbox, then the possible values are 1 or blank.  Let's make the display_value a little more interesting
       if ($details['type'] == 'checkbox') {
         $val = intval($val);
-        if ($val === 1) {         
+        if ($val === 1) {
           $display_value = t("Yes / Checked");
         }
         else {
           $display_value = t("No / Unchecked");
         }
       }
-      
+
       // If this was a set of checkboxes ($val is an array), we want to display the label the values went to.
       if ($details['type'] == 'checkboxes') {
         $display_value = "<div class='checkbox-values checkbox-values-field__$fieldname'>";
         // Convert val into an array.  It will look like:  ~~key~~key~~key~~ etc.
-        // Only do this if it is not ALREADY an array.        
-        if (is_string($val)) {        
-        
+        // Only do this if it is not ALREADY an array.
+        if (is_string($val)) {
+
           @$temp = explode("~~", $val);
           if (!is_array($temp)) $temp = array();
-                  
+
           $val = array();
           foreach ($temp as $k) {
             if (trim($k) == "") continue;
             $val[$k] = $k;
           }
-          
+
         }
-        
+
         if (is_array($val)) {
-          foreach ($val as $k => $v) {  
-            $temp = @$details['options'][$v];            
+          foreach ($val as $k => $v) {
+            $temp = @$details['options'][$v];
             if ($temp != "") $display_value .= "<div class='checkbox-val'>$temp</div>";
           }
         }
-        
+
         $display_value .= "</div>";
         $content->{'field__' . $fieldname}['value'] = $val;
-        
+
       }
-      
+
       if ($details['type'] == 'file') {
-          
+
         if ($val != "") {
           $display_value = "";
-          $fids = explode(",", $val);          
+          $fids = explode(",", $val);
           foreach ($fids as $fid) {
             if ($fid == '') continue;
             $fid = intval($fid);
             $file = content_get_uploaded_file($fid);
             if ($file) {
-              $url = $file['url'];                        
-              $display_value .= "<div class='field-file-attachment-wrapper'><a href='$url'>" . $file['original_filename'] . "</a></div>";          
+              $url = $file['url'];
+              $display_value .= "<div class='field-file-attachment-wrapper'><a href='$url'>" . $file['original_filename'] . "</a></div>";
             }
           }
-        }  
-          
+        }
+
       }
-      
-      
-      
+
+
+
       $content->{'field__' . $fieldname}['display_value'] = $display_value;
     } // type != cfieldset
     else {
@@ -2321,7 +2321,7 @@ function content_content_load(&$content) {
           if (is_serialized_string($val)) {
             $val = unserialize($val);
           }
-          
+
           $content->{'field__' . $fieldname} = array('value' => $val, 'field' => $details);
           $display_value = $val;
           if (isset($edetails['filter']) && $edetails['filter'] != 'plain') {
@@ -2333,9 +2333,9 @@ function content_content_load(&$content) {
             // Need to add in line breaks if this was plain.
             $display_value = nl2br(trim($display_value));
           }
-            
-            
-          
+
+
+
           // If this is a datetime-local field, then the value needs to be adjusted for it to work correctly.
           if ($edetails['type'] == 'datetime-local') {
             if (trim($display_value) != '') {
@@ -2346,21 +2346,21 @@ function content_content_load(&$content) {
               }
               $display_value = format_date(convert_time(strtotime($display_value)), $format);
             }
-          }      
-           
+          }
+
           // if this is a "time" field, then similar to datetime-local, it needs to be adjusted.  That's because
           // in the database we saved it as UTC.  We ned to now convert into the user's timezone.
           if ($edetails['type'] == 'time') {
-            if (trim($display_value) != '') {          
+            if (trim($display_value) != '') {
               $format = 'standard';
               if (isset($details['format_date'])) {
                 $format = $details['format_date'];
               }
               $display_value = format_date(convert_time(strtotime("2001-01-01 $display_value")), 'custom', 'g:ia');
             }
-          }            
-          
-            
+          }
+
+
           // if this is a select list, we want to display the option label this value went with.
           if ($edetails['type'] == 'select') {
             $temp = @$edetails['options'][$val];
@@ -2372,12 +2372,12 @@ function content_content_load(&$content) {
             $fid = intval($val);
             $file = content_get_uploaded_file($fid);
             if ($file) {
-              $url = $file['url'];                        
-              $display_value = "<a href='$url'>" . $file['original_filename'] . "</a>";          
-            }            
+              $url = $file['url'];
+              $display_value = "<a href='$url'>" . $file['original_filename'] . "</a>";
+            }
           }
 
-          
+
           // If this was a set of checkboxes ($val is an array), we want to display the label the values went to.
           if ($edetails['type'] == 'checkboxes') {
             $display_value = "<div class='checkbox-values checkbox-values-field__$fieldname'>";
@@ -2388,10 +2388,10 @@ function content_content_load(&$content) {
               if (trim($k) == "") continue;
               $val[$k] = $k;
             }
-            
-                    
+
+
             if (is_array($val)) {
-              foreach ($val as $k => $v) {  
+              foreach ($val as $k => $v) {
                 $temp = @$details['options'][$v];
                 if ($temp != "") $display_value .= "<div class='checkbox-val'>$temp</div>";
               }
@@ -2400,20 +2400,20 @@ function content_content_load(&$content) {
             $content->{'field__' . $fieldname}['value'] = $val;
 
           }
-          
-          
+
+
           $content->{'field__' . $fieldname}['display_value'] = $display_value;
-          
+
         }
       }
     } // else type == cfielset
-      
-      
-    
-  } // foreach  
-    
-  
-     
+
+
+
+  } // foreach
+
+
+
 }
 
 
@@ -2421,7 +2421,7 @@ function content_content_load(&$content) {
  * hook_cron
  */
 function content_cron() {
-  
+
   // We want to delete any content (and files!) which have been scheduled for deletion.
   // Check to see when the last time we did this.  If less than X number of days, we don't do it.
   $last_run = intval(variable_get("content_last_run_delete_flag_removal", 0));
@@ -2429,26 +2429,26 @@ function content_cron() {
   $delete_threshold = strtotime("NOW - 7 DAYS");  // delete content older than X days.
   $c = 0;
   if ($check_against > $last_run) {
-    
+
     $delete_settings = variable_get("delete_flagged_data_from_db", array());
     if (isset($delete_settings['content'])) {
-    
-      $res = db_query("SELECT * FROM content 
+
+      $res = db_query("SELECT * FROM content
                        WHERE delete_flag = 1
                        AND `updated` < ?", array($delete_threshold));
       while ($cur = db_fetch_object($res)) {
-              
+
         $cid = $cur->cid;
         $type = $cur->type;
-        
+
         // Sanitize $type as best we can.  Should be fine coming from database, but just in case.
         $type = str_replace("`", "", $type);
         $type = str_replace("'", "", $type);
         $type = str_replace('"', "", $type);
         $type = str_replace(' ', "", $type);
         $type = str_replace('(', "", $type);
-        
-        
+
+
         // First, are there any files associated with this cid we need to delete?
         $res2 = db_query("SELECT * FROM content_files WHERE cid = ?", array($cid));
         while ($cur2 = db_fetch_object($res2)) {
@@ -2456,35 +2456,35 @@ function content_cron() {
           $full_filename = fp_get_files_path() . '/content_uploads/' . $cur2->filename;
           if (!unlink($full_filename)) {
             watchdog("content", "Could not delete $full_filename for content $cid", array(), WATCHDOG_ERROR);
-            fpm("Could not delete $full_filename for content $cid");          
+            fpm("Could not delete $full_filename for content $cid");
           }
           db_query("DELETE FROM content_files WHERE fid = ?", array($fid));
         }
-        
+
         // Now, delete the content from the table it belongs to...
         db_query("DELETE FROM `content__$type` WHERE cid = ?", array($cid));
-        
+
         // Delete from content_versions and content_last_access, engagements_tracking
         db_query("DELETE FROM content_versions WHERE cid = ?", array($cid));
         db_query("DELETE FROM content_last_access WHERE cid = ?", array($cid));
         db_query("DELETE FROM engagements_tracking WHERE cid = ?", array($cid));
-        
+
         // Lastly, delete from content table itself.
         db_query("DELETE FROM content WHERE cid = ?", array($cid));
         watchdog("content", "Deleted from db deleted content $cid", array(), WATCHDOG_DEBUG);
-        $c++;      
+        $c++;
       } // while cur
-      
-      watchdog("content", "Delete from db complete. $c items removed.", array(), WATCHDOG_DEBUG);    
-    
+
+      watchdog("content", "Delete from db complete. $c items removed.", array(), WATCHDOG_DEBUG);
+
     } // isset delete content
 
     variable_set("content_last_run_delete_flag_removal", time());
-    
+
   } // check against > last_run, so we should do it.
-  
-  
-  
+
+
+
 } // hook_cron
 
 
@@ -2504,14 +2504,14 @@ function content_cron() {
  */
 function content_display_content_admin_list() {
   global $user;
-  
+
   $rtn = "";
-  
+
   //fp_add_css(fp_get_module_path("content") . "/css/content.css");
-  
+
   fp_set_title('');
-  
-  
+
+
   $rtn .= "<br><b>" .t("Create new content:") . "</b>
             <table border='1' width='100%' cellpadding='4'>";
   // Go through all available content types and provide a link.
@@ -2527,16 +2527,16 @@ function content_display_content_admin_list() {
     }
   }
 
-  
-  
+
+
   $rtn .= "</table>
-          
+
           <hr>";
-  
+
   // Show a table of current content in the system.
   $rtn .= "<b>" . t("Existing content:") . "</b>";
   @$filter = $_GET["filter"];
-  
+
   $rtn .= "<form action='" . fp_url("admin-tools/content") . "' method='GET'>
               " . t("Display type:") . " &nbsp; <select name='filter'>
                   <option value=''>" . t(" -- Any --") . "</option>";
@@ -2546,76 +2546,76 @@ function content_display_content_admin_list() {
   }
   $rtn .= "</select><input type='submit' value='-&gt;'> </form>";
 
-  
-  
+
+
   $table_headers = array();
-  $table_headers[] = array("label" => "Actions");  
-  $table_headers[] = array("label" => "Title", "field" => "n.title");  
-  $table_headers[] = array("label" => "Type", "field" => "n.type");  
-  $table_headers[] = array("label" => "Published", "field" => "n.published");  
-  $table_headers[] = array("label" => "Author");  
+  $table_headers[] = array("label" => "Actions");
+  $table_headers[] = array("label" => "Title", "field" => "n.title");
+  $table_headers[] = array("label" => "Type", "field" => "n.type");
+  $table_headers[] = array("label" => "Published", "field" => "n.published");
+  $table_headers[] = array("label" => "Author");
   $table_headers[] = array("label" => "Updated", "field" => "n.updated");
-     
-  // Set our initial sort, if none is already set.   
+
+  // Set our initial sort, if none is already set.
   theme_table_header_sortable_set_initial_sort('n.updated', 'DESC');
-  
+
   $rtn .= "<table width='100%' border='1'>";
   // Draw our our table headers, with links....
-  $rtn .= theme_table_header_sortable($table_headers);  
-  
+  $rtn .= theme_table_header_sortable($table_headers);
+
   $params = array();
   $filter_line = "";
   if ($filter != "") {
     $filter_line = "AND type = :ftype";
     $params[":ftype"] = $filter;
-    
+
   }
-  
+
   $content_types = content_get_types();
-  
+
   // Only look for types which have been defined (nothing for modules we have since disabled)
   $types_line = "AND `type` IN ('" . join("','", array_keys($content_types)) . "')";
-  
-      
-  // Get our order by clause based on selected table header, if any.    
-  $order_by = theme_table_header_sortable_order_by($table_headers);  
+
+
+  // Get our order by clause based on selected table header, if any.
+  $order_by = theme_table_header_sortable_order_by($table_headers);
   $res = pager_query("SELECT DISTINCT(cid) FROM content n
                       WHERE delete_flag = 0
                       $types_line
-                      $filter_line                                                       
+                      $filter_line
                       $order_by", $params, 20, 0, "SELECT COUNT(DISTINCT(cid)) FROM content n
                                                         WHERE delete_flag = 0
                                                         $types_line
-                                                        $filter_line                                                       
-                                                        $order_by", $params);    
+                                                        $filter_line
+                                                        $order_by", $params);
 
-  
-    
+
+
   while ($cur = db_fetch_array($res)) {
-      
-    $content = content_load($cur['cid']);    
-    
+
+    $content = content_load($cur['cid']);
+
     $author = fp_load_user($content->user_id);
     $author_name = "";
     if ($author && isset($author->name)) {
       $author_name = $author->name;
     }
-    
+
     $updated = format_date(convert_time($content->updated));
-    
+
     $view_link = $edit_link = "";
     $view_link = l("<i class='fa fa-eye'></i>", "content/$content->cid");
-    
+
     if ((user_has_permission("edit_any_{$content->type}" . "_content")) || (user_has_permission("edit_own_{$content->type}" . "_content") && intval($content->user_id) === intval($user->id) && intval($user->id) > 0)) {
       $edit_link = l("<i class='fa fa-pencil'></i>", "content/{$cur["cid"]}/edit");
     }
-    
-    
-    
+
+
+
     $rtn .= "<tr>
                 <td>$view_link &nbsp; $edit_link</td>
                 <td valign='top'>" . $content->title . "</td>";
-    
+
     $rtn .= "
                 <td valign='top'>" . $content->type . "</td>
                 <td valign='top'>" . $content->published . "</td>
@@ -2623,20 +2623,20 @@ function content_display_content_admin_list() {
                 <td valign='top'>" . $updated . "</td>
              </tr>";
   }
-  
+
   $rtn .= "</table>";
-   
-  // Display the pager that was generated by the pager_query above!  
-  $rtn .= theme_pager(); 
-   
-    
+
+  // Display the pager that was generated by the pager_query above!
+  $rtn .= theme_pager();
+
+
   return $rtn;
 }
 
 
 /**
  * Return an array with all the possible content types known to FlightPath
- * 
+ *
  * Modules may declare their content types using the hook_content_register_content_type hook.
  * You should clear the cache after creating a new content type.
  *
@@ -2648,23 +2648,23 @@ function content_get_types() {
   if (isset($GLOBALS['content_types_cache'])) {
     return $GLOBALS['content_types_cache'];
   }
-    
+
   $modules = modules_implement_hook("content_register_content_type");
   foreach($modules as $module) {
-    $types = call_user_func($module . '_content_register_content_type');  
+    $types = call_user_func($module . '_content_register_content_type');
     $rtn += $types;
   }
-  
+
   $GLOBALS['content_types_cache'] = $rtn;
-  
+
   return $rtn;
-  
+
 }
 
 
 /**
  * Implementation of this module's hook_content_register_content_type.
- * 
+ *
  * I mainly just want to register the "page" content type, for a basic
  * web page set up.
  *
@@ -2672,22 +2672,22 @@ function content_get_types() {
 function content_content_register_content_type() {
   $arr['page'] = array(
     'title' => 'Page',
-    'description' => 'This is a basic, publicly visible web page.',    
+    'description' => 'This is a basic, publicly visible web page.',
   );
-  
+
   $fields['body'] = array(
-    'type' => 'textarea_editor',  
+    'type' => 'textarea_editor',
     'label' => '',
-    'filter' => 'basic',        
+    'filter' => 'basic',
   );
-  
+
   $arr['page']['fields'] = $fields;
-  
-  
-  
-  
+
+
+
+
   return $arr;
-  
+
 }
 
 
@@ -2697,7 +2697,7 @@ function content_content_register_content_type() {
  */
 function content_render_content($bool_show_delete = FALSE) {
   $rtn = "";
-  
+
   $res = db_query("SELECT * FROM content WHERE delete_flag = 0
                     ORDER BY posted DESC");
   while ($cur = db_fetch_array($res)) {
@@ -2707,73 +2707,73 @@ function content_render_content($bool_show_delete = FALSE) {
     if ($bool_show_delete) {
       $delete_link = "";
       $delete_link = fp_get_js_confirm_link(t("Are you sure you wish to delete this content?"), 'window.location="' . fp_url("content/delete", "aid=" . $cur["aid"]) . '"', t("Delete?"));
-      $rtn .= "<div class='content-delete'>$delete_link</div>";  
+      $rtn .= "<div class='content-delete'>$delete_link</div>";
     }
-    
+
     $rtn .= "</div>";
-  }                    
-  
+  }
+
   return $rtn;
 }
 
 
 /**
  * Implementation of hook_perm
- * 
+ *
  * We want to create a permission for every content type.
  *
  */
 function content_perm() {
-  $rtn = array();  
+  $rtn = array();
 
-  
+
   $rtn["admin_content"] = array(
     "title" => t("Administer Content"),
     "description" => t("The user needs this permission to access the content page at all, in
                       addition to specific permissions listed below for editing
                       different content types."),
   );
-  
+
   $rtn["admin_public_files"] = array(
     "title" => t("Administer Public Files"),
     "description" => t("The user is allowed to upload, modify, or delete 'public files' which are stored in a special location
                         on the web server.  Only give this permission to admin or developer users."),
   );
-  
-  
+
+
   $types = content_get_types();
   foreach ($types as $type => $details) {
 
     $rtn ["add_$type" . "_content"] = array(
-      "title" => t("Add new") . " " . $details["title"] . " " . t("content"),      
+      "title" => t("Add new") . " " . $details["title"] . " " . t("content"),
     );
 
 
     $rtn ["view_$type" . "_content"] = array(
-      "title" => "&nbsp; &nbsp; " . t("View published") . " " . $details["title"] . " " . t("content"),      
+      "title" => "&nbsp; &nbsp; " . t("View published") . " " . $details["title"] . " " . t("content"),
     );
 
-      
+
     $rtn ["edit_any_$type" . "_content"] = array(
-      "title" => "&nbsp; &nbsp; " . t("Edit any") . " " . $details["title"] . " " . t("content"),      
+      "title" => "&nbsp; &nbsp; " . t("Edit any") . " " . $details["title"] . " " . t("content"),
     );
 
     $rtn ["edit_own_$type" . "_content"] = array(
-      "title" => "&nbsp; &nbsp; " . t("Edit own") . " " . $details["title"] . " " . t("content"),      
+      "title" => "&nbsp; &nbsp; " . t("Edit own") . " " . $details["title"] . " " . t("content"),
     );
-    
+
     $rtn ["delete_any_$type" . "_content"] = array(
-      "title" => "&nbsp; &nbsp; " . t("Delete any") . " " . $details["title"] . " " . t("content"),      
+      "title" => "&nbsp; &nbsp; " . t("Delete any") . " " . $details["title"] . " " . t("content"),
     );
-    
+
     $rtn ["delete_own_$type" . "_content"] = array(
-      "title" => "&nbsp; &nbsp; " . t("Delete own") . " " . $details["title"] . " " . t("content"),      
+      "title" => "&nbsp; &nbsp; " . t("Delete own") . " " . $details["title"] . " " . t("content"),
     );
-    
-    
-    
+
+
+
   }
-  
+
   return $rtn;
 }
 
@@ -2785,10 +2785,10 @@ function content_perm() {
  *  delta => "This is the title of the block.",
  *  ),
  * );
- * 
+ *
  * Delta can be just about anything machine-readable.  Alphanumeric and underscores only.
  * Ex: 0, 1, fun_2, etc.
- * 
+ *
  */
 function content_blocks() {
   return array(
@@ -2805,18 +2805,18 @@ function content_blocks() {
  * );
  */
 function content_render_block($delta) {
-  
+
   $rtn = array();
-  
+
   if ($delta == "primary") {
-      
+
     fp_add_css(fp_get_module_path("content") . "/css/content.css");
-    
-    $rtn["title"] = t("content");       
+
+    $rtn["title"] = t("content");
     $rtn["body"] = content_render_content();
   }
-  
-  
+
+
   return $rtn;
-  
+
 }

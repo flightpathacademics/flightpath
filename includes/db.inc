@@ -536,7 +536,7 @@ function fp_get_user_timezone($account = NULL) {
 /**
  * Look up the user_id based on the the user_name.  Returns FALSE if it cannot find it.
  *
- * @param unknown_type $user_name
+ * @param string $user_name
  */
 function db_get_user_id($user_name) {
   $user_id = db_result(db_query("SELECT user_id FROM users WHERE user_name = ?", $user_name));
@@ -765,7 +765,7 @@ function db_insert_id() {
 /**
  * Return the array from the user_settings table.
  *
- * @param unknown_type $user_id
+ * @param int $user_id
  */
 function db_get_user_settings($user_id) {
   $db = get_global_database_handler();
@@ -788,8 +788,8 @@ function db_get_school_id_for_user_id($user_id) {
 /**
  * Return a specific setting's value, based on the var_name given.
  *
- * @param unknown_type $user_id
- * @param unknown_type $var_name
+ * @param int $user_id
+ * @param string $var_name
  */
 function db_get_user_setting($user_id, $var_name = "", $default_value = "") {
   $settings = db_get_user_settings($user_id);
@@ -969,8 +969,8 @@ function variable_get_for_school($name, $default_value = "", $school_id = 0, $bo
  * This will write to our variables database table, as well as store in a cache
  * array for quick look-up later.
  *
- * @param unknown_type $name
- * @param unknown_type $value
+ * @param string $name
+ * @param mixed $value
  */
 function variable_set($name, $value) {
 

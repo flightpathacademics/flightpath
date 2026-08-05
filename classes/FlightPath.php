@@ -655,7 +655,7 @@ class FlightPath extends stdClass
 
 
 
-  function assign_courses_to_list(ObjList $list_requirements, Student $student, $bool_perform_assignment = true, Group $group = null, $bool_check_significant_courses = false, $assign_to_semester_num = -1) {
+  function assign_courses_to_list(CourseList $list_requirements, Student $student, $bool_perform_assignment = TRUE, Group $group = NULL, $bool_check_significant_courses = FALSE, $assign_to_semester_num = -1) {
 
     $count = 0;
     $school_id = 0;
@@ -663,7 +663,7 @@ class FlightPath extends stdClass
       $school_id = $student->school_id;
     }
 
-    if ($group == NULL || $group == '' || $group == 0 || $group == FALSE)
+    if ($group == NULL || $group == '' || $group == FALSE)
     {
       $group = new Group();
       $group->group_id = 0;
@@ -1113,8 +1113,8 @@ class FlightPath extends stdClass
    * Get the plain English title of a subject, from
    * subject_id.  Ex: COSC = Computer Science.
    *
-   * @param unknown_type $subject_id
-   * @return unknown
+   * @param string $subject_id
+   * @return string
    */
   function get_subject_title($subject_id, $school_id = 0)
   {
@@ -1523,7 +1523,7 @@ class FlightPath extends stdClass
       $course_id = trim($temp[1]);
       $semester_num = trim($temp[2]);
       $group_id = str_replace("U", "_", trim($temp[3]));  // replace U with _, which was required for the submission to work (couldn't use the _ in group_id.)
-      $var_hours = trim($temp[4]) * 1;
+      $var_hours = floatval($temp[4]) * 1;
       $random_id = trim($temp[5]);
       $advised_term_id = trim($temp[6]);
       //$db_group_requirement_id = trim($temp[7]);
@@ -1654,12 +1654,12 @@ class FlightPath extends stdClass
       $course_id = $temp[0];  // required course
       $group_id = trim($temp[1]);
       $req_by_degree_id = $temp[2];
-      $semester_num = $temp[3] * 1;
+      $semester_num = intval($temp[3]) * 1;
 
       $sub_course_id = $temp[4];
       $sub_term_id = $temp[5];
       $sub_transfer_flag = $temp[6];
-      $sub_hours = $temp[7] * 1;
+      $sub_hours = floatval($temp[7]) * 1;
       $sub_addition = $temp[8];
       $sub_remarks = urldecode($temp[9]);
 
@@ -1722,11 +1722,11 @@ class FlightPath extends stdClass
     if (isset($_POST["removesubstitution"]) && trim($_POST["removesubstitution"]) != "")
     {
       $temp = explode("~",trim($_POST["removesubstitution"]));
-      $sub_id = trim($temp[0]) * 1;
+      $sub_id = intval($temp[0]) * 1;
 
       $result = $db->db_query("UPDATE student_substitutions
                   SET `delete_flag`='1'
-                  WHERE `id`='?'  ", $sub_id);
+                  WHERE `id`= ?  ", array($sub_id));
 
       watchdog("remove_substitution", "$student_id,sub_id:$sub_id");
 
@@ -1753,8 +1753,8 @@ class FlightPath extends stdClass
                   `term_id`,`transfer_flag`,`group_id`,`degree_id`,
                   `posted`)
                   VALUES
-                  ('?','?','?','?','?','?','?','?')
-                  ", $student_id,$faculty_id,$course_id,$term_id,$transfer_flag,$group_id,$degree_id,time());
+                  (?,?,?,?,?,?,?,?)
+                  ", array($student_id,$faculty_id,$course_id,$term_id,$transfer_flag,$group_id,$degree_id,time()));
 
       watchdog("save_unassign_group", "$student_id,group_id:$group_id,degree_id:$degree_id");
 
@@ -1764,12 +1764,12 @@ class FlightPath extends stdClass
     if (isset($_POST["restore_unassign_group"]) && trim($_POST["restore_unassign_group"]) != "")
     {
       $temp = explode("~",trim($_POST["restore_unassign_group"]));
-      $unassign_id = trim($temp[0]) * 1;
+      $unassign_id = intval($temp[0]) * 1;
 
 
       $result = $db->db_query("UPDATE student_unassign_group
                   SET `delete_flag`='1'
-                  WHERE `id`='?' ", $unassign_id);
+                  WHERE `id`=? ", array($unassign_id));
 
       watchdog("restore_unassign_group", "$student_id,unassign_id:$unassign_id");
 
@@ -1800,11 +1800,11 @@ class FlightPath extends stdClass
     if (isset($_POST["restore_transfer_eqv"]) && trim($_POST["restore_transfer_eqv"]) != "")
     {
       $temp = explode("~",trim($_POST["restore_transfer_eqv"]));
-      $unassign_id = trim($temp[0]) * 1;
+      $unassign_id = intval($temp[0]) * 1;
 
       $result = $db->db_query("UPDATE student_unassign_transfer_eqv
                   SET `delete_flag`='1'
-                  WHERE `id`='?' ", $unassign_id);
+                  WHERE `id`=? ", array($unassign_id));
 
       watchdog("restore_unassign_transfer", "$student_id,unassign_id:$unassign_id");
 

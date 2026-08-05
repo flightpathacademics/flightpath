@@ -2176,7 +2176,7 @@ function fp_theme_location($bool_include_base_path = TRUE) {
  * Will draw a string in a pretty curved box.  Used for displaying semester
  * titles.
  *
- * @param string $title
+ * @param string $text
  * @return string
  */
 function fp_render_curved_line($text) {
@@ -2214,7 +2214,7 @@ function fp_render_section_title($text, $extra_class = '') {
  * Will draw a string in a pretty square box.  Used for displaying semester
  * titles.
  *
- * @param string $title
+ * @param string $text
  * @return string
  */
 function fp_render_square_line($text) {

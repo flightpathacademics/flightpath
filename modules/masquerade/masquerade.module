@@ -13,36 +13,36 @@
  *
  */
 function masquerade_menu() {
-  
+
   $items = array();
-  
+
   $items["admin-tools/masquerade"] = array(
     "title" => "Masquerade as another user",
     "page_callback" => "fp_render_form",
     "page_arguments" => array("masquerade_form"),
     "access_arguments" => array("access_masquerade"),
-    "page_settings" => array(      
-      "menu_links" => array(          
+    "page_settings" => array(
+      "menu_links" => array(
         0 => array(
           "text" => t("Admin Tools"),
           "path" => "admin-tools",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
-      ),    
+      ),
       "menu_icon" => fp_get_module_path('masquerade') . "/icons/mask.png",
-    ),        
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
     'weight' => 40,
   );
-   
-  
+
+
   $items["masquerade"] = array(
     "page_callback" => "masquerade_perform_masquerade",
     "access_arguments" => array("access_masquerade"),
-    "type" => MENU_TYPE_CALLBACK,  
-  ); 
-  
-  
+    "type" => MENU_TYPE_CALLBACK,
+  );
+
+
   return $items;
 }
 
@@ -54,32 +54,32 @@ function masquerade_menu() {
  */
 function masquerade_perform_masquerade() {
   global $user;
-  
+
   $user_id = intval($_REQUEST["user_id"]);
-  
+
   // Do not allow user_id 1
   if ($user_id === 1) {
     fp_add_message(t("Admin user is not allowed to be selected for masquerade."), "error");
     fp_goto("<front>");
     return;
   }
-  
-  
+
+
   // Set up a new $account object.
   $account = new stdClass();
-  
+
   $account = fp_load_user($user_id);
   // Okay, let's look for all the modules who have implimented hook_user_login
   $modules = modules_implement_hook("user_login");
   foreach ($modules as $module) {
     call_user_func_array($module . '_user_login', array(&$account));
   }
-  
+
   // Set the $account to the SESSION.
   $_SESSION["fp_user_object"] = $account;
-  
+
   watchdog("masquerade", "@user is now masquerading as @newuser. New CWID: @cwid", array("@user" => "$user->name ($user->id)", "@newuser" => "$account->name ($account->id)", "@cwid" => $account->cwid));
-  
+
   $_SESSION["masquerade_active"] = TRUE;
   $_SESSION["masquerade_original_user"] = $user;
   fp_goto("<front>");
@@ -88,11 +88,11 @@ function masquerade_perform_masquerade() {
 
 function masquerade_init() {
   global $user;
-  
+
   if (isset($_SESSION["masquerade_active"]) && $_SESSION["masquerade_active"]) {
     fp_add_message(t("You are currently masquerading as %user (originally %ou).  To return to your previous
-                      account, log out, then log in normally.", 
-                      array("%user" => $user->name, "%ou"=>$_SESSION["masquerade_original_user"]->name)), 
+                      account, log out, then log in normally.",
+                      array("%user" => $user->name, "%ou"=>$_SESSION["masquerade_original_user"]->name)),
                    "status", TRUE);
 
   }
@@ -106,14 +106,14 @@ function masquerade_init() {
  */
 function masquerade_form() {
   $form = array();
-  
+
   $m = 1;
-  
+
   $form["mark" . $m++] = array(
     "value" => "<p>" . t("Use this form to decide which user you wish to impersonate.  Once selected,
                   you will experience FlightPath as that user would until you log out.") . "</p>",
   );
-   
+
   $form["username_or_cwid"] = array(
     "label" => t("Last name, Email, Username, or CWID:"),
     "type" => "textfield",
@@ -121,53 +121,53 @@ function masquerade_form() {
     "description" => t("Enter the last name, email, username, or CWID of the person you wish to impersonate.  Will display the first 20 results only.
                       <br>Ex:  peacocrj7  or  10022312."),
   );
-  
+
   $form["submit"] = array(
-    "type" => "submit", 
+    "type" => "submit",
     "spinner" => TRUE,
     "value" => t("Look up"),
   );
-  
+
   $users = @$_SESSION["masquerade_lookup_users"];
   if (is_array($users) && count($users) > 0) {
     $form["mark" . $m++] = array(
       "value" => "<hr><p>" . t("Please click on the user you wish to impersonate:") . "</p>
         <ul>",
     );
-    
+
     $c = 0;
     foreach($users as $uid) {
       $account = fp_load_user($uid);
-             
+
       $type = "";
       if ($account->is_student) $type .= t("student");
       if ($account->is_faculty) $type .= t("faculty");
-      
-      $form["mark" . $m++] = array(        
-        "value" => "<li>" . l("$account->name - $account->f_name $account->l_name ($account->cwid) - $type", "masquerade", "user_id=$account->id") . "</li>",        
+
+      $form["mark" . $m++] = array(
+        "value" => "<li>" . l("$account->name - $account->f_name $account->l_name ($account->cwid) - $type", "masquerade", "user_id=$account->id") . "</li>",
       );
-      
+
       $c++;
       if ($c >= 20) break;
-      
+
     }
-    
+
     $form["mark" . $m++] = array(
       "value" => "</ul>",
     );
-    
+
     unset($_SESSION["masquerade_lookup_users"]);
-    
+
   }
   else if (is_array($users)) {
     $form["mark" . $m++] = array(
       "value" => "<hr><p>" . t("Sorry, no results.") . "</p>
         <ul>",
     );
-    unset($_SESSION["masquerade_lookup_users"]);    
+    unset($_SESSION["masquerade_lookup_users"]);
   }
-  
-  
+
+
   return $form;
 }
 
@@ -175,57 +175,57 @@ function masquerade_form() {
 
 /**
  * The submit handler for masquerade_form.
- * 
+ *
  * We want to look up the user(s) for the username or CWID entered, placing that
  * information in the SESSION.  When we return to the form, it will display these
  * results for the user to select.
  *
- * @param unknown_type $form
- * @param unknown_type $form_state
+ * @param array $form
+ * @param array $form_state
  */
 function masquerade_form_submit($form, &$form_state) {
-  
+
   $username_or_cwid = trim($form_state["values"]["username_or_cwid"]);
 
-  
+
   if ($username_or_cwid == "") return;
-  
+
   $users = array();
-  
+
   $res = db_query("SELECT user_id FROM users WHERE cwid LIKE ?
                     LIMIT 20", array("%$username_or_cwid%"));
   while ($cur = db_fetch_array($res)) {
     $users[intval($cur['user_id'])] = $cur['user_id'];
   }
-  
+
   $res = db_query("SELECT user_id FROM users WHERE user_name LIKE ?
                     LIMIT 20", array("%$username_or_cwid%"));
   while ($cur = db_fetch_array($res)) {
     $users[intval($cur['user_id'])] = $cur['user_id'];
   }
 
-  
+
   $res = db_query("SELECT user_id FROM users WHERE email LIKE ?
                     LIMIT 20", array("%$username_or_cwid%"));
   while ($cur = db_fetch_array($res)) {
     $users[intval($cur['user_id'])] = $cur['user_id'];
   }
-  
+
   $res = db_query("SELECT user_id FROM users WHERE l_name LIKE ?
                     LIMIT 20", array("%$username_or_cwid%"));
   while ($cur = db_fetch_array($res)) {
     $users[intval($cur['user_id'])] = $cur['user_id'];
   }
-    
+
   if (isset($users[1])) {
     unset($users[1]); // do not allow admin user to be selected.
   }
-  
-  
+
+
   // Okay, let's add the users we found to the SESSION.
   $_SESSION["masquerade_lookup_users"] = $users;
-   
-  
+
+
 }
 
 
@@ -239,7 +239,7 @@ function masquerade_perm() {
   return array(
     "access_masquerade" => array(
       "title" => t("Access masquerade"),
-      "description" => t("This is a VERY powerful permission!  It will allow 
+      "description" => t("This is a VERY powerful permission!  It will allow
                            a user to become any other user (except admin), without
                            knowing their password.  Only give it to very trusted users."),
       "admin_restricted" => TRUE, // means only appears for admin (user_id == 1)

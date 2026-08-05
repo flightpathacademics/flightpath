@@ -223,7 +223,7 @@ function draw_menu_item($url, $target, $icon_img, $title, $description = "") {
  *
  * Returns the HTML or "" if no menus could be drawn.
  *
- * @param unknown_type $menu_array
+ * @param array $menu_array
  */
 function draw_menu_items($menu_array) {
 
@@ -2384,82 +2384,6 @@ function draw_menu_items($menu_array) {
 
 
 
-  /**
-   * This function is called when we know we are on a mobile
-   * browser.  We have to handle tab rendering differently
-   * in order to make them all fit.
-   *
-   * @param unknown_type $tab_array
-   */
-  function z__draw_mobile_tabs($tab_array) {
-
-    $rtn = "";
-
-    $js_vars = "var mobileTabSelections = new Array(); ";
-
-    if (count($tab_array) <= 1) return "";
-
-
-    $rtn .= "<table border='0' width='200' cellpadding='0' cellspacing='0' class='fp-mobile-tabs'>
-             <td>
-             <b>Display: </b>";
-
-
-/*    if (count($tab_array) == 1) {
-      // Just one element, no need to render the select list.
-      $rtn .= $tab_array[0]["title"];
-      $rtn .= "</td></table>";
-      return $rtn;
-    }
-*/
-
-    $rtn .= "<select onChange='executeSelection()' id='mobileTabsSelect'>";
-
-    for ($t = 0; $t < count($tab_array); $t++)
-    {
-      $title = $tab_array[$t]["title"];
-      $active = $tab_array[$t]["active"];
-      $on_click = $tab_array[$t]["on_click"];
-
-      if ($title == "")
-      {
-        continue;
-      }
-      $sel = ($active == true) ? $sel = "selected":"";
-
-      $rtn .= "<option $sel value='$t'>$title</option>";
-
-      $js_vars .= "mobile_tab_selections[$t] = '$on_click'; \n";
-
-    }
-
-    $rtn .= "</select>
-              </td></table>";
-
-
-    $rtn .= '
-      <script type="text/javascript">
-      ' . $js_vars . '
-
-      function executeSelection() {
-        var sel = document.getElementById("mobileTabsSelect").value;
-
-        var statement = mobile_tab_selections[sel];
-        // Lets execute the statement...
-        eval(statement);
-
-      }
-
-
-      </script>
-    ';
-
-    return $rtn;
-
-  }
-
-
-
 
   /**
    * Displays the contents of the Descripton tab for the course popup.
@@ -2482,13 +2406,13 @@ function draw_menu_items($menu_array) {
    *
    * @return string
    */
-  function display_popup_course_description($course_id = "", Course $course = NULL, $group = NULL, $show_advising_buttons = FALSE)
+  function display_popup_course_description($course_id = 0, Course $course = NULL, $group = NULL, $show_advising_buttons = FALSE)
   {
     $pC = "";
 
     $db = $this->db;
 
-    if ($course_id != "" && $course_id != 0) {
+    if ($course_id && $course_id != 0) {
       $course = new Course($course_id);
     }
 
@@ -3216,7 +3140,7 @@ function draw_menu_items($menu_array) {
    * method of $course->fix_title to make a course's title more readable.
    *
    * @param string $str
-   * @return stromg
+   * @return string
    */
   function fix_course_title($str)
   {
@@ -3243,7 +3167,7 @@ function draw_menu_items($menu_array) {
    *
    * @return string
    */
-  function display_semester(Semester $semester, $bool_display_hour_count = false)
+  function display_semester(Semester $semester, $bool_display_hour_count = FALSE)
   {
     // Display the contents of a semester object
     // on the screen (in HTML)
@@ -3845,9 +3769,9 @@ function draw_menu_items($menu_array) {
    * @todo Check on unused variables.
    *
    * @param CourseList $course_list
-   * @param unknown_type $group
-   * @param unknown_type $semester_num
-   * @return unknown
+   * @param Group $group
+   * @param int $semester_num
+   * @return string
    */
   function display_group_course_list($course_list, $group, $semester_num)
   {
@@ -5193,9 +5117,10 @@ function draw_menu_items($menu_array) {
    * actually make a substitution.
    *
    * @param int $course_id
-   * @param int $group_id
+   * @param string $group_id
    * @param int $semester_num
-   * @param int $hours_avail
+   * @param string $hours_avail
+   * @param int $req_by_degree_id
    *
    * @return string
    */

@@ -75,7 +75,7 @@ class Course extends stdClass
  *
  * @param bool $bool_use_draft
  */
-  function __construct($course_id = "", $is_transfer = false, DatabaseHandler $db = NULL, $is_blank = false, $catalog_year = "", $bool_use_draft = false)
+  function __construct($course_id = 0, $is_transfer = FALSE, DatabaseHandler $db = NULL, $is_blank = FALSE, $catalog_year = 0, $bool_use_draft = FALSE)
   {
 
     $this->advised_hours = -1;
@@ -740,7 +740,7 @@ class Course extends stdClass
 
     $this->set_hours_awarded(0,floatval($temp[7]) * 1);  // *1 to force numeric, and trim extra zeros.
     $this->term_id        =   $temp[8];
-    $this->advised_hours      = $temp[9] * 1;
+    $this->advised_hours      = floatval($temp[9]) * 1;
 
     $this->bool_transfer    =   (bool) $temp[10];
 
@@ -782,8 +782,8 @@ class Course extends stdClass
 
     $this->db_substitution_id_array   =   fp_explode_assoc($temp[17]);
 
-    $this->min_hours        =   $temp[18] * 1;
-    $this->max_hours        =   $temp[19] * 1;
+    $this->min_hours        =   floatval($temp[18]) * 1;
+    $this->max_hours        =   floatval($temp[19]) * 1;
 
     //$this->bool_substitution_new_from_split =   (bool) $temp[20];
     $this->set_degree_details_from_data_array(fp_explode_assoc($temp[20]), "bool_substitution_new_from_split");
@@ -919,7 +919,7 @@ class Course extends stdClass
    * the course has not been advised for any particular number
    * of hours, then it's min_hours are returned.
    *
-   * @return unknown
+   * @return float
    */
   function get_advised_hours()
   {
@@ -1166,8 +1166,6 @@ class Course extends stdClass
   /**
    * Calculate the quality points for this course's grade and hours.
    *
-   * @param string $grade
-   * @param int $hours
    * @return int
    */
   function get_quality_points($degree_id = 0){
@@ -1295,11 +1293,11 @@ class Course extends stdClass
 
 
     $catalog_line = "";
-    if ($this->catalog_year != "") {
-      $catalog_line = " AND catalog_year = '$this->catalog_year' ";
+    if ($this->catalog_year != 0) {
+      $catalog_line = " AND catalog_year = '" . intval($this->catalog_year) . "' ";
     }
 
-    if ($is_transfer == false) {
+    if ($is_transfer == FALSE) {
       $this->load_descriptive_data();
     }
     else {
@@ -1310,8 +1308,8 @@ class Course extends stdClass
                     transfer_courses a,
                     transfer_institutions b
                     WHERE
-                     a.transfer_course_id = '?'
-                     AND a.institution_id = b.institution_id ", $course_id);
+                     a.transfer_course_id = ?
+                     AND a.institution_id = b.institution_id ", array($course_id));
       $cur = $this->db->db_fetch_array($res);
       if ($cur) {
         $this->subject_id = $cur["subject_id"];
@@ -1792,9 +1790,9 @@ class Course extends stdClass
    * Similar to load_descriptive_data(), this will load whatever we have
    * for $this transfer course.
    *
-   * @param int $student_id
-   *        - If > 0, we will look for the course data which has been
-   *          assigned for this particular student.  If it == 0, we will
+   * @param string $student_id
+   *        - If != '', we will look for the course data which has been
+   *          assigned for this particular student.  If it == '', we will
    *          just use the first bit of data we find.
    *
    */
@@ -1941,7 +1939,7 @@ class Course extends stdClass
    *          Spring will be "Spr" and 2006 will be '06.
    *
    *
-   * @return unknown
+   * @return string
    */
   function get_term_description($bool_abbreviate = FALSE)
   {

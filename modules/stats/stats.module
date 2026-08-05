@@ -4,7 +4,6 @@
  * @file
  * This module displays statistics and reports for FlightPath
  *
- * @return unknown
  */
 
 
@@ -13,7 +12,7 @@
 /**
  * Implementation of hook_menu
  *
- * @return unknown
+ * @return array
  */
 function stats_menu() {
   $items = array();
@@ -231,7 +230,7 @@ function stats_menu() {
  *
  * There are no permissions on this, except the can_access_stats permission.
  *
- * @param unknown_type $batch_id
+ * @param int $batch_id
  */
 function stats_download_csv_from_batch($batch_id) {
 
@@ -261,7 +260,7 @@ function stats_download_csv_from_batch($batch_id) {
  * Lets the user download a CSV file from a completed batch, from a file created during the batch operation.
  *
  *
- * @param unknown_type $batch_id
+ * @param int $batch_id
  */
 function stats_download_csv_from_batch_file($batch_id) {
 
@@ -330,8 +329,8 @@ function stats_perm() {
 /**
  * Return the HTML for a pulldown containing the catalog years available for selection.
  *
- * @param unknown_type $selected
- * @param unknown_type $display_submit
+ * @param string $selected
+ * @param bool $display_submit
  */
 function stats_draw_catalog_year_pulldown($selected = "", $display_submit = FALSE) {
 
@@ -651,34 +650,6 @@ function stats_draw_majors_pulldown($smajor = "", $display_submit = FALSE, $bool
 
 
 
-/**
- * Draws a simple form for entering a student's CWID, used by other reports.
- *
- * @param unknown_type $path
- * @param unknown_type $student_cwid
- * @return unknown
- */
-function z__stats_draw_student_cwid_form($path, $student_cwid = "") {
-  $rtn = "";
-
-  $rtn .= "<form action='" . fp_url($path) . "' method='GET' >
-            " . t("Enter a student's CWID to see their courses") . "
-            <br>
-            <span class='form-element element-type-textfield'>
-              <input type='textfield' value='$student_cwid' name='student_cwid'>
-            </span>
-
-            <span class='buttons form-element element-type-submit'>
-              <input type='submit' value='" . t("Submit") . "'>
-            </span>
-          </form> <hr>
-          ";
-
-
-  return $rtn;
-}
-
-
 
 
 
@@ -748,7 +719,7 @@ function stats_select_school_form_submit($form, $form_state) {
 /**
  * This report shows how many students are in each major.
  *
- * @return unknown
+ * @return string
  */
 function stats_report_major_counts() {
   $rtn = "";
@@ -844,7 +815,7 @@ function stats_report_major_counts() {
  * This is a helpful report for determining which functionality is most popular
  * in FlightPath
  *
- * @return unknown
+ * @return string
  */
 function stats_report_flightpath_use_summary() {
   $rtn = "";
@@ -1012,14 +983,14 @@ function stats_report_flightpath_use_summary() {
  * Used by the use_summary report.  This function will simply return log counts
  * for the specified parameters in the watchdog table.
  *
- * @param unknown_type $action
- * @param unknown_type $action_array
- * @param unknown_type $bool_distinct
- * @param unknown_type $start_date
- * @param unknown_type $end_date
- * @param unknown_type $bool_students
- * @param unknown_type $bool_mobile_only
- * @return unknown
+ * @param string $action
+ * @param string $action_array
+ * @param bool $bool_distinct
+ * @param string $start_date
+ * @param string $end_date
+ * @param bool $bool_students
+ * @param bool $bool_mobile_only
+ * @return int
  */
 function stats_get_log_count($action = "", $action_array = "", $bool_distinct = false, $start_date = '', $end_date = '', $bool_students = true, $bool_mobile_only = false)
 {
@@ -1066,7 +1037,7 @@ function stats_get_log_count($action = "", $action_array = "", $bool_distinct = 
             $action_line
           ");
   $cur = db_fetch_array($res);
-  return $cur["count"] * 1;
+  return intval($cur["count"]) * 1;
 
 
 }
@@ -1129,7 +1100,7 @@ function stats_draw_date_range_form($path, $start_date = "", $end_date = "", $ad
  * This report shows which advisors are using FlightPath most often.
  *
  *
- * @return unknown
+ * @return string
  */
 function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
   $rtn = "";
@@ -1345,7 +1316,7 @@ function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
  * This report shows recent activity in FlightPath.  It can also be used to see
  * if anyone is "online" in that they would have activity less than 5 minutes old.
  *
- * @return unknown
+ * @return string
  */
 function stats_report_access_stats() {
   $rtn = "";
@@ -1459,7 +1430,7 @@ function stats_report_access_stats() {
 /**
  * This report shows a list of all of a student's courses which FlightPath is aware of.
  *
- * @return unknown
+ * @return string
  */
 function stats_report_student_course_list() {
 
@@ -1639,7 +1610,7 @@ function stats_report_student_course_list() {
  * set weight < 100 to appear above.
 
  *
- * @return unknown
+ * @return string
  */
 function stats_display_main() {
   $rtn = "";

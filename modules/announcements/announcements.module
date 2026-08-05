@@ -1,8 +1,8 @@
 <?php
 
 /**
- *  This module lets administrators create announcements, when then appear can appear in a block.  
- * 
+ *  This module lets administrators create announcements, when then appear can appear in a block.
+ *
  * This module uses the Content module to do all of its work.  All it is really for is
  * specifying the content type, then handing its output as a block.
 */
@@ -11,7 +11,7 @@
 /**
  * Implementatin of content's hook_content_register_content_type
  *
- * @return unknown
+ * @return array
  */
 function announcements_content_register_content_type() {
   $arr = array(
@@ -19,41 +19,41 @@ function announcements_content_register_content_type() {
       "title" => t("Announcement"),
       "description" => t("This is a short announcement to the user, meant to be displayed like news items in a block."),
       "settings" => array(),
-    ),    
+    ),
   );
-  
-  
+
+
   $fields['activity_datetime'] = array(
     'type' => 'datetime-local',
-    'label' => t('Date/Time'),    
+    'label' => t('Date/Time'),
     'value' => 'now',
     'format_date' => 'short',
     'weight' => 60,
-    'required' => TRUE, 
-  );
-  
-  
-  
-  
-  $fields['msg'] = array(
-    'type' => 'textarea_editor',  
-    'label' => t('Message'),
-    'filter' => 'basic',
-    'weight' => 70,    
+    'required' => TRUE,
   );
 
-  
-  
+
+
+
+  $fields['msg'] = array(
+    'type' => 'textarea_editor',
+    'label' => t('Message'),
+    'filter' => 'basic',
+    'weight' => 70,
+  );
+
+
+
   $fields['visibility'] = array(
-    'type' => 'radios',  
+    'type' => 'radios',
     'label' => 'Visible to:',
-    'options' => array('public' => 'Anyone (incl. student)', 'faculty' => 'Faculty/Staff only'),   
-    'weight' => 80,    
-  );  
-  
-  
-  $arr['announcement']['fields'] = $fields;  
-  
+    'options' => array('public' => 'Anyone (incl. student)', 'faculty' => 'Faculty/Staff only'),
+    'weight' => 80,
+  );
+
+
+  $arr['announcement']['fields'] = $fields;
+
   return $arr;
 }
 
@@ -63,7 +63,7 @@ function announcements_content_register_content_type() {
  *
  */
 function announcements_perm() {
-    
+
   return array(
     "view_faculty_announcements" => array(
       "title" => t("View faculty announcements"),

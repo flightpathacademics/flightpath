@@ -403,7 +403,7 @@ function search_user_can_search_for_some_advisees() {
 /**
  * Implementation of hook_perm
  *
- * @return unknown
+ * @return array
  */
 function student_search_perm() {
   return array(

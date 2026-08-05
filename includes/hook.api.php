@@ -364,9 +364,9 @@ function hook_theme_pie_charts(&$theme) {
  *
  * For example, you may want to let the user know that a nightly job failed to run the night before.
  *
- * @return array()
- *  - severity: "normal", "warning", and "alert" are the choices.
- *  - status: A short message.
+ * @return array
+ *          - severity: "normal", "warning", and "alert" are the choices.
+ *          - status: A short message.
  *
  */
 function hook_status() {

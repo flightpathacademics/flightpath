@@ -94,7 +94,7 @@ class DatabaseHandler extends stdClass
    * db_query("INSERT ... '" . $db->escape_question_marks($xml) . "' ");  is good.
    * db_query("INSERT ... '?' ", $xml);  is good.   This function not needed.
    *
-   * @param unknown_type $str
+   * @param string $str
    */
   function escape_question_marks($str) {
     $rtn = str_replace("?", "??", $str);
@@ -116,8 +116,8 @@ class DatabaseHandler extends stdClass
    * or
    * $result = $db->db_query("SELECT * FROM table WHERE name = :name ", array(":name" => $name));
    *
-   * @param unknown_type $sql_query
-   * @return unknown
+   * @param string $sql_query
+   * @return resource
    */
   function db_query($sql_query, $args = array()) {
 
@@ -951,8 +951,8 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
   /**
    * Sets a variable's value in the variables table.
    *
-   * @param unknown_type $name
-   * @param unknown_type $value
+   * @param string $name
+   * @param string $value
    */
   function set_variable($name, $value) {
 
@@ -1226,8 +1226,8 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
    * Returns whatever is in the Rank field for this student.
    * Ex: JR, SR, FR, etc.
    *
-   * @param unknown_type $student_id
-   * @return unknown
+   * @param string $student_cwid
+   * @return string
    */
   function get_student_rank($student_cwid) {
 
@@ -1252,7 +1252,10 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
    * Returns the student's first and last name, put together.
    * Ex: John Smith.
    *
-   * @param int $student_id
+   * @param string $cwid
+   * @param bool $bool_include_cwid
+   *        - If set to TRUE, the student's name will be returned
+   *          with their CWID in parentheses. Ex: John Smith (12345)
    * @return string
    */
   function get_student_name($cwid, $bool_include_cwid = FALSE) {
@@ -1288,7 +1291,7 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
    * Returns the faculty's first and last name, put together.
    * Ex: John Smith or John W Smith.
    *
-   * @param int $faculty_id
+   * @param string $cwid
    * @return string
    */
   function get_faculty_name($cwid, $bool_include_cwid = FALSE) {
@@ -1595,8 +1598,8 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
    *
    * Returns boolean FALSE if it cannot find the degree.
    *
-   * @param unknown_type $degree_id
-   * @param unknown_type $bool_use_draft
+   * @param int $degree_id
+   * @param bool $bool_use_draft
    */
   function get_degree_allow_dynamic($degree_id, $bool_use_draft = FALSE) {
 

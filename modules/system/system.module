@@ -1044,7 +1044,7 @@ function system_execute_php_form_submit($form, $form_state) {
 /**
  * Display a confirmation form before we run the db updates (hook_updates)
  *
- * @return unknown
+ * @return array
  */
 function system_confirm_db_updates_form() {
   $form = array();
@@ -1081,8 +1081,8 @@ function system_confirm_db_updates_form() {
 /**
  * Perform the actual hook_update calls here, send the user to a completed page.
  *
- * @param unknown_type $form
- * @param unknown_type $form_state
+ * @param array $form
+ * @param array $form_state
  */
 function system_confirm_db_updates_form_submit($form, $form_state) {
 
@@ -2253,8 +2253,8 @@ function system_get_exclude_degree_ids_from_appears_in_counts($school_id) {
  * we want to save them to special tables, then remove them from the form_state so
  * they don't get saved to the variables table, taking up a lot of space.
  *
- * @param unknown_type $form
- * @param unknown_type $form_state
+ * @param array $form
+ * @param array $form_state
  */
 function system_school_data_form_validate($form, &$form_state) {
 
@@ -2931,8 +2931,8 @@ function system_settings_form_validate($form, &$form_state) {
 /**
  *  Extra submit handler for the system_settings_form
  *
- * @param unknown_type $form
- * @param unknown_type $form_state
+ * @param array $form
+ * @param array $form_state
  */
 function system_settings_form_submit($form, &$form_state) {
 
@@ -3647,7 +3647,7 @@ function system_perform_clear_menu_cache() {
  * This page is meant to be displayed in conjunction with blocks, so the user can
  * easily define their own messages and such.
  *
- * @return unknown
+ * @return string
  */
 function system_display_login_page() {
   $rtn = "";

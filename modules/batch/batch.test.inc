@@ -14,7 +14,7 @@
  *
  * Notice that $batch is being automatically supplied.
  *
- * @param unknown_type $batch
+ * @param array $batch
  */
 function batch_test_finished_page($batch, $items_max) {
   $rtn = "";
@@ -114,8 +114,8 @@ function batch_test_form_submit($form, $form_state) {
  *   !!!!! You MUST set $batch["results"]["finished"] = TRUE  when the batch has completed.
  *
  *
- * @param unknown_type $batch
- * @param unknown_type $items_max
+ * @param array $batch
+ * @param int $items_max
  */
 function batch_test_perform_batch_operation(&$batch, $items_max) {
 

@@ -1781,7 +1781,7 @@ function fp_set_page_tabs($tab_array) {
 /**
  * Allows the programmer to define subtabs at the top of the page.
  *
- * @param unknown_type $tab_array
+ * @param array $tab_array
  */
 function fp_set_page_sub_tabs($tab_array) {
   $GLOBALS["fp_set_page_sub_tabs"] = $tab_array;
@@ -1846,7 +1846,7 @@ function fp_set_breadcrumbs($arr = array()) {
 /**
  * Allows the programmer to set the title of the page, overwriting any default title.
  *
- * @param unknown_type $title
+ * @param string $title
  */
 function fp_set_title($title) {
   $GLOBALS["fp_set_title"] = $title;
@@ -2176,10 +2176,10 @@ function fp_explode_assoc($string, $delim = ",", $assign_sep = "_S-") {
 /**
  * Return the filepath to the module
  *
- * @param unknown_type $module
- * @param unknown_type $bool_include_file_system_path
- * @param unknown_type $bool_include_base_path
- * @return unknown
+ * @param string $module
+ * @param bool $bool_include_file_system_path
+ * @param bool $bool_include_base_path
+ * @return string
  */
 function fp_get_module_path($module, $bool_include_file_system_path = FALSE, $bool_include_base_path = TRUE) {
 
@@ -2236,7 +2236,7 @@ function fp_user_is_student($account = null) {
 /**
  * Simply returns the module's row from the modules table, if it exists.
  *
- * @param unknown_type $module
+ * @param string $module
  */
 function fp_get_module_details($module) {
 
@@ -3329,7 +3329,7 @@ function fp_number_pad($number, $len) {
  *   fp_truncate_decimals(1.999999, 2) = 1.99
  *
  *
- * @param unknown_type $places
+ * @param int $places
  */
 function fp_truncate_decimals($num, $places = 2) {
 
@@ -3384,9 +3384,9 @@ function fp_query_string_encode($query, $exclude = array(), $parent = '') {
  *
  * @see fp_debug_current_time_millis()
  *
- * @param unknown_type $debug_val
- * @param unknown_type $var
- * @return unknown
+ * @param string $debug_val
+ * @param mixed $var
+ * @return string
  */
 function fp_debug_ct($debug_val = "", $var = "")
 { // Shortcut to the other function.
@@ -3415,7 +3415,7 @@ function fp_debug_ct($debug_val = "", $var = "")
  * @param String $var
  *          Optional.  Include a variable name so you can have more than one timer running
  *          at the same time.
- * @return unknown
+ * @return string
  */
 function fp_debug_current_time_millis($debug_val = "", $show_current_time = true, $var = "")
 {

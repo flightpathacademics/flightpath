@@ -821,7 +821,7 @@ class Student extends stdClass
    *
    * It will return FALSE if the student never took the course.
    *
-   * @param unknown_type $course
+   * @param Course $course
    */
   function get_best_grade_for_course(Course $course) {
 

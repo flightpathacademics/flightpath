@@ -2886,7 +2886,7 @@ function user_get_roles_for_fapi($bool_exclude_anonymous = TRUE, $bool_exclude_a
 /**
  * Simple function to return the human-readable name for a role, by rid.
  *
- * @param unknown_type $rid
+ * @param int $rid
  */
 function user_get_role_name($rid) {
   $name = db_result(db_query("SELECT name FROM roles WHERE rid = ? ", $rid));
