@@ -44,7 +44,11 @@ function admin_display_degrees_popup_add_group2() {
               AND school_id = ?
               ORDER BY title ", $de_catalog_year, $school_id);
   while($cur = db_fetch_array($res)) {
-    extract($cur, 3, "db");
+
+    $db_group_id = $cur['group_id'];
+    $db_title = $cur['title'];
+    $db_group_name = $cur['group_name'];
+
     $rtn .= "<tr><td valign='middle'>
                 <input type='radio' name='rgroups' value='$db_group_id'></td>
           <td valign='top' class='tenpt'>
@@ -417,27 +421,29 @@ function admin_copy_degree_form_submit($form, &$form_state) {
     $res = db_query("SELECT * FROM draft_degree_requirements
                          WHERE degree_id = ?", array($src_degree_id));
     while ($cur = db_fetch_array($res)) {
-      extract($cur, 3, "db");
+
 
       $res2 = $db->db_query("INSERT INTO draft_degree_requirements
                           (degree_id, semester_num, group_id,
                            group_requirement_type,
                            group_hours_required,
                            group_min_hours_allowed,
-                           group_min_grade, course_id,
+                           group_min_grade,
+                           course_id,
                            course_min_grade,
                            course_requirement_type,
                            data_entry_value)
                            VALUES
                           (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
-                            $dest_degree_id, $db_semester_num, $db_group_id,
-                           $db_group_requirement_type,
-                           $db_group_hours_required,
-                           $db_group_min_hours_allowed,
-                           $db_group_min_grade, $db_course_id,
-                           $db_course_min_grade,
-                           $db_course_requirement_type,
-                           $db_data_entry_value);
+                            array($dest_degree_id, $cur['semester_num'], $cur['group_id'],
+                              $cur['group_requirement_type'],
+                              $cur['group_hours_required'],
+                              $cur['group_min_hours_allowed'],
+                              $cur['group_min_grade'],
+                              $cur['course_id'],
+                              $cur['course_min_grade'],
+                              $cur['course_requirement_type'],
+                              $cur['data_entry_value']));
 
     }
 
@@ -852,7 +858,28 @@ function admin_display_degrees() {
   while($cur = db_fetch_array($res)) {
 
     $db_exclude = 0;
-    extract($cur, 3, "db");
+    //extract($cur, 3, "db");
+
+    $db_degree_id = $cur['degree_id'];
+    $db_school_id = $cur['school_id'];
+    $db_major_code = $cur['major_code'];
+    $db_degree_type = $cur['degree_type'];
+    $db_degree_level = $cur['degree_level'];
+    $db_degree_class = $cur['degree_clas'];
+    $db_title = $cur['title'];
+    $db_semester_titles_csv = $cur['semester_titles_csv'];
+    $db_catalog_year = $cur['db_catalog_year'];
+    $db_exclude = $cur['exclude'];
+    $db_public_note = $cur['public_note'];
+    $db_allow_dynamic = $cur['allow_dynamic'];
+    $db_advising_weight = $cur['advising_weight'];
+    $db_override_degree_hours = $cur['override_degree_hours'];
+    $db_min_tracks = $cur['min_tracks'];
+    $db_max_tracks = $cur['max_tracks'];
+    $db_default_tracks = $cur['default_tracks'];
+    $db_track_selection_config = $cur['track_selection_config'];
+
+
 
     $disp_level = strtoupper($db_degree_level);
 
