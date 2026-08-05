@@ -357,12 +357,12 @@ function admin_copy_degree_form_submit($form, &$form_state) {
                         AND catalog_year = ?
                         AND school_id = ? ", $source_major_code, "$source_major_code|%", $de_catalog_year, $school_id) ;
     while($cur = db_fetch_array($res)) {
-      extract($cur, 3, "db");
+      //extract($cur, 3, "db");
       $dest_code = $destination_major_code;
-      if (strstr($db_major_code, "|")) {
+      if (strstr($cur['major_code'], "|")) {
         // We need to adjust the destCode to match
         //the source.
-        $dest_code = str_replace("$source_major_code|", "$destination_major_code|", $db_major_code);
+        $dest_code = str_replace("$source_major_code|", "$destination_major_code|", $cur['major_code']);
       }
 
       $res2 = db_query("INSERT INTO draft_degree_tracks
@@ -370,9 +370,9 @@ function admin_copy_degree_form_submit($form, &$form_state) {
                           track_title, track_short_title, track_description, school_id)
                           VALUES
                           (?, ?, ?, ?, ?, ?, ?) ",
-                          $de_catalog_year, $dest_code, $db_track_code,
-                          $db_track_title, $db_track_short_title,
-                          $db_track_description, $destination_school_id) ;
+                          array($de_catalog_year, $dest_code, $cur['track_code'],
+                                $cur['track_title'], $cur['track_short_title'],
+                                $cur['track_description'], $destination_school_id));
 
     }
   }
@@ -382,7 +382,24 @@ function admin_copy_degree_form_submit($form, &$form_state) {
   // Okay, now it's time to go through the sourceArray
   // and duplicate them.
   foreach ($source_array as $src) {
-    extract($src, 3, "src");
+    //extract($src, 3, "src");
+
+    $src_major_code = $src['major_code'];
+    $src_degree_id = $src['degree_id'];
+    $src_degree_type = $src['degree_type'];
+    $src_degree_level = $src['degree_level'];
+    $src_degree_class = $src['degree_class'];
+    $src_title = $src['title'];
+    $src_public_note = $src['public_note'];
+    $src_semester_titles_csv = $src['semester_titles_csv'];
+    $src_exclude = $src['exclude'];
+    $src_allow_dynamic = $src['allow_dynamic'];
+    $src_advising_weight = $src['advising_weight'];
+    $src_override_degree_hours = $src['override_degree_hours'];
+    $src_min_tracks = $src['min_tracks'];
+    $src_max_tracks = $src['max_tracks'];
+    $src_default_tracks = $src['default_tracks'];
+    $src_track_selection_config = $src['track_selection_config'];
 
     $dest_code = $destination_major_code;
     if (strstr($src_major_code, "|")) {
@@ -412,16 +429,15 @@ function admin_copy_degree_form_submit($form, &$form_state) {
                          min_tracks, max_tracks, default_tracks, track_selection_config, school_id)
                          VALUES
                         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
-                         $dest_degree_id, $dest_code, $src_degree_type, $src_degree_level, $src_degree_class, $src_title,
-                         $src_public_note, $src_semester_titles_csv,
-                         $de_catalog_year, $src_exclude, $src_allow_dynamic, $src_advising_weight, $src_override_degree_hours,
-                         $src_min_tracks, $src_max_tracks, $src_default_tracks, $src_track_selection_config, $destination_school_id);
+                         array($dest_degree_id, $dest_code, $src_degree_type, $src_degree_level, $src_degree_class, $src_title,
+                               $src_public_note, $src_semester_titles_csv,
+                               $de_catalog_year, $src_exclude, $src_allow_dynamic, $src_advising_weight, $src_override_degree_hours,
+                               $src_min_tracks, $src_max_tracks, $src_default_tracks, $src_track_selection_config, $destination_school_id));
 
     // Now, go through the source's degree requirements and copy those over.
     $res = db_query("SELECT * FROM draft_degree_requirements
                          WHERE degree_id = ?", array($src_degree_id));
     while ($cur = db_fetch_array($res)) {
-
 
       $res2 = $db->db_query("INSERT INTO draft_degree_requirements
                           (degree_id, semester_num, group_id,
