@@ -870,7 +870,7 @@ function stats_report_flightpath_use_summary() {
   $_REQUEST['report_type'] = 'unique';
   $_REQUEST['is_whatif'] = 'yes';
   $wi_advisings = stats_report_advisor_use(TRUE);
-  $total_advisings = $regular_advisings + $wi_advisings;
+  $total_advisings = intval($regular_advisings) + intval($wi_advisings);
   $rtn .= "<b>Advisings</b>
       <blockquote>
         Total unique student advisings: $total_advisings <br>
@@ -984,7 +984,7 @@ function stats_report_flightpath_use_summary() {
  * for the specified parameters in the watchdog table.
  *
  * @param string $action
- * @param string $action_array
+ * @param mixed $action_array
  * @param bool $bool_distinct
  * @param string $start_date
  * @param string $end_date
@@ -992,7 +992,7 @@ function stats_report_flightpath_use_summary() {
  * @param bool $bool_mobile_only
  * @return int
  */
-function stats_get_log_count($action = "", $action_array = "", $bool_distinct = false, $start_date = '', $end_date = '', $bool_students = true, $bool_mobile_only = false)
+function stats_get_log_count($action = "", $action_array = NULL, $bool_distinct = FALSE, $start_date = '', $end_date = '', $bool_students = true, $bool_mobile_only = false)
 {
 
   $action_line = " `type` = '$action' ";

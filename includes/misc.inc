@@ -320,9 +320,10 @@ function fp_re_array_files($file_post) {
 
 // From: https://www.php.net/manual/en/function.timezone-offset-get.php
 /**    Returns the offset from the origin timezone to the remote timezone, in seconds.
-*    @param $remote_tz;
-*    @param $origin_tz; If null the servers current timezone is used as the origin.
-*    @return int;
+*    @param $remote_tz
+*    @param $origin_tz
+*             If null the servers current timezone is used as the origin.
+*    @return int
 */
 function get_timezone_offset($remote_tz, $origin_tz = null) {
     if($origin_tz === null) {
@@ -530,8 +531,11 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
 
   // We don't want to bother repeating the same message more than once for errors.  The following code
   // will prevent that.
-  // TODO: Make this a setting?
-  $errmsg = $err_name . ": $message<br>... ($line) $filename";
+
+  $errmsg = "$message<br>... ($line) $filename";
+  if (is_string($err_name)) {
+    $errmsg = $err_name . ": $message<br>... ($line) $filename";
+  }
   $errmsg_hash = hash('sha256', $errmsg);
 
   if (!isset($GLOBALS['fp_error_handler__already_shown_error'][$errmsg_hash])) {
@@ -1041,7 +1045,7 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   // RFC 2616 states that all unknown HTTP codes must be treated the same as the
   // base code in their class.
   if (!isset($responses[$code])) {
-    $code = floor($code / 100) * 100;
+    $code = floor(intval($code) / 100) * 100;
   }
 
   switch ($code) {
@@ -3311,7 +3315,7 @@ function get_modules_menus() {
  * and so on.
  *
  * @param int $number
- * @param int $n
+ * @param int $len
  * @return String
  */
 function fp_number_pad($number, $len) {

@@ -1849,7 +1849,7 @@ function content_add_new_uploaded_file($file, $cid = 0, $bool_override_original_
 /**
  * Save the content to the database.
  *
- * @param int $cid
+ * @param object $content
  */
 function content_save(&$content) {
 

@@ -2558,7 +2558,7 @@ function draw_menu_items($menu_array) {
         $sub_id = $course->db_substitution_id_array[$course->get_course_substitution()->req_by_degree_id];
 
         $temp = $db->get_substitution_details($sub_id);
-        $sub_hours = @$temp['sub_hours'] * 1;  // trim excess zeros with *1.
+        $sub_hours = @floatval($temp['sub_hours']) * 1;  // trim excess zeros with *1.
         if ($sub_hours < $use_hours) {
           $use_hours = $sub_hours;
         }
@@ -4039,17 +4039,14 @@ function draw_menu_items($menu_array) {
    * @param bool $hideheaders
    *       - If TRUE, then the course/hrs/grd headers will not be displayed.
    *
-   * @param int $table_width
-   *       - The HTML table width, in pixels.  If not set, it will default
-   *         to 300 pixels wide.
    *
    * @return string
    */
-  function draw_box_top($title, $hideheaders=false, $extra_classes = ""){
+  function draw_box_top($title, $hideheaders = FALSE, $extra_classes = ""){
     // returns the beginnings of the semester block tables...
 
     $headers = array();
-    if ($hideheaders != true)
+    if ($hideheaders != TRUE)
     {
       $headers[0] = t("Course");
       $headers[1] = t("Hrs");
@@ -4335,7 +4332,7 @@ function draw_menu_items($menu_array) {
     }
 
     if (is_numeric($hours)) {
-      $hours = $hours * 1;  // force numeric, trim extra zeros.
+      $hours = floatval($hours) * 1;  // force numeric, trim extra zeros.
     }
 
     $var_hour_icon = "&nbsp;";
@@ -5176,7 +5173,7 @@ function draw_menu_items($menu_array) {
       $c_ghost_hour = t("ghost") . "<a href='javascript: alertSubGhost();'>?</a>";
     }
 
-    if (($hours_avail*1 > 0 && $hours_avail < $c_hours) || ($c_hours <= 0))
+    if ((floatval($hours_avail) * 1 > 0 && $hours_avail < $c_hours) || ($c_hours <= 0))
     {
 
       // Use the remaining hours if we have fewer hours left in
@@ -5184,7 +5181,7 @@ function draw_menu_items($menu_array) {
       $c_hours = $hours_avail;
     }
 
-    if ($hours_avail == "" || $hours_avail*1 <= 0)
+    if ($hours_avail == "" || floatval($hours_avail) * 1 <= 0)
     {
       $hours_avail = $c_hours;
     }
