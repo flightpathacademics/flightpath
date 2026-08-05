@@ -2084,7 +2084,7 @@ function admin_edit_degree_form_submit($form, $form_state) {
   }
 
 
-  $school_id = 0;
+  $school_id = $oschool_id = 0;
   if (isset($form_state['values']['school_id'])) {
     $school_id = intval($form_state['values']['school_id']);
   }
