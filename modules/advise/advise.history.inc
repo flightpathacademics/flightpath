@@ -581,7 +581,7 @@ function advise_popup_display_summary($advising_session_id = NULL, $bool_html = 
         </tr>
         <tr>
           <td valign='top' width='10%'>" . t("Advisor:") . "</td>
-          <td valign='top'>" . fp_get_faculty_name($cur['faculty_id'], false) . "</td>
+          <td valign='top'>" . fp_get_faculty_name($cur['faculty_id']) . "</td>
 
           </tr>
           <tr>

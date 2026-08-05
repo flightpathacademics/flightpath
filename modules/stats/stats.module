@@ -1394,24 +1394,25 @@ function stats_report_access_stats() {
               ORDER BY `timestamp` DESC
               ", $interval);
   while ($cur = db_fetch_array($res)) {
-    extract ($cur, 3, "db");
+    // extract ($cur, 3, "db");
+
     $wid = $cur['wid'];
-    $account = fp_load_user($db_user_id);
+    $account = fp_load_user($cur['user_id']);
 
     $pol = ($pol == "even") ? "odd" : "even";
 
-    $minago = round((time() - $db_timestamp) / 60, 0);
+    $minago = round((time() - $cur['timestamp']) / 60, 0);
 
-    $vars = @unserialize($db_variables);
+    $vars = @unserialize($cur['variables']);
     if (!$vars) $vars = '';
 
-    $message = strip_tags(t($db_message, $vars));
+    $message = strip_tags(t($cur['message'], $vars));
     if (strlen($message) > 100) {
       $message = trim(substr($message, 0, 100)) . "...";
     }
 
 
-    $pretty_date = format_date(convert_time($db_timestamp));
+    $pretty_date = format_date(convert_time($cur['timestamp']));
 
     $user_type = "";
     if ($account->is_student) {
@@ -1425,14 +1426,14 @@ function stats_report_access_stats() {
           <td valign='top'>" . l($wid, "admin/config/watchdog/$wid") . "</td>
           <td valign='top'>$account->name</td>
           <td valign='top'>$user_type</td>
-          <td valign='top'>$db_type</td>
+          <td valign='top'>{$cur['type']}</td>
           <td valign='top'>$message</td>
           <td valign='top'>$minago " . t("min ago") . " &nbsp; <em>($pretty_date)</em></td>
         </tr>";
 
     // Let's increase our counters, if this is a new CWID.
-    if (!in_array($db_user_id, $cwid_array)) {
-      $cwid_array[] = $db_user_id;
+    if (!in_array($cur['user_id'], $cwid_array)) {
+      $cwid_array[] = $cur['user_id'];
       if ($account->is_student) {
         $student_actions++;
       } else if ($account->is_faculty) {

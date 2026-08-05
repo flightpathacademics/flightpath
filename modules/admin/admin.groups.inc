@@ -17,7 +17,7 @@ function admin_edit_group_form_validate(&$form, &$form_state) {
   if (isset($values['schools_school'])) { // A school was set from the schools module.
     $school_id = intval($values['schools_school']);  // Use our NEW school_id for validating.
   }
-  
+
   $school_name = $andschool = "";
   if ($school_id > 0) $school_name = "School-" . $school_id;
   if (module_enabled("schools")) {
@@ -25,34 +25,34 @@ function admin_edit_group_form_validate(&$form, &$form_state) {
     if (isset($defs[$school_id])) $school_name = $defs[$school_id];
     $andschool = " and school %school";
   }
-  
-  
+
+
   // We want to make sure the group_name is in a machine-name format,
   // and we need to make sure it is unique for this catalog year and school_id!
   $group_name = fp_get_machine_readable(strtolower($group_name));
-  
+
   $form_state['values']['group_name'] = $group_name;
-  
-    
+
+
   // Check that group_name is unique (but exclude the current group_id from the check)
-  $mycount = db_query("SELECT count(*) as mycount FROM draft_groups 
+  $mycount = db_query("SELECT count(*) as mycount FROM draft_groups
                        WHERE group_name = ?
                        AND group_id != ?
                        AND delete_flag = 0
                        AND catalog_year = ?
                        AND school_id = ?", $group_name, $group_id, $de_catalog_year, $school_id)->fetchColumn();
-  
-  if ($mycount > 0) {    
+
+  if ($mycount > 0) {
     form_error("group_name", t("The 'Internal group machine name' %gn is already in use in FlightPath by another group
-                                in the catalog year %cy$andschool.  
+                                in the catalog year %cy$andschool.
                                 Please change to a different name, and submit again. <b>Your work has NOT been saved.</b>
                                 ", array("%gn" => $group_name, "%cy" => $de_catalog_year, "%school" => $school_name)));
     return;
   }
-  
-  
+
+
   $db = get_global_database_handler();
-  
+
 
 
   // Make sure that courses are for the correct school for this group.
@@ -79,10 +79,10 @@ function admin_edit_group_form_validate(&$form, &$form_state) {
       // within this group.
       $line = trim(str_replace("-", "", $line));  // get rid of attributes, if any.
       $line = trim(str_replace("*", "", $line));  // get rid of attributes, if any.
-      
+
       $c_tokes = explode("&",$line);
       for ($cT = 0; $cT < count($c_tokes); $cT++)
-      {        
+      {
         $tokens = explode(" ", trim($c_tokes[$cT]));
         $subject_id = trim($tokens[0]);
         $course_num = trim($tokens[1]);
@@ -92,14 +92,14 @@ function admin_edit_group_form_validate(&$form, &$form_state) {
         $subject_id = str_replace("_A_", "&", $subject_id);
 
         if ($course_id = $db->get_course_id($subject_id, $course_num, "", TRUE, $school_id, TRUE)) {
-          // Course was found correctly, no need to do anything.                    
-        } 
+          // Course was found correctly, no need to do anything.
+        }
         else {
           // The course_id could not be found!
 
           // Different message if it's a school_id problem.
           if (module_enabled("schools")) {
-            
+
             form_error("courses", t("<strong>Your work has NOT been saved.</strong> Course not found.  You specified the course %course as a requirement,
                             but this course could not be found.  This could be due to a typo, or due to the course not belonging to the same school
                             as the group (%schoolname).  Please check the course (and possibly change the group's school back first), then try again.", array("%course" => "$subject_id $course_num", "%schoolname" => $school_name)));
@@ -107,67 +107,67 @@ function admin_edit_group_form_validate(&$form, &$form_state) {
           else {
             // Not related to school (possibly).
             form_error("courses", t("<strong>Your work has NOT been saved.</strong> Course not found.  You specified the course %course as a requirement,
-                            but this course could not be found.  This could be due to a typo.  
+                            but this course could not be found.  This could be due to a typo.
                             Please check the course and try again.", array("%course" => "$subject_id $course_num")));
-                      
-          }          
-        }    
+
+          }
+        }
 
       } // for cT (tokens)
 
 
-    } // if line contains & 
+    } // if line contains &
     else {
       // Did NOT contain an ampersand (&), so this goes in the
       // regular course requirements.
-      
+
       $line = trim(str_replace("-", "", $line));  // get rid of attributes, if any.
       $line = trim(str_replace("*", "", $line));  // get rid of attributes, if any.
-      
+
       if ($line == "") continue; // blank line, so skip
-            
-      
+
+
       $tokens = explode(" ", $line);
       $subject_id = @trim($tokens[0]);
       $course_num = @trim($tokens[1]);
 
       if ($subject_id == "") continue; // blank line, or mal-formed, so skip.
-      
+
       // If the subject_id had a _A_ in it, convert this back
       // to an ampersand.
       $subject_id = str_replace("_A_", "&", $subject_id);
 
       // We don't care about catalog year anymore...
       if ($course_id = $db->get_course_id($subject_id, $course_num, "", TRUE, $school_id, TRUE)) {
-        // Course found normally, do nothing.        
-      } 
+        // Course found normally, do nothing.
+      }
       else {
-            
+
           // Different message if it's a school_id problem.
           if (module_enabled("schools")) {
-            
+
             form_error("courses", t("<strong>Your work has NOT been saved.</strong> Course not found.  You specified the course %course as a requirement,
                             but this course could not be found.  This could be due to a typo, or due to the course not belonging to the same school
                             as the group (%schoolname).  Please check the course (and possibly change the group's school back first), then try again.", array("%course" => "$subject_id $course_num", "%schoolname" => $school_name)));
           }
           else {
             // Not related to school (possibly).
-            
+
             form_error("courses", t("<strong>Your work has NOT been saved.</strong> Course not found.  You specified the course %course as a requirement,
-                            but this course could not be found.  This could be due to a typo.  
+                            but this course could not be found.  This could be due to a typo.
                             Please check the course and try again.", array("%course" => "$subject_id $course_num")));
-                 
-          }          
-            
+
+          }
+
 
       }
 
     } // else (did not contain &)
 
-  } // for t (lines of courses)  
-    
-  
-  
+  } // for t (lines of courses)
+
+
+
 } // .._validate
 
 
@@ -176,7 +176,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
   $values = $form_state["values"];
   $de_catalog_year = $values["de_catalog_year"];
 
-  $db = get_global_database_handler();  
+  $db = get_global_database_handler();
   $db2 = new DatabaseHandler();
 
   $group_id = $values["group_id"];
@@ -201,7 +201,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
 
 
   // Save the entire post to the log.
- 
+
   // Since we are making a change to the draft table(s), let's add a row
   // to draft instructions.
   $db->add_draft_instruction("-");
@@ -211,14 +211,14 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
   if ($_POST["perform_action2"] == "delete_group" && user_has_permission("can_delete_data_entry")) {
     $res = db_query("UPDATE draft_groups
                 SET delete_flag = '1'
-                WHERE group_id = '?' 
+                WHERE group_id = '?'
                 AND catalog_year = '?'
                 ", $group_id, $de_catalog_year);
     fp_add_message(t("The group @title (%name) has been deleted successfully for @year", array("@title" => $title, "%name" => $group_name, "@year" => $de_catalog_year)));
-    
+
     watchdog("admin", "Deleted group: $group_name - $group_id ($de_catalog_year), school_id = $school_id");
-    
-    fp_goto("admin/groups", "de_catalog_year=$de_catalog_year");    
+
+    fp_goto("admin/groups", "de_catalog_year=$de_catalog_year");
     return;
   }
 
@@ -232,10 +232,10 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
     $form["#redirect"] = array(
       "path" => "admin/groups/edit-group",
       "query" => "group_id=$group_id&de_catalog_year=$de_catalog_year",
-    );    
-    
+    );
+
     $form_state['values']['group_id'] = $group_id; // set the new group id back into the array, for other modules to use.
-    
+
   }
 
   $res = db_query("UPDATE draft_groups
@@ -245,9 +245,9 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
               icon_filename = ?,
               catalog_repeat = ?,
               public_note = ?,
-              data_entry_comment = ?              
+              data_entry_comment = ?
               WHERE
-                group_id = ? ", 
+                group_id = ? ",
               $group_name, $title, $priority, $icon_filename, $catalog_repeat, $public_note, $data_entry_comment, $group_id);
 
   // We need to delete all the existing course & subgroup requirements from this group.
@@ -292,7 +292,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
       $res = db_query("UPDATE draft_groups
               SET definition = ''
               WHERE
-                group_id = '?' ", $group_id);    
+                group_id = '?' ", $group_id);
   }
 
 
@@ -325,7 +325,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
       // First, we need to request a new branchID for this new group.
       if (!$branch_id = $db->request_new_group_id()) {
         die ("Error.  Could not create new group (branch) ID.");
-      } 
+      }
       else {
         // Add this branch to the list of requirements for this group.
         $query = "INSERT INTO draft_group_requirements
@@ -334,16 +334,16 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
         $res = db_query($query, $group_id, $branch_id);
 
       }
-      
+
       $attributes = "";
       if (substr($line, 0, 1) == "-") $attributes .= "-";  // hidden attribute
-      if (substr($line, 0, 1) == "*") $attributes .= "*";  // recommended attribute            
+      if (substr($line, 0, 1) == "*") $attributes .= "*";  // recommended attribute
       $line = trim(str_replace("-", "", $line));  // get rid of attributes, if any.
       $line = trim(str_replace("*", "", $line));  // get rid of attributes, if any.
-      
+
       $c_tokes = explode("&",$line);
       for ($cT = 0; $cT < count($c_tokes); $cT++)
-      {        
+      {
         $tokens = explode(" ", trim($c_tokes[$cT]));
         $subject_id = trim($tokens[0]);
         $course_num = trim($tokens[1]);
@@ -371,24 +371,24 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
         // to an ampersand.
         $subject_id = str_replace("_A_", "&", $subject_id);
 
-        
+
         if ($course_id = $db->get_course_id($subject_id, $course_num, "", TRUE, $school_id, TRUE)) {
-                    
+
           $query = "INSERT INTO draft_group_requirements
                     (group_id, course_id,
                     course_min_grade, course_repeats, attributes, data_entry_value)
                     values (?,?,?,?, ?, ?) ";
           $res = db_query($query, $branch_id, $course_id, $min_grade, $course_repeats, $attributes, "$subject_id~$course_num");
-        } 
+        }
         else {
           // The course_id could not be found!
-          
+
           form_error("courses", t("Course Not Found!
               You specified the course
               <b>%course</b> as a requirement, but this course
               could not be found in the catalog.
               It was removed from the list of requirements.
-              Are you sure you typed it correctly?  Please check 
+              Are you sure you typed it correctly?  Please check
               your spelling, and add the course again.", array("%course" => "$subject_id $course_num")));
 
         }
@@ -396,18 +396,18 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
       }
 
 
-    } 
+    }
     else {
       // Did NOT contain an ampersand (&), so this goes in the
       // regular course requirements.
-      
+
       $attributes = "";
       if (substr($line, 0, 1) == "-") $attributes .= "-";  // hidden attribute
-      if (substr($line, 0, 1) == "*") $attributes .= "*";  // recommended attribute            
+      if (substr($line, 0, 1) == "*") $attributes .= "*";  // recommended attribute
       $line = trim(str_replace("-", "", $line));  // get rid of attributes, if any.
       $line = trim(str_replace("*", "", $line));  // get rid of attributes, if any.
-            
-      
+
+
       $tokens = explode(" ", $line);
       $subject_id = @trim($tokens[0]);
       $course_num = @trim($tokens[1]);
@@ -433,15 +433,15 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
       // to an ampersand.
       $subject_id = str_replace("_A_", "&", $subject_id);
 
-      // We don't care about catalog year anymore...      
+      // We don't care about catalog year anymore...
       if ($course_id = $db->get_course_id($subject_id, $course_num, "", TRUE, $school_id, TRUE)) {
         $query = "INSERT INTO draft_group_requirements
                     (group_id, course_id,
                     course_min_grade, course_repeats, attributes, data_entry_value)
                     values (?,?,?,?,?,?) ";
         $res = db_query($query, $group_id, $course_id, $min_grade, $course_repeats, $attributes, "$subject_id~$course_num");
-        
-      } 
+
+      }
       else {
         // The course_id could not be found!
         form_error("courses", t("Course Not Found!
@@ -449,7 +449,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
               <b>%course</b> as a requirement, but this course
               could not be found in the catalog.
               It was removed from the list of requirements.
-              Are you sure you typed it correctly?  Please check 
+              Are you sure you typed it correctly?  Please check
               your spelling, and add the course again.", array("%course" => "$subject_id $course_num")));
 
       }
@@ -469,7 +469,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
   // Clear previous values to make sure the Required Courses box gets updated,
   // even if its set to readonly.
   clear_session_form_values("admin_edit_group_form");
-  
+
 }
 
 
@@ -484,7 +484,7 @@ function admin_edit_group_form_submit(&$form, &$form_state) {
  */
 function admin_process_catalog_repeats_for_group_courses_text($courses, $catalog_year, $school_id = 0) {
   $rtn = "";
-  
+
   // Okay, now we look at the actual "courses" box and assemble the group
   // in the database.
   $lines = explode("\n", $courses);
@@ -502,12 +502,12 @@ function admin_process_catalog_repeats_for_group_courses_text($courses, $catalog
     // then this is a subgroup (branch), and we need to look at all the courses
     // on that branch.
     if (strstr($line, "&")) {
-      
+
       // If this branch contains an ampersand, I don't think I should attempt to process it at all.
       $new_line = $line;
-      
-      
-    } 
+
+
+    }
     else {
       // Did NOT contain an ampersand (&), so this goes in the
       // regular course requirements.
@@ -541,9 +541,9 @@ function admin_process_catalog_repeats_for_group_courses_text($courses, $catalog
       $max_cat_repeats = fp_get_max_catalog_repeats_for_course($subject_id, $course_num, $catalog_year, TRUE, $school_id);
       if (!$max_cat_repeats) $max_cat_repeats = 0;
 
-      // Okay, now, let's rebuild this line.        
+      // Okay, now, let's rebuild this line.
       $subject_id = str_replace("&", "_A_", $subject_id);
-      
+
       $new_line .= "$subject_id $course_num";
       // Was there a min grade?
       if ($min_grade != "") {
@@ -554,18 +554,18 @@ function admin_process_catalog_repeats_for_group_courses_text($courses, $catalog
         $new_line .= " [$max_cat_repeats]";
       }
 
-           
+
 
 
     } // else (does not contain &)
 
     // Add to our $rtn
     $rtn .= $new_line . "\n";
-    
+
   } // for lines...
-        
-    
-    
+
+
+
   return $rtn;
 } // admin_process_catalog_repeats_for_group_courses_text
 
@@ -580,38 +580,38 @@ function admin_process_catalog_repeats_for_group_courses_text($courses, $catalog
 function admin_edit_group_form() {
   $form = array();
   $m = 0;
-  
+
   $group_id = $_REQUEST["group_id"];
   $db = get_global_database_handler();
   $school_id = 0;
   if ($group_id != "new") {
     $school_id = $db->get_school_id_for_group_id($group_id, TRUE);
   }
-  
+
   $de_catalog_year = admin_get_de_catalog_year(TRUE, $school_id);
-  
-  
+
+
   fp_add_css(fp_get_module_path("admin") . "/css/admin.css");
   fp_add_js(fp_get_module_path("admin") . "/js/admin.js");
-    
-  
+
+
   $form["#redirect"] = array(
     "path" => "admin/groups/edit-group",
     "query" => "group_id=$group_id&de_catalog_year=$de_catalog_year",
   );
-  
-  
+
+
   $draft_setting_current_catalog_year = variable_get_for_school("current_draft_catalog_year", 2006, $school_id);
 
   if ($draft_setting_current_catalog_year < $de_catalog_year) {
-    
+
     fp_add_message(t("<b>Warning:</b> The \"Current DRAFT catalog year\" advising setting is set to %dy, which is less than the catalog year
-                    you are editing. This might cause issues with loading course 
+                    you are editing. This might cause issues with loading course
                     names and data correctly.", array("%dy" => $draft_setting_current_catalog_year)), "warning");
-    $draft_setting_current_catalog_year = "<b>" . $draft_setting_current_catalog_year . "</b>"; 
+    $draft_setting_current_catalog_year = "<b>" . $draft_setting_current_catalog_year . "</b>";
   }
 
-  
+
   if (user_has_permission("can_view_advanced")) {
     $form["mark" . $m++] = array(
       "type" => "markup",
@@ -639,8 +639,8 @@ function admin_edit_group_form() {
   $definition = '';
   if (isset($group->definition)) {
     $definition = $group->definition;
-  }  
-  
+  }
+
   $form["set_definition"] = array(
     "type" => "hidden",
     "value" => urlencode($definition),
@@ -682,8 +682,8 @@ function admin_edit_group_form() {
     "required" => TRUE,
     "popup_description" => t("The group's <b>internal machine name</b> is internal to FlightPath, and is never seen by the average user.
                         <br>
-                        You may use this to distinguish between groups with the same title. 
-                        <br>Ex: <i>major_electives_sr</i> and <i>major_electives_jr</i>.  
+                        You may use this to distinguish between groups with the same title.
+                        <br>Ex: <i>major_electives_sr</i> and <i>major_electives_jr</i>.
                         <br>The field must be unique within each catalog year, and
                         consist of only letters, numbers, and underscores.  FlightPath will make
                         sure it is unique when you save, and give you a chance to change it if it
@@ -705,13 +705,13 @@ function admin_edit_group_form() {
     "weight" => 30,
   );
 
-  
+
   if (!$group->icon_filename) {
     $group->icon_filename = "major.gif";  // set a default if none is specified!
   }
 
   $form["icon_filename"] = array(
-    "type" => "hidden",    
+    "type" => "hidden",
     "value" => $group->icon_filename,
     "weight" => 40,
   );
@@ -725,7 +725,7 @@ function admin_edit_group_form() {
     "weight" => 41,
   );
 
-    
+
   $form["definition"] = array(
     "type" => "markup",
     "label" => t("Definition:"),
@@ -735,7 +735,7 @@ function admin_edit_group_form() {
                             >[" . t("edit definition") . "]</a>",
     "weight" => 50,
   );
- 
+
 
   $form["mark" . $m++] = array(
     "type" => "markup",
@@ -743,7 +743,7 @@ function admin_edit_group_form() {
     "weight" => 60,
   );
 
-  
+
   $courses = admin_get_group_courses($group);
   $form["courses"] = array(
     "type" => "textarea",
@@ -766,35 +766,35 @@ function admin_edit_group_form() {
                               <br>Ex:  ART 101 [2]
                               <br>This means that ART 101 may be repeated up to two times for this group.  If using this feature, make sure
                                   that repeats are permissible for this course."),
-                              
+
   );
   // if a definition was specified, we need to disable the courses textarea.
-  if (trim($definition)) {    
+  if (trim($definition)) {
     $form["courses"]["attributes"] = array("readonly"=>"readonly", "style" => "background-color: #ddd;'" );
     $form["courses"]["prefix"] = "<div class='admin-groups-courses-disabled'>
                                  " . t("Note: Because a definition was specified, you cannot directly
                                       edit the Required Courses.  Manage these courses using the
                                       Edit Definition popup window.") . "</div>";
-                                 
+
   }
-  
+
   $form["catalog_repeat"] = array(
     "type" => "checkbox",
     "label" => t("Set Catalog Repeats"),
     "value" => $group->db_catalog_repeat,
     "popup_description" => t("If checked, this group will automatically assign specified repeats to courses
-                        which are determined to be repeatable for this catalog year.  
-                        
+                        which are determined to be repeatable for this catalog year.
+
                         For example, if you enter
                         ART 101, and in the course catalog that course may be taken two times, then
                         when you save this group the line will be changed to ART 101 [2].
-                        
+
                         This will work with definitions, but will not work in groups with branches.
                         If you are unsure what to select, leave this box unchecked."),
     "weight" => 80,
   );
 
-  
+
   $form["submit"] = array(
     "type" => "submit",
     "value" => "Submit",
@@ -802,23 +802,23 @@ function admin_edit_group_form() {
     "weight" => 100,
   );
 
-  
+
   // Advanced options
-  $elements = array();     
+  $elements = array();
   $bool_start_closed = TRUE;
   if (fp_trim($group->public_note) != "" || fp_trim($group->data_entry_comment) != "") {
     $bool_start_closed = FALSE;
   }
-     
+
   $elements['public_note'] = array(
     'type' => 'textarea',
     'label' => t('Public Note'),
     'rows' => 4,
     'value' => @$group->public_note,
     'description' => t("You may enter simple HTML in this field. Ex: &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italics&lt;/i&gt;"),
-    'popup_description' => t("A public note will appear at the top of the group when displayed in the dialog popup in FlightPath."),    
-    "weight" => 50010,    
-  ); 
+    'popup_description' => t("A public note will appear at the top of the group when displayed in the dialog popup in FlightPath."),
+    "weight" => 50010,
+  );
 
   $elements["data_entry_comment"] = array(
     "type" => "textarea",
@@ -828,9 +828,9 @@ function admin_edit_group_form() {
     "value" => $group->data_entry_comment,
     "weight" => 90,
   );
-  
-  
-    
+
+
+
   // Place in our advanced options fs.
   $form['advanced_options_fs'] = array(
     'type' => 'cfieldset',
@@ -838,14 +838,14 @@ function admin_edit_group_form() {
     'elements' => array($elements),
     'start_closed' => $bool_start_closed,
     "weight" => 50100,
-  ); 
-    
-  
-  
-  
-    
-  // Only show delete option based on permission  
-  if (user_has_permission("can_delete_data_entry")) {  
+  );
+
+
+
+
+
+  // Only show delete option based on permission
+  if (user_has_permission("can_delete_data_entry")) {
     $form["mark" . $m++] = array(
       "type" => "markup",
       "value" => "<div align='right' class='groups-delete-group-wrapper'>
@@ -854,9 +854,9 @@ function admin_edit_group_form() {
                       </div>",
       "weight" => 600000,
     );
- 
+
   }
-  
+
   return $form;
 }
 
@@ -865,26 +865,26 @@ function admin_edit_group_form() {
 function admin_display_groups_popup_edit_definition() {
   $rtn = $tdef = "";
 
-  
+
   fp_add_css(fp_get_module_path("admin") . "/css/admin.css");
   fp_add_js(fp_get_module_path("admin") . "/js/admin.js");
 
   $group_id = trim($_REQUEST["group_id"]);
-  
+
   $group = new Group($group_id, null, -1, false, true);
   $group->load_descriptive_data();
 
   $school_id = intval($group->school_id);
-  
+
   $de_catalog_year = admin_get_de_catalog_year(TRUE, $school_id);
-  
+
   $school_name = "";
   if ($school_id > 0) $school_name = " School-" . $school_id;
   if (module_enabled("schools")) {
     $defs = schools_get_school_definitions();
     if (isset($defs[$school_id])) $school_name = $defs[$school_id];
-  }    
-  
+  }
+
   $definition = '';
   if (isset($_REQUEST["definition"])) {
     $definition = trim($_REQUEST["definition"]);
@@ -894,12 +894,12 @@ function admin_display_groups_popup_edit_definition() {
   }
 
   $results = admin_get_courses_from_definition($definition, "", $school_id);
-  
+
   // This text will be used to describe how the definition works in a javascript alert box:
   $tdef .= t("Definitions provide a very quick way to add or remove many courses from a group.") . "<br><br>
-          " . t("To view a complete set of instructions, <a href='https://getflightpath.com/node/11941' target='_balnk'>visit the documentation page by clicking here</a>.");  
-            
-  
+          " . t("To view a complete set of instructions, <a href='https://getflightpath.com/node/11941' target='_balnk'>visit the documentation page by clicking here</a>.");
+
+
   $rtn .= "" . t("Edit Definition for %group (%cat)
                        - @name", array("%group" => $group->title, "%cat" => $de_catalog_year, "@name" => $group->title));
   if ($school_name) {
@@ -934,27 +934,27 @@ function admin_display_groups_popup_edit_definition() {
       </tr>
       </table>
       </form>
-      " . t("If you are satisfied with the results of this definition, 
+      " . t("If you are satisfied with the results of this definition,
       click the Save to Group button.  To cancel, simply close this window.") . "
-      
+
       <br>
       <input type='button' value='" . t("Save to Group") . "' onClick='adminPopupSaveDefinition(\"\");'>
-  
-    ";    
-    
-    
-     
-  
+
+    ";
+
+
+
+
   // Give a little padding.
   return "<body style='padding:5px;'>$rtn</body>";
-  
+
 }
 
 
 
 
-function admin_get_course_array_from_course_id_array($course_idArray) {  
-  
+function admin_get_course_array_from_course_id_array($course_idArray) {
+
   // Convert an array of course_id's into their subject_id ~~ course_num format.
   // Pick non-excluded courses over excluded courses, when you have the option.
   $rtn_array = array();
@@ -979,9 +979,9 @@ function admin_get_course_array_from_course_id_array($course_idArray) {
 
 
 function admin_get_courses_from_definition($definition, $catalog_year = "", $school_id = 0) {
-  
-  if (!$definition) $definition = ''; // Make sure it's a string and not FALSE or NULL. 
-  
+
+  if (!$definition) $definition = ''; // Make sure it's a string and not FALSE or NULL.
+
   $group_array = array();
 
   // Okay, first things first, let's trim this sucker and remove extra whitespace.
@@ -996,7 +996,7 @@ function admin_get_courses_from_definition($definition, $catalog_year = "", $sch
   {
     $line = trim($line);
     if ($line == "") continue;  // blank line
-    
+
     // Let's get each of the parts... the instruction, and the course data.
     $tokens = explode(" ", $line);
     $instruction = strtolower(trim($tokens[0]));
@@ -1008,7 +1008,7 @@ function admin_get_courses_from_definition($definition, $catalog_year = "", $sch
     @$course_numData = trim(strtoupper($c_tokens[1]));
 
     if ($subject_data == "") continue;  // blank or mal-formed?
-    
+
     // Okay, so now, for this line, we have an instruction,
     // and some course data (possibly wild cards) to act on.
     //debugCT("$instruction $subject_data $course_numData");
@@ -1044,7 +1044,7 @@ function admin_get_courses_from_definition($definition, $catalog_year = "", $sch
   $course_idArray = $group_array;
   // Take out duplicate entries (caused by eqv courses)...
 
-  $course_idArray = array_unique($course_idArray);  
+  $course_idArray = array_unique($course_idArray);
   // Now, convert BACK into the "groupArray" structure (subject_id and course_num)...
   $group_array2 = admin_get_course_array_from_course_id_array($course_idArray);
 
@@ -1082,7 +1082,7 @@ function admin_get_courses_from_definition($definition, $catalog_year = "", $sch
 
 
 function admin_get_course_array_from_definition_data($subject_data, $course_numData, $catalog_year = "", $school_id = 0, $bool_check_allow_default_school = FALSE) {
-  
+
    // Looks at the subjectData and course_numData fields, and constructs
   // a query to pull our every course which matches it.
 
@@ -1104,13 +1104,13 @@ function admin_get_course_array_from_definition_data($subject_data, $course_numD
   // Should we ALSO check the default school, in addition to whatever we specified?  Don't bother if what we specified was the default school.
   if ($bool_check_allow_default_school && module_enabled('schools') && variable_get('schools_allow_courses_from_default_school', 'yes') === 'yes' && $school_id != 0) {
     $school_line = " AND (school_id = :school_id OR school_id = 0) ";
-  }  
+  }
 
   $params[':subject_id'] = $si;
   $params[':course_num'] = $cn;
-  $params[':school_id'] = $school_id;    
+  $params[':school_id'] = $school_id;
 
-  
+
   $query = "SELECT * FROM draft_courses
               WHERE subject_id LIKE :subject_id
               AND course_num LIKE :course_num
@@ -1122,10 +1122,10 @@ function admin_get_course_array_from_definition_data($subject_data, $course_numD
   $res = db_query($query, $params) ;
   while ($cur = db_fetch_array($res)) {
     $course_id = $cur["course_id"];
-    
+
     if (in_array($course_id, $rtn_array)) continue;
     $rtn_array[] = $course_id;
-    
+
   }
 
   return $rtn_array;
@@ -1138,8 +1138,8 @@ function admin_get_course_array_from_definition_data($subject_data, $course_numD
  * version has a nasty bug where it doesn't work after a certain number of elements.
  */
 function admin_array_diff($array1, $array2) {
-  
-  
+
+
   // Return an array of values from array1 that
   // are NOT in array2.
   // This is my (Richard Peacock) own implementation of array_diff,
@@ -1170,10 +1170,10 @@ function admin_array_diff($array1, $array2) {
  */
 function admin_display_groups_popup_select_icon() {
   $rtn = "";
-  
+
   fp_add_css(fp_get_module_path("admin") . "/css/admin.css");
   fp_add_js(fp_get_module_path("admin") . "/js/admin.js");
-    
+
   $group_id = $_REQUEST["group_id"];
   $group = new Group();
   $group->group_id = $group_id;
@@ -1226,8 +1226,8 @@ function admin_display_groups_popup_select_icon() {
  * Return back the courses in a group, suitable for the edit-group form.
  */
 function admin_get_group_courses(Group $group) {
-  
-  
+
+
   // Returns a plain text list of the courses in a group's requirements
   // for use in the edit_group_form.
   $rtn = "";
@@ -1238,15 +1238,15 @@ function admin_get_group_courses(Group $group) {
   $courses = array();
   $c_count = 0;
   $group->list_courses->load_course_descriptive_data();
-    
+
   if ($group_sort_policy == 'database') {
     $group->list_courses->sort_group_requirement_id();
   }
   else {
-    // By default, sort alphabetical      
+    // By default, sort alphabetical
     $group->list_courses->sort_alphabetical_order();
-  }  
-      
+  }
+
   $group->list_courses->reset_counter();
   while($group->list_courses->has_more())
   {
@@ -1258,13 +1258,13 @@ function admin_get_group_courses(Group $group) {
       $c->subject_id = str_replace("&", "_A_", $c->subject_id);
 
     }
-    
+
     if ($c->db_group_attributes != "") {
       $attributes = $c->db_group_attributes . " ";
     }
-    
+
     $course_line .= trim("$attributes$c->subject_id $c->course_num");
-    
+
     if (!$course_line) {
       // Some kind of problem, just skip this because it's blank.
       continue;
@@ -1302,7 +1302,7 @@ function admin_get_group_courses(Group $group) {
   // Now, get them branches!
   if (!$group->list_groups->is_empty)
   {
-    
+
     $group->list_groups->reset_counter();
     while ($group->list_groups->has_more())
     {
@@ -1331,8 +1331,8 @@ function admin_get_group_courses(Group $group) {
           // Some kind of problem, just skip this because it's blank.
           continue;
         }
-        
-        
+
+
         if ($c->min_grade != "" && $c->min_grade != "D")
         {
           $course_line .= " ($c->min_grade)";
@@ -1346,7 +1346,7 @@ function admin_get_group_courses(Group $group) {
         $courses[$course_line]++;
 
 
-    
+
       }
 
 
@@ -1360,7 +1360,7 @@ function admin_get_group_courses(Group $group) {
         }
         $rtn .= "$course$rep_line & ";
       }
-      
+
 
 
       // Take off the last &.
@@ -1385,30 +1385,30 @@ function admin_get_group_courses(Group $group) {
  */
 function admin_display_groups() {
   $rtn = "";
-  
+
   // Do this using $render array, so it can be altered
   // by hook_content_alter
-  
+
   $render = array();
   $render['#id'] = 'admin_display_groups';
-  
-  
-  
+
+
+
   $de_catalog_year = admin_get_de_catalog_year();
-  
+
   fp_add_css(fp_get_module_path("admin") . "/css/admin.css");
   fp_add_js(fp_get_module_path("admin") . "/js/admin.js");
-  
+
   $db2 = new DatabaseHandler();
 
-  
 
-  fp_set_title(t("Edit Groups for @de_catalog_year", array("@de_catalog_year" => $de_catalog_year)));  
-  
-  
+
+  fp_set_title(t("Edit Groups for @de_catalog_year", array("@de_catalog_year" => $de_catalog_year)));
+
+
   $render['upper_links'] = array(
     'value' => "        Options:
-                  <ul style='margin-top: 5px;'>          
+                  <ul style='margin-top: 5px;'>
                     <li>" . l(t("Add a new group to this year"), "admin/groups/edit-group", "de_catalog_year=$de_catalog_year&group_id=new") . "</li>
                     <li>" . l(t("Process all group definitions & catalog repeats for this year"), "admin/groups/process-all-definitions", "de_catalog_year=$de_catalog_year") . "</li>
                     </li>
@@ -1416,21 +1416,21 @@ function admin_display_groups() {
                     <div align='center'>" . t("Hint: use CTRL-F to search groups quickly") . "</div>
                 ",
   );
-    
-  
-  
+
+
+
   $html = "";
   $html .= "<div class='degrees-filter'>";
   $html .= fp_render_form("admin_groups_list_filter_form");
   $html .= "</div>";
-  
-  
+
+
   $render['degrees_filter'] = array(
-    'value' => $html,    
+    'value' => $html,
   );
-  
-  
-  
+
+
+
 
   $render['groups_table_top'] = array(
     'value' => "<table border='0' cellpadding='5' cellspacing='5' width='100%' class='admin-groups-list'>
@@ -1442,7 +1442,7 @@ function admin_display_groups() {
                   <th align='center'>" . t("Used") . "</th>
                 </tr>",
   );
-  
+
 
 
   $on_mouse_over = " onmouseover=\"style.backgroundColor='#FFFF99'\"
@@ -1451,20 +1451,20 @@ function admin_display_groups() {
 
   $params = array();
   $params[":catalog_year"] = $de_catalog_year;
-  
+
   $filter_name_value = @trim($_SESSION['groups_filter_name']);
   $filter_school_value = @intval($_SESSION['groups_filter_school']);
   $extra_where_conditions = "";
-  
+
   // Let's adjust the query based on filter selections (if any exist)
   if ($filter_name_value) {
     $extra_where_conditions .= " AND (group_name LIKE :name1 OR title LIKE :name2) ";
     $params[":name1"] = "%$filter_name_value%";
     $params[":name2"] = "%$filter_name_value%";
   }
-  
-  
-  
+
+
+
   if (module_enabled('schools')) {
     if ($filter_school_value) {
       $extra_where_conditions .= " AND school_id = :school_id ";
@@ -1474,8 +1474,8 @@ function admin_display_groups() {
   else {
     // schools not enabled, so only search for school = 0
       $extra_where_conditions .= " AND school_id = 0 ";
-  }  
-  
+  }
+
 
   watchdog("admin", "Viewed admin groups list. Name filter: $filter_name_value. ($de_catalog_year), school_id: $filter_school_value", array(), WATCHDOG_DEBUG);
 
@@ -1486,7 +1486,13 @@ function admin_display_groups() {
                     $extra_where_conditions
                     ORDER BY title, group_name ", $params);
   while($cur = db_fetch_array($res)) {
-    extract($cur, 3, "db");
+
+    $db_group_id = $cur['group_id'];
+    $db_definition = $cur['definition'];
+    $db_title = $cur['title'];
+    $db_group_name = $cur['group_name'];
+    $db_priority = $cur['priority'];
+    $db_icon_filename = $cur['icon_filename'];
 
     $use_count = 0;
     // Find out how many degree plans are using this particular group...
@@ -1507,8 +1513,8 @@ function admin_display_groups() {
       $db_title = "[" . t("NO TITLE SPECIFIED") . "]";
     }
 
- 
- 
+
+
     $render['group_row_' . $db_group_id] = array(
       'value' => "<tr $on_mouse_over>
                     <td valign='top' ><a name='group_$db_group_id'></a>
@@ -1526,35 +1532,35 @@ function admin_display_groups() {
                     <td valign='top' >
                       $use_count <a href='javascript: adminPopupWindow(\"" . fp_url("admin/groups/popup-show-group-use", "group_id=$db_group_id") . "\");'><i class='fa fa-window-restore'></i></a>
                     </td>
-          
-                    
+
+
                   </tr>
                 ",
-                
+
         'data' => array(
                     'group_id' => $db_group_id,
                     'db_row' => $cur,
                     'use_count' => $use_count,
                     'def_flag' => $def_flag,
-                  ),                
-                
+                  ),
+
     );
-  
- 
- 
-   
+
+
+
+
   }
 
   $render['groups_table_bottom'] = array(
     'value' => "</table>",
   );
-  
-  
-  
-  
+
+
+
+
   $rtn .= fp_render_content($render);
-  
-  
+
+
   return $rtn;
 }
 
@@ -1565,13 +1571,13 @@ function admin_groups_list_filter_form() {
 
   $form = array();
 
-  
+
   $form['mark_top'] = array(
     'type' => 'markup',
     'value' => "<strong>" . t('Filter by...') . "</strong>",
     'weight' => 0,
   );
-  
+
   $filter_name_value = '';
   if (isset($_SESSION['groups_filter_name'])) {
     $filter_name_value = fp_trim($_SESSION['groups_filter_name']);
@@ -1584,56 +1590,56 @@ function admin_groups_list_filter_form() {
     'size' => 20,
     'weight' => 10,
   );
-  
-  
+
+
   // If we have enabled the schools module, then have a selector for that as well
   if (module_enabled('schools')) {
-  
+
     $filter_school_value = @intval($_SESSION['groups_filter_school']);
     $options = schools_get_schools_for_fapi(TRUE, TRUE, 'group', TRUE);
     $options[0] = t('- All / Default -');
-    $form['filter_school'] = array(      
+    $form['filter_school'] = array(
       'type' => 'select',
       'label' => t('School:'),
       'options' => $options,
       'value' => $filter_school_value,
-      'weight' => 20,   
-      'hide_please_select' => TRUE,   
-    );      
-      
-  } // if schools enabled  
+      'weight' => 20,
+      'hide_please_select' => TRUE,
+    );
 
-  
-  
+  } // if schools enabled
+
+
+
   $form['submit_btn'] = array(
     'type' => 'submit',
     'value' => t('Apply'),
     'weight' => 100,
   );
-  
+
   $form['reset_btn'] = array(
     'type' => 'submit',
     'value' => t('Reset'),
     'weight' => 110,
   );
-  
-  
+
+
   return $form;
-}  
+}
 
 
 
 function admin_groups_list_filter_form_submit($form, $form_state) {
   $values = $form_state['values'];
-    
+
   unset($_SESSION['groups_filter_name']);
   unset($_SESSION['groups_filter_school']);
-    
+
   if ($values['submit_btn'] != '') {
     $_SESSION['groups_filter_name'] = trim($values['filter_name']);
     $_SESSION['groups_filter_school'] = @$values['filter_school'];
   }
-    
+
 }
 
 
@@ -1642,20 +1648,20 @@ function admin_groups_list_filter_form_submit($form, $form_state) {
 
 function admin_process_all_definitions_form() {
   $form = array();
-  
-  
+
+
   $de_catalog_year = admin_get_de_catalog_year();
 
   fp_set_title(t("Process all group definitions and settings for @year", array("@year" => $de_catalog_year)));
   $m = 0;
-  
+
   $form["mark" . $m++] = array(
     "type" => "markup",
     "value" => t("This will cause all of the groups with definitions and other settings (ex: catalog repeats) to be cleared, and their
                   course requirements re-processed.  This function can take several minutes, depending
-                  on how many groups with definitions you have."), 
-  );  
-      
+                  on how many groups with definitions you have."),
+  );
+
 
   $form["de_catalog_year"] = array(
     "type" => "hidden",
@@ -1668,27 +1674,27 @@ function admin_process_all_definitions_form() {
     "value" => t("Process groups"),
     "description" => t("Can take several minutes to run. Do not navigate away from this tab or close the browser."),
   );
-     
 
 
-    
+
+
   return $form;
-  
+
 }
 
 /**
  * Actually perform the refreshing of definitions.
  */
 function admin_process_all_definitions_form_submit($form, $form_submit) {
-  
+
   $values = $form_submit["values"];
-  
+
   $db = get_global_database_handler();
   $de_catalog_year = $values["de_catalog_year"];
 
-  
+
   watchdog("admin", "Processed group definitions for: $de_catalog_year");
-  
+
   // Okay, set up the batch....
   $batch = array(
     "operation" => array("admin_process_all_definitions_perform_batch_operation", array($de_catalog_year)),
@@ -1697,12 +1703,12 @@ function admin_process_all_definitions_form_submit($form, $form_submit) {
     "progress_message" => "Processing group @current of @total",
     "display_percent" => TRUE,
   );
- 
- 
+
+
   // Set the batch...
-  batch_set($batch);  
-  
-  
+  batch_set($batch);
+
+
 }
 
 
@@ -1711,52 +1717,52 @@ function admin_process_all_definitions_form_submit($form, $form_submit) {
  * This actually is the batch operation for processing all of our group definitions.
  */
 function admin_process_all_definitions_perform_batch_operation(&$batch, $de_catalog_year) {
-  
-  
+
+
   ////////////////////////////  FIRST TIME ///////////////////////////////
   // If this is our first time through, let's init our values.
   if (!isset($batch["results"]["total"])) {
-    // Our first time through.  Let's start up.    
+    // Our first time through.  Let's start up.
     $batch["results"]["current"] = 0;
-    $batch["results"]["finished"] = FALSE;    
+    $batch["results"]["finished"] = FALSE;
 
     // Change to count how many groups with definitions OR "catalog_repeat" set.
     // We need a count of how many groups in this year have definitions to process.
     $res = db_query("SELECT count(*) as `count` FROM draft_groups
-                       WHERE (definition != '' OR catalog_repeat = 1) 
-                       AND catalog_year = ? 
+                       WHERE (definition != '' OR catalog_repeat = 1)
+                       AND catalog_year = ?
                        AND delete_flag = 0 ", $de_catalog_year);
     $cur = db_fetch_array($res);
-        
+
     $batch["results"]["total"] = $cur["count"];
-    
-  } 
-  ////////////////////////////////////////////////////////////////////////  
-  
-  
+
+  }
+  ////////////////////////////////////////////////////////////////////////
+
+
   // Okay, we can now begin the actual batch process.
   $current = $batch["results"]["current"];
   $total = $batch["results"]["total"];
 
   $limit = 1;  // how many definitions to process per run of THIS function
   $c = 0;  // count of records.
-  
-  $db = get_global_database_handler();  
-  
+
+  $db = get_global_database_handler();
+
   // Change to count how many groups with definitions OR "catalog_repeat" set.
   // First, find every group which has a definition set.
   $res = db_query("SELECT * FROM draft_groups
-                       WHERE (definition != '' OR catalog_repeat = 1) 
-                       AND catalog_year = ? 
-                       AND delete_flag = 0 
+                       WHERE (definition != '' OR catalog_repeat = 1)
+                       AND catalog_year = ?
+                       AND delete_flag = 0
                        limit $current, $limit", $de_catalog_year);
   while($cur = db_fetch_array($res)) {
-          
+
     if ($c >= $limit) {
       break;
     }
-      
-    
+
+
     $def = trim($cur["definition"]);
     $group_id = $cur["group_id"];
     $group_name = $cur["group_name"];
@@ -1770,10 +1776,10 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
     }
     else {
       // If there are no definitions, assemble a $courses string. admin_get_group_courses(Group $group)
-      
+
       $g = new Group($group_id, null, -1, false, true);  // make sure we are loading from draft.
       $courses = admin_get_group_courses($g);
-            
+
     }
 
     // If the catalog_repeat flag is set, process that.
@@ -1846,15 +1852,15 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
         // to an ampersand.
         $subject_id = str_replace("_A_", "&", $subject_id);
 
-        
+
         if ($course_id = $db->get_course_id($subject_id, $course_num, "", true, $school_id, TRUE)) {
           $query = "INSERT INTO draft_group_requirements
                     (`group_id`,`course_id`,
                     `course_min_grade`,`course_repeats`,`data_entry_value`)
                     values (?, ?, ?, ?, ?) ";
           $res2 = db_query($query, $group_id, $course_id, $min_grade, $course_repeats, "$subject_id~$course_num");
-          $ccount++;        
-        } 
+          $ccount++;
+        }
         else {
           // The course_id could not be found!
 
@@ -1873,14 +1879,14 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
         // First, we need to request a new branchID for this new group.
         if (!$branch_id = $db->request_new_group_id()) {
           die ("Error.  Could not create new group (branch) ID.");
-        } 
+        }
         else {
           // Add this branch to the list of requirements for this group.
           $query = "INSERT INTO draft_group_requirements
                       (group_id, child_group_id)
                       values ('?','?') ";
           $res2 = db_query($query, $group_id, $branch_id);
-  
+
         }
         $c_tokes = explode("&",$line);
         for ($cT = 0; $cT < count($c_tokes); $cT++)
@@ -1890,71 +1896,71 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
           $course_num = trim($tokens[1]);
           $min_grade = @trim($tokens[2]);
           $course_repeats = @trim($tokens[3]);
-  
+
           if (strstr($min_grade, "[")) {
             // This is actually a specified repeat, not a min grade.
             $course_repeats = $min_grade;
             $min_grade = "";
           }
-  
+
           $min_grade = str_replace("(","",$min_grade);
           $min_grade = str_replace(")","",$min_grade);
-  
+
           $course_repeats = str_replace("[","",$course_repeats);
           $course_repeats = str_replace("]","",$course_repeats);
           $course_repeats = intval($course_repeats);
           $course_repeats--;
           if ($course_repeats < 0) { $course_repeats = 0; }
-  
+
           // If the subject_id had a _A_ in it, convert this back
           // to an ampersand.
           $subject_id = str_replace("_A_", "&", $subject_id);
-  
+
 
           if ($course_id = $db->get_course_id($subject_id, $course_num, "", true, $school_id, TRUE)) {
-                      
+
             $query = "INSERT INTO draft_group_requirements
                       (group_id, course_id,
                       course_min_grade, course_repeats, data_entry_value)
                       values (?,?,?,?,?) ";
             $res2 = db_query($query, $branch_id, $course_id, $min_grade, $course_repeats, "$subject_id~$course_num");
-          } 
+          }
           else {
             // The course_id could not be found!
-            
+
             fp_add_message(t("Course not found! You specified %course as a requirement in %gname,
                             but this course could not be found in the catalog.  It was removed from
                             the list of requirements.  Are you sure you typed it correctly? Please
                             check your spelling, and add the course again.", array("%course" => "$subject_id $course_num", "%gname" => $group_name)), "error");
-              
+
           }
-  
+
         } // for $cT
-      } // else it does contain &      
-      
-      
+      } // else it does contain &
+
+
     } // for t < count lines
 
-    fp_add_message(t("%name processed. %count courses added.", array("%name" => $group_name, "%count" => $ccount)) . "<br><br>");    
+    fp_add_message(t("%name processed. %count courses added.", array("%name" => $group_name, "%count" => $ccount)) . "<br><br>");
 
-    
+
 
     $c++;
-    
+
   } // while cur = db_fetch_array($res)
-  
+
 
   // Update our $batch results variables
   $batch["results"]["current"] = $current + $c;
-  
+
 
   if ($batch["results"]["current"] >= $total) {
     // We are finished!
     $batch["results"]["finished"] = TRUE;
     fp_add_message("<br><br><br>" . t("Group definitions have been processed for %year", array("%year" => $de_catalog_year)));
-  }  
-    
-  
+  }
+
+
 } // admin_process....batch_operation
 
 
@@ -1967,7 +1973,7 @@ function admin_process_all_definitions_perform_batch_operation(&$batch, $de_cata
  */
 function admin_display_groups_popup_show_group_use() {
   $rtn = "";
-  
+
   $group_id = $_REQUEST["group_id"];
   $group = new Group();
   $group->group_id = $group_id;
@@ -1992,18 +1998,24 @@ function admin_display_groups_popup_show_group_use() {
     </tr>
     ";
 
-    
-  $db = get_global_database_handler();   
-    
+
+  $db = get_global_database_handler();
+
   $res = db_query("SELECT * FROM draft_degrees a,
                     draft_degree_requirements b
                   WHERE a.degree_id = b.degree_id
                   AND b.group_id = ?
-                  ORDER BY a.title, a.major_code, b.semester_num ", $group_id);
-  while($cur = db_fetch_array($res))
-  {
-    extract($cur, 3, "db");
-    
+                  ORDER BY a.title, a.major_code, b.semester_num ", array($group_id));
+  while($cur = db_fetch_array($res)) {
+
+    $db_degree_id = $cur['degree_id'];
+    $db_title = $cur['title'];
+    $db_major_code = $cur['major_code'];
+    $db_catalog_year = $cur['catalog_year'];
+    $db_semester_num = intval($cur['semester_num']);
+
+
+
     $school_id = $db->get_school_id_for_degree_id($db_degree_id, TRUE);
     $school_code = @$defs[$school_id]['school_code'];
     if ($school_id === 0) {
@@ -2022,21 +2034,21 @@ function admin_display_groups_popup_show_group_use() {
           <td valign='top' class='tenpt'>
             $db_catalog_year
           </td>
-          
+
           <td valign='top' class='tenpt'>
             $school_code
           </td>
-          
+
         </tr>
         ";
 
   }
 
 
-  $rtn .= "</table>";  
-  
-  
-  
+  $rtn .= "</table>";
+
+
+
   return $rtn;
 }
 

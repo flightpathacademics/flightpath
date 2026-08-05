@@ -590,6 +590,9 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     $attributes['class'] = '';
   }
 
+  if (!isset($attributes['class'])) $attributes['class'] = '';
+  if (!isset($attributes['style'])) $attributes['style'] = '';
+
   if ($type == 'textarea_editor') {
     // Add the "html-editor" class to attributes.
     $attributes['class'] .= ' html-editor';
