@@ -3304,11 +3304,8 @@ function get_modules_menus() {
     $d = $vals[2];
 
     // Place them into subarrays indexed by location
-
-    //$new_array[$menus[$c][$d]["location"]][] = $menus[$c][$d];
-    $menu = $menus[$c][$d];
-    $location = $menu["location"];
-    $new_array[$location][] = $menu;
+    // @phpstan-ignore-next-line   (phpstan gets confused by the complexity of the next line)
+    $new_array[$menus[$c][$d]["location"]][] = $menus[$c][$d];
 
 
   }
