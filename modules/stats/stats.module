@@ -1439,7 +1439,7 @@ function stats_report_student_course_list() {
   $student_cwid = "";
 
   if (isset($_REQUEST["student_cwid"])) {
-    $student_cwid = trim(addslashes($_REQUEST["student_cwid"]));
+    $student_cwid = fp_get_machine_readable(trim(addslashes($_REQUEST["student_cwid"])));
   }
   $student_pidm = 0;
   //$rtn .= stats_draw_student_cwid_form("stats/reports/student-course-list", $student_cwid);
@@ -1462,8 +1462,8 @@ function stats_report_student_course_list() {
   }
 
   // If we have the banner_integration module installed, then get the pidm from banner too
-  if (function_exists("banner_integration_get_pidm_for_cwid")) {
-    $student_pidm = intval(banner_integration_get_pidm_for_cwid($student_cwid));
+  if (function_exists("fpl_banner_integration_get_pidm_for_cwid")) {
+    $student_pidm = intval(fpl_banner_integration_get_pidm_for_cwid($student_cwid));
   }
   $student_name = fp_get_student_name($student_cwid);
   $student = new Student($student_cwid);
