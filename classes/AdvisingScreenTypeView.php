@@ -114,7 +114,7 @@ class AdvisingScreenTypeView extends AdvisingScreen
    * @param string $requirement_type
    * @param string $title
    * @param bool $bool_display_hour_count
-   * @return string
+   * @return string|false
    */
   function display_semester_list($list_semesters, $requirement_type, $title, $bool_display_hour_count = false)
   {

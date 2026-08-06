@@ -3165,7 +3165,7 @@ function draw_menu_items($menu_array) {
    *         at the bottom of each semester, showing how many hours are in
    *         the semester.  Good for debugging purposes.
    *
-   * @return string
+   * @return string|false
    */
   function display_semester(Semester $semester, $bool_display_hour_count = FALSE)
   {
@@ -3462,7 +3462,7 @@ function draw_menu_items($menu_array) {
    * on.
    *
    * @param Group $place_group
-   * @return string
+   * @return string|false
    */
   function display_group(Group $place_group)
   {
@@ -3478,7 +3478,7 @@ function draw_menu_items($menu_array) {
     if (!$group = $this->degree_plan->find_group($place_group->group_id))
     {
       fpm("Group not found.");
-      return;
+      return FALSE;
     }
 
 
@@ -5530,7 +5530,7 @@ function draw_menu_items($menu_array) {
    *
    * @param Group $place_group
    * @param int $group_hours_remaining
-   * @return string
+   * @return string|false
    */
   function display_popup_group_select(Group $place_group, $group_hours_remaining = 0, $req_by_degree_id = 0)
   {
@@ -5552,7 +5552,7 @@ function draw_menu_items($menu_array) {
       if (!$group = $this->degree_plan->find_group($place_group->group_id))
       {
         fpm("Group not found.");
-        return;
+        return FALSE;
       }
       else {
         // Found the group... we don't need to do anything.
@@ -6069,7 +6069,7 @@ function draw_menu_items($menu_array) {
    *
    * @param CourseList $course_list
    * @param int $group_hours_remaining
-   * @return string
+   * @return string|false
    */
   function display_popup_group_select_course_list(CourseList $course_list = null, $group_hours_remaining = 0)
   {
@@ -6077,10 +6077,8 @@ function draw_menu_items($menu_array) {
     // be called by display_popup_group_select().
     $rtn = "";
 
-    if ($course_list == null)
-    {
-
-      return;
+    if ($course_list == null) {
+      return FALSE;
     }
 
     $old_course = null;
