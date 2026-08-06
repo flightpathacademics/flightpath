@@ -2533,7 +2533,7 @@ function calendar_render_mini_calendar($month, $year, $faculty_user_id, $event_t
 
 
   list($month, $year, $month_name, $weekday) = explode(',', strftime('%m, %Y, %B, %w', $first_of_month));
-  $weekday = ($weekday + 7 - $first_day) % 7; //adjust for $first_day
+  $weekday = (intval($weekday) + 7 - intval($first_day)) % 7; //adjust for $first_day
 
   // Make sure they are integers.
   $month = intval($month);
@@ -3141,7 +3141,6 @@ function calendar_display_mobile_date_page($date, $cids_csv) {
  * Creating date collection between two dates
  *
  * <code>
- * <?php
  * # Example 1
  * date_range("2014-01-01", "2014-01-20", "+1 day", "m/d/Y");
  *
@@ -3150,10 +3149,14 @@ function calendar_display_mobile_date_page($date, $cids_csv) {
  * </code>
  *
  * @author Ali OYGUR <alioygur@gmail.com>
- * @param string since any date, time or datetime format
- * @param string until any date, time or datetime format
- * @param string step
- * @param string date of output format
+ * @param string $first
+ *          - since any date, time or datetime format
+ * @param string $last
+ *          - until any date, time or datetime format
+ * @param string $step
+ *          - Example:  +1 day, +2 days, etc.
+ * @param string $output_format
+ *          - output format for use with date() function
  * @return array
  */
 function calendar_get_date_range($first, $last, $step = '+1 day', $output_format = 'Y-m-d' ) {

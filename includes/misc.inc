@@ -533,8 +533,10 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
   // will prevent that.
 
   $errmsg = "$message<br>... ($line) $filename";
+  $derr_name = "";
   if (is_string($err_name)) {
     $errmsg = $err_name . ": $message<br>... ($line) $filename";
+    $derr_name = $err_name;
   }
   $errmsg_hash = hash('sha256', $errmsg);
 
@@ -581,9 +583,9 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
   $msg .= "USER:   $user_name ($user_id) \n";
   $msg .= "SERVER:   $hostname \n";
   $msg .= "DATE:     " . format_date(convert_time(time())) . "\n";
-  $msg .= "SEVERITY: $err_name \n";
+  $msg .= "SEVERITY: $derr_name \n";
   $msg .= "--------------------------\n\n";
-  $msg .= "$err_name: $message \n\n";
+  $msg .= "$derr_name: $message \n\n";
   $msg .= "... ($line) $filename\n\n";
 
   $emsg = $msg;   // We don't need the full backtrace for our "email" message.

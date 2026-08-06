@@ -396,9 +396,6 @@ class DegreePlan extends stdClass
    * Similar to get_progress_hours, this will return back the quality points a student has earned
    * towards this degree.  It can then be used to calculate GPA.
    *
-   * @param string $requirement_type
-   * @param bool $bool_required_hours_only
-   * @return int
    */
   function get_progress_quality_points($requirement_type = "", $bool_exclude_all_transfer_credits = FALSE, $req_by_degree_id = 0) {
     // Returns the number of hours required (or fulfilled) in a degree plan

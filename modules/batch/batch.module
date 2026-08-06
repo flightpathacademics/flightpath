@@ -340,7 +340,7 @@ function batch_cron() {
  *
  *
  *
- * @param $batch
+ * @param array $batch
  *   This is an array containing everything we need to know about the batch we are creating.
  *   The non-required fields will be substituted with default values if left out.
  *
@@ -357,7 +357,7 @@ function batch_cron() {
  *    - display_percent : boolean, default FALSE.  If set to TRUE, display percentage value in progress bar.
  *
  *
- * @return $batch_id - the id from batch_queue table for this batch.
+ * @return int $batch_id - the id from batch_queue table for this batch.
  */
 function batch_set($batch) {
   global $user;

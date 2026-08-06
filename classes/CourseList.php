@@ -1361,7 +1361,8 @@ class CourseList extends ObjList
    * @param bool $bool_set_array_index
    *         - If set to true, it will set the $course->array_index value
    *           to the index value in $this's array_list array.
-   * @param new_split_subs_higher_priority_in_degree_id
+   *
+   * @param bool subs_higher_priority_in_degree_id
    *         - If the course is a split substitution for the supplied
    *           degree_id, then  give it a higher "priority" so it will
    *           sort above courses with identical names.

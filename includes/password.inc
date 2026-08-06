@@ -4,16 +4,16 @@
  * @file
  * Secure password hashing functions for user authentication.
  *
- * 
+ *
  * Please NOTE:  This file was taken largely from the open source Drupal 7 CMS project,
  * and is used here in compliance with the GNU GPL v.3+ license.
- * 
+ *
  * For more documentation, see:
  * https://api.drupal.org/api/drupal/includes%21password.inc/7
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  * Based on the Portable PHP password hashing framework.
  * @see http://www.openwall.com/phpass/
  *
@@ -55,13 +55,13 @@ function _password_itoa64() {
 /**
  * Encodes bytes into printable base 64 using the *nix standard from crypt().
  *
- * @param $input
- *   The string containing bytes to encode.
- * @param $count
- *   The number of characters (bytes) to encode.
+ * @param string $input
+ *          - The string containing bytes to encode.
+ * @param int $count
+ *          - The number of characters (bytes) to encode.
  *
- * @return
- *   Encoded string
+ * @return string
+ *
  */
 function _password_base64_encode($input, $count) {
   $output = '';
@@ -99,12 +99,12 @@ function _password_base64_encode($input, $count) {
  *  - The ability to determine whether two users have the same (or different)
  *    password without actually having to guess one of the passwords.
  *
- * @param $count_log2
- *   Integer that determines the number of iterations used in the hashing
- *   process. A larger value is more secure, but takes more time to complete.
+ * @param $int count_log2
+ *          - Integer that determines the number of iterations used in the hashing
+ *          - process. A larger value is more secure, but takes more time to complete.
  *
- * @return
- *   A 12 character string containing the iteration count and a random salt.
+ * @return string
+ *          - A 12 character string containing the iteration count and a random salt.
  */
 function _password_generate_salt($count_log2) {
   $output = '$S$';
@@ -116,7 +116,7 @@ function _password_generate_salt($count_log2) {
   // 6 bytes is the standard salt for a portable phpass hash.
   $output .= _password_base64_encode(fp_random_bytes(6), 6);
   //$output .= _password_base64_encode("123456", 6);
-    
+
   return $output;
 }
 
@@ -130,13 +130,13 @@ function fp_random_bytes($count) {
       // less secure implementation.
     }
   }
-  
+
   static $random_state, $bytes, $has_openssl;
 
-  
+
   $missing_bytes = $count - strlen((string) $bytes);
-  
-  
+
+
   if ($missing_bytes > 0) {
     // PHP versions prior 5.3.4 experienced openssl_random_pseudo_bytes()
     // locking on Windows and rendered it unusable.
@@ -183,7 +183,7 @@ function fp_random_bytes($count) {
       do {
         $random_state = hash('sha256', microtime() . mt_rand() . $random_state);
         $bytes .= hash('sha256', mt_rand() . $random_state, TRUE);
-      } 
+      }
        while (strlen($bytes) < $count);
     }
   }
@@ -198,11 +198,11 @@ function fp_random_bytes($count) {
 /**
  * Ensures that $count_log2 is within set bounds.
  *
- * @param $count_log2
+ * @param int $count_log2
  *   Integer that determines the number of iterations used in the hashing
  *   process. A larger value is more secure, but takes more time to complete.
  *
- * @return
+ * @return int
  *   Integer within set bounds that is closest to $count_log2.
  */
 function _password_enforce_log2_boundaries($count_log2) {
@@ -224,15 +224,15 @@ function _password_enforce_log2_boundaries($count_log2) {
  * for an attacker to try to break the hash by brute-force computation of the
  * hashes of a large number of plain-text words or strings to find a match.
  *
- * @param $algo
+ * @param string $algo
  *   The string name of a hashing algorithm usable by hash(), like 'sha256'.
- * @param $password
+ * @param string $password
  *   The plain-text password to hash.
- * @param $setting
+ * @param string $setting
  *   An existing hash or the output of _password_generate_salt().  Must be
  *   at least 12 characters (the settings and salt).
  *
- * @return
+ * @return string
  *   A string containing the hashed password (and salt) or FALSE on failure.
  *   The return string will be truncated at FP_HASH_LENGTH characters max.
  */
@@ -256,7 +256,7 @@ function _password_crypt($algo, $password, $setting) {
 
   // Convert the base 2 logarithm into an integer.
   $count = 1 << $count_log2;
-  
+
   // We rely on the hash() function being available in PHP 5.2+.
   $hash = hash($algo, $salt . $password, TRUE);
   do {
@@ -282,13 +282,13 @@ function _password_get_count_log2($setting) {
 /**
  * Hash a password using a secure hash.
  *
- * @param $password
+ * @param string $password
  *   A plain-text password.
- * @param $count_log2
+ * @param int $count_log2
  *   Optional integer to specify the iteration count. Generally used only during
  *   mass operations where a value less than the default is needed for speed.
  *
- * @return
+ * @return string
  *   A string containing the hashed password (and a salt), or FALSE on failure.
  */
 function user_hash_password($password, $count_log2 = 0) {
@@ -306,24 +306,24 @@ function user_hash_password($password, $count_log2 = 0) {
  * $account object, for example the uid to look up the hash in a custom table
  * or remote database.
  *
- * @param $password
+ * @param string $password
  *   A plain-text password
- * @param $stored_hash
+ * @param string $stored_hash
  *   The password hash for a user from the database.
- * 
- * @return
+ *
+ * @return bool
  *   TRUE or FALSE.
  */
 function user_check_password($password, $stored_hash) {
-    
-  if (!$password) return FALSE;
-  if (!$stored_hash) return FALSE; 
 
-  $type = substr($stored_hash, 0, 3);  
+  if (!$password) return FALSE;
+  if (!$stored_hash) return FALSE;
+
+  $type = substr($stored_hash, 0, 3);
   switch ($type) {
     case '$S$':
       // A normal FlightPath password using sha512.
-      $hash = _password_crypt('sha512', $password, $stored_hash);      
+      $hash = _password_crypt('sha512', $password, $stored_hash);
       break;
     case '$H$':
       // phpBB3 uses "$H$" for the same thing as "$P$".
@@ -343,26 +343,26 @@ function user_check_password($password, $stored_hash) {
 
 /**
  * This function checks a plain text password to make sure it meets our minimum complexity requirements.
- * 
+ *
  * Complexity requirement is based on NIST minimum requirements, which stresses length over arbitrarily
  * complicated rules. This is why our complexity rules are faily basic.
- * 
+ *
  * Returns TRUE if password satisfies complexity.
- * 
+ *
  * Returns FALSE if it does not.
- * 
+ *
  */
 function password_validate_complexity($plain_text_password) {
-  
-  
+
+
   // At least 1 text character
   // At least 1 non-character number
   // At least 12 characters in length
   // No digit or text character can appear more than twice in a row.
-  
+
   $pattern = '/^(?=.*\D)(?=.*\d)(?!.*(.)\1\1).{12,}$/';
   return preg_match($pattern, $plain_text_password);
-  
+
 }
 
 /**
@@ -372,23 +372,23 @@ function password_validate_complexity($plain_text_password) {
 function password_get_complexity_rules($bool_return_array = FALSE) {
   $html = "";
   $arr = array();
-  
+
   $arr[] = t("Must be at least 12 characters long");
   $arr[] = t("Must contain at least one number");
   $arr[] = t("Must contain at least one letter or symbol");
   $arr[] = t("Cannot contain the same character more than twice in a row");
-  
-  
+
+
   $html .= "<ul class='password-complexity-rules'>";
   foreach ($arr as $r) {
     $html .= "<li>$r</li>";
   }
   $html .= "</ul>";
-  
+
   if ($bool_return_array) return $arr;
-  
+
   return $html;
-  
+
 }
 
 
@@ -398,8 +398,8 @@ function password_get_complexity_rules($bool_return_array = FALSE) {
 
 /**
  * NOTE:  This function is from Drupal 7, but at the moment is not being used by FlightPath.
- * 
- * 
+ *
+ *
  */
  /* Check whether a user's hashed password needs to be replaced with a new hash.
  *

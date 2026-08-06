@@ -4,7 +4,7 @@
 
 
 function admin_display_degrees_popup_add_group2() {
-  $semester_num = trim($_GET["semester_num"]);
+  $semester_num = intval($_GET["semester_num"]);
   $school_id = intval($_GET["school_id"]);
   $de_catalog_year = admin_get_de_catalog_year(TRUE, $school_id);
 
@@ -1781,7 +1781,7 @@ function admin_edit_degree_form_validate($form, &$form_state) {
     }
     // Only look at the groups...
     $temp = explode("_", $key);
-    $semester_num = trim($temp[1]);
+    $semester_num = intval($temp[1]);
     $semester_nums_in_use[] = $semester_num;
 
     if ($semester_num > $highest_semester_num) {
@@ -1878,7 +1878,7 @@ function admin_edit_degree_form_validate($form, &$form_state) {
   if (strstr($perform_action2,"addGroup")) {
     $temp = explode("_",$perform_action2);
     $group_id = $temp[1];
-    $semester_num = $temp[2];
+    $semester_num = intval($temp[2]);
     $semester_nums_in_use[] = $semester_num;
     $hours = trim($temp[3]);
     $min_hours = $hours;
@@ -1940,7 +1940,7 @@ function admin_edit_degree_form_validate($form, &$form_state) {
 
     $group_id = $temp[0];
 
-    $semester_num = $temp[1];
+    $semester_num = intval($temp[1]);
     $semester_nums_in_use[] = $semester_num;
 
     if ($semester_num > $highest_semester_num) {
@@ -2011,8 +2011,8 @@ function admin_edit_degree_form_validate($form, &$form_state) {
   if (strstr($perform_action2,"editSemesterBlockNum")) {
     // Make sure we don't already have this number in existence elsewhere in the degree.
     $temp = explode("_",$perform_action2);
-    $old_semester_num = $temp[1];
-    $new_semester_num = $temp[2];
+    $old_semester_num = intval($temp[1]);
+    $new_semester_num = intval($temp[2]);
 
     if (in_array($new_semester_num, $semester_nums_in_use)) {
       form_error('', t("<strong>Your work has NOT been saved.</strong> Sorry, but you requested to change block number %old to %new, but block number %new
@@ -2207,7 +2207,7 @@ function admin_edit_degree_form_submit($form, $form_state) {
     }
     // Only look at the groups...
     $temp = explode("_", $key);
-    $semester_num = trim($temp[1]);
+    $semester_num = intval($temp[1]);
 
     if ($semester_num > $highest_semester_num) {
       $highest_semester_num = $semester_num;
@@ -2309,7 +2309,7 @@ function admin_edit_degree_form_submit($form, $form_state) {
 
     $group_id = $temp[0];
 
-    $semester_num = $temp[1];
+    $semester_num = intval($temp[1]);
 
     if ($semester_num > $highest_semester_num) {
       $highest_semester_num = $semester_num;
@@ -2372,7 +2372,7 @@ function admin_edit_degree_form_submit($form, $form_state) {
   if (strstr($perform_action2,"addGroup")) {
     $temp = explode("_",filter_plain($perform_action2));
     $group_id = $temp[1];
-    $semester_num = $temp[2];
+    $semester_num = intval($temp[2]);
     $hours = trim($temp[3]);
     $min_hours = $hours;
     if (strstr($hours, "-")) {
@@ -2420,8 +2420,8 @@ function admin_edit_degree_form_submit($form, $form_state) {
   if (strstr($perform_action2,"editSemesterBlockNum")) {
     // Make sure we don't already have this number in existence elsewhere in the degree.
     $temp = explode("_",$perform_action2);
-    $old_semester_num = $temp[1];
-    $new_semester_num = $temp[2];
+    $old_semester_num = intval($temp[1]);
+    $new_semester_num = intval($temp[2]);
 
     // Since we have already passed validation, we should be able to simply update the draft table.
     db_query("UPDATE draft_degree_requirements SET semester_num = ?

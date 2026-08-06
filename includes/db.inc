@@ -475,7 +475,7 @@ function fp_load_user($user_id) {
 
   // Set the user image url...
   // See if there are any other modules which might be overriding how we look up user images.
-  $image_url = @$cur->settings['image_url'];
+  $image_url = @$rtn->settings['image_url'];
   $type = 'student';
   if ($rtn->is_faculty) $type = 'faculty';
   $modules = invoke_hook("get_user_image_url", array($rtn->cwid, $type));
