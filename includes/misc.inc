@@ -319,24 +319,25 @@ function fp_re_array_files($file_post) {
 
 
 // From: https://www.php.net/manual/en/function.timezone-offset-get.php
-/**    Returns the offset from the origin timezone to the remote timezone, in seconds.
+/**
+* Returns the offset from the origin timezone to the remote timezone, in seconds, or false if there is an error
 *    @param $remote_tz
 *    @param $origin_tz
 *             If null the servers current timezone is used as the origin.
-*    @return int
+*    @return int|false
 */
 function get_timezone_offset($remote_tz, $origin_tz = null) {
-    if($origin_tz === null) {
-        if(!is_string($origin_tz = date_default_timezone_get())) {
-            return false; // A UTC timestamp was returned -- bail out!
-        }
+  if($origin_tz === null) {
+    if(!is_string($origin_tz = date_default_timezone_get())) {
+      return false; // A UTC timestamp was returned -- bail out!
     }
-    $origin_dtz = new DateTimeZone($origin_tz);
-    $remote_dtz = new DateTimeZone($remote_tz);
-    $origin_dt = new DateTime("now", $origin_dtz);
-    $remote_dt = new DateTime("now", $remote_dtz);
-    $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
-    return $offset;
+  }
+  $origin_dtz = new DateTimeZone($origin_tz);
+  $remote_dtz = new DateTimeZone($remote_tz);
+  $origin_dt = new DateTime("now", $origin_dtz);
+  $remote_dt = new DateTime("now", $remote_dtz);
+  $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
+  return $offset;
 }
 
 
@@ -3303,7 +3304,13 @@ function get_modules_menus() {
     $d = $vals[2];
 
     // Place them into subarrays indexed by location
-    $new_array[$menus[$c][$d]["location"]][] = $menus[$c][$d];
+
+    //$new_array[$menus[$c][$d]["location"]][] = $menus[$c][$d];
+    $menu = $menus[$c][$d];
+    $location = $menu["location"];
+    $new_array[$location][] = $menu;
+
+
   }
 
   return $new_array;

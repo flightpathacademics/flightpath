@@ -1365,7 +1365,7 @@ class CourseList extends ObjList
    *           sort above courses with identical names.
    *
    */
-  function sort_alphabetical_order($bool_reverse_order = FALSE, $bool_only_transfers = FALSE, $bool_set_array_index = FALSE, $subs_higher_prority_in_degree_id = 0, $bool_include_degree_sort = FALSE)
+  function sort_alphabetical_order($bool_reverse_order = FALSE, $bool_only_transfers = FALSE, $bool_set_array_index = FALSE, $subs_higher_priority_in_degree_id = 0, $bool_include_degree_sort = FALSE)
   {
     // Sort the list into alphabetical order, based
     // on the subject_id and course_num.
@@ -1401,10 +1401,10 @@ class CourseList extends ObjList
 
 
       $priority = 5;  // default sort priority for courses with identical names.
-      if ($subs_higher_prority_in_degree_id > 0) {
-        if (@$c->details_by_degree_array[$subs_higher_prority_in_degree_id]["bool_substitution_new_from_split"] == TRUE
-            || @$c->details_by_degree_array[$subs_higher_prority_in_degree_id]["bool_substitution_split"] == TRUE
-            || @$c->details_by_degree_array[$subs_higher_prority_in_degree_id]["bool_substitution"] == TRUE) {
+      if ($subs_higher_priority_in_degree_id > 0) {
+        if (@$c->details_by_degree_array[$subs_higher_priority_in_degree_id]["bool_substitution_new_from_split"] == TRUE
+            || @$c->details_by_degree_array[$subs_higher_priority_in_degree_id]["bool_substitution_split"] == TRUE
+            || @$c->details_by_degree_array[$subs_higher_priority_in_degree_id]["bool_substitution"] == TRUE) {
           //fpm("here for $c->subject_id $c->course_num");
           $priority = 3;  // lower priority so it sorts higher in the list.
         }
