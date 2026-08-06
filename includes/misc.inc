@@ -261,8 +261,8 @@ function fp_translate_numeric_grade($grade, $school_id = 0) {
       if ($line == "") continue;
 
       $tokens = explode("~", $line);
-      $low = floatval(trim($tokens[0]));
-      $high = floatval(trim($tokens[1]));
+      $low = trim($tokens[0]);
+      $high = trim($tokens[1]);
       $letter = trim($tokens[2]);
 
       $translate[$low][$high] = $letter;
@@ -277,7 +277,7 @@ function fp_translate_numeric_grade($grade, $school_id = 0) {
   $grade = floatval($grade);
   foreach ($translate as $low => $details) {
     foreach ($translate[$low] as $high => $letter) {
-      if ($grade >= $low && $grade <= $high) {
+      if ($grade >= floatval($low) && $grade <= floatval($high)) {
         if ($bool_midterm) $letter .= "MID";
         return $letter;
       }
@@ -632,8 +632,10 @@ function _fp_error_handler($error_level, $message, $filename, $line, $context = 
 /**
 * Map an error code into an Error word
 *
-* @param int $code Error code to map
-* @return array Array of error word, and log location.
+* @param int $code
+*             - Error code to map
+* @return string
+*             - String describing the error type
 */
 function _fp_map_php_error_code($code) {
     $error = '';
@@ -3289,10 +3291,9 @@ function get_modules_menus() {
     }
   }
 
-  //var_dump($temp);
   // Now, sort $temp...
   sort($temp);
-  //var_dump($temp);
+
   // Now, go back through $temp and get our new array...
   $new_array = array();
 

@@ -875,7 +875,7 @@ class Course extends stdClass
    *
    * Examples: 3 or 1-6
    *
-   * @return string
+   * @return string|float
    */
   function get_catalog_hours()
   {
@@ -1119,7 +1119,7 @@ class Course extends stdClass
    * of hours selected.  If that does not exist,
    * it will return the MIN HOURS.
    *
-   * @return int
+   * @return float
    */
   function get_hours($degree_id = 0)
   {

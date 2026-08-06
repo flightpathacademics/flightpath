@@ -1432,8 +1432,8 @@ function fp_render_sidebar_left_content($bool_for_hamburger_menu = FALSE) {
     $path = $link['path'];
     $icon = $link['icon'];
     $desc = $link['desc'];
-    $query = @$link['query'];
-    $class = @$link['class'];
+    $query = $link['query'] ?? '';
+    $class = $link['class'] ?? '';
 
     if ($c == 0) $class .= " first";
     if ($c == count($links) - 1) $class .= " last";

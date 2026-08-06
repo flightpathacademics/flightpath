@@ -1100,7 +1100,7 @@ function stats_draw_date_range_form($path, $start_date = "", $end_date = "", $ad
  * This report shows which advisors are using FlightPath most often.
  *
  *
- * @return string
+ * @return string|int
  */
 function stats_report_advisor_use($bool_only_return_total_number = FALSE) {
   $rtn = "";

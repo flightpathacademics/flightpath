@@ -117,7 +117,7 @@ class DatabaseHandler extends stdClass
    * $result = $db->db_query("SELECT * FROM table WHERE name = :name ", array(":name" => $name));
    *
    * @param string $sql_query
-   * @return resource
+   * @return resource|null
    */
   function db_query($sql_query, $args = array()) {
 

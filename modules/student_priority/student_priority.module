@@ -16,10 +16,10 @@ function student_priority_menu() {
     "page_callback" => "student_priority_display_priority_calculations_page",
     "access_callback" => "system_can_access_student",  // make sure we are allowed to access the student specified by current_student_id.
     "type" => MENU_TYPE_TAB,
-    "tab_family" => "priority-calculations",    
+    "tab_family" => "priority-calculations",
     "page_settings" => array(
       "display_currently_advising" => TRUE,
-      "screen_mode" => "not_advising",      
+      "screen_mode" => "not_advising",
     ),
   );
 
@@ -38,27 +38,27 @@ function student_priority_menu() {
 function student_priority_display_priority_calculations_page() {
 
   global $current_student_id, $user;
-  
+
   $student_id = $current_student_id;
   $rtn = "";
-  
+
   fp_add_css(fp_get_module_path('student_profile') . '/css/style.css');
   fp_add_js(fp_get_module_path('advise') . '/js/advise.js');
-   
+
   fp_set_title('');
-    
+
   $rtn .= "";
 
-  
-  
+
+
   if (@$_GET['window_mode'] == 'popup') {
-      
+
     $rtn .= "<a class='tests-expand-link' href='javascript:parent.window.location=\"" . fp_url("student-profile/priority-calculations", "current_student_id=$current_student_id") . "\"; void(0);'><i class='fa fa-expand'></i> " . t("View full page") . "</a>";
   }
-  
-  $rtn .= "<p>" . t("This system is able to make calculations as to the student's \"Academic Priority\", or, how at-risk the 
+
+  $rtn .= "<p>" . t("This system is able to make calculations as to the student's \"Academic Priority\", or, how at-risk the
                       student is of experiencing significant difficulties.") . "</p>";
-  
+
   $rtn .= "<h3>" . t("Current Academic Priority:") . "</h3>";
   $rtn .= "<!--current-academic-priority-->";
 
@@ -81,17 +81,17 @@ function student_priority_display_priority_calculations_page() {
 
 
   $calcs = student_priority_get_calculations_for_student($student_id, TRUE);
-    
-  foreach ($calcs['calc_test_results'] as $machine_name => $details) {      
+
+  foreach ($calcs['calc_test_results'] as $machine_name => $details) {
     $result = $result_label = $details['result'];
     if (isset($details['result_label'])) $result_label = $details['result_label'];
-    
-    $score = $details['score'];    
+
+    $score = $details['score'];
     $extra = isset($details['extra']) ? trim($details['extra']) : '';
-    
+
     $test_title = $calcs['calc_tests'][$machine_name]['title'];
     $test_description = @$calcs['calc_tests'][$machine_name]['description'];
-    
+
     $more_content = "";
     $more_toggle = "";
     if ($extra != "") {
@@ -101,23 +101,23 @@ function student_priority_display_priority_calculations_page() {
       $more_content = "<div id='test-extra-$rnd' class='test-extra' style='display:none;'>
                             $extra
                           </div>";
-    } 
-        
+    }
+
     $bgcolor='white';
     if (is_numeric($score)) {
-       if ($score > 0) $bgcolor = '#fff4f4';    
-      $score = (strlen("$score") == 1) ? number_format($score, 1) : $score; // force at least X num of decimals       
+       if ($score > 0) $bgcolor = '#fff4f4';
+      $score = (strlen("$score") == 1) ? number_format($score, 1) : $score; // force at least X num of decimals
     }
-    
+
     $rtn .= "<tr>
                 <td style='background-color: $bgcolor; color: black;'>$more_toggle$test_title$more_content</td>
                 <td style='background-color: $bgcolor;'>$result_label</td>
                 <td style='background-color: $bgcolor;'>$score</td>
              </tr>";
-    
+
   } // foreach priority_tests
-  
-  
+
+
   $rtn .= "</table>";
 
 
@@ -126,18 +126,18 @@ function student_priority_display_priority_calculations_page() {
   $avg = $calcs['avg'];
   $percent = $calcs['percent'];
   $max_possible = $calcs['max_possible'];
-  
+
   // TODO: these might be controlled by setting one day
   $academic_priority_desc = array(
     "high" => t("High"),
     "medium" => t("Medium"),
     "normal" => t("Normal"),
-  );    
-  
-    
+  );
+
+
   $rtn .= "<p><b>Totals:</b> $total_score score / $max_possible max = <b>" . $percent . "</b>%.
           </p>
-          
+
           <p>
             <b>" . t("Percent Scoring:") . "</b>
             <br><span class='profile-priority-bar priority-normal'>" . $academic_priority_desc['normal'] . "</span> 0 to 30
@@ -145,27 +145,27 @@ function student_priority_display_priority_calculations_page() {
             <br><span class='profile-priority-bar priority-high'>" . $academic_priority_desc['high'] . "</span> 71 to 100
           </p>
           ";
-  
-  
+
+
   // Update the "academic priority" field at the top of the page, based on ranges.
   $academic_priority = student_priority_get_student_academic_priority_label($percent);
   $machine = $academic_priority['machine'];
   $label = $academic_priority['label'];
-    
-    
+
+
   $priority_html = "<span class='profile-priority-bar priority-$machine'>" . $label . "</span>";
   $rtn = str_replace("<!--current-academic-priority-->", $priority_html, $rtn);
 
 
 
-  
-  
+
+
   // Let's set our breadcrumbs
   fp_set_standard_advising_breadcrumbs();
-  
-  
+
+
   return $rtn;
-  
+
 } //student_priority_display_priority_calculations_page
 
 
@@ -173,37 +173,37 @@ function student_priority_display_priority_calculations_page() {
 
 /**
  * Returns 'normal', 'medium', or 'high' based on values.
- * 
+ *
  * TODO: Make those values be able to be set by configuration.
- * 
+ *
  * TODO: If we have have a student specified, then see if we have a special priority value for them?
- * 
+ *
  */
 function student_priority_get_student_academic_priority_label($priority_val, $student_id = NULL) {
-  
+
   $academic_priority_label = array(
     "high" => "High",
     "medium" => "Medium",
     "normal" => "Normal",
-  );    
-  
+  );
+
   //if ($priority_val == -1) {
   //  $priority_val = @floatval($student_node->field_priority_value['und'][0]['value']);
   //}
-  
-  $machine = 'normal';  
+
+  $machine = 'normal';
   if ($priority_val >= 31 && $priority_val <= 70) $machine = "medium";
   if ($priority_val > 70 ) $machine = "high";
-  
-  
+
+
   $rtn = array();
   $rtn['val'] = $priority_val;
   $rtn['machine'] = $machine;
   $rtn['label'] = $academic_priority_label[$machine];
-  
+
   return $rtn;
-  
-    
+
+
 }
 
 
@@ -213,24 +213,24 @@ function student_priority_get_student_academic_priority_label($priority_val, $st
  * this student.  Set to zero to force it to recalculate every time.
  */
 function student_priority_get_academic_priority_value($student_id, $recalculate_if_older_than = 86400) {
-  
+
   $check_ts = time() - $recalculate_if_older_than;
 
-  
-  
+
+
   $val = db_result(db_query('SELECT priority_value FROM student_priority WHERE student_id = ? AND updated > ?', array($student_id, $check_ts)));
-  
+
   if (!$val) {
     // Recalculate!
     //fpm('recalculating');
     $calcs = student_priority_get_calculations_for_student($student_id, TRUE);
     $rtn = $calcs['percent'];
-    
+
     return $rtn;
   }
-      
-  return $val;  
-  
+
+  return $val;
+
 } // .. get academic priority value
 
 
@@ -239,127 +239,127 @@ function student_priority_get_academic_priority_value($student_id, $recalculate_
 /**
  * Run all of the calculations for a student, and return back the results
  * in a formatted array.
- * 
+ *
  * If bool_save_to_student is true, then we will write the results to the student_priority.
- * 
+ *
  */
 function student_priority_get_calculations_for_student($student_cwid, $bool_save_to_student = FALSE) {
- 
+
   global $current_student_id, $user, $student;
-  
+
   if (!isset($student) || $student == null || !is_object($student)) {
     $student = new Student($current_student_id);
-  }  
- 
+  }
+
   $rtn = array();
-  
+
   //load student as object for use in the calculation tests.
   $use_student = $student;
   if ($student_cwid != $current_student_id) {
-    $use_student = new Student($student_cwid);   
-  } 
-  
+    $use_student = new Student($student_cwid);
+  }
+
   $student_user_id = db_get_user_id_from_cwid($use_student->student_id, 'student');
-  
+
   $calc_test_results = array();
   $total = 0;
   $max_possible = 0;
   $count = 0;
-  
-  // Invoke a hook to run our priority calculations.  
+
+  // Invoke a hook to run our priority calculations.
   // First, get all our tests from all modules.
   $calc_tests = array();
   invoke_hook('define_calculation_tests', array(&$calc_tests));
-  
-    
+
+
   /////////////////////////////////
   // sort results by weight, title.
-  /////////////////////////////////  
+  /////////////////////////////////
   $sorted_calc_tests = array();
   $lines = array();
-  foreach ($calc_tests as $key => $value) {    
+  foreach ($calc_tests as $key => $value) {
     $lines[] = str_pad($value['weight'], 5, '0', STR_PAD_LEFT) . " ~~~ " . $value['title'] . " ~~~ " . $key;
-  }  
-  sort($lines);  
+  }
+  sort($lines);
   foreach ($lines as $line) {
     $temp = explode("~~~", $line);
     $key = trim($temp[2]);
-    $sorted_calc_tests[$key] = $calc_tests[$key];
-  }  
+    $sorted_calc_tests[$key] = $calc_tests[$key] ?? '';
+  }
   $calc_tests = $sorted_calc_tests;
   //////////////////////////
-  
-    
+
+
   $rtn['calc_tests'] = $calc_tests;
-    
+
   foreach ($calc_tests as $callback => $details) {
-     
-    $file = @$details['file'];  // 0 = module, 1 = filename    
-    if ($file) {    
+
+    $file = @$details['file'];  // 0 = module, 1 = filename
+    if ($file) {
       $x = include_once(fp_get_module_path($file[0], TRUE, FALSE) . "/" . $file[1]);
       if (!$x) {
         fpm('Could not load include file:' . fp_get_module_path($file[0], TRUE, FALSE) . "/" . $file[1]);
       }
-      
-            
+
+
       // Now execute the callback.
       $calc_test_results[$callback] = call_user_func_array($callback, array($use_student));
     }
-    
+
     // Are we instead looking for a user attribute?
     if (isset($details['result_from_user_attribute'])) {
-      $val = user_get_attribute($student_user_id, $details['result_from_user_attribute']);      
+      $val = user_get_attribute($student_user_id, $details['result_from_user_attribute']);
       if ($val == '') {
          $val = 'SKIP';
       }
       $calc_test_results[$callback]['result'] = $val;
       $calc_test_results[$callback]['result_label'] = $val;
-      
+
       // If we have the original options we can use for the label, use that.
       //fpm($details);
       if (isset($details['options'][$val])) {
-        $calc_test_results[$callback]['result_label'] = $details['options'][$val]; 
+        $calc_test_results[$callback]['result_label'] = $details['options'][$val];
       }
-      
+
     }
-    
-    
+
+
     $raw_score = $details['result_scores'][$calc_test_results[$callback]['result']];
-    
+
     // If the raw_score is "SKIP" then we don't want to count this at all.
-            
+
     if (is_numeric($raw_score)) {
       $score = floatval($raw_score);
       $calc_test_results[$callback]['score'] = $score;
-      
+
       // Figure out the max possible score from this test.
-      $test_max_score = 0;      
+      $test_max_score = 0;
       foreach ($details['result_scores'] as $k => $v) {
         $v = floatval($v);
         if ($v > $test_max_score) $test_max_score = $v;
       }
 
       $max_possible += $test_max_score;
-        
+
       $total = $total + $score;
       $count++;
     }
     else {
       $calc_test_results[$callback]['score'] = $raw_score;
     }
-  
+
   } // foreach
-  
+
   $avg = 0;
   if ($count > 0) {
     $avg = round($total / $count, 2);
   }
-  
+
   $percent = 0;
   if ($max_possible > 0) {
     $percent = round(($total / $max_possible * 100), 2);
   }
-  
+
 
   $rtn['calc_test_results'] = $calc_test_results;
   $rtn['count'] = $count;
@@ -368,16 +368,16 @@ function student_priority_get_calculations_for_student($student_cwid, $bool_save
   $rtn['max_possible'] = $max_possible;
   $rtn['percent'] = $percent;
 
-  
-  // Should we save the value to the student_priority table?  
+
+  // Should we save the value to the student_priority table?
   if ($bool_save_to_student) {
     db_query('REPLACE INTO student_priority (student_id, priority_value, results, updated)
                 VALUES (?, ?, ?, ?) ', array($student_cwid, $percent, serialize($rtn), time()));
   }
-  
+
   return $rtn;
-  
-  
+
+
 } // student_priority_get_calculations_for_student($student_nid)
 
 

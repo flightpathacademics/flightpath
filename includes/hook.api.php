@@ -378,11 +378,11 @@ function hook_status() {
 
   if ($last_run < strtotime("-2 DAY")) {
     $rtn["severity"] = "alert";
-    $rtn["status"] .= t("Cron hasn't run in over 2 days.  For your installation of FlightPath
+    $rtn["status"] = t("Cron hasn't run in over 2 days.  For your installation of FlightPath
                to function properly, cron.php must be accessed routinely. At least once per day is recommended.");
   }
   else {
-    $rtn["status"] .= t("Cron was last run on %date", array("%date" => format_date($last_run)));
+    $rtn["status"] = t("Cron was last run on %date", array("%date" => format_date($last_run)));
   }
 
   $rtn["status"] .= "<p style='font-size: 0.8em;'>" . t("Your site's cron URL is:");

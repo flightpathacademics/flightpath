@@ -1077,7 +1077,7 @@ class DegreePlan extends stdClass
    * Returns a simple array with values seperated by " ~~ "
    * in this order: track_code ~~ track_title ~~ trackDesc ~~ track's degree id
    *
-   * @return array
+   * @return array|false
    */
   function get_available_tracks()
   {

@@ -232,7 +232,7 @@ function _password_enforce_log2_boundaries($count_log2) {
  *   An existing hash or the output of _password_generate_salt().  Must be
  *   at least 12 characters (the settings and salt).
  *
- * @return string
+ * @return string|false
  *   A string containing the hashed password (and salt) or FALSE on failure.
  *   The return string will be truncated at FP_HASH_LENGTH characters max.
  */

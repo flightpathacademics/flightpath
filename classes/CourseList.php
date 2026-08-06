@@ -123,12 +123,12 @@ class CourseList extends ObjList
    *         NULL.  If using this, then $course_id, $term_id, and $bool_transfer
    *         will be ignored.
    *
-   * @param Int $sub_req_by_degree_id
+   * @param int $sub_req_by_degree_id
    *      - Optional.  If set, we will only exclude substituted courses if they were substitutions made for this degree_id.  Leave 0 if not sure
    *        what to use.
    *
    *
-   * @return Course
+   * @return Course|false
    */
   function find_specific_course($course_id = 0, $term_id = 0, $bool_transfer = false, $bool_exclude_substitutions = true, Course $use_course = null, $sub_req_by_degree_id = 0)
   {
@@ -210,15 +210,12 @@ class CourseList extends ObjList
    * the Course object.
    *
    * @param Course $course_c
-   * @return CourseList
+   * @return CourseList|false
    */
-  function find_all_matches(stdClass $course_c)
-  {
-    if (!$list_matches =  parent::find_all_matches($course_c))
-    {
+  function find_all_matches(stdClass $course_c) {
+    if (!$list_matches =  parent::find_all_matches($course_c)) {
       return false;
     }
-
 
     $list_matches = CourseList::cast($list_matches);
     return $list_matches;
@@ -232,7 +229,7 @@ class CourseList extends ObjList
    * yet been assigned.
    *
    * @param Course $course_c
-   * @return Course
+   * @return Course|false
    */
   function find_first_unfulfilled_match(Course $course_c)
   {
@@ -249,7 +246,7 @@ class CourseList extends ObjList
       }
     }
 
-    return false;
+    return FALSE;
   }
 
 
@@ -317,7 +314,7 @@ class CourseList extends ObjList
    * Returns FALSE if no matches were found, else it will
    * return the matched Course object.
    *
-   * @return Course
+   * @return Course|false
    */
   function find_most_recent_match(Course $course_c, $min_grade = "", $bool_mark_repeats_exclude = false, $degree_id = 0, $bool_skip_already_assigned_to_degree = TRUE, $bool_skip_subs = FALSE, $group_id = 0)
   {
@@ -467,7 +464,7 @@ class CourseList extends ObjList
    * return the matched Course object.
    *
    *
-   * @return Course
+   * @return Course|false
    */
   function find_best_grade_match(Course $course_c, $min_grade = "", $bool_mark_repeats_exclude = false, $degree_id = 0, $bool_skip_already_assigned_to_degree = TRUE, $bool_skip_subs = FALSE, $group_id = 0)
   {
@@ -1362,7 +1359,7 @@ class CourseList extends ObjList
    *         - If set to true, it will set the $course->array_index value
    *           to the index value in $this's array_list array.
    *
-   * @param int subs_higher_priority_in_degree_id
+   * @param int $subs_higher_priority_in_degree_id
    *         - If the course is a split substitution for the supplied
    *           degree_id, then  give it a higher "priority" so it will
    *           sort above courses with identical names.
@@ -1559,7 +1556,7 @@ class CourseList extends ObjList
    *
    * Returns FALSE if it cannot find a selectable course.
    *
-   * @return Course
+   * @return Course|false
    */
   function find_first_selectable()
   {
@@ -1986,7 +1983,7 @@ class CourseList extends ObjList
    *         - Works the same as get_clone()'s boolReturnNewCourses
    *           variable.
    *
-   * @return Course
+   * @return CourseList
    */
   function get_fulfilled_or_advised($bool_return_new_courses = false)
   {
