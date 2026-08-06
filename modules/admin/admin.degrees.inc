@@ -881,10 +881,10 @@ function admin_display_degrees() {
     $db_major_code = $cur['major_code'];
     $db_degree_type = $cur['degree_type'];
     $db_degree_level = $cur['degree_level'];
-    $db_degree_class = $cur['degree_clas'];
+    $db_degree_class = $cur['degree_class'];
     $db_title = $cur['title'];
     $db_semester_titles_csv = $cur['semester_titles_csv'];
-    $db_catalog_year = $cur['db_catalog_year'];
+    $db_catalog_year = $cur['catalog_year'];
     $db_exclude = $cur['exclude'];
     $db_public_note = $cur['public_note'];
     $db_allow_dynamic = $cur['allow_dynamic'];
