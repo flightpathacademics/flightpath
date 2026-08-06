@@ -1,0 +1,24 @@
+name: Semgrep
+
+on:
+  push:
+    branches: [flightpath-7.x]
+  pull_request:
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: semgrep/semgrep-action@v1
+        with:
+          config: >
+            p/php
+            p/owasp-top-ten
+            p/secrets
