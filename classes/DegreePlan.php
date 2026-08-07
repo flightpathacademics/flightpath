@@ -997,8 +997,8 @@ class DegreePlan extends stdClass
               $degree_track_cache[$table_name][$just_major_code][$this->track_code][$this->catalog_year] = $cur;
         }
 
-        $this->track_title = $cur["track_title"];
-        $this->track_description = $cur["track_description"];
+        $this->track_title = $cur["track_title"] ?? '';
+        $this->track_description = $cur["track_description"] ?? '';
 
       }
 
