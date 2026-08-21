@@ -1659,15 +1659,14 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
 
 
   // Returns a simple array of all degree_id's which match this major code, any catalog year.
-  function get_degree_ids($major_code, $school_id = 0) {
+  function get_degree_ids($major_code, $school_id = 0, $bool_use_draft = FALSE) {
 
     $rtn = array();
 
-    $bool_use_draft = FALSE;
 
     // Always override if the global variable is set.
-    if (@$GLOBALS["fp_advising"]["bool_use_draft"] == true) {
-      $bool_use_draft = true;
+    if (@$GLOBALS["fp_advising"]["bool_use_draft"] === TRUE) {
+      $bool_use_draft = TRUE;
     }
 
     $table_name = "degrees";

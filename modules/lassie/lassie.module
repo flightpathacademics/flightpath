@@ -15,10 +15,10 @@ function lassie_get_machine_name($str) {
 }
 
 
- 
+
 /**
  * Set a new job for Lassie to watch.
- * 
+ *
  * @param $job_machine_name - The machine name of this job. Must be alphanumeric + underscore.  Ex:  job_123
  * @param $hours  - must be integer or a warning will be logged and displayed via fpm().
  * @param $emails - comma separated listed of email addresses to notify if the job fails to finish.
@@ -34,40 +34,40 @@ function lassie_start($job_machine_name, $hours = 2, $emails = "") {
   }
 
   $job_machine_name = lassie_get_machine_name($job_machine_name);
-    
-  $data = array( 
+
+  $data = array(
     'start' => time(),
     'hours' => $hours,
     'expires' => strtotime("NOW + $hours HOURS"),
     'emails' => $emails,
     'user_uid' => $user->id,
   );
-  
-  
+
+
   variable_set('lassie_job__' . $job_machine_name, $data);
-  
+
   watchdog('lassie', t("Beginning new job: ") . $job_machine_name . ". " . print_r($data, TRUE));
-  
+
 }
 
 /**
  * Tell Lassie that we have finished the job.
  */
 function lassie_finish($job_machine_name) {
-    
+
   $job_machine_name = lassie_get_machine_name($job_machine_name);
-  
+
   $data = variable_get('lassie_job__' . $job_machine_name, array());
   $start = $data['start'];
   $elapsed = round((time() - $start) / 60, 3);
-    
+
   watchdog('lassie', t("Finished job: ") . $job_machine_name . ". " . $elapsed . " minutes elapsed.");
-  
+
   // TODO:  Implement a hook?
-  
+
   db_query("DELETE FROM variables WHERE name = ?", array("lassie_job__$job_machine_name"));
-  
-    
+
+
 }
 
 
@@ -76,7 +76,7 @@ function lassie_finish($job_machine_name) {
  */
 function lassie_check($job_machine_name) {
   $job_machine_name = lassie_get_machine_name($job_machine_name);
-  
+
   $data = variable_get('lassie_job__' . $job_machine_name, array());
   $start = $data['start'];
   $elapsed = round((time() - $start) / 60, 3);
@@ -84,15 +84,15 @@ function lassie_check($job_machine_name) {
   if (time() > $expires) {
     // YES!  We need to trigger the email, this job has expired.
     $emails = $data['emails'];
-    // TODO: also include any default emails from settings.
-    
-    
+    // TODO: also include any default emails from settings?
+
+
     $hours = $data['hours'];
     $user_uid = $data['user_uid'];
-    
+
     // TODO:  Implement a hook so other modules can act?
-    
-    
+
+
     // Implement the warning email.
     $msg = "";
     $msg .= "FlightPath Lassie module reports that a job has failed to complete in the expected time.\n\n";
@@ -103,23 +103,23 @@ function lassie_check($job_machine_name) {
     $msg .= "Hours  : $hours \n";
     $msg .= "Expires: " . format_date(convert_time($expires)) . "\n";
     $msg .= "Elapsed: $elapsed min.";
-        
-    if ($emails != "") {    
-      fp_mail($emails, "FlightPath job failed to end: $job_machine_name", $msg);    
+
+    if ($emails != "") {
+      fp_mail($emails, "FlightPath job failed to end: $job_machine_name", $msg);
     }
-        
+
     // Delete from variables table.
     db_query("DELETE FROM variables WHERE name = ?", array("lassie_job__$job_machine_name"));
     watchdog('lassie', t("Expired job: ") . $job_machine_name . ". " . $elapsed . " minutes elapsed.", array(), WATCHDOG_ERROR);
-   
-   
+
+
     if (isset($GLOBALS['lassie_disable_maintenance_mode_on_fail']) && $GLOBALS['lassie_disable_maintenance_mode_on_fail'] == TRUE) {
       // We should set maintenance mode to FALSE.  See README.txt file for an explanation.
-      variable_set("maintenance_mode", FALSE);      
+      variable_set("maintenance_mode", FALSE);
     }
-    
+
   }
-  
+
 }
 
 
@@ -127,7 +127,7 @@ function lassie_check($job_machine_name) {
  * Check all of the jobs we are currently waiting on.
  */
 function lassie_check_all() {
-  
+
   $res = db_query("SELECT * FROM variables WHERE name LIKE 'lassie_job__%' ");
   while ($cur = db_fetch_array($res)) {
     $name = $cur['name'];
@@ -142,17 +142,17 @@ function lassie_check_all() {
  * Implements hook_cron
  */
 function lassie_cron() {
-      
-  // If its been less than 45 minutes since last check, then skip.  Saves checks if our cron is running very frequently.  
+
+  // If its been less than 45 minutes since last check, then skip.  Saves checks if our cron is running very frequently.
   $last_check = variable_get("lassie_last_check", 0);
-  if (time() < ($last_check + (45 * 60))) return; 
-  
+  if (time() < ($last_check + (45 * 60))) return;
+
   watchdog("lassie", "Lassie checking for any long-running jobs....", array(), WATCHDOG_DEBUG);
-  
+
   lassie_check_all();
-  
+
   variable_set("lassie_last_check", time());
-  
+
 }
 
 
