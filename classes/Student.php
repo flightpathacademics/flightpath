@@ -273,19 +273,20 @@ class Student extends stdClass
 
       $c++;
 
-      if (!is_numeric($cur['position'])) $cur['position'] = 0;
 
       // Get the test's description, if available.
       $test_description = $category_description = "";
+      $position = 0;
       $res2 = db_query("SELECT * FROM standardized_tests
                         WHERE test_id = ?
                         AND category_id = ?
                         AND school_id = ?
-                        ORDER BY position", $cur['test_id'], $cur['category_id'], $this->school_id);
+                        ORDER BY position", array($cur['test_id'], $cur['category_id'], $this->school_id));
       $cur2 = db_fetch_array($res2);
       if ($cur2) {
         $test_description = trim($cur2["test_description"] ?? '');
         $category_description = trim($cur2["category_description"] ?? '');
+        $position = intval($cur2['position'] ?? 0);
       }
 
       // Did we find anything in the table?  If not, just use the codes themselves
@@ -309,14 +310,14 @@ class Student extends stdClass
           $st->bool_date_unavailable = TRUE;
         }
 
-        $st->description = $cur['test_description'];
+        $st->description = $cur['test_description'] ?? '';
         $old_row = $cur['date_taken'] . $cur['test_id'];
 
       }
 
-      $st->categories[$cur['position'] . $c]["description"] = $category_description;
-      $st->categories[$cur['position'] . $c]["category_id"] = $cur['category_id'];
-      $st->categories[$cur['position'] . $c]["score"] = $cur['score'];
+      $st->categories[$position . $c]["description"] = $category_description;
+      $st->categories[$position . $c]["category_id"] = $cur['category_id'];
+      $st->categories[$position . $c]["score"] = $cur['score'];
 
     }
 

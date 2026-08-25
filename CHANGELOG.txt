@@ -1,12 +1,18 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-08-24
+  Fixed bug in Student.php where standardized tests were not showing in correct order.
+
+  Removed several places where "extract" command was used.
+
+
 2026-08-03
   Fixed a bug where groups with min hours were not correctly showing as fulfilled even
   when the min hours were indeed fulfilling the group.
 
   Various small fixes pointed out by phpstan
-  
+
 
 2026-07-30
   For 'submit' form elements, the 'confirm' property now uses a more attractive modal dialog
