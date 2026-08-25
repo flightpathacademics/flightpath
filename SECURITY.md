@@ -7,7 +7,7 @@ At the moment, only the following (checked) versions of FlightPath are supported
 | Version | Supported          |
 | ------- | ------------------ |
 | 7.x     | :white_check_mark: |
-| 6.x     | :x:		       |
+| 6.x     | :x:		             |
 | < 5.x   | :x:                |
 
 ## Reporting a Vulnerability

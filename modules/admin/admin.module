@@ -993,7 +993,7 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
       $db_major_code = $cur['major_code'];
       $db_degree_type = $cur['degree_type'];
       $db_degree_level = $cur['degree_level'];
-      $db_degree_class = $cur['degree_clas'];
+      $db_degree_class = $cur['degree_class'];
       $db_title = $cur['title'];
       $db_semester_titles_csv = $cur['semester_titles_csv'];
       $db_exclude = $cur['exclude'];
@@ -1096,8 +1096,8 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
 
 
     fp_add_message(t("The copy operation is now completed.  You may view the new year
-                    by using the Data Entry links on the admin main menu.  Remember, you must
-                    apply draft changes before they will be visible in FlightPath."));
+                    by using the Degree & Course Management links on the admin main menu.  Remember, you must
+                    apply draft changes before they will be visible in to other users in the system."));
 
 
   }
