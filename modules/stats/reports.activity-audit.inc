@@ -122,7 +122,7 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
 
   $types_exclude = array(
     'access_denied', 'page_not_found', 'ban_ip', 'cron', 'debug', 'http_request', 'lassie', 'nightly_import_routine',
-    'night_import_routine', 'php_error', 'system',
+    'night_import_routine', 'php_error', 'system', 'engagements_debug',
     'php_warning', 'saml', 'update_status', 'save_adv_draft', 'save_adv_draft_whatif',
   );
 
@@ -146,8 +146,9 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
                      WHERE `timestamp` >= :start
                      AND `timestamp` <= :end
                      $types_not_in
+                     AND severity = :wdnotice
                      ORDER BY wid
-                     ", array(':start' => strtotime($start), ':end' => strtotime($end)));
+                     ", array(':start' => strtotime($start), ':end' => strtotime($end), ':wdnotice' => WATCHDOG_NOTICE));
     $cur = db_fetch_array($res);
 
     $batch["results"]["total"] = intval($cur["count"]);
@@ -173,9 +174,10 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
                      WHERE `timestamp` >= :start
                      AND `timestamp` <= :end
                      $types_not_in
+                     AND severity = :wdnotice
                      ORDER BY wid
                      LIMIT $current, $limit
-                     ", array(':start' => strtotime($start), ':end' => strtotime($end)));
+                     ", array(':start' => strtotime($start), ':end' => strtotime($end), ':wdnotice' => WATCHDOG_NOTICE));
   while ($cur = db_fetch_object($res)) {
 
     if ($c >= $limit) {
