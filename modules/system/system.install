@@ -2,7 +2,7 @@
 /**
  * @file
  * The install file for the System module
- * 
+ *
  * This file is responsible for installing all of the required tables
  * for FlightPath.
 */
@@ -11,183 +11,183 @@
 
 /**
  * Implementation of hook_enable.
- * 
+ *
  * This is meant to be called during initial installation.  We will make all of the
  * database changes we need to make in order to have FlightPath up and running.
  */
 function system_enable() {
-  
+
   // Set up our default roles
   db_query("INSERT INTO roles (rid, name)
-            VALUES (1, 'anonymous user'), 
+            VALUES (1, 'anonymous user'),
                    (2, 'authenticated user')");
-   
+
   // Add in the anonymous user into the users table (uid = 0)
   db_query("INSERT INTO users (user_id, cwid, user_name) VALUES (0, 0, 'anonymous')");
 
   // Let's figure out what the current schema value is for this system module...
-  $info_contents = file_get_contents("modules/system/system.info");    
+  $info_contents = file_get_contents("modules/system/system.info");
   // From the info_contents variable, split up and place into an array.
   $info_details_array = array();
   $lines = explode("\n", $info_contents);
   foreach ($lines as $line) {
     if (trim($line) == "") continue;
     $temp = explode("=", trim($line));
-    $info_details_array[trim($temp[0])] = trim(substr($line, strlen($temp[0]) + 1)); 
-  }  
+    $info_details_array[trim($temp[0])] = trim(substr($line, strlen($temp[0]) + 1));
+  }
 
-  // Set up the modules table-- add the system module first.    
+  // Set up the modules table-- add the system module first.
   db_query("INSERT INTO modules (`path`, `name`, `version`, `enabled`, `weight`, `type`, `schema`)
             VALUES ('modules/system', 'system', 'core', 1, '-999', 'module', '?') ", $info_details_array["schema"]);
-    
+
 
   // Let's perform installations on the other modules we want enabled by default.
-  $modules = array("admin", "advise", "comments", "student_search", "update_status", "content", "announcements", "tinymce", "course_search", "blank_degrees", "user", 
+  $modules = array("admin", "advise", "comments", "student_search", "update_status", "content", "announcements", "tinymce", "course_search", "blank_degrees", "user",
                     "batch", 'stats', 'smtp', 'prereqs', 'lassie', 'calendar', 'alerts', 'audit', 'engagements', 'notify', 'student_files', 'encryption',
                     'student_priority', 'student_profile', 'masquerade');
   foreach ($modules as $module) {
-    
-    $info_contents = file_get_contents("modules/$module/$module.info");    
+
+    $info_contents = file_get_contents("modules/$module/$module.info");
     // From the info_contents variable, split up and place into an array.
     $info_details_array = array();
     $lines = explode("\n", $info_contents);
     foreach ($lines as $line) {
       if (trim($line) == "") continue;
       $temp = explode("=", trim($line));
-      $info_details_array[trim($temp[0])] = trim(substr($line, strlen($temp[0]) + 1)); 
-    }      
-    
+      $info_details_array[trim($temp[0])] = trim(substr($line, strlen($temp[0]) + 1));
+    }
+
     $schema = 0;
     if (isset($info_details_array['schema'])) $schema = $info_details_array['schema'];
-    
+
     system_enable_module(array("module" => $module, "path" => "modules/$module", "version" => "core", "schema" => $schema));
   }
-  
-  
+
+
   /*
   // Set up some blocks for the system module by default.
   db_query("INSERT INTO blocks (section, region, module, delta, weight)
             VALUES ('system_main', 'right_col', 'system', 'tools', 1),
-                   ('system_main', 'right_col', 'system', 'admin_tools', 2), 
-                   ('system_main', 'left_col', 'announcements', 'primary', 0), 
-                   ('system_login', 'left_col', 'blocks', 'block_1', 0), 
+                   ('system_main', 'right_col', 'system', 'admin_tools', 2),
+                   ('system_main', 'left_col', 'announcements', 'primary', 0),
+                   ('system_login', 'left_col', 'blocks', 'block_1', 0),
                    ('system_login', 'right_col', 'system', 'login_form', 0),
                    ('system_login', 'top', 'blocks', 'block_2', 0)
-                   
-                   ");  
-    
+
+                   ");
+
    */
-   
+
   // Set up some basic permissions for authenticated user.
   db_query("INSERT INTO role_permissions (rid, perm)
-            VALUES 
+            VALUES
               (2, 'access_logged_in_content'),
-              (2, 'view_comments'), 
+              (2, 'view_comments'),
               (2, 'view_degree_plan_course_descriptions')
           ");
 
-  
+
   // Add some default variable values, to make things a little easier on first-run.
   variable_set("earliest_catalog_year", date("Y"));
   variable_set("current_catalog_year", date("Y"));
   variable_set("current_draft_catalog_year", date("Y"));
-  
-  
+
+
   // Do we have "clean URLs" enabled?
   $test = system_check_clean_urls();
   variable_set("clean_urls", $test);
-  
+
 }
 
 
 
 function system_update($old_schema, $new_schema) {
-  
+
   if (intval($old_schema) < 2) {
-    
+
     db_query("CREATE TABLE `banned_ips` (
               `ip_address` varchar(64) NOT NULL,
               `posted_ts` bigint(20) unsigned DEFAULT NULL,
               PRIMARY KEY (`ip_address`),
               KEY `posted_ts` (`posted_ts`)
               )");
-    
+
   }
 
-   
+
   if (intval($old_schema) < 3) {
-    
+
     // We want to enable a new permission for authenticated users.
-    
+
     // Delete first in case its already been enabled.
     db_query("DELETE from role_permissions WHERE rid = 2 AND perm = 'view_degree_plan_course_descriptions' ");
-    
+
     db_query("INSERT INTO role_permissions (rid, perm)
                 VALUES (2, 'view_degree_plan_course_descriptions')");
-    
+
   }
-  
-  
-  
+
+
+
   if (intval($old_schema) < 4) {
-    
+
     // Expand the number of chars cumulative hours can be.
-    
+
     db_query("ALTER TABLE students
               MODIFY cumulative_hours VARCHAR(8)");
   }
-  
-  
+
+
   if (intval($old_schema) < 5) {
-    
+
     // Add additional index on watchdog to help with ban ip operations
-    
+
     db_query("CREATE INDEX idx_watchdog_user_ip_type_ts
                 ON watchdog (user_id, ip, `type`, `timestamp`)");
   }
-  
-  
-  
+
+
+
   if (intval($old_schema) < 6) {
-    
-    // Modify banned_ips table    
+
+    // Modify banned_ips table
     db_query("ALTER TABLE banned_ips
                 MODIFY ip_address VARCHAR(64)");
-    
+
     db_query("ALTER TABLE banned_ips
                 MODIFY posted_ts INT UNSIGNED DEFAULT NULL");
-    
+
   }
-  
-  
+
+
   if (intval($old_schema) < 7) {
-    
+
     // Add additional index on users for the email column
-    
+
     db_query("CREATE INDEX idx_email
                 ON users (`email`)");
   }
-  
-  
-  
+
+
+
 } // update
 
 
 
 /**
  * Implementation of hook_install.
- * 
+ *
  * This will create all of our tables.
- */ 
+ */
 function system_install() {
-  
+
   // Since this will ONLY be called during initial install, we do not
   // need to first check for existing tables; it is assumed that the database
   // is empty.
-  
+
   // Therefore, let's place all of our create table statements in one query, for
   // simplicity.
-    
+
   $q = "
 CREATE TABLE `advised_courses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -198,7 +198,7 @@ CREATE TABLE `advised_courses` (
   `group_id` varchar(50) DEFAULT '',
   `var_hours` decimal(8,4) DEFAULT '0.0000',
   `term_id` varchar(20) DEFAULT '',
-  `degree_id` int(11) DEFAULT '0',  
+  `degree_id` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `advid` (`advising_session_id`),
   KEY `course_id` (`course_id`),
@@ -208,11 +208,11 @@ CREATE TABLE `advised_courses` (
   KEY `semester_num` (`semester_num`)
 );   ";
 
-  
+
   db_query($q);
 
-  $q = "  
-  
+  $q = "
+
 CREATE TABLE `advising_comments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `student_id` varchar(30) DEFAULT '0',
@@ -221,15 +221,15 @@ CREATE TABLE `advising_comments` (
   `comment` longtext DEFAULT NULL,
   `posted` int(10) unsigned DEFAULT 0,
   `access_type` varchar(20) DEFAULT '',
-  `delete_flag` tinyint(4) DEFAULT 0,  
+  `delete_flag` tinyint(4) DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `student_id` (`student_id`),
   KEY `faculty_id` (`faculty_id`),
   KEY `posted` (`posted`),
   KEY `term_id` (`term_id`),
   KEY `delete_flag` (`delete_flag`),
-  KEY `access_type` (`access_type`)  
-); 
+  KEY `access_type` (`access_type`)
+);
   ";
 
   db_query($q);
@@ -274,7 +274,7 @@ $q = "
 CREATE TABLE `advisor_student` (
   `faculty_id` varchar(30) NOT NULL DEFAULT '0',
   `student_id` varchar(30) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`faculty_id`,`student_id`) 
+  PRIMARY KEY (`faculty_id`,`student_id`)
 );  ";
 
 db_query($q);
@@ -294,8 +294,8 @@ CREATE TABLE `banned_ips` (
   KEY `posted_ts` (`posted_ts`)
 ); ";
 db_query($q);
- 
- 
+
+
 $q = "
 CREATE TABLE `courses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -342,7 +342,7 @@ db_query("CREATE TABLE `degree_college` (
   PRIMARY KEY (`major_code`,`school_id`),
   KEY `college_code` (`college_code`),
   KEY `school_id` (`school_id`)
-);  "); 
+);  ");
 
 
 $q = "
@@ -435,7 +435,7 @@ CREATE TABLE `draft_courses` (
   KEY `subject_id` (`subject_id`) ,
   KEY `course_num` (`course_num`) ,
   KEY `delete_flag` (`delete_flag`) ,
-  KEY `exclude` (`exclude`) ,    
+  KEY `exclude` (`exclude`) ,
   KEY `catalog_year` (`catalog_year`) ,
   KEY `school_id` (`school_id`),
   KEY `catalog_year_2` (`catalog_year`,`exclude`,`school_id`,`delete_flag`),
@@ -574,12 +574,12 @@ $q = "
 CREATE TABLE `faculty` (
   `cwid` varchar(30) NOT NULL,
   `college` varchar(255) DEFAULT '',
-  `department_code` varchar(255) DEFAULT '',  
-  `major_code_csv` varchar(255) DEFAULT '',  
+  `department_code` varchar(255) DEFAULT '',
+  `major_code_csv` varchar(255) DEFAULT '',
   PRIMARY KEY (`cwid`),
-  KEY `major_code_csv` (`major_code_csv`),  
+  KEY `major_code_csv` (`major_code_csv`),
   KEY `department_code` (`department_code`),
-  KEY `college` (`college`)  
+  KEY `college` (`college`)
 );  ";
 db_query($q);
 
@@ -705,12 +705,12 @@ CREATE TABLE `student_courses` (
   `hours_awarded` decimal(8,4) DEFAULT 0.0000,
   `grade` varchar(5) DEFAULT '',
   `term_id` varchar(20) DEFAULT '',
-  `level_code` varchar(10) DEFAULT '',  
-  `course_id` int(11) DEFAULT 0,  
+  `level_code` varchar(10) DEFAULT '',
+  `course_id` int(11) DEFAULT 0,
   PRIMARY KEY (`id`) ,
   KEY `student_id` (`student_id`) ,
   KEY `course_id` (`course_id`) ,
-  KEY `level_code` (`level_code`)  
+  KEY `level_code` (`level_code`)
 );  ";
 db_query($q);
 
@@ -735,7 +735,7 @@ $q = "
 CREATE TABLE `student_developmentals` (
   `student_id` varchar(30) NOT NULL,
   `requirement` varchar(15) NOT NULL DEFAULT '',
-  PRIMARY KEY (`student_id`,`requirement`), 
+  PRIMARY KEY (`student_id`,`requirement`),
   KEY `requirement` (`requirement`)
 ); ";
 db_query($q);
@@ -767,11 +767,11 @@ CREATE TABLE `student_substitutions` (
   `sub_hours` decimal(8,4) DEFAULT 0.0000,
   `sub_remarks` longtext DEFAULT NULL,
   `posted` int(10) unsigned DEFAULT 0,
-  `delete_flag` tinyint(4) DEFAULT 0,  
+  `delete_flag` tinyint(4) DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `student_id` (`student_id`),
   KEY `rev` (`required_entry_value`),
-  KEY `sev` (`sub_entry_value`)  
+  KEY `sev` (`sub_entry_value`)
 );  ";
 db_query($q);
 
@@ -799,14 +799,14 @@ CREATE TABLE `student_transfer_courses` (
   `term_id` varchar(20) DEFAULT '',
   `grade` varchar(5) DEFAULT '',
   `hours_awarded` decimal(8,4) DEFAULT 0.0000,
-  `level_code` varchar(10) DEFAULT '',  
+  `level_code` varchar(10) DEFAULT '',
   PRIMARY KEY (`id`) ,
   KEY `student_id` (`student_id`) ,
   KEY `transfer_id` (`transfer_course_id`) ,
   KEY `term_id` (`term_id`) ,
   KEY `grade` (`grade`) ,
   KEY `level_code` (`level_code`) ,
-  KEY `hrs` (`hours_awarded`)  
+  KEY `hrs` (`hours_awarded`)
 );  ";
 db_query($q);
 
@@ -821,11 +821,11 @@ CREATE TABLE `student_unassign_group` (
   `group_id` varchar(50) DEFAULT '',
   `degree_id` int(11) DEFAULT 0,
   `delete_flag` tinyint(4) DEFAULT 0,
-  `posted` int(10) unsigned DEFAULT 0,  
+  `posted` int(10) unsigned DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `student_id` (`student_id`),
   KEY `faculty_id` (`faculty_id`),
-  KEY `delete_flag` (`delete_flag`)  
+  KEY `delete_flag` (`delete_flag`)
 );  ";
 db_query($q);
 
@@ -894,16 +894,16 @@ db_query($q);
 $q = "
 CREATE TABLE `transfer_eqv_per_student` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `student_id` varchar(30) DEFAULT '', 
+  `student_id` varchar(30) DEFAULT '',
   `transfer_course_id` int(11) DEFAULT 0,
   `local_course_id` int(11) DEFAULT 0,
   `valid_term_id` varchar(20) DEFAULT '',
-  `broken_id` int(11) DEFAULT 0,  
+  `broken_id` int(11) DEFAULT 0,
   PRIMARY KEY (`id`) ,
   KEY `student_id` (`student_id`) ,
   KEY `transfer_course_id` (`transfer_course_id`) ,
   KEY `local_course_id` (`local_course_id`) ,
-  KEY `broken_id` (`broken_id`)  
+  KEY `broken_id` (`broken_id`)
 );  ";
 db_query($q);
 
@@ -1012,7 +1012,7 @@ CREATE TABLE `user_attributes` (
 db_query($q);
 
 
- 
+
 $q = "
 CREATE TABLE `watchdog` (
   `wid` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -1042,11 +1042,12 @@ CREATE TABLE `watchdog` (
   KEY `timestamp` (`timestamp`) USING BTREE,
   KEY `is_student` (`is_student`) USING BTREE,
   KEY `is_faculty` (`is_faculty`) USING BTREE,
-  KEY `idx_combo1` (`user_id`,`ip`,`type`,`timestamp`) USING BTREE
-);  
+  KEY `idx_combo1` (`user_id`,`ip`,`type`,`timestamp`) USING BTREE,
+  KEY `idx_combo2` (`timestamp`,`type`,`severity`,`wid`) USING BTREE
+);
 
 ";
-  
-  db_query($q); 
-      
+
+  db_query($q);
+
 }

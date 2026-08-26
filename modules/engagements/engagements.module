@@ -200,7 +200,7 @@ function engagements_handle_incoming_aws_email() {
 
 
   watchdog('debug_aws', "Type: $event_type<br>to_email $to_email<br>srcarn: $source_arn<br>
-                          <pre>" . print_r($sns, TRUE) . '</pre>');
+                          <pre>" . print_r($sns, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
 
 
 

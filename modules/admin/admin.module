@@ -762,7 +762,7 @@ function admin_duplicate_year_perform_batch_operation(&$batch, $ops, $old_year, 
   $op_val = $ops[$batch['results']['current']][$op_command];
   $db = get_global_database_handler();
 
-  watchdog('debug', "$op_command");
+  watchdog('debug', "$op_command", array(), WATCHDOG_DEBUG);
 
   if ($op_command == 'delete_new_year') {
     /////////////////////  DELETION  ///////////////////////////////////////////

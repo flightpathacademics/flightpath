@@ -28,7 +28,7 @@ function student_search_ajax_autocomplete_student($output_format = "default") {
   $matches = array();
 
   // Result will be in $form['adv_array']['value'];
-  //watchdog('debug', pretty_print($form['adv_array']['value'], TRUE));
+  //watchdog('debug', pretty_print($form['adv_array']['value'], TRUE), array(), WATCHDOG_DEBUG);
   $adv_array = $form['adv_array']['value'];
   if (is_array($adv_array)) {
     foreach ($adv_array as $cwid => $details) {

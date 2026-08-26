@@ -10,7 +10,9 @@ FlightPath 7.x Changelog
   Added extra logging to Engagements for when we RECEIVE a text message.
 
   Created new report on Analytics page: Activity Audit
-  
+
+  Found instances of watchdog() that should have been given severity = WATCHDOG_DEBUG
+
 
 2026-08-24
   Fixed bug in Student.php where standardized tests were not showing in correct order.

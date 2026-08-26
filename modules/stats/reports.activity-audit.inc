@@ -211,8 +211,8 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
     $message = str_replace('"', '""', $message);
 
 
-    if ($user_id === 0 && $type == 'content' && strstr($message, 'content_save')) {
-      // This is likely a text message coming in. We can skip it.
+    if ($user_id === 0 && $type == 'content') {
+      // This is likely a text message coming in, or an anonymous user simply viewing content. We can skip it.
       $c++;
       continue;
     }
