@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-08-26
+  Added new FAPI attribute for all elements: "inline".  If set to TRUE, a class "element-inline-element" will
+  be added to the outer "wrapper" div.
+
+
 2026-08-24
   Fixed bug in Student.php where standardized tests were not showing in correct order.
 

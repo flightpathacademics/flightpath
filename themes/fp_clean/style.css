@@ -1164,7 +1164,15 @@ label {
   font-size: 0.9em;
 }
 
+.element-inline-element {
+  display: inline-block;
+  margin-right: 20px;
+}
 
+/* Dates are extra wide, so if inline, make the margin greater */
+.element-type-date.element-inline-element {
+  margin-right: 50px;
+}
 
 
 input::placeholder {

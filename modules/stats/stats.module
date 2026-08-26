@@ -67,6 +67,28 @@ function stats_menu() {
   );
 
 
+  $items["stats/reports/activity-audit"] = array(
+    "title" => "Activity Audit",
+    "description" => "Export to CSV a detailed history of user activity.",
+    "page_callback" => "fp_render_form",
+    "page_arguments" => array("stats_report_activity_audit_form"),
+    "access_arguments" => array("can_access_stats"),
+    "page_settings" => array(
+      "page_show_title" => TRUE,
+      "menu_links" => array(
+        0 => array(
+          "text" => t("Analytics"),
+          "path" => "stats",
+        ),
+      ),
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
+    "weight" => 125,
+    "file" => menu_get_module_path("stats") . "/reports.activity-audit.inc",
+  );
+
+
+
   $items["stats/reports/major-counts"] = array(
     "title" => "Major Counts",
     "description" => "Displays the number of students within each major or major/concentration.",
@@ -1042,6 +1064,33 @@ function stats_get_log_count($action = "", $action_array = NULL, $bool_distinct 
 
 }
 
+
+
+
+/*
+ * This returns a date range elements (eg: Start Date - End Date), and returns as an array of elements, suitable
+ * for use in a form API
+ */
+function stats_get_date_range_form_elements($bool_inline = TRUE, $start_date = '', $end_date = '') {
+  $form = array();
+
+  $form['start_date'] = array(
+    'type' => 'date',
+    'label' => 'Start date:',
+    'value' => $start_date,
+    'inline' => $bool_inline,
+  );
+
+  $form['end_date'] = array(
+    'type' => 'date',
+    'label' => 'End date:',
+    'value' => $end_date,
+    'inline' => $bool_inline,
+  );
+
+
+  return $form;
+}
 
 
 

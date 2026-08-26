@@ -559,6 +559,8 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   $suffix = @$element["suffix"];
   $multiple = @$element["multiple"];
   $spinner = @$element["spinner"];
+  $inline = @$element['inline'] ?? FALSE;
+
   if ($multiple == TRUE) {
     $multiple = "multiple=multiple";
   }
@@ -651,8 +653,9 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
     $attributes = $new_attr;
   }
 
-
-
+  if ($inline === TRUE) {
+    $extra_wrapper_class .= " element-inline-element";
+  }
 
 
 
