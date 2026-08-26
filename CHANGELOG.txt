@@ -13,6 +13,8 @@ FlightPath 7.x Changelog
 
   Found instances of watchdog() that should have been given severity = WATCHDOG_DEBUG
 
+  Fix bug where content module was double-logging when content was being saved.
+
 
 2026-08-24
   Fixed bug in Student.php where standardized tests were not showing in correct order.

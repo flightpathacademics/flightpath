@@ -2027,7 +2027,11 @@ function content_content_save(&$content) {
   fp_recalculate_alert_count_by_type();
 
 
-  watchdog('content', "content_save cid:$content->cid");
+  // This is being saved in the watchdog twice. This GLOBALS var should prevent duplicates.
+  if (($GLOBALS['content_already_logged_save'] ?? '') !== intval($content->cid)) {
+    watchdog('content', "content_save cid:$content->cid");
+  }
+  $GLOBALS['content_already_logged_save'] = intval($content->cid);
 
 
 
