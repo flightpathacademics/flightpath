@@ -1867,6 +1867,11 @@ function engagements_handle_incoming_sms($vars = array())
   $tbody = nl2br($tbody);
   ///////////////////////////////////
 
+  if ($dir == 'received') {
+    watchdog('engagements_sms', "SMS message received from $from_mobile to $to_mobile. Possible student cwid: ($stu_cwid). Msg: $body");
+  }
+
+
   if (trim($stu_cwid) != "") {
     // create an engagement content node for this student!
 

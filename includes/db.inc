@@ -399,6 +399,11 @@ function fp_get_faculty_name($cwid) {
  */
 function fp_load_user($user_id) {
 
+  // Already in GLOBALS cache?
+  if (isset($GLOBALS['fp_load_user'][$user_id]) && is_object($GLOBALS['fp_load_user'][$user_id])) {
+    return $GLOBALS['fp_load_user'][$user_id];
+  }
+
   $rtn = new stdClass();
 
   if ($user_id <= 0) {
@@ -494,6 +499,8 @@ function fp_load_user($user_id) {
     $rtn->attributes[$cur['name']] = $cur['value'];
   }
 
+  // Add to GLOBALS cache
+  $GLOBALS['fp_load_user'][$user_id] = $rtn;
 
   return $rtn;
 }

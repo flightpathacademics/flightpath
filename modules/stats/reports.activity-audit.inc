@@ -44,6 +44,20 @@ function stats_report_activity_audit_form() {
 
   //$html .= "<p>" . l(t("Download CSV"), "stats/download-csv-from-batch-file/$last_batch_id", "filename=" . urlencode("lee_cocur_progress_report__" . format_date(convert_time($last_timestamp))), array('class' => 'button')) . "</p>";
 
+  if (isset($_SESSION["stats_report_activity_audit_batch_results"])) {
+    $html = "";
+    $last_batch_id = $_SESSION["stats_report_activity_audit_batch_results"]["last_batch_id"];
+    $last_timestamp = $_SESSION["stats_report_activity_audit_batch_results"]["last_timestamp"];
+
+    $html .= "<p>Last run: " . format_date(convert_time($last_timestamp)) . ".</p>
+              <p>" . l(t("Download CSV"), "stats/download-csv-from-batch-file/$last_batch_id", "filename=" . urlencode("activity_audit__" . format_date(convert_time($last_timestamp))), array('class' => 'button')) . "</p>";
+
+    $form['mark_results'] = array(
+      'type' => 'markup',
+      'value' => $html,
+    );
+  }
+
 
   return $form;
 } // form
@@ -71,7 +85,6 @@ function stats_report_activity_audit_form_validate($form, $form_state) {
 function stats_report_activity_audit_form_submit($form, $form_state) {
 
   unset($_SESSION["stats_report_activity_audit_batch_results"]);
-  $_SESSION["stats_report_activity_audit_batch_results"] = array();
 
   $start = $form_state['values']['start_date'];
   $end = $form_state['values']['end_date'];
@@ -106,6 +119,14 @@ function stats_report_activity_audit_form_submit($form, $form_state) {
 function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $end) {
 
   $csv = '';
+
+  $types_exclude = array(
+    'access_denied', 'page_not_found', 'ban_ip', 'cron', 'debug', 'http_request', 'lassie', 'nightly_import_routine',
+    'night_import_routine', 'php_error', 'system',
+    'php_warning', 'saml', 'update_status', 'save_adv_draft', 'save_adv_draft_whatif',
+  );
+
+
   ////////////////////////////  FIRST TIME ///////////////////////////////
   // If this is our first time through, let's init our values.
   if (!isset($batch["results"]["total"])) {
@@ -114,14 +135,9 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
     $batch["results"]["finished"] = FALSE;
 
 
-    // TODO: set to real header
-    //$csv = "CWID, LAST, FIRST, CATALOG, MAJOR, RANK, ";
+    // CSV headers
+    $csv = '"DB Log ID","User","CWID","User Type","Action","Msg/Details","Timestamp"' . "\n";
 
-    $types_exclude = array(
-      'access_denied', 'page_not_found', 'ban_ip', 'cron', 'debug', 'http_request', 'lassie', 'nightly_import_routine',
-      'night_import_routine', 'php_error',
-      'php_warning', 'saml', 'update_status', 'save_adv_draft', 'save_adv_draft_whatif',
-    );
 
     $types_not_in = "AND `type` NOT IN ('" . join("','", $types_exclude) . "')";
 
@@ -143,16 +159,12 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
   $current = $batch["results"]["current"];
   $total = $batch["results"]["total"];
 
-  $limit = 100;  // how many records to examine for THIS time through the function.
+  $limit = mt_rand(150, 250);  // how many records to examine for THIS time through the function.
   $c = 0;  // count of records.
 
   $db = get_global_database_handler();
 
-  $types_exclude = array(
-    'access_denied', 'page_not_found', 'ban_ip', 'cron', 'debug', 'http_request', 'lassie', 'nightly_import_routine',
-    'night_import_routine', 'php_error',
-    'php_warning', 'saml', 'update_status', 'save_adv_draft', 'save_adv_draft_whatif',
-  );
+
 
   $types_not_in = "AND `type` NOT IN ('" . join("','", $types_exclude) . "')";
 
@@ -164,43 +176,93 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
                      ORDER BY wid
                      LIMIT $current, $limit
                      ", array(':start' => strtotime($start), ':end' => strtotime($end)));
-   while ($cur = db_fetch_object($res)) {
+  while ($cur = db_fetch_object($res)) {
 
-     if ($c >= $limit) {
-       break;
-     }
-
-
-     // TODO: Get data and add to $csv
+    if ($c >= $limit) {
+      break;
+    }
 
 
+    // Get data and add to $csv
 
-     $c++;
+    $user_id = intval($cur->user_id);
+    $user_name = $cur->user_name;
+    $cwid = $cur->cwid;
+    $type = $cur->type;
 
-   } // while $cur
+    $vars = array();
+    if ($cur->variables) {
+      $vars = @unserialize($cur->variables);
+    }
+    if (!$vars) $vars = array();
 
-   // Write our work to a temporary file in the /files/private dir for this batch.
-   batch_append_to_batch_file($batch, $csv);
+    $message = strip_tags($cur->message);
 
-   // So that we don't use up all server resources, let's pause every so often.
-   if (mt_rand(1, 6) == 3) {
-     sleep(1);
-   }
+    if (count($vars) > 0) {
+      $message = strip_tags(t($message, $vars));
+    }
+
+    if (strlen($message) > 200) {
+     $message = trim(substr($message, 0, 200)) . "...";
+    }
+    // Escape any quotes for CSV
+    $message = str_replace('"', '""', $message);
 
 
-   // Update our $batch results variables
-   $batch["results"]["current"] = $current + $c;
+    if ($user_id === 0 && $type == 'content' && strstr($message, 'content_save')) {
+      // This is likely a text message coming in. We can skip it.
+      $c++;
+      continue;
+    }
 
 
-   if ($batch["results"]["current"] >= $total) {
-     // We are finished!
-     $batch["results"]["finished"] = TRUE;
+    $is_student = intval($cur->is_student);
+    $is_faculty = intval($cur->is_faculty);
 
-     $_SESSION["stats_report_activity_audit_batch_results"]["results"] = $batch['results'];
-     $_SESSION["stats_report_activity_audit_batch_results"]["last_batch_id"] = $batch["batch_id"];
-     $_SESSION["stats_report_activity_audit_batch_results"]["last_timestamp"] = time();
+    $user_type = "";
+    if ($is_student === 1) {
+      $user_type = "student";
+    }
+    if ($is_faculty === 1) {
+      $user_type = "faculty";
+    }
 
-   }
+    $ts = intval($cur->timestamp);
+    $timestamp = date("Y-m-d H:i:s", $ts);
+
+
+    // Add to our CSV variable
+    //$csv .= '"WID","User","CWID","User Type","Action","Msg/Details","Timestamp"' . "\n";
+    $csv .= "\"$cur->wid\",\"$user_name\",\"$cwid\",\"$user_type\",\"$type\",\"$message\",\"$timestamp\"" . "\n";
+
+    $c++;
+
+  } // while $cur
+
+  // Write our work to a temporary file in the /files/private dir for this batch.
+  batch_append_to_batch_file($batch, $csv);
+
+  // So that we don't use up all server resources, let's pause every so often.
+  if (mt_rand(1, 30) == 3) {
+    sleep(1);
+  }
+
+
+  // Update our $batch results variables
+  $batch["results"]["current"] = $current + $c;
+
+
+  if ($batch["results"]["current"] >= $total) {
+    // We are finished!
+    $batch["results"]["finished"] = TRUE;
+
+    $_SESSION["stats_report_activity_audit_batch_results"]["results"] = $batch['results'];
+    $_SESSION["stats_report_activity_audit_batch_results"]["last_batch_id"] = $batch["batch_id"];
+    $_SESSION["stats_report_activity_audit_batch_results"]["last_timestamp"] = time();
+
+    fp_add_message(t("Activity audit CSV created successfully. Use the button below to download."));
+
+  }
 
 
 

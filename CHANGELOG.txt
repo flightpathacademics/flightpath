@@ -5,6 +5,12 @@ FlightPath 7.x Changelog
   Added new FAPI attribute for all elements: "inline".  If set to TRUE, a class "element-inline-element" will
   be added to the outer "wrapper" div.
 
+  Added a simple GLOBALS cache for fp_load_user() in db.inc.
+
+  Added extra logging to Engagements for when we RECEIVE a text message.
+
+  Created new report on Analytics page: Activity Audit
+  
 
 2026-08-24
   Fixed bug in Student.php where standardized tests were not showing in correct order.
