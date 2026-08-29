@@ -2,7 +2,7 @@
 /**
  * @file
  * The update status module file.
- * 
+ *
  * This module is responsible for checking with getflightpath.com, to see
  * if a new update is available for any of the installed modules or system.
 */
@@ -13,33 +13,33 @@
  *
  */
 function update_status_menu() {
-  
+
   $items = array();
-  
+
   $items["update-status-check-now"] = array(
     "page_callback" => "update_status_check_now",
     "access_arguments" => array("run_cron"),
     "type" => MENU_TYPE_CALLBACK,
   );
-  
-  
+
+
   return $items;
-  
+
 }
 
 
 /**
  * This will force a re-check of modules for this update_status module.
- * 
+ *
  * Required permission is the same as Run Cron permission.
  *
  */
 function update_status_check_now() {
   update_status_perform_check();
-  
+
   // Go back to the System status page...
   fp_goto("admin/config/status");
-  
+
 }
 
 
@@ -53,43 +53,43 @@ function update_status_perform_check() {
   // Let's assemble our URL which should be fairly long.
   $url = update_status_get_install_status_url();
   $response = fp_url_get_contents($url);
-    
+
   // Response must contain the text "FLIGHTPATH_SUCCESS" for us to believe it is successful.
   if (!strstr($response, "FLIGHTPATH_SUCCESS")) {
     watchdog("update_status", "Checking update status failed. URL: $url. Response: " . print_r($response, TRUE), array(), WATCHDOG_ERROR);
     fp_add_message(t("Checking update status failed.  Perhaps FlightPath cannot access external sites?"));
-    return;    
+    return;
   }
-  
+
   // If we are here then we got back a valid response.
-  
+
   // Parse result and set variables where needed.
   $res_array = array();
-  
+
   parse_str($response, $res_array);
-  
+
   // The modules which have different versions than what we have installed
   // are in $res_array["modules"] and ["release_types"]
   variable_set("update_status_need_updates_modules", @$res_array["modules"]);
   variable_set("update_status_need_updates_release_types", @$res_array["release_types"]);
-  
-    
+
+
   variable_set("update_status_last_run", time());
-  fp_add_message(t("Check of update status successful."));  
-  
-  
+  fp_add_message(t("Check of update status successful."));
+
+
 }
 
 
 
 /**
  * Implementation of hook_cron()
- * 
+ *
  * We only want to check every few days that cron runs.  Check with getflightpath.com,
  * and, if updates are available, store that information in our variables table.
  */
 function update_status_cron() {
-  
+
   $check_if_older_than = strtotime("-7 DAY");
   // When was the last time we ran this check?
   // (we only want to run once every few days)
@@ -98,11 +98,11 @@ function update_status_cron() {
     // We have run this recently, harmlessly return
     // Comment out to have this run every time (good for development)
     return;
-  } 
+  }
 
   // If we are here, it means we should run our check.
   update_status_perform_check();
-  
+
 }
 
 
@@ -111,22 +111,22 @@ function update_status_cron() {
  */
 function update_status_status() {
   $rtn = array();
-  
+
   fp_add_css(fp_get_module_path("update_status") . "/css/update_status.css");
-  
+
   $status = "";
   // Check the data we have for modules, to see if any of them could use an update.
   $updates = variable_get("update_status_need_updates_modules", array());
-  $releases = variable_get("update_status_need_updates_release_types", array()); 
+  $releases = variable_get("update_status_need_updates_release_types", array());
 
   if (!is_array($updates)) {
     $updates = array(); // just set to empty array if for some reason its null.
   }
   if (!is_array($releases)) {
     $releases = array();
-  }    
+  }
 
-  
+
   $release_desc = array(
     "other" => "Other",
     "bug_features" => "Bug fixes & new features",
@@ -134,10 +134,10 @@ function update_status_status() {
     "bug_fixes" => "Bug fixes",
     "security" => "Security - High Priority!",
   );
-  
-  
+
+
   ksort($updates);
-  
+
   if (count($updates)) {
     $status .= t("The following packages have available updates:");
     $status .= "<table border='0' cellpadding='3' width='100%' class='update-status-status-table'>
@@ -149,20 +149,19 @@ function update_status_status() {
                   </tr>";
     foreach ($updates as $module => $version) {
       $release_type = fp_get_machine_readable($releases[$module]);
-      
+
       $display_name = $module;
       $module_details = fp_get_module_details($module);
       if ($module_details["info"]["name"] != "") {
         $display_name = $module_details["info"]["name"];
       }
-      
+
       $your_version = $module_details["version"];
-            
+
       if ($your_version == "%FP_VERSION%") {
-        // This means you are using a version not downloaded from getflightpath.com.  Probably directly from a git repository.
-        $your_version = "GitRepo";    
+        $your_version = "GitRepo";
       }
-      
+
 
       $status .= "<tr class='release-row release-row-$release_type'>
                   <td valign='top' class='update-status-status-module'>
@@ -170,10 +169,10 @@ function update_status_status() {
                   <td valign='top' class='update-status-status-your-version'>$your_version</td>
                   <td valign='top' class='update-status-status-version'>$version</td>
                   <td valign='top' class='update-status-status-type'>" . @$release_desc[$releases[$module]] . "</td>
-                  
+
                   </tr>";
     }
-    $status .= "</table>";  
+    $status .= "</table>";
   }
   else {
     $status .= t("All modules are up to date.");
@@ -183,21 +182,21 @@ function update_status_status() {
   if (user_has_permission("run_cron")) {
     $check_link = l(t("Check now?"), "update-status-check-now");
   }
-  
-  
+
+
   $last_run = variable_get("update_status_last_run", 0);
-  if ($last_run > 0) {  
+  if ($last_run > 0) {
     $status .= "<p>" . t("Last check on %date.", array("%date" => format_date($last_run))) . "  $check_link</p>";
   }
   else {
     $status .= "<p><b><span style='color:red;'>*</span>
                 </b>" . t("Module status has never been checked.  Please make sure you have a correctly configured cron job.") . "  $check_link</p>";
   }
-  
-  
-  
+
+
+
   $rtn["status"] = $status;
-  
+
   return $rtn;
 }
 
@@ -207,28 +206,28 @@ function update_status_status() {
  */
 function update_status_get_install_status_url() {
   $rtn = "";
-  
+
   $domain = "getflightpath.com";
-  
-  
+
+
   $rtn .= "https://$domain/check-update-status?pa=cv&st=" . urlencode(fp_token());
   $rtn .= "&u=" . urlencode($GLOBALS["fp_system_settings"]["base_url"]);
   $rtn .= "&c=" . FLIGHTPATH_CORE;
-  
+
   // These core modules do not have version numbers, so we will skip them.
   $ignore_core_modules = array(
     "admin", "advise", "announcements", "blank_degrees", "blocks", "comments", "content", "course_search", "stats",
     "student_search", "system", "update_status", "tinymce", "user",
   );
-  
+
   foreach ($GLOBALS["fp_system_settings"]["modules"] as $module => $details) {
     if (in_array($module, $ignore_core_modules)) continue;
     $rtn .= "&" . "modules[" . urlencode($module) . "]=" . urlencode($details["version"]);
   }
-   
+
   // Add FP version string.
   $rtn .= "&" . "modules[" . urlencode("flightpath") . "]=" . urlencode(FLIGHTPATH_CORE . '-' . FLIGHTPATH_VERSION);
-  
+
   return $rtn;
 }
 

@@ -1589,7 +1589,7 @@ function system_school_data_form($school_id = 0) {
     "description" => t("This setting affects the course repeat policy for FlightPath for normal courses (courses which are not allowed to be repeated normally).
                         <br><b>If you are unsure what to select</b>, choose 'most recent, exclude previous attempts'.
                         <br>Please see the
-                <b><a href='http://getflightpath.com/node/1085' target='_blank'>FlightPath documentation</a></b>
+                <b><a href='https://docs.flightpathacademics.com/flightpath-settings/advanced-settings/course-repeat-policy/' target='_blank'>FlightPath documentation</a></b>
                 on how to set up this field."),
 
 
@@ -1633,7 +1633,7 @@ function system_school_data_form($school_id = 0) {
     "value" => variable_get_for_school("term_id_structure", "", $school_id, TRUE),
     "description" => t("Use this space to define termID structures, one per line.
                 Please see the
-                <b><a href='http://getflightpath.com/node/1085' target='_blank'>FlightPath documentation</a></b>
+                <b><a href='https://docs.flightpathacademics.com/flightpath-settings/advanced-settings/term-id-structure/' target='_blank'>FlightPath documentation</a></b>
                 on how to set up this field.") . "
                 <br>&nbsp; &nbsp; &nbsp; " . t("Like so: Structure, Short Desc, Long Desc, Abbr Desc, Year Adjustment") . "
                 <br>" . t("Ex:") . "
@@ -1986,7 +1986,7 @@ function system_school_data_form($school_id = 0) {
                          </div>
 
                          Please see the
-                <b><a href='http://getflightpath.com/node/1085' target='_blank'>FlightPath documentation</a></b>
+                <b><a href='https://docs.flightpathacademics.com/flightpath-settings/advanced-settings/requirement-types-codes/' target='_blank'>FlightPath documentation</a></b>
                 for more information on how to set up this field.
                          ",
 
@@ -2559,15 +2559,17 @@ function system_settings_form() {
       "type" => "checkbox",
       "label" => t("Enable 'Clean URLs?'"),
       "value" => variable_get("clean_urls", FALSE),
+      // Intentionally leaving the reference to getflightpath.com, since it is a technical issue.
       "description" => t("Your server supports 'clean URLs', which eliminates 'index.php?q=' from your URLs, making them
-                          more readable.  It is recommended you leave this feature enabled.  For more information, see: http://getflightpath.com/node/5."),
+                          more readable.  It is recommended you leave this feature enabled.  For more information, see: https://getflightpath.com/node/5."),
     );
   }
   else {
     // Server does not support clean URLs.
+    // Intentionally leaving the reference to getflightpath.com, since it is a technical issue.
     $form["support_clean_markup"] = array(
       "value" => "<p><b>Clean URLs:</b> This server <u>does not support</u> clean URLs.  If you are using an Apache-compatible server,
-                  make sure that your .htaccess file is properly configured.  For more information, see: http://getflightpath.com/node/5.</p>",
+                  make sure that your .htaccess file is properly configured.  For more information, see: https://getflightpath.com/node/5.</p>",
 
     );
   }
@@ -3555,7 +3557,6 @@ function system_status() {
   // Report on current details about FlightPath.
   $fpversion = FLIGHTPATH_VERSION;
   if ($fpversion == "%FP_VERSION%") {
-    // This means you are using a version not downloaded from getflightpath.com.  Probably directly from a git repository.
     $fpversion = "GitRepo";
   }
   $rtn["status"] .= "<p>" . t("FlightPath version:") . " " . FLIGHTPATH_CORE . "-" . $fpversion . "</p>";

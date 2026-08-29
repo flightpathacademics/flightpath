@@ -47,7 +47,7 @@ documentation, etc.
 ## Problems with Installation?
 
 See: https://getflightpath.com/node/6
-
+or contact https://flightpathacademics.com/contact/
 
 
 ## History and Credits
