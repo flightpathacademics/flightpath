@@ -2032,7 +2032,16 @@ function draw_menu_items($menu_array) {
 
       } // foreach $line  (for piechart by type)
 
+      // If there we no data created (no pie charts to display) then do not include this row.
+      if (!isset($pie_chart_theme_array["degree_rows"][$degree_id]['data'])) {
+        unset($pie_chart_theme_array["degree_rows"][$degree_id]);
+
+      }
+
+
     } //foreach $degree_id
+
+
 
 
     //////////////////

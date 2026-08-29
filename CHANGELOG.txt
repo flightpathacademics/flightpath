@@ -1,6 +1,15 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-08-28
+  Changed the way level-3 degrees are handled in installations with "legacy concentrations" enabled.
+  
+  Fixed a bug where level-3 degrees were not selectable with "legacy concentrations".
+  
+  Fixed bug where if a degree plan has nothing (no pie charts), then no row is created in the pie charts
+  area.
+  
+
 2026-08-26
   Added new FAPI attribute for all elements: "inline".  If set to TRUE, a class "element-inline-element" will
   be added to the outer "wrapper" div.

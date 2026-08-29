@@ -195,6 +195,7 @@ class DatabaseHandler extends stdClass
     // If the message involves a complaint about the sql_mode, point the user to a
     // help page about setting the sql_mode.
     if (stristr($message, "sql_mode=")) {
+      // NOTE: We're going to intentionally leave this as a getflightpath.com link since it is technical, and not for the end-user.
       $message .= "<br><br><b>" . t("It appears this error is being caused because of your server's sql_mode setting.") . "</b> ";
       $message .= t("To set your sql_mode for MySQL, please see the following help page: <a href='http://getflightpath.com/node/1161' target='_blank'>http://getflightpath.com/node/1161</a>");
     }

@@ -897,7 +897,7 @@ function admin_display_groups_popup_edit_definition() {
 
   // This text will be used to describe how the definition works in a javascript alert box:
   $tdef .= t("Definitions provide a very quick way to add or remove many courses from a group.") . "<br><br>
-          " . t("To view a complete set of instructions, <a href='https://getflightpath.com/node/11941' target='_balnk'>visit the documentation page by clicking here</a>.");
+          " . t("To view a complete set of instructions, <a href='https://docs.flightpathacademics.com/degree-data/advanced/group-definitions/' target='_balnk'>visit the documentation page by clicking here</a>.");
 
 
   $rtn .= "" . t("Edit Definition for %group (%cat)

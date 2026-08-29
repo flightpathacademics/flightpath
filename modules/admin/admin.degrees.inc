@@ -1189,7 +1189,7 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   $legacy_notice = "";
   if ($bool_legacy_concentrations) {
     $legacy_notice .= "<div class='legacy-concentration-notice'>" . t("Note: Since you have 'Enable legacy concentrations' checked
-                          in the System Settings, the Degree Classification Level is limited to either Level 1 or Level 2.") . "</div><br>";
+                          in the System Settings, all degree plans must be full and complete, not partial, degree plans.") . "</div><br>";
 
   }
 
@@ -1215,7 +1215,7 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   $degree_classes = fp_get_degree_classifications();
   foreach ($degree_classes["levels"] as $level => $details) {
 
-    if (intval($level) == 3 && $bool_legacy_concentrations) continue;
+    //if (intval($level) == 3 && $bool_legacy_concentrations) continue;
 
     foreach ($degree_classes["levels"][$level] as $machine_name => $title) {
       //$rtn .= "<option value='$machine_name' $sel>$level - $title</option>";

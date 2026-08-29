@@ -919,7 +919,7 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
     // We don't add the port to prevent from breaking rewrite rules checking the
     // host that do not take into account the port number.
     'Host' => "Host: $host",
-    'User-Agent' => 'User-Agent: FlightPath (+https://getflightpath.com/)',
+    'User-Agent' => 'User-Agent: FlightPath (+https://flightpathacademics.com/)',
   );
 
   // Only add Content-Length if we actually have any content or if it is a POST

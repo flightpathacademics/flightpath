@@ -2,7 +2,7 @@
 
 /**
  * @file
- * This is the module file for the prereqs module. 
+ * This is the module file for the prereqs module.
 */
 
 
@@ -16,7 +16,7 @@
  */
 function prereqs_menu() {
   $items = array();
-  
+
   $items["admin/config/prereqs"] = array(
     "title" => "Prereqs settings",
     "description" => "Configure settings related to the prereqs module.",
@@ -25,18 +25,18 @@ function prereqs_menu() {
     "access_arguments" => array("administer_prereqs"),
     "page_settings" => array(
       "menu_icon" => fp_get_module_path('system') . "/icons/book_previous.png",
-      "menu_links" => array(         
+      "menu_links" => array(
         0 => array(
           "text" => "Admin Console",
           "path" => "admin-tools/admin",
           "query" => "de_catalog_year=%DE_CATALOG_YEAR%",
         ),
       ),
-    ),    
+    ),
     "type" => MENU_TYPE_NORMAL_ITEM,
-    "tab_parent" => "admin-tools/admin",            
+    "tab_parent" => "admin-tools/admin",
   );
-  
+
   return $items;
 }
 
@@ -48,19 +48,19 @@ function prereqs_perm() {
     ),
     'override_course_locks' => array(
       'title' => t("Override course locks"),
-      'description' => t("Users with this permission are allowed to 'override' courses with locks for checkboxes, meaning they can 
+      'description' => t("Users with this permission are allowed to 'override' courses with locks for checkboxes, meaning they can
                           still advise a course even if the prereqs (or other issues) have not passed."),
     ),
   );
-    
+
 }
 
 
 function prereqs_settings_form() {
   $form = array();
-  
+
   $elements = array();
-  
+
   $elements["prereqs_show_availability_in_popup"] = array(
     "label" => t("Show course's anticipated availability (from Course Search module) in course description popups?"),
     "type" => "select",
@@ -70,8 +70,8 @@ function prereqs_settings_form() {
     "description" => t("If set to 'Yes', this will show a course's anticipated availability (what terms it will be available)
                         in the course description popup which loads when a course is clicked."),
   );
-  
-  
+
+
   $elements["prereqs_lock_course_advise_based_on_avail"] = array(
     "label" => t("Lock advising for a course based on availability?"),
     "type" => "select",
@@ -82,7 +82,7 @@ function prereqs_settings_form() {
                         offered in the advising term selected.  This requires that most of your courses
                         have accurate term schedules entered in the Course Search module.  If unsure what to select, choose 'no'."),
   );
-  
+
   $elements["prereqs_use_term_desc_abbr_in_popup"] = array(
     "label" => t("Use term description abbreviations in popup?"),
     "type" => "select",
@@ -95,7 +95,7 @@ function prereqs_settings_form() {
   );
 
 
-  
+
   $elements["prereqs_not_anticipated_text"] = array(
     "label" => t("The message to show in the popup description, when 'Not Anticipated' has been selected for a course, or if no current terms are selected:"),
     "type" => "textfield",
@@ -106,9 +106,9 @@ function prereqs_settings_form() {
                         have been selected.
                         <br>Ex: <em>This course isn't currently anticipated to be offered. Please ask your advisor to learn more.</em>"),
   );
-    
-  
-  
+
+
+
   $elements["prereqs_lock_msg_avail"] = array(
     "label" => t("The message to show the user when the course is locked due to availability (option above must be set to 'yes'):"),
     "type" => "textfield",
@@ -116,28 +116,28 @@ function prereqs_settings_form() {
     "size" => "80",
     "value" => variable_get("prereqs_lock_msg_avail", "This course is not listed as being available for the selected advising term (@term)."),
     "description" => t("This message will show to the advisor when they try to bypass the lock for availability.  You may use the replacement pattern <b>@term</b>
-                        to mean the current term selected.  
+                        to mean the current term selected.
                         <br>Ex: <em>This course is not listed as being available for the selected advising term (@term).</em>"),
   );
-  
-  
+
+
   $form["avail"] = array(
     "type" => "cfieldset",
     "label" => t("Prereqs based on availability"),
     "elements" => array($elements),
   );
-  
-  
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  
-  
-  $elements = array();  
 
-  
+
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+
+
+  $elements = array();
+
+
   $elements["prereqs_show_courses_in_popup"] = array(
     "label" => t("Show course's prereq courses in course description popups and on Course Search module?"),
     "type" => "select",
@@ -147,8 +147,8 @@ function prereqs_settings_form() {
     "description" => t("If set to 'Yes', this will show a course's prereq course requirements (from the Course Edit form)
                         in the course description popup which loads when a course is clicked, and in course descriptions in the Course Search module."),
   );
-  
-    
+
+
   $elements["prereqs_lock_course_advise_based_on_courses"] = array(
     "label" => t("Lock advising for a course based on prereq courses?"),
     "type" => "select",
@@ -158,7 +158,7 @@ function prereqs_settings_form() {
     "description" => t("If set to 'Yes', this will 'lock' a course's advising checkbox if its prereq courses (entered on the Course Edit form for that course)
                         have not been fulfilled.  If unsure what to select, choose 'no'."),
   );
-  
+
   $elements["prereqs_lock_msg_courses"] = array(
     "label" => t("The message to show the user when the course is locked due to prereq courses (option above must be set to 'yes'):"),
     "type" => "textfield",
@@ -166,19 +166,19 @@ function prereqs_settings_form() {
     "size" => "80",
     "value" => variable_get("prereqs_lock_msg_courses", "This course is not listed as being available because the student has not fulfilled the following prerequisite course(s) and possible min grades:\\n@need_courses"),
     "description" => t("This message will show to the advisor when they try to bypass the lock for prereq courses.  You may use the replacement pattern <b>@needed_courses</b>
-                        to mean the current term selected.  You may also use \\n to mean 'insert new line.'  
+                        to mean the current term selected.  You may also use \\n to mean 'insert new line.'
                         <br>Ex: <em>This course is not listed as being available because the student has not fulfilled the following prerequisite course(s) and possible min grades:\\n@need_courses</em>"),
   );
-    
-  
-  
+
+
+
   $form["courses"] = array(
     "type" => "cfieldset",
     "label" => t("Prereqs based on prereq courses"),
     "elements" => array($elements),
   );
-  
-  
+
+
   ///////////////////////////
   ///////////////////////////
   ///////////////////////////
@@ -193,12 +193,12 @@ function prereqs_settings_form() {
     "description" => t("This message will be appended AFTER the lock message to the advisor, asking them if they wish to proceed with advising anyway.
                         Ex: <em>Are you sure you wish to advise the student to enroll in this course anyway?</em>"),
   );
-    
-  
-  
-  
-  
-  
+
+
+
+
+
+
   return $form;
 }
 
@@ -209,11 +209,11 @@ function prereqs_settings_form() {
  * Implements hook_form_alter
  */
 function prereqs_form_alter(&$form, $form_id) {
-          
-          
+
+
   // We want to edit the edit_course form, to inject some fields for adding prereqs to course requirements.
   if ($form_id == "admin_edit_course_form") {
-        
+
     // Add in our validate and submit handlers...
     $form["#validate_handlers"][] = "prereqs_edit_course_form_validate";
     $form["#submit_handlers"][] = "prereqs_edit_course_form_submit";
@@ -221,8 +221,8 @@ function prereqs_form_alter(&$form, $form_id) {
 
     $existing_prereqs = (String) db_result(db_query("SELECT prereq_data FROM prereqs_prereqs
                                             WHERE course_id = ?", $form["course_id"]["value"]));
-            
-        
+
+
     // Add in the fields...
     $form["prereqs_prereqs"] = array(
       "label" => t("Prerequisites:"),
@@ -233,78 +233,78 @@ function prereqs_form_alter(&$form, $form_id) {
                           data is for <b>ALL CATALOG YEARS</b> of the course.  Also, this is <b>not placed in a draft</b> state.  Any changes
                           to prereqs will be instantly live.
                           <br>
-                          
+
                           Enter data in this format:  SUBJECT_ID  COURSE_NUM  (MIN_GRADE)  -- you may leave off the min grade if any passing grade is acceptable.
                           <br><br>Each row means 'AND this course'.  To have and option of more than one course required, enter on a single line, separated by the word 'or'.  <b>Remember to leave
-                          spaces between courses, grades, or's, etc.</b><br>For more details, <a href='http://getflightpath.com/node/1157' target='_blank'>please refer to the documentation page</a>.
+                          spaces between courses, grades, or's, etc.</b><br>For more details, <a href='https://docs.flightpathacademics.com/degree-data/advanced/prerequisites/' target='_blank'>please refer to the documentation page</a>.
                           <br>
                           Ex:
                           <br><em>
                           &nbsp; &nbsp; ACCT 104 (B)
                           <br>&nbsp; &nbsp; ACCT 101 (C) or  ACCT 102 (C)
-                          <br>&nbsp; &nbsp; ACCT 101 or  ACCT 103  
-                            
-                          </em>                      
+                          <br>&nbsp; &nbsp; ACCT 101 or  ACCT 103
+
+                          </em>
                           <br>The above example means 'The student must take ACCT 104 (earning a B or higher).  They must also take EITHER ACCT 101 or ACCT 102.  Finally, they
                           must also take EITHER ACCT 101 or ACCT 103.<br>
                           Take note in this example that if the student takes only ACCT 104 and ACCT 101, then they will have satisfied all of the prereq requirements, since ACCT 101 is listed
-                          in both rows 2 and 3.                              
+                          in both rows 2 and 3.
                           "),
       "weight" => 85,
     );
-    
-    
-      
-    
-  } // if form id == admin_edit_course_form      
-        
-        
-      
-    
-  
+
+
+
+
+  } // if form id == admin_edit_course_form
+
+
+
+
+
 } // hook_form_alter
 
 
 
 /**
  * validate for the edit course form, from admin.courses.inc.
- * 
+ *
  * We want to check that the prereqs entered are valid.
  */
 function prereqs_edit_course_form_validate($form, &$form_state) {
   $prereqs = trim($form_state["values"]["prereqs_prereqs"]);
   if ($prereqs == "") return; //nothing there, so ignore.
-  
+
   $db = get_global_database_handler();
   $school_id = $db->get_school_id_for_course_id($form_state["values"]["course_id"], TRUE);
-  // TODO:  If schools_school exists, use THAT id instead?  
-    
+  // TODO:  If schools_school exists, use THAT id instead?
+
   // Turn into a friendly array.
   $prereq_array = prereqs_get_prereq_array_from_string($prereqs, $school_id);
 
   // If any of the courses in our array don't have valid course id's, it means
   // the course wasn't found.
   foreach ($prereq_array as $reqs) {
-        
+
     foreach ($reqs as $details) {
-    
+
       if (!$details["course_id"] || $details["course_id"] == 0) {
         form_error("prereqs_prereqs", t("Prereqs: Could not find course %course in any catalog year.  Check spelling and try again.", array("%course" => $details["subject_id"] . " " . $details["course_num"])));
-        continue;      
+        continue;
       }
-      
+
       // also make sure they didn't enter the same course as its own prereq...
       if (intval($details["course_id"]) == intval($form_state["values"]["course_id"])) {
         form_error("prereqs_prereqs", t("Prereqs: You entered %course for a prereq but that is the course you are currently editing.  A course cannot be its own prereq.
                                           Please check your spelling and try again.", array("%course" => $details["subject_id"] . " " . $details["course_num"])));
         continue;
       }
-  
+
     }
-    
+
   }
-  
-  
+
+
 } // validate handler
 
 
@@ -312,35 +312,35 @@ function prereqs_edit_course_form_validate($form, &$form_state) {
 
 /**
  * Our submit handler.
- * 
+ *
  * In this, we just want to write our values to the database.
  */
 function prereqs_edit_course_form_submit($form, &$form_state) {
-    
+
   $prereqs = trim(fp_reduce_whitespace($form_state["values"]["prereqs_prereqs"]));
   $prereqs = str_replace("\n ", "\n", $prereqs);
-  
-  
+
+
   // Make sure "or's" are lowercase.
   $prereqs = str_replace(" OR ", " or ", $prereqs);
   $prereqs = str_replace(" oR ", " or ", $prereqs);
   $prereqs = str_replace(" Or ", " or ", $prereqs);
-  
+
   $prereqs = str_replace(" 0R ", " or ", $prereqs);  // zero-r  (to catch typos)
   $prereqs = str_replace(" 0r ", " or ", $prereqs);  // zero-R
-  
-  
-  
+
+
+
   // First, delete what is there for this course, if anything is there at all.
-  $this_course_id = $form_state["values"]["course_id"]; 
+  $this_course_id = $form_state["values"]["course_id"];
   db_query("DELETE FROM prereqs_prereqs WHERE course_id = ?", $this_course_id);
-  
-  
+
+
   // Add to our table.
   db_query("INSERT INTO prereqs_prereqs (course_id, prereq_data)
             VALUES (?, ?) ", $this_course_id, $prereqs);
-  
-  
+
+
 } // submit handler
 
 
@@ -349,21 +349,21 @@ function prereqs_edit_course_form_submit($form, &$form_state) {
  */
 function prereqs_get_prereq_string_for_course($course_id) {
   $prereq_data = db_result(db_query("SELECT prereq_data from prereqs_prereqs WHERE course_id = ?", $course_id));
-  
+
   $prereq_data = @(String) trim($prereq_data);
   // Get rid of windows trouble characters.
   $prereq_data = str_replace("\r", "", $prereq_data);
-  
+
   // Make sure "or's" are lowercase.
   $prereq_data = str_replace(" OR ", " or ", $prereq_data);
   $prereq_data = str_replace(" oR ", " or ", $prereq_data);
   $prereq_data = str_replace(" Or ", " or ", $prereq_data);
-  
+
   $prereq_data = str_replace(" 0R ", " or ", $prereq_data);  // zero-r  (to catch typos)
   $prereq_data = str_replace(" 0r ", " or ", $prereq_data);  // zero-R
-  
-  
-  return $prereq_data;  
+
+
+  return $prereq_data;
 }
 
 
@@ -380,8 +380,8 @@ function prereqs_get_prereq_array_for_course($course_id) {
 
   $rtn = prereqs_get_prereq_array_from_string($prereq_data, $school_id);
 
- 
-  
+
+
   return $rtn;
 }
 
@@ -393,47 +393,47 @@ function prereqs_get_prereq_array_for_course($course_id) {
  * Assumes prereqs are written in this format:
  * ACCT 101 (C) & ACCT 103
  * ACCT 102 (B)
- * 
+ *
  * Returns back a friendly array that makes everything easier to read.
- * 
+ *
  */
 function prereqs_get_prereq_array_from_string($prereqs_str, $school_id = 0) {
-    
-  $rtn = array();      
-  
+
+  $rtn = array();
+
   $db = get_global_database_handler();
   $c = 0;
   $lines = explode("\n", $prereqs_str);
   foreach ($lines as $line) {
-    $line = fp_reduce_whitespace($line);  
+    $line = fp_reduce_whitespace($line);
     $line = trim($line);
     if ($line == "") continue; // skip blanks.
-    
-    
+
+
     $courses = explode(" or ", $line);
     foreach ($courses as $course_line) {
-      
+
       $course_line = trim(fp_reduce_whitespace($course_line));
-        
+
       $temp = explode(" ", $course_line);
-    
+
       $subject_id = fp_trim(@$temp[0]);
       $course_num = fp_trim(@$temp[1]);
       $min_grade = @trim(str_replace("(", "", $temp[2]));
       $min_grade = @trim(str_replace(")", "", $min_grade));
-      
+
       // Was there a min grade stuck with the course_num?
       if (strstr($course_num, "(")) {
         $temp2 = explode("(", $course_num);
         $course_num = trim($temp2[0]);
-        $min_grade = trim(str_replace(")", "", $temp2[1]));  
+        $min_grade = trim(str_replace(")", "", $temp2[1]));
       }
-      
+
       // Okay, now that we have the subject_id and course_num, let's find the course_id (if it exists).
       $course_id = $db->get_course_id($subject_id, $course_num, '', FALSE, $school_id, TRUE);
-      
+
       $min_grade = strtoupper($min_grade);  // make sure it is all-caps
-      
+
       // Okay, add to our return array.
       $rtn[$c][] = array(
         "subject_id" => $subject_id,
@@ -441,14 +441,14 @@ function prereqs_get_prereq_array_from_string($prereqs_str, $school_id = 0) {
         "course_id" => $course_id,
         "min_grade" => $min_grade,
       );
-      
-      
-    } //foreach courses    
-        
+
+
+    } //foreach courses
+
     $c++;
-        
+
   } // foreach line
-    
+
   return $rtn;
 }
 
@@ -460,89 +460,89 @@ function prereqs_get_prereq_array_from_string($prereqs_str, $school_id = 0) {
 
 /**
  * This is meant to be a general function to find all relavent prereq warnings for the supplied course.
- * 
+ *
  * It will also call a hook to allow other modules to add to it.
- * 
- * Returns an array of warning messages, or an empty array if the course is good to go. 
+ *
+ * Returns an array of warning messages, or an empty array if the course is good to go.
  */
 function prereqs_get_prereq_warnings_for_course(Course $course, Student $student = null) {
-  
+
   $rtn = array();
-  
- 
-  
+
+
+
   $school_id = $course->school_id;
-  
+
   $bool_use_term_abbreviation = (variable_get("prereqs_use_term_desc_abbr_in_popup", "yes") == "yes");
-  
+
   ///////////////////////////////////////////////////
   ///////////////////////////////////////////////////
   // Advising Term Based Locks
   // Should we lock this course if its unavailable for this advising term?
   if (variable_get("prereqs_lock_course_advise_based_on_avail", "no") == "yes") {
-    
+
     $warning_msg = variable_get("prereqs_lock_msg_avail", "This course is not listed as being available for the selected advising term (@term).  Are you sure you wish to advise the student to enroll in it?");
-  
+
     // Find out what the rotation schedule is for this course.
-    $advising_term_id = fp_trim(@$GLOBALS["fp_advising"]["advising_term_id"]);    
+    $advising_term_id = fp_trim(@$GLOBALS["fp_advising"]["advising_term_id"]);
     // Get the advising year from the term.
-    $year = substr($advising_term_id, 0, 4);    
+    $year = substr($advising_term_id, 0, 4);
     $rotation_schedule = course_search_get_course_rotation_schedule($course->course_id, $year, 5);
-    
+
     // Is the "not anticipated" flag set?
     $bool_not_anticipated = course_search_get_course_rotation_schedule_not_anticipated($course->course_id);
     if ($bool_not_anticipated) {
       // Clear out the rotation_schedule, since it isn't anticipated.
       $rotation_schedule = array();
-    
+
     }
-    
-   
+
+
     if (!in_array($advising_term_id, $rotation_schedule)) {
       // The course is NOT listed for this advising term!  Therefor, it SHOULD have a warning!
-      
+
         $rtn["avail"]["plain_text"] = t($warning_msg, array("@term" => htmlentities(get_term_description($advising_term_id, $bool_use_term_abbreviation, $school_id), ENT_QUOTES)));
-       
+
     } // !in_array advising_term_id in rotation_schedule
-    
-    
-    
-    
-    
-      
+
+
+
+
+
+
   } // advising availbility / term based locks
-  
+
   /////////////////////////////////////////
   /////////////////////////////////////////
   //  Previous course requirement prereq locks
-  
+
   if (variable_get("prereqs_lock_course_advise_based_on_courses", "no") == "yes" && $student != null && is_object($student)) {
-    
+
     // Let's get the prereqs array for this course.
     $prereqs = prereqs_get_prereq_array_for_course($course->course_id);
-        
+
     $retake_grades = csv_to_array(variable_get_for_school("retake_grades", "W,F", $course->school_id));
-    
+
     if (count($prereqs) > 0) {
 
       $bool_fulfilled_prereqs = TRUE;
       $completed_courses = array();
       $completed_branches = array();
-              
+
       foreach ($prereqs as $branch_num => $reqs) {
-        
-        $bool_fulfilled_branch = FALSE;        
-        // Loop through and see if the student HAS fulfilled the specified prereq.  
+
+        $bool_fulfilled_branch = FALSE;
+        // Loop through and see if the student HAS fulfilled the specified prereq.
         foreach ($reqs as $details) {
           $bool_found_course = FALSE;
           $test_course = new Course();
           $test_course->course_id = $details["course_id"];
           $found = $student->list_courses_taken->find_best_match($test_course, $details["min_grade"], FALSE, 0, FALSE);
-          
+
           if ($found && is_object($found) && !in_array($found->grade, $retake_grades)) {
             // YEP!  They have this requirement, so that means the entire branch is good.
-            $bool_found_course = TRUE;            
-            
+            $bool_found_course = TRUE;
+
           }  // was found.
           else {
             // NOT FOUND!
@@ -550,72 +550,72 @@ function prereqs_get_prereq_warnings_for_course(Course $course, Student $student
             // Perhaps this course ($test_course) is being fulfilled by a substitution?
             $found_sub = $student->list_substitutions->find_requirement($test_course);
             if ($found_sub) {
-              $found = $found_sub->course_requirement;              
+              $found = $found_sub->course_requirement;
               // Yes, there is at least ONE substitution for this course.  We will count it as completed the prereq, even if it does
               // not complete all of the hours.
-              
+
               // TODO:  Make that also check completed hours to make sure the sub is "complete" and not split up?
               $bool_found_course = TRUE;
             }
             else {
               // Nope, this was not a substitution.  But perhaps the student has an automatic transfer eqv for this course?
-              
+
             }
 
 
-            
+
           } // if/else
-          
+
           if ($bool_found_course) {
             $bool_fulfilled_branch = TRUE;
             $completed_branches[$branch_num] = $branch_num;
-            $completed_courses[$found->course_id . "~" . $details["min_grade"]] = $found->course_id . "~" . $details["min_grade"];            
+            $completed_courses[$found->course_id . "~" . $details["min_grade"]] = $found->course_id . "~" . $details["min_grade"];
           }
-          
-          
-        } // foreach reqs 
-        
+
+
+        } // foreach reqs
+
         // If we didn't fulfill a branch, then we have failed.  We should quit.
         if ($bool_fulfilled_branch == FALSE) {
           $bool_fulfilled_prereqs = FALSE;
         }
-        
+
       }// foreach prereqs
 
-      
+
       if ($bool_fulfilled_prereqs == FALSE) {
         // We did NOT fulfill the prereqs for this course!  Let's add a message!
-        
+
         // Prepare our prereq requirements for display...
         $prereq_data = prereqs_get_prereq_string_for_course($course->course_id);
-        
+
         // Fix trouble characters, and reformat so it looks pretty.
         $prereq_data = "  - " . str_replace("\n", "\\n  - ", $prereq_data);
-                
+
         $prereq_data = trim($prereq_data);
-        
+
         $warning_msg = variable_get("prereqs_lock_msg_courses", "This course is not listed as being available because the student has not fulfilled the following prerequisite course(s) and possible min grades:\\n@need_courses\\nAre you sure you wish to advise the student to enroll in this course anyway?");
-        
+
         $rtn["prereq"]["plain_text"] = t($warning_msg, array("@need_courses" => $prereq_data));
-        
+
         // Let's also get the full-html version, where we indicate what we've completed or not.
         $html = "";
         foreach ($prereqs as $branch_num => $reqs) {
           $branch_class = "prereqs-incomplete-branch";
           if (in_array($branch_num, $completed_branches)) $branch_class = "prereqs-completed-branch";
           $html .= "<div class='prereqs-req-branch $branch_class'>";
-          $c = 0;          
+          $c = 0;
           foreach ($reqs as $details) {
-            
+
             if ($c > 0) {
               $html .= " <span class='prereq-req-or-token'>or</span> ";
-            } 
-              
-              
+            }
+
+
             $course_id = $details["course_id"];
             $course_class = "prereqs-incomplete-course";
             if (in_array($course_id . "~" . $details["min_grade"], $completed_courses)) $course_class = "prereqs-completed-course";
-            
+
             $html .= "<span class='prereqs-req-course $course_class'>";
             $html .= $details["subject_id"] . " " . $details["course_num"];
             if ($details["min_grade"] != "") {
@@ -624,32 +624,32 @@ function prereqs_get_prereq_warnings_for_course(Course $course, Student $student
             if ($course_class == "prereqs-incomplete-course") {
               $html .= " &nbsp; [" . t("not fulfilled") . "]";
             }
-            $html .= "</span>";            
-            
+            $html .= "</span>";
+
             $c++;
           }
           $html .= "</div>";  // prereqs-req-branch
         }
-        
+
         $rtn["prereq"]["full_html"] = t($warning_msg, array("@need_courses" => $html));
-        
-        
-                  
+
+
+
       } // bool_fulfilled_prereqs = false
-      
+
     } // if count > 0
-  } // previous course requirement prereq locks    
-  
-  
+  } // previous course requirement prereq locks
+
+
   //////////////////////////////////////
   // Okay, now we invoke a hook, to see if any other modules
-  // would like to add or alter our prereq warnings.  
-  invoke_hook("prereqs_get_prereq_warnings_for_course", array(&$rtn, $course, $student));  
-    
-  
-  
+  // would like to add or alter our prereq warnings.
+  invoke_hook("prereqs_get_prereq_warnings_for_course", array(&$rtn, $course, $student));
+
+
+
   return $rtn;
-  
+
 } //get prereq warnings for course
 
 
@@ -661,73 +661,73 @@ function prereqs_get_prereq_warnings_for_course(Course $course, Student $student
  */
 function prereqs_theme_advise_course_row(&$theme) {
 
-  
+
   $display_status = $theme["course"]["display_status"];
   // We only need to bother to check
   if ($display_status == "eligible") {
-    
+
     fp_add_js(fp_get_module_path("prereqs") . "/js/prereqs.js");
-    fp_add_css(fp_get_module_path("prereqs") . "/css/prereqs.css");    
-    
+    fp_add_css(fp_get_module_path("prereqs") . "/css/prereqs.css");
+
     $course = $theme["course"]["course"];
     $student = $theme["student"];
 
     $warnings = prereqs_get_prereq_warnings_for_course($course, $student);
     if (count($warnings) == 0) return;  // no prereqs to worry about!
-    
+
     // Otherwise, yes, there are prereq warnings!
     // Combine the warning messages.....
-    
+
     $warning_msg = "";
     foreach ($warnings as $details) {
       $warning_msg .= $details["plain_text"] . "\\n \\n";;
     }
-    
+
     $confirm = variable_get("prereqs_confirm_msg", "Are you sure you wish to advise the student to enroll in this course anyway?");
-    
+
     $confirm_warning_msg = $warning_msg . "\\n\\n" . $confirm;
-    
+
     $function = "toggleSelection";
     $group_select_function = "";
-    
+
     // Only allow user with correct permissions actually perform advising (override lock)  If they do NOT have the permission,
     // we display a message saying they can't advise that course.
-    if (!user_has_permission('override_course_locks')) {         
+    if (!user_has_permission('override_course_locks')) {
       $confirm_warning_msg = $warning_msg . "<br><br>" . t("You do have have sufficient permissions to override this lock.");
       $function = "prereqs_no_toggleSelection";
       $group_select_function = "prereqs_no_group_toggleSelection";
     }
-    
+
 
     $theme["op"]["display_status"] = "locked";
     $theme["course"]["display_status"] = "locked";
     $theme["op"]["extra_css"] = str_replace("eligible", "locked", $theme["op"]["extra_css"]);
-    
-    
+
+
     if ($theme["op"]["onclick"]["function"] == "toggleSelection") {
-      // All we need to do is add text to argument 2.      
+      // All we need to do is add text to argument 2.
       $theme["op"]["onclick"]["function"] = $function;
       $theme["op"]["onclick"]["arguments"][1] = "locked";
       $theme["op"]["onclick"]["arguments"][2] = $confirm_warning_msg;
-    } 
-    
-    
+    }
+
+
     if (@$theme["from_group_select"] == TRUE) {
       // Meaning, this is from a group select course row!  Let's change some things.
-      
+
       $theme["icon"]["filename"] = "n.gif";
       $theme["icon"]["location"] = fp_get_module_path("prereqs") . "/css/images";
       $theme["icon"]["title"] = str_replace("\\n", " ", $warning_msg);
-      
-      
+
+
       if ($group_select_function) {
         $theme["op"]["onclick"]["function"] = $group_select_function;
       }
       $theme["op"]["onclick"]["arguments"][0] = $confirm_warning_msg;
     }
 
-    
-    
+
+
   } // if display status == "eligible"
 
 
@@ -747,115 +747,115 @@ function prereqs_theme_advise_course_row(&$theme) {
  * Implememnt hook_content_alter
  */
 function prereqs_content_alter(&$render, $content_id) {
-            
-            
-          
-          
+
+
+
+
   // TODO: Make this a setting?
-  // Do we simply wish to DISPLAY prereq warnings in the popup window at all?      
+  // Do we simply wish to DISPLAY prereq warnings in the popup window at all?
   if ($content_id == "AdvisingScreen_display_popup_course_description") {
-    
+
     fp_add_css(fp_get_module_path("prereqs") . "/css/prereqs.css");
-    
+
     $course = @$render["#course"]["value"];
     if (!is_object($course)) return; // some kind of problem...
 
-    $student = @$GLOBALS["screen"]->student;    
-        
-    
+    $student = @$GLOBALS["screen"]->student;
+
+
     $warnings = prereqs_get_prereq_warnings_for_course($course, $student);
-        
+
     if (count($warnings) > 0) {
 
       $warning_msg = "";
       foreach ($warnings as $details) {
-        
+
         $msg = $details["plain_text"];
         $bool_using_plain_text = TRUE;
-                        
+
         if (isset($details["full_html"])) {
           $msg = $details["full_html"];
           $bool_using_plain_text = FALSE;
         }
-        
-        
+
+
         $msg = str_replace("\\n", "\n", $msg);
         $msg = str_replace("  ", "&nbsp;&nbsp;", $msg);
-        
+
         if ($bool_using_plain_text) {
           $msg = nl2br($msg);
         }
 
-        
+
         $warning_msg .= "<div class='prereq-popup-warning-msg'>" . $msg . "</div>";
       }
-      
+
       $render["prereq_warnings"] = array(
         "label" => t("Prerequisites Warning:"),
         "value" => $warning_msg,
         "attributes" => array("class" => "popup-description-section tenpt"),
         "weight" => 500,
-      );        
-      
-            
+      );
+
+
       // Do we have permission to override the prereq for this course?
-      if (!user_has_permission('override_course_locks')) {      
+      if (!user_has_permission('override_course_locks')) {
         // Set a temporary variable in our GLOBALS array so we know this course cannot be advised.  Used in the advise.module, to make sure
         // if we get a description from within a group, we do not have this course selected when we change tabs back to the list.
         $GLOBALS['prereqs_no_advise_course_id'][] = $course->course_id;
         $render['hidden_vars_and_buttons']['value'] = "<p class='no-override-permission'><label>" .t("Cannot Advise") . "</label>" . t("Sorry, but you do not have permission to override the advising lock on this course.") . "<p>";
-      }      
-      
-      
+      }
+
+
     } // count of warnings > 0
-        
-    
+
+
   } // simply in the course description popup.
-        
-        
-        
-        
-  ///////////////////////////////        
-  ///////////////////////////////        
-  ///////////////////////////////        
-  ///////////////////////////////        
-  ///////////////////////////////        
-        
-        
-        
-      
-    
-  
-  
+
+
+
+
+  ///////////////////////////////
+  ///////////////////////////////
+  ///////////////////////////////
+  ///////////////////////////////
+  ///////////////////////////////
+
+
+
+
+
+
+
   // We want to place "anticipated availability" for the course in its popup window.
-  // Only do this based on our setting.  
+  // Only do this based on our setting.
   if ($content_id == "AdvisingScreen_display_popup_course_description" && function_exists("course_search_get_course_rotation_schedule")
         && variable_get("prereqs_show_availability_in_popup", "no") == "yes") {
     // This is the popup window we see when we click on a course to get its description.
     //fpm($render);
     $course = @$render["#course"]["value"];
     if (!is_object($course)) return; // some kind of problem...
-            
+
     $school_id = $course->school_id;
-    
+
     // What is the current advising term?
     //fpm($GLOBALS["fp_advising"]);
     $advising_term_id = $GLOBALS["fp_advising"]["advising_term_id"];
-    
+
     // Get the advising year from the term.
     $year = substr($advising_term_id, 0, 4);
-    
-    $rotation_schedule = course_search_get_course_rotation_schedule($course->course_id, $year, 5);    
+
+    $rotation_schedule = course_search_get_course_rotation_schedule($course->course_id, $year, 5);
     $bool_not_anticipated = course_search_get_course_rotation_schedule_not_anticipated($course->course_id);
     //fpm($rotation_schedule);
-    
+
     $bool_use_term_abbreviation = (variable_get("prereqs_use_term_desc_abbr_in_popup", "yes") == "yes");
-    
-    
+
+
     // By default, the scehdule text is saying that nothing is anticipated.
     $schedule_text = "<span class='prereqs-schedule-not-anticipated'>" . variable_get("prereqs_not_anticipated_text", "This course isn't currently anticipated to be offered. Please ask your advisor to learn more.");
     $schedule_text .= "</span>";
-          
+
     if (!$bool_not_anticipated) {
       $x = "";
       foreach ($rotation_schedule as $term_id)
@@ -863,13 +863,13 @@ function prereqs_content_alter(&$render, $content_id) {
         $x .= " <span class='term-rot-avail'>" . htmlentities(get_term_description($term_id, $bool_use_term_abbreviation, $school_id), ENT_QUOTES) . "</span><span class='comma'>,</span>";
       }
       $x = rtrim($x, ',');
-      
-      
-      if ($x) $schedule_text = "<span class='term-rotation-schedule-terms'>$x</span>";       
+
+
+      if ($x) $schedule_text = "<span class='term-rotation-schedule-terms'>$x</span>";
     }
-    
-    
-    
+
+
+
     if ($schedule_text) {
       // Add it to our render array.  Weeee.
       $render["schedule"] = array(
@@ -877,113 +877,113 @@ function prereqs_content_alter(&$render, $content_id) {
         "value" => " <div class='prereqs-schedule-text'>" . $schedule_text . "</div>",
         "attributes" => array("class" => "popup-description-section tenpt"),
         "weight" => 510,
-      );        
-    }        
-    
+      );
+    }
+
   } // if content_id == AdvisingScreen_display_popup_course_description and showing availability
-  
-  
-  
-  
+
+
+
+
   ////////////////////////////////////////////////
   ////////////////////////////////////////////////
   ////////////////////////////////////////////////
   ////////////////////////////////////////////////
   ////////////////////////////////////////////////
-  
-  
-  
-  
-  // Show course prereqs in the popup window too.  
-  if ($content_id == "AdvisingScreen_display_popup_course_description" 
+
+
+
+
+  // Show course prereqs in the popup window too.
+  if ($content_id == "AdvisingScreen_display_popup_course_description"
         && variable_get("prereqs_show_courses_in_popup", "no") == "yes") {
-          
+
     $course = @$render["#course"]["value"];
     if (!is_object($course)) return; // some kind of problem...
 
     $prereq_data = prereqs_get_prereq_string_for_course($course->course_id);
     if ($prereq_data != "") {
-      
+
       fp_add_css(fp_get_module_path("prereqs") . "/css/prereqs.css");
 
       // Format the string for HTML.
       $prereq_data = "- " . str_replace("\n", "<br>- ", $prereq_data);
       $prereq_data = "<div class='popup-prereq-course-req'>$prereq_data</div>";
-      
-      
-       
+
+
+
       $render["prereq_courses"] = array(
         "value" => t("<b>Prerequisite courses:</b>") . $prereq_data,
         "attributes" => array("class" => "popup-description-section"),
       );
-    }    
-          
-          
+    }
+
+
   } // if in course description popup and showing course prereqs.
-    
-  
-  
-  
-  
-  
+
+
+
+
+
+
   //////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
-  
-  
-  
-  
-  // This is from the course_search module.  Are we displaying rereq courses in the course description?  
+
+
+
+
+  // This is from the course_search module.  Are we displaying rereq courses in the course description?
   if ($content_id == "course_search_display_courses" && variable_get("prereqs_show_courses_in_popup", "no") == "yes") {
-      
+
     // Go through the render array, and find the "blocks" where we have our HTML about the courses.
     foreach ($render as $key => $details) {
-      
+
       if (strstr($key, "course_search_course_block__")) {
-        // Found it!    
+        // Found it!
         // Get the course_id.
         $course_id = str_replace("course_search_course_block__", "", $key);
-        
+
         // Okay, let's get our prereq data...
         $prereq_data = prereqs_get_prereq_string_for_course($course_id);
         if ($prereq_data != "") {
-      
+
           fp_add_css(fp_get_module_path("prereqs") . "/css/prereqs.css");
-    
+
           // Format the string for HTML.
           $prereq_data = "- " . str_replace("\n", "<br>- ", $prereq_data);
           $prereq_data = "<!-- PREREQ_COURSE--><div class='popup-prereq-course-req'>$prereq_data</div>";
-           
+
           $html = t("<b>Prerequisite courses:</b>") . $prereq_data;
           //  "attributes" => array("class" => "popup-description-section"),
-          
-          // Insert this html just after the description.  (above the <!-- DETAILS --> comment) 
+
+          // Insert this html just after the description.  (above the <!-- DETAILS --> comment)
           $render[$key]["value"] = str_replace("<!-- DETAILS -->", "$html<!-- DETAILS -->", $render[$key]["value"]);
-        
-        
+
+
         } // prereq_data != ""
       } // in course_search_course_block
 
-    }    
-    
-    
-    
+    }
+
+
+
   } // course_search display courses
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 } // hook_content_alter
