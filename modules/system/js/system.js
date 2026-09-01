@@ -402,7 +402,14 @@ function fpToggleHamburgerMenu() {
     DayPilot.Modal.confirm(msg).then(function(modal) {
       if (modal.result) {
         // they said YES, so perform the submission on the form this element belongs to.
-        myEl.srcElement.form.submit();
+
+        // In order for the source button work correctly (and keep its value in the POST), we need
+        // to be slightly fancy.  We will call the form's "requestSubmit" and pass it the button.
+        // This is a little javascript trick to make the submission behave as if the button was clicked
+        // directly, without calling .click() --> which won't work because of how we've set this up.
+
+        myEl.srcElement.form.requestSubmit(myEl.srcElement);
+
       }
       else {
         // they cancelled.  Disable spinner, re-enable button

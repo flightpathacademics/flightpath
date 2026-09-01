@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-01
+  Fixed bug where "confirm" logic on a submit button was not passing the button's value
+  through the POST.
+
+
 2026-08-28
   Changed the way level-3 degrees are handled in installations with "legacy concentrations" enabled.
 
