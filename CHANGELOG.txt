@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-03
+  Modified .htaccess to prevent bot attempts at accessing common files, so the attempt never
+  reaches Flightpath's logic.
+  
+
 2026-09-01
   Fixed bug where "confirm" logic on a submit button was not passing the button's value
   through the POST.

@@ -1,6 +1,5 @@
 #
 # Apache/PHP/FlightPath settings:
-# (Inspired by the .htaccess file which ships with Drupal 6.x)
 #
 
 # We want to clear any existing X-Frame-Options (like "DENY") which may have been
@@ -29,7 +28,7 @@ Options +FollowSymLinks
 <Files favicon.ico>
   ErrorDocument 404 "The requested file favicon.ico was not found."
 </Files>
- 
+
 # Set the default handler.
 DirectoryIndex index.php
 
@@ -41,21 +40,21 @@ DirectoryIndex index.php
 
   # Cache all files for 2 weeks after access (A).
   ExpiresDefault A1209600
-  
+
 </IfModule>
 
 # Add headers to all responses.
-<IfModule mod_headers.c>  
+<IfModule mod_headers.c>
   # Make cookies a bit more secure
   ## Header edit Set-Cookie ^(.*)$ $1;SameSite=strict
   # Commenting-out because this caused us to not be able to provide links
   # in emails for users who are already logged in.
-  
+
   # Disable content sniffing, since it's an attack vector.
-  Header always set X-Content-Type-Options nosniff  
-  
+  Header always set X-Content-Type-Options nosniff
+
   # Disable Proxy header, since it's an attack vector.
-  RequestHeader unset Proxy   
+  RequestHeader unset Proxy
 </IfModule>
 
 
@@ -63,13 +62,32 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
   RewriteEngine on
 
+  ###########################################################################
+  # Block common vulnerability/scanner requests before they reach FlightPath.
+  ###########################################################################
+  # WordPress-specific requests.
+  RewriteRule ^(?:wp-admin(?:/|$)|wp-content(?:/|$)|wp-includes(?:/|$)|wordpress(?:/|$)) - [R=404,END,NC]
+  RewriteRule ^(?:wp-login\.php|wp-config\.php.*|wp-load\.php|wp-cron\.php|wp-activate\.php|wp-mail(?:s)?\.php|wp-blog\.php|xmlrpc\.php)$ - [R=404,END,NC]
+  RewriteRule ^(?:wp-json(?:/|$)|wp/.*/wp-json(?:/|$)) - [R=404,END,NC]
+  # Environment files, including .env.local, .env.production, etc.
+  RewriteRule (?:^|/)\.env(?:$|[./]) - [R=404,END,NC]
+  # PHPUnit remote-code-execution probes.
+  RewriteRule ^.*(?:phpunit|eval-stdin)\.php$ - [R=404,END,NC]
+  # Common framework/debug endpoints that FlightPath does not use.
+  RewriteRule ^(?:actuator(?:/|$)|_ignition(?:/|$)|_profiler(?:/|$)|_debugbar(?:/|$)|telescope(?:/|$)|debug/default/view|debug/pprof(?:/|$)) - [R=404,END,NC]
+  # Common server-information endpoints.
+  RewriteRule ^(?:phpinfo\.php|trace\.axd|elmah(?:\.axd)?|nginx_status|server-info)$ - [R=404,END,NC]
+  # Obvious cloud credential/secret files.
+  RewriteRule ^(?:.*\/)?(?:credentials\.json|service-account\.json|serviceAccountKey\.json|application_default_credentials\.json|gcp-credentials\.json|gcp-key\.json|firebase-adminsdk\.json|firebase-admin\.json|aws-credentials\.json|terraform\.tfstate(?:\.backup)?|rclone\.conf)$ - [R=404,END,NC]
+  # Obvious path traversal attempts.
+  RewriteRule ^.*(?:\.\./|\.\.%2f|%2e%2e%2f|%2e%2e/).*$ - [R=404,END,NC]
   # Prevent access to Git repository metadata.
   RewriteRule "(^|/)\.git(?:/|$)" - [F,L,NC]
 
 
 #######################################
-######################################  
-  
+######################################
+
   # Modify the RewriteBase if you are using FlightPath in a subdirectory or in a
   # VirtualDocumentRoot and the rewrite rules are not working properly.
   # For example if your site is at http://example.com/flightpath uncomment and
@@ -79,7 +97,7 @@ DirectoryIndex index.php
   # If your site is running in a VirtualDocumentRoot at http://example.com/,
   # uncomment the following line:
   # RewriteBase /
-  
+
   # Rewrite URLs of the form 'x' to the form 'index.php?q=x'.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
