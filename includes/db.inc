@@ -865,7 +865,7 @@ function db_affected_rows($result_handler) {
 function db_table_exists($table_name) {
   $res = db_query("SHOW TABLES LIKE ? ", $table_name);
   $cur = db_fetch_array($res);
-  if ($cur[0] == $table_name) {
+  if (($cur[0] ?? '') == $table_name) {
     return TRUE;
   }
 
