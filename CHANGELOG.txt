@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-14
+  Fixed bug in content module where fields with array value submissions caused a
+  fatal error in PHP 8.2+.
+
+
 2026-09-08
   Removed deprecated php function call in calendar module; cleaned up code to remove warnings.
 
