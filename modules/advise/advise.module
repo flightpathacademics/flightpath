@@ -585,7 +585,7 @@ function advise_display_popup_change_track_non_dynamic_degree() {
 
   $degree_plan->load_descriptive_data();
 
-  $major_code = $degree_plan->major_code;
+  $major_code = $degree_plan->major_code ?? '';
   $catalog_year = $degree_plan->catalog_year;
   $bare_degree_plan = $degree_plan;
   // Are we already on a track?  If so, find out what the original degree was.
