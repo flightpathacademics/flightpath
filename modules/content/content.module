@@ -1639,6 +1639,17 @@ function content_edit_content_form_submit(&$form, &$form_state) {
 
       // Was a filter (plain, basic, full) specified?  If not, assume PLAIN.  Else, use the selected filter.
       if (!isset($details['filter']) || $details['filter'] == 'plain') {
+
+        if (is_array($values[$fieldname])) {
+          foreach ($values[$fieldname] as $k => $v) {
+            $values[$fieldname][$k] = filter_plain($v);
+          }
+        }
+        else {
+          $values[$fieldname] = filter_plain($values[$fieldname]);
+        }
+
+
         $values[$fieldname] = filter_plain($values[$fieldname]);
       }
       else if (isset($details['filter']) && $details['filter'] != 'plain') {
