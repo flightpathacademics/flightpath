@@ -1981,16 +1981,22 @@ function draw_menu_items($menu_array) {
 
 
         // Okay, let's see if this degreeplan even has any data on this requirement type.
-        $total_hours = $this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["total_hours"]*1;
-        $fulfilled_hours = $this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["fulfilled_hours"]*1;
-        $qpts = $this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["qpts"]*1;
+        $total_hours = floatval($this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["total_hours"])*1;
+
+        // If we are overriding the required number of hours for this degree, display that instead of whatever we calculated.
+        if ($requirement_type == 'degree' && floatval($this->degree_plan->db_override_degree_hours ?? 0) > 0) {
+          $total_hours = floatval($this->degree_plan->db_override_degree_hours);
+        }
+
+        $fulfilled_hours = floatval($this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["fulfilled_hours"])*1;
+        $qpts = floatval($this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["qpts"])*1;
 
         if (floatval($total_hours) == 0) continue;  // no hours for this requirement type!
 
         // Setting to display GPA
         $gpa = $extra_gpa = "";
         if (variable_get_for_school("pie_chart_gpa", "no", $this->student->school_id) == "yes") {
-          if ($this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["qpts_hours"] > 0) {
+          if (floatval($this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["qpts_hours"] ?? 0) > 0) {
             $gpa = fp_truncate_decimals($qpts / $this->degree_plan->gpa_calculations[$degree_id][$requirement_type]["qpts_hours"], 3);
           }
           if ($gpa) {

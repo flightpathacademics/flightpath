@@ -615,7 +615,17 @@ class DegreePlan extends stdClass
 
           $new_group->hours_required = $new_group->hours_required + ($cur["group_hours_required"] * 1);
           $new_group->hours_required_by_type[$cur["group_requirement_type"]] += ($cur["group_hours_required"] * 1);
-          $new_group->min_hours_allowed = $cur['group_min_hours_allowed'] * 1;
+
+          // Min hours may equal hours_required in the database.  If so, then they should not be set!
+          if (floatval($cur['group_min_hours_allowed'] ?? 0) !== floatval($cur["group_hours_required"] ?? 0)) {
+            $new_group->min_hours_allowed = floatval($cur['group_min_hours_allowed'] ?? 0) * 1;
+          }
+
+          // If min hours is the same as hours_required, set it to "not set"
+          if ($new_group->hours_required === $new_group->min_hours_allowed) {
+            $new_group->min_hours_allowed = Group::GROUP_MIN_HOURS_NOT_SET;
+          }
+
           //Set which degree_id this is required by.
           $new_group->req_by_degree_id = $this->degree_id;
 
@@ -630,7 +640,18 @@ class DegreePlan extends stdClass
 
           if (!isset($group_n->hours_required_by_type[$cur["group_requirement_type"]])) $group_n->hours_required_by_type[$cur["group_requirement_type"]] = 0;
           $group_n->hours_required_by_type[$cur["group_requirement_type"]] += $group_n->hours_required;
-          $group_n->min_hours_allowed = $cur['group_min_hours_allowed'] * 1;
+
+          // Min hours may equal hours_required in the database.  If so, then they should not be set!
+          if (floatval($cur['group_min_hours_allowed'] ?? 0) !== floatval($cur["group_hours_required"] ?? 0)) {
+            $group_n->min_hours_allowed = floatval($cur['group_min_hours_allowed'] ?? 0) * 1;
+          }
+
+          // If min hours is the same as hours_required, set it to "not set"
+          if ($group_n->hours_required === $group_n->min_hours_allowed) {
+            $group_n->min_hours_allowed = Group::GROUP_MIN_HOURS_NOT_SET;
+          }
+
+
           $group_n->set_req_by_degree_id($this->degree_id);
           if (trim($cur["group_min_grade"]) != "")
           {
@@ -658,7 +679,18 @@ class DegreePlan extends stdClass
         $group_g->title = "$title";
         $group_g->icon_filename = $icon_filename;
         $group_g->hours_required = floatval($cur["group_hours_required"]);
-        $group_g->min_hours_allowed = floatval($cur["group_min_hours_allowed"]);
+
+        // Min hours may equal hours_required in the database.  If so, then they should not be set!
+        if (floatval($cur['group_min_hours_allowed'] ?? 0) !== floatval($cur["group_hours_required"] ?? 0)) {
+          $group_g->min_hours_allowed = floatval($cur['group_min_hours_allowed'] ?? 0) * 1;
+        }
+
+        // If min hours is the same as hours_required, set it to "not set"
+        if ($group_g->hours_required === $group_g->min_hours_allowed) {
+          $group_g->min_hours_allowed = Group::GROUP_MIN_HOURS_NOT_SET;
+        }
+
+
         $group_g->bool_placeholder = TRUE;
 
 
