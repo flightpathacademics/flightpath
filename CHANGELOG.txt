@@ -1,6 +1,12 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-15
+  Fixed bug where "override hour count" for degrees was being ignored in certain situations.
+
+  Fixed bug where groups were being incorrectly counted with minimum allowed hours.
+
+
 2026-09-14
   Fixed bug in content module where fields with array value submissions caused a
   fatal error in PHP 8.2+.
