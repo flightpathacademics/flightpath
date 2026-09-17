@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-16
+  Adding the beginnings of a testing framework with PHPUnit.
+
+
 2026-09-15
   Fixed bug where "override hour count" for degrees was being ignored in certain situations.
 

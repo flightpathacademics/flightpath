@@ -58,6 +58,7 @@ jobs:
           zip -r flightpath.zip . \
             -x "*.git*" \
             -x ".cspell/*" \
+            -x "tests/**" \
             -x ".github/*"
 
       - name: Upload release asset

@@ -4,6 +4,8 @@ custom/*
 .project
 .buildpath
 
+tests/test-settings.php
+
 #Re-include specific files so subdirs are created.
 !custom/files/README.txt
 !custom/modules/README.txt

@@ -4,7 +4,7 @@
  * @file
  * This file should be included by every public-facing page of FlightPath.
  * It will include all the classes, as well as settings and function files, and modules.
- * 
+ *
 */
 
 
@@ -23,9 +23,11 @@ require_once("$levels_deep" . "includes/password.inc");
 
 // Should we load the settings file?  This variable should be
 // set prior to including this bootstrap file.
+// We can also see if we are meant to override the standard location of our settings.php file
+// by checking if an $override_settings_filepath variable is set.
 if (!isset($skip_flightpath_settings) || $skip_flightpath_settings != TRUE) {
-  // Load the global system settings file.
-  require_once("$levels_deep" . "custom/settings.php");
+  $settings_file = isset($override_settings_filepath) ? $override_settings_filepath : "$levels_deep" . "custom/settings.php";
+  require_once($settings_file);
 }
 
 
@@ -41,7 +43,7 @@ set_error_handler('_fp_error_handler');  // located in includes/misc.inc
 
 // To be consistent, we want all internal dates to be in "UTC", and we will convert the display for the
 // benefit of the user later on.
-date_default_timezone_set('UTC'); 
+date_default_timezone_set('UTC');
 
 
 
@@ -53,7 +55,7 @@ if (!isset($skip_flightpath_modules) || $skip_flightpath_modules != TRUE) {
     if (isset($value["enabled"]) && $value["enabled"] != "1") {
       // Module is not enabled.  Skip it.
       continue;
-    }  
+    }
     include_module($module, FALSE);  // simply include the module, do not call hook_init yet.
   }
 }
