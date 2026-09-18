@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-18
+  Added several new icons to the default icon set, in the "flat" style which will eventually be adopted
+  by FP8.
+  
+
 2026-09-16
   Adding the beginnings of a testing framework with PHPUnit.
 

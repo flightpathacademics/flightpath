@@ -59,7 +59,7 @@ jobs:
             -x "*.git*" \
             -x ".cspell/*" \
             -x "tests/**" \
-            -x ".github/*"
+            -x ".github/**"
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1

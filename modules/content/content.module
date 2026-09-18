@@ -887,8 +887,8 @@ function content_view_content($cid) {
 
       if ($field_details['type'] == 'cfieldset') {
         // TODO:  make this appear within a fieldset?
-        foreach ($field_details['elements'] as $c => $v) {
-          foreach ($field_details['elements'][$c] as $efield_name => $edetails) {
+        foreach ($field_details['elements'] as $k => $v) {
+          foreach ($field_details['elements'][$k] as $efield_name => $edetails) {
 
             $display_value = $content->{"field__$efield_name"}['display_value'];
 
@@ -902,6 +902,7 @@ function content_view_content($cid) {
             }
           }
         }
+
 
       } // its a fieldset
 
@@ -1988,8 +1989,8 @@ function content_content_save(&$content) {
     }
     else if ($details['type'] == 'cfieldset'){
       // This is a fieldset, so now we need to descend into its elements to find the fields we need to save.
-      foreach($details['elements'] as $c => $v) {
-        foreach ($details['elements'][$c] as $fieldname => $edetails) {
+      foreach ($details['elements'] as $k => $v) {
+        foreach ($details['elements'][$k] as $fieldname => $edetails) {
           if (strstr($edetails['type'], 'markup') || $edetails['type'] == '') continue; // skip markup
 
           $db_field_name = "field__$fieldname";

@@ -1991,6 +1991,7 @@ function csv_to_array($csv_string) {
   return $temp;
 }
 
+
 /**
  * Splits a basic csv but returns an array suitable for the form_api, retuns assoc array.
  */
@@ -2009,6 +2010,32 @@ function csv_to_form_api_array($csv_string, $delimeter = ",", $bool_make_keys_ma
   return $rtn;
 
 }
+
+
+/**
+ * Similar to @see csv_to_form_api_array(), this function
+ * takes a multi-line string like this:
+ *   key1 ~ Value One
+ *   key2 ~ Value Two
+ * And returns an assoc array suitable for the form_api.
+ */
+function csv_multiline_to_form_api_array($csv_string, $delim = '~', $bool_make_keys_machine_readable = TRUE) {
+  $rtn = [];
+
+  foreach (explode("\n", trim($csv_string)) as $line) {
+    [$key, $value] = array_map('trim', explode($delim, $line, 2));
+
+    if ($bool_make_keys_machine_readable) {
+      $key = strtolower(fp_get_machine_readable($key));
+    }
+
+    $rtn[$key] = $value;
+
+  }
+
+  return $rtn;
+}
+
 
 
 
