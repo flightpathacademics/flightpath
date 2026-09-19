@@ -962,9 +962,13 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
         $degree_title .= " ($degree_plan->major_code)";
       }
 
-      if ($use_degree_plan != null && $use_degree_plan->get_available_tracks()) {
+      $only_levels = array();
+      if ($bool_legacy_concentrations) {
+        // We only care about level-3 degrees here, if we are using legacy concentrations
+        $only_levels[] = 3;
+      }
+      if ($use_degree_plan != null && $use_degree_plan->get_available_tracks($only_levels)) {
         $bool_show_track_selection_link = TRUE;
-
       }
 
       $degree_title_div = "<div class='degree-title'>$degree_title</div>";
@@ -983,7 +987,12 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
 
         $t_degree_plan->load_descriptive_data();
 
-        if ($t_degree_plan->get_available_tracks()) {
+        //$only_levels = array();
+        if ($bool_legacy_concentrations) {
+          // We only care about level-3 degrees here, if we are using legacy concentrations
+          //$only_levels[] = 3;
+        }
+        if ($t_degree_plan->get_available_tracks($only_levels)) {
           $bool_show_track_selection_link = TRUE;
         }
 
@@ -1027,7 +1036,8 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
 
     // Now, do we want to add an option to select a track to the degree_title_div?
     //if ($bool_show_track_selection_link && ($bool_legacy_concentrations != TRUE || $advising_what_if === 'yes')) {
-    if ($bool_show_track_selection_link || $advising_what_if === 'yes') {
+    //if ($bool_show_track_selection_link || $advising_what_if === 'yes') {
+    if ($bool_show_track_selection_link) {
       // We want to add a link to the popup to let the user select other degree tracks.
       $op_link = "<a class='degree-op-link-change-degree-options' href='javascript: popupSmallIframeDialog(\"" . fp_url("advise/popup-change-track", "advising_what_if=$advising_what_if") . "\",\"" . t("Select a Degree Option") . "\");'
                     title='" . t("Change degree options") . "'><i class='fa fa-cog'></i></a>";

@@ -1589,8 +1589,8 @@ function fp_get_degree_classifications() {
   $temp = explode("\n", variable_get("degree_classifications_level_1", "MAJOR ~ Major"));
   foreach ($temp as $line) {
     $temp2 = explode("~", $line);
-    $machine_name = fp_trim(@$temp2[0]);
-    $title = fp_trim(@$temp2[1]);
+    $machine_name = trim($temp2[0] ?? '');
+    $title = trim($temp2[1] ?? '');
     if ($machine_name != "") {
       $rtn["levels"][1][$machine_name] = $title;
       $rtn["machine_names"][$machine_name] = $title;
@@ -1651,7 +1651,7 @@ function fp_get_degree_classification_details($degree_class = "MAJOR", $bool_ret
   $degree_classifications = fp_get_degree_classifications();
   foreach ($degree_classifications["levels"] as $num => $details) {
     if (isset($details[$degree_class])) {
-      $rtn["level_num"] = $num;
+      $rtn["level_num"] = intval($num);
       $rtn["title"] = $details[$degree_class];
       $rtn["degree_class"] = $degree_class;
       break;

@@ -1214,9 +1214,6 @@ function admin_edit_degree_form($degree_id, $de_catalog_year) {
   $options = array();
   $degree_classes = fp_get_degree_classifications();
   foreach ($degree_classes["levels"] as $level => $details) {
-
-    //if (intval($level) == 3 && $bool_legacy_concentrations) continue;
-
     foreach ($degree_classes["levels"][$level] as $machine_name => $title) {
       //$rtn .= "<option value='$machine_name' $sel>$level - $title</option>";
       $options[$machine_name] = "$level - $title";

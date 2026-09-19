@@ -1,0 +1,40 @@
+1_blue 			:	A blue circle with the number "1" in the middle.  Used as a multi-purpose misc icon.
+1_maroon		:	A maroon circle with the number "1" in the middle. Used as a multi-purpose misc icon.
+2_blue 			:	A blue circle with the number "2" in the middle.  Used as a multi-purpose misc icon.
+2_maroon		:	A maroon circle with the number "2" in the middle. Used as a multi-purpose misc icon.
+3_blue 			:	A blue circle with the number "3" in the middle.  Used as a multi-purpose misc icon.
+3_maroon		:	A maroon circle with the number "3" in the middle. Used as a multi-purpose misc icon.
+4_blue 			:	A blue circle with the number "4" in the middle.  Used as a multi-purpose misc icon.
+4_maroon		:	A maroon circle with the number "4" in the middle. Used as a multi-purpose misc icon.
+5_blue 			:	A blue circle with the number "5" in the middle.  Used as a multi-purpose misc icon.
+5_maroon		:	A maroon circle with the number "5" in the middle. Used as a multi-purpose misc icon.
+beaker			:	One or two beakers with liquid inside. Used to illustrate science and lab equipment.
+book			:	An open book. Illustrates reading, literature, etc.
+core_engl-comp	:	An ink pen writing something. The same as the "engl-comp" icon, but with a gold border for meaning it is special.
+core_fine_arts	:	An image of a painting, specifically the Mona Lisa. The same as the "mona" icon, with a gold border added.
+core_hum		:	An open book. Same as the book icon, with a gold border added.
+core_socscience	:	The scales of justice, or the traditional symbol for libra. Same as the "socscience" icon, with a gold border.
+cosc			:	A computer monitor and computer. Illustrates an computr science or a course dealing with computers.
+engl			:	A portrait of William Shakespeare. Illustrates the study of English Literature.
+engl-comp		:	An ink pen writing a line. Used to illustrate the idea of writing or composition
+free			:	A university bell tower. This is often used to mean "any course at the university".
+french			:	The french flag. Illustrates a course dealing with the French language or history
+history-icon	:	A stylized "H". Used for courses which generically deal with history.
+humanities		:	A single pyramid, in the style of the great pyramid of egypt. Used for humanities and history courses.
+kins			:	An illustration of a person in motion, within a circle. Used for Kineseology courses
+lang			:	An illustration of the eiffel tower. Used for generic language studies.
+major			:	A diploma rolled up and tied with a ribbon in the middle. This is the default icon.
+math			:	The greek letter Pi. Used for math-related courses.
+mona			:	A portrait of the mona lisa. Used for art-related courses.
+music_note		:	This is a single musical note. Used for music courses.
+music2			:	This depects two music notes, for example, 8th notes. Meant as an alternative to the music_note icon.
+music3			:	This is a treble clef as someone would see on sheet music. Meant as an alternative to the music_note icon.
+music4			:	A violin. Meant as an alternative to the music_note icon.
+notepad			:	A notepad with writing on it, and a pencil. Illustrates writing.
+socscience		:	The scales of justice. Used to illustrate the social sciences.
+spanish			:	The flag of Spain. Used for spanish-language courses.
+ucap			:	A university belltower. This is the same as the "free" elective, but with a gold border.
+us_history		:	Illustration of a bald eagle in profile. Used for courses in US History.
+video_monitor	:	A test pattern on a screen. Used for illustrating courses having to do with video.
+voice_balloon	:	This is a comic-book style voice balloon, empty. Used for Speech or Communications courses.
+world_history	:	A small globe of the planet Earth. For World History.

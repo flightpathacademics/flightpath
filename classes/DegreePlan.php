@@ -1114,9 +1114,15 @@ class DegreePlan extends stdClass
    * Returns a simple array with values seperated by " ~~ "
    * in this order: track_code ~~ track_title ~~ trackDesc ~~ track's degree id
    *
+   * @param array $only_degree_class_levels
+   *                This is an array of the degree class level numbers we want to search for.
+   *                For example array(3) would mean "only get level-3 tracks".  But array(2,3) would
+   *                search for degrees belonging to either level-2 or level-3.
+   *                MOST COMMON: Leave empty to mean any degree which is in the degree_tracks table.
+   *
    * @return array|false
    */
-  function get_available_tracks()
+  function get_available_tracks($only_degree_class_levels = array())
   {
     $rtn_array = array();
 
@@ -1146,6 +1152,13 @@ class DegreePlan extends stdClass
       // Also find out what is the degree_class for this degree_id.
       $degree_class = @trim(db_result(db_query("SELECT degree_class FROM $table_name2
                         WHERE degree_id = ?", $track_degree_id)));
+
+      if (!empty($only_degree_class_levels)) {
+        // Make sure the classification number is one of the ones we selected.
+        $arr = fp_get_degree_classification_details($degree_class);
+        $ln = $arr['level_num'];
+        if ($ln !== 0 && !in_array($ln, $only_degree_class_levels)) continue;
+      }
 
 
       $rtn_array[] = "$track_code ~~ $track_title ~~ $track_description ~~ $track_degree_id ~~ $degree_class";
