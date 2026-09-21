@@ -54,7 +54,8 @@ jobs:
       - name: Create test settings
         run: |
           cp tests/test-settings.php.github_template tests/test-settings.php
-
+          cp tests/test-settings.php.github_template custom/settings.php
+          
       - name: Install test database
         run: |
           php tests/install.php
