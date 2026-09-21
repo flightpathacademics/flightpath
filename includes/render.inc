@@ -355,6 +355,11 @@ function fp_render_form($callback, $form_type = "") {
   $attributes = @$form["#attributes"];
   if (!is_array($attributes)) $attributes = array();
 
+
+  if (!isset($attributes['enctype'])) {
+    $attributes['enctype'] = 'multipart/form-data';
+  }
+
   if (!isset($attributes["class"])) $attributes["class"] = "";
   $attributes["class"] .= " $extra_form_class fp-form fp-form-$callback ";
   // Convert the attributes array into a string.

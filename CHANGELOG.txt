@@ -1,6 +1,15 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-20
+  Made it so all forms used enctype multipart/form-data, to be able to handle uploads automatically.
+
+  Altered the function "csv_multiline_to_array()" in misc.inc, so that if there are the wrong
+  number of elements in a row, the function returns NULL instead of continuing.
+
+  Modified certain code in preparation for teamsapi module.
+
+
 2026-09-19
   Fixed bug related to selecting tracks when "legacy concentrations" is turned on.
 

@@ -3219,6 +3219,22 @@ function system_handle_form_submit() {
           }
         }
 
+
+        // If this is a file, and we have a matching value in $_FILES, then place that information
+        // in our $values.
+        if ($element['type'] == 'file') {
+          $values[$name] = NULL;
+          // If there is anything in $_FILES, then assign that instead.  We will make sure there's something
+          // listed for the tmp_name.
+          if (isset($_FILES[$name])) {
+            if (trim($_FILES[$name]['tmp_name'][0] ?? '') !== '') {
+              $values[$name] = $_FILES[$name];
+            }
+          }
+        }
+
+
+
       }
       // Do we need to alter the value from the POST?
 
@@ -3246,6 +3262,21 @@ function system_handle_form_submit() {
                   $values[$cname] = FALSE;
                 }
               }
+
+
+              // If this is a file, and we have a matching value in $_FILES, then place that information
+              // in our $values.
+              if ($celement['type'] == 'file') {
+                $values[$cname] = NULL;
+                // If there is anything in $_FILES, then assign that instead.  We will make sure there's something
+                // listed for the tmp_name.
+                if (isset($_FILES[$cname])) {
+                  if (trim($_FILES[$cname]['tmp_name'][0] ?? '') !== '') {
+                    $values[$cname] = $_FILES[$cname];
+                  }
+                }
+              }
+
 
 
 

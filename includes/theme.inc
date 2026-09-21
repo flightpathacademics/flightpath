@@ -992,7 +992,7 @@ function fp_render_student_profile_header($bool_mini = TRUE, $extra_profile_item
           // We only care about level-3 degrees here, if we are using legacy concentrations
           //$only_levels[] = 3;
         }
-        if ($t_degree_plan->get_available_tracks($only_levels)) {
+        if ($t_degree_plan->get_available_tracks()) {
           $bool_show_track_selection_link = TRUE;
         }
 

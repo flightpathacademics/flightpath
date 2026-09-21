@@ -2050,6 +2050,7 @@ function csv_multiline_to_array($csv_str, $bool_first_row_is_headers = TRUE) {
     }
     else {
       fpm("Warning: issue converting multiline CSV to an array within FlightPath.  Not the same number of elements.");
+      return NULL;
     }
   });
   if (!$bool_first_row_is_headers) {

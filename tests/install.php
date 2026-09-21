@@ -26,10 +26,11 @@ $GLOBALS["fp_die_mysql_errors"] = TRUE;
 
 // Remove any existing tables from the test database.
 $tables = $GLOBALS["pdo"]->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-
 foreach ($tables as $table) {
   $GLOBALS["pdo"]->exec("DROP TABLE `" . str_replace("`", "``", $table) . "`");
 }
+
+
 
 system_install();
 

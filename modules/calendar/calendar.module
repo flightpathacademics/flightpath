@@ -474,6 +474,7 @@ function calendar_confirm_cancel_appointment_form($cid) {
   );
 
 
+  /*
   //If this appointment had meeting data (zoom) then we should include some text here that explains it will be cancelled as well.
   if (isset($content->field__video_data) && isset($content->field__video_data['value']) && $content->field__video_data['value'] != "") {
     $data = json_decode($content->field__video_data['value']);
@@ -486,6 +487,30 @@ function calendar_confirm_cancel_appointment_form($cid) {
       );
     }
   }
+*/
+
+  // If this appointment had meeting data (Zoom or Teams) then we should include some text here that explains it will be cancelled as well.
+  if (isset($content->field__video_data) && isset($content->field__video_data['value']) && $content->field__video_data['value'] != "") {
+    $data = json_decode($content->field__video_data['value']);
+    $video_provider = $data->video_provider;
+
+    if ($video_provider == "zoom" && module_enabled('zoomapi')) {
+      $id = $data->id;
+      $form['video_msg_markup'] = array(
+        'type' => 'markup',
+        'value' => t("<strong>Zoom Meeting:</strong> By cancelling this appointment, the scheduled Zoom meeting (ID: $id) will also be cancelled."),
+      );
+    }
+
+    if ($video_provider == "teams" && module_enabled('teamsapi')) {
+      $id = $data->id;
+      $form['video_msg_markup'] = array(
+        'type' => 'markup',
+        'value' => t("<strong>Microsoft Teams Meeting:</strong> By cancelling this appointment, the scheduled Microsoft Teams meeting (ID: $id) will also be cancelled."),
+      );
+    }
+
+  } // if isset(content....
 
 
 
@@ -547,10 +572,11 @@ function calendar_confirm_cancel_appointment_form_submit(&$form, &$form_state) {
   $faculty_cwid = $content->field__faculty_id['value'];
 
 
-  // If the appointment had meeting data (eg, Zoom), make sure we send a request to delete the Zoom meeting as well.
+  // If the appointment had meeting data (eg, Zoom or Teams), make sure we send a request to delete the Zoom/Teams meeting as well.
   if (isset($content->field__video_data) && isset($content->field__video_data['value']) && $content->field__video_data['value'] != "") {
     $data = json_decode($content->field__video_data['value']);
     $video_provider = $data->video_provider;
+
     if ($video_provider == "zoom") {
       $id = $data->id;
       $video_account_user_id = $data->video_account_owner_user_id;
@@ -558,6 +584,15 @@ function calendar_confirm_cancel_appointment_form_submit(&$form, &$form_state) {
         zoomapi_cancel_zoom_meeting($id, $video_account_user_id);
       }
     }
+
+    if ($video_provider == "teams") {
+      $id = $data->id;
+      $video_account_user_id = $data->video_account_owner_user_id;
+      if (module_enabled("teamsapi")) {
+        teamsapi_cancel_teams_meeting($id, $video_account_user_id);
+      }
+    }
+
   }
 
 
@@ -859,8 +894,13 @@ function calendar_display_user_appointment_settings_page() {
     $edit_link = "<a href='javascript:fpOpenLargeIframeDialog(\"$url\",\"$dtitle\");'><i class='fa fa-pencil'></i></a>";
 
     $video = "-";
-    if (module_enabled('zoomapi') && ($content->field__video_meeting['value'] ?? '') == 'zoom') {
+    $video_provider = $content->field__video_meeting['value'] ?? '';
+
+    if ($video_provider == 'zoom' && module_enabled('zoomapi')) {
       $video = "Zoom";
+    }
+    elseif ($video_provider == 'teams' && module_enabled('teamsapi')) {
+      $video = "Microsoft Teams";
     }
 
 
@@ -897,12 +937,38 @@ function calendar_display_user_appointment_settings_page() {
     $url = zoomapi_get_zoom_install_url();
     $rtn .= "<div class='zoom-install-btn'>&nbsp; &nbsp; <a href='$url' class='$link_class' title='" . t($button_text) . "'><i class='fa fa-external-link'></i> " . t($button_text) . "</a> &nbsp;";
     if ($zoomapi_data) {
-      // TODO: change to "w2" subdomain.
       $rtn .= t("To unlink/de-authorize Zoom from FlightPath, view the instructions here: ") . "<a href='https://w2.flightpathacademics.com/help/61' target='_blank'>Uninstalling Zoom from FlightPath</a>";
     }
     $rtn .= "</div>";
 
   } // we have zoom client id set up.
+
+
+
+  // Connect Microsoft Teams?
+  if (module_enabled("teamsapi") && isset($GLOBALS['teams_client_id'])) {
+
+    $msg = t("To enable automatic Microsoft Teams meeting creation for video chats, you must first link your Microsoft Teams account with your FlightPath account by pressing the button below:");
+    $button_text = t("Link Microsoft Teams Account");
+    $link_class = "button";
+
+    $teamsapi_data = teamsapi_get_teamsapi_data_for_user($user->id);
+
+    if ($teamsapi_data) {
+      $msg = t("You have already linked your FlightPath account with Microsoft Teams!  If you need to re-link your account, click the following:");
+      $button_text = "Re-Link Microsoft Teams Account";
+      $link_class = "";
+    }
+
+    $rtn .= "<p>" . t("<strong>Microsoft Teams:</strong> @msg", array("@msg" => $msg)) . "</p>";
+    $url = teamsapi_get_teams_install_url();
+    $rtn .= "<div class='teams-install-btn'>&nbsp; &nbsp; <a href='$url' class='$link_class' title='" . t($button_text) . "'><i class='fa fa-external-link'></i> " . t($button_text) . "</a> &nbsp;</div>";
+
+  } // we have Teams client id set up.
+
+
+
+
 
 
 
@@ -2044,7 +2110,7 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
   // We have made it this far with no errors.  If this is a video meeting, let's attempt to create that meeting.
 
 
-
+  /*
   // If this is a Zoom meeting, then attempt to create the zoom meeting and save it in form_state['values']['field__video_data'] so it
   // gets saved with the content.
   if (module_enabled("zoomapi") && @$event_type_content->field__video_meeting['value'] == 'zoom') {
@@ -2062,7 +2128,43 @@ function calendar_schedule_appointment_confirm_form_validate($form, &$form_state
     $form_state['values']['video_type'] = "zoom";
     $form_state['values']['video_account_owner_user_id'] = $faculty_user_id;
   }
+  */
 
+
+  // If this is a Zoom meeting, then attempt to create the Zoom meeting and save it in form_state['values']['video_data'] so it
+  // gets saved with the content.
+  if (module_enabled("zoomapi") && @$event_type_content->field__video_meeting['value'] == 'zoom') {
+
+    // gmt_date_time must look like yyyy-MM-ddTHH:mm:ssZ.  For example: 2020-03-31T22:02:00Z.  The Z tells it that we are using GMT/UTC time.
+    $gmt_date_time = date("Y-m-d\TH:i:s\Z", $utc_schedule_time_ts);
+
+    $response = zoomapi_create_zoom_meeting($faculty_user_id, $gmt_date_time, $event_duration_minutes, "Video meeting - $faculty_name / $student_name");
+    if (!$response) {
+      form_error("", t("Sorry, but there was an issue creating the Zoom meeting for this appointment.  Your appointment has not been saved.
+                        Please try another method, or contact the IT administrator to let them know of this issue."));
+      return;
+    }
+    $form_state['values']['video_data'] = $response;
+    $form_state['values']['video_type'] = "zoom";
+    $form_state['values']['video_account_owner_user_id'] = $faculty_user_id;
+  }
+
+  // If this is a Microsoft Teams meeting, then attempt to create the Teams meeting.
+  if (module_enabled("teamsapi") && @$event_type_content->field__video_meeting['value'] == 'teams') {
+
+    // gmt_date_time must look like yyyy-MM-ddTHH:mm:ssZ.  The Z tells it that we are using GMT/UTC time.
+    $gmt_date_time = date("Y-m-d\TH:i:s\Z", $utc_schedule_time_ts);
+
+    $response = teamsapi_create_teams_meeting($faculty_user_id, $gmt_date_time, $event_duration_minutes, "Video meeting - $faculty_name / $student_name");
+    if (!$response) {
+      form_error("", t("Sorry, but there was an issue creating the Microsoft Teams meeting for this appointment.  Your appointment has not been saved.
+                        Please try another method, or contact the IT administrator to let them know of this issue."));
+      return;
+    }
+    $form_state['values']['video_data'] = $response;
+    $form_state['values']['video_type'] = "teams";
+    $form_state['values']['video_account_owner_user_id'] = $faculty_user_id;
+  }
 
 
 
@@ -2144,9 +2246,30 @@ function calendar_schedule_appointment_confirm_form_submit($form, &$form_state) 
       $decoded->video_info = $video_info;  // add to our json object for ease of use later.
       $decoded->video_provider = "zoom";  // declare that this is a "zoom" meeting.
       $decoded->video_account_owner_user_id = $form_state['values']['video_account_owner_user_id'];
-      $video_data = json_encode($decoded); // re-encode as a simpl string, so we can add to the database.
+      $video_data = json_encode($decoded); // re-encode as a simple string, so we can add to the database.
+    } // zoom
+
+
+    if ($form_state['values']['video_type'] == 'teams') {
+
+      $meeting_id = $decoded->id;
+      $join_url = $decoded->joinWebUrl;
+      $location = $join_url;
+
+      $event_title = t("Microsoft Teams meeting between @stu and @fac", array("@stu" => $student_name, "@fac" => $faculty_name));
+
+      $video_info .= "<p><b>" . t("Microsoft Teams Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a></p>\n";
+
+      $decoded->video_info = $video_info;  // add to our json object for ease of use later.
+      $decoded->video_provider = "teams";  // declare that this is a "teams" meeting.
+      $decoded->video_account_owner_user_id = $form_state['values']['video_account_owner_user_id'];
+      $video_data = json_encode($decoded); // re-encode as a simple string, so we can add to the database.
     }
-  }
+
+
+  } // isset form_state values video_data
+
+
 
 
   // NOTE: the "\n" at the end is important, since when we txt these the tags get stripped.
@@ -2856,6 +2979,7 @@ function calendar_content_register_content_type() {
   );
 
 
+  /*
   $zoomapi_data = "";
   if (module_enabled("zoomapi")) {
     $zoomapi_data = zoomapi_get_zoomapi_data_for_user($user->id);
@@ -2878,7 +3002,47 @@ function calendar_content_register_content_type() {
 
 
   }
+  */
 
+  $zoomapi_data = "";
+  $teamsapi_data = "";
+
+  if (module_enabled("zoomapi")) {
+    $zoomapi_data = zoomapi_get_zoomapi_data_for_user($user->id);
+  }
+
+  if (module_enabled("teamsapi")) {
+    $teamsapi_data = teamsapi_get_teamsapi_data_for_user($user->id);
+  }
+
+  $attr = array();
+
+  if (!$zoomapi_data && !$teamsapi_data) {
+    $attr = array("style" => "display: none; ");
+  }
+
+  $options = array(
+    'no' => t('No (default)'),
+  );
+
+  if ($zoomapi_data) {
+    $options['zoom'] = t('Yes - Automatically generate a Zoom meeting and attach URL');
+  }
+
+  if ($teamsapi_data) {
+    $options['teams'] = t('Yes - Automatically generate a Microsoft Teams meeting and attach URL');
+  }
+
+  $fields['video_meeting'] = array(
+    'type' => 'select',
+    'label' => t('Automatically generate video meeting?'),
+    'options' => $options,
+    'hide_please_select' => TRUE,
+    'description' => t("If set to Yes, this event will be treated like a video chat, and a meeting will automatically be created for the appointment.
+                        The URL for the new meeting will be included at the end of the notification and reminder messages sent to the student & faculty/staff members."),
+    'attributes' => $attr,
+    'weight' => 40,
+  );
 
 
 
@@ -3254,6 +3418,8 @@ function calendar_form_alter(&$form, $form_id) {
         $form['published']['value'] = TRUE;
         $form['published']['attributes'] = array('class' => 'hidden');
 
+
+        /*
         // If this user has Zoom set up, then show an option to make this a zoom meeting.
         $test = FALSE;
         if (module_enabled("zoomapi")) {
@@ -3268,6 +3434,41 @@ function calendar_form_alter(&$form, $form_id) {
             'weight' => 5,
           );
         }
+        */
+        // If this user has Zoom or Microsoft Teams set up, show an option to make this a video meeting.
+        $zoomapi_data = FALSE;
+        $teamsapi_data = FALSE;
+
+        if (module_enabled("zoomapi")) {
+          $zoomapi_data = zoomapi_get_zoomapi_data_for_user($user->id);
+        }
+
+        if (module_enabled("teamsapi")) {
+          $teamsapi_data = teamsapi_get_teamsapi_data_for_user($user->id);
+        }
+
+        if ($zoomapi_data || $teamsapi_data) {
+          $options = array(
+            'no' => t('No video meeting'),
+          );
+
+          if ($zoomapi_data) {
+            $options['zoom'] = t('Zoom');
+          }
+
+          if ($teamsapi_data) {
+            $options['teams'] = t('Microsoft Teams');
+          }
+
+          $form['video_provider'] = array(
+            'type' => 'select',
+            'label' => t("Video meeting"),
+            'options' => $options,
+            'description' => t("If selected, a video meeting will be created automatically and the recipients will be notified."),
+            'weight' => 5,
+          );
+        }
+
 
 
 
@@ -3402,6 +3603,7 @@ function calendar_appointment_content_form_validate($form, &$form_state) {
 
   $event_title = "Meeting between $student_name and $faculty_name";
 
+  /*
   // Only do this for NEW appointments.
   if ($values['cid'] === 'new' && module_enabled('zoomapi') && isset($values['enable_zoom']) && $values['enable_zoom'] === TRUE) {
 
@@ -3443,6 +3645,83 @@ function calendar_appointment_content_form_validate($form, &$form_state) {
     $form_state['values']['video_data'] = $video_data;
 
   } // enable_zoom
+  */
+
+  // Only do this for NEW appointments.
+  if ($values['cid'] === 'new' && isset($values['video_provider']) && $values['video_provider'] == 'zoom' && module_enabled('zoomapi')) {
+
+    // We want to create a new Zoom meeting!
+    $event_title = t("Zoom meeting between @stu and @fac", array("@stu" => $student_name, "@fac" => $faculty_name));
+    $month = date('n', $schedule_time_ts);
+    $year = date('Y', $schedule_time_ts);
+    $day = date('j', $schedule_time_ts);
+
+
+    //gmt_date_time must look like yyyy-MM-ddTHH:mm:ssZ.  For example: 2020-03-31T22:02:00Z.  The Z tells it that we are using GMT/UTC time.
+    $gmt_date_time = date("Y-m-d\TH:i:s\Z", $utc_schedule_time_ts);
+
+    $response = zoomapi_create_zoom_meeting($faculty_user_id, $gmt_date_time, $event_duration_minutes, "Video meeting - $faculty_name / $student_name");
+
+    if (!$response) {
+      form_error("", t("Sorry, but there was an issue creating the Zoom meeting for this appointment.  Your appointment has not been saved.
+                        Please try another method, or contact the IT administrator to let them know of this issue."));
+      return;
+    }
+
+    $decoded = json_decode($response);
+
+    $meeting_id = $decoded->id;
+    $join_url = $decoded->join_url;
+    $location = $join_url;
+    $dial_in = $decoded->settings->global_dial_in_numbers[0]->number;
+
+    if (function_exists("engagements_convert_to_pretty_phone_number")) {
+      $dial_in = engagements_convert_to_pretty_phone_number($dial_in, TRUE);
+    }
+
+    $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";
+
+    $decoded->video_info = $video_info;  // add to our json object for ease of use later.
+    $decoded->video_provider = "zoom";  // declare that this is a "zoom" meeting.
+    $decoded->video_account_owner_user_id = $user->id;
+    $video_data = json_encode($decoded); // re-encode as a simpl string, so we can add it to the database.
+    $form_state['values']['video_data'] = $video_data;
+
+  } // zoom
+
+
+  if ($values['cid'] === 'new' && isset($values['video_provider']) && $values['video_provider'] == 'teams' && module_enabled('teamsapi')) {
+
+    // We want to create a new Microsoft Teams meeting!
+    $event_title = t("Microsoft Teams meeting between @stu and @fac", array("@stu" => $student_name, "@fac" => $faculty_name));
+
+    // gmt_date_time must look like yyyy-MM-ddTHH:mm:ssZ.  The Z tells it that we are using GMT/UTC time.
+    $gmt_date_time = date("Y-m-d\TH:i:s\Z", $utc_schedule_time_ts);
+
+    $response = teamsapi_create_teams_meeting($faculty_user_id, $gmt_date_time, $event_duration_minutes, "Video meeting - $faculty_name / $student_name");
+
+    if (!$response) {
+      form_error("", t("Sorry, but there was an issue creating the Microsoft Teams meeting for this appointment.  Your appointment has not been saved.
+                        Please try another method, or contact the IT administrator to let them know of this issue."));
+      return;
+    }
+
+    $decoded = json_decode($response);
+
+    $meeting_id = $decoded->id;
+    $join_url = $decoded->joinWebUrl;
+    $location = $join_url;
+
+    $video_info .= "<p><b>" . t("Microsoft Teams Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a></p>\n";
+
+    $decoded->video_info = $video_info;  // add to our json object for ease of use later.
+    $decoded->video_provider = "teams";  // declare that this is a "teams" meeting.
+    $decoded->video_account_owner_user_id = $user->id;
+    $video_data = json_encode($decoded); // re-encode as a simpl string, so we can add it to the database.
+    $form_state['values']['video_data'] = $video_data;
+
+  } // teams
+
 
 
 
@@ -3969,6 +4248,8 @@ function calendar_content_alter(&$render, $render_id) {
       } // user has permission
 
 
+
+      /*
       // If we have valid video data, we should display relevant links to join the meeting and such.
 
       unset($render['field__video_data']);
@@ -3996,7 +4277,45 @@ function calendar_content_alter(&$render, $render_id) {
 
 
       } // video_data != ""
+      */
 
+
+      // If we have valid video data, we should display relevant links to join the meeting and such.
+
+      unset($render['field__video_data']);
+      if ($render['#content_object'] && $render['#content_object']->field__video_data['value'] != "") {
+        // Meaning, we have video meeting data to display!
+        $video_info = '';
+        // create new markup field which renders out the video links and such.
+        $decoded = json_decode($render['#content_object']->field__video_data['value']);
+
+        $meeting_id = $decoded->id;
+        $video_provider = isset($decoded->video_provider) ? $decoded->video_provider : 'zoom';
+
+        if ($video_provider == 'teams') {
+          $join_url = $decoded->joinWebUrl;
+
+          $video_info .= "<p><b>" . t("Microsoft Teams Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a></p>\n";
+        }
+        else {
+          $join_url = $decoded->join_url;
+          $dial_in = $decoded->settings->global_dial_in_numbers[0]->number;
+
+          if (function_exists("engagements_convert_to_pretty_phone_number")) {
+            $dial_in = engagements_convert_to_pretty_phone_number($dial_in, TRUE);
+          }
+
+          $video_info .= "<p><b>" . t("Zoom Meeting:") . "</b> <a href='$join_url'>" . $join_url . "</a> \n<br> " . t("Be sure to download the Zoom app on your phone, tablet, or computer.") . " \n<br> " . t("To dial in instead of using video chat, you may dial:<br>\n @dial (ID: @id)", array("@dial" => $dial_in, "@id" => $meeting_id)) . ".</p>\n";
+        }
+
+        $render['video_information'] = array(
+          'type' => 'markup',
+          'value' => "<div class='video-information'>" . $video_info . "</div>",
+          'weight' => 65,
+        );
+
+
+      } // video_data != ""
 
 
 
