@@ -23,6 +23,7 @@ parameters:
     ignoreErrors:
       - '#Constant WATCHDOG_.* not found#'
       - '#Function zoomapi_.* not found#'
+      - '#Function teamsapi_.* not found#'
       - '#Variable \$page_.* might not be defined.#'
       - '#Variable \$theme_location might not be defined.#'
       - '#Variable \$system_name might not be defined.#'

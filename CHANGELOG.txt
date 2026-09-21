@@ -7,7 +7,7 @@ FlightPath 7.x Changelog
   Altered the function "csv_multiline_to_array()" in misc.inc, so that if there are the wrong
   number of elements in a row, the function returns NULL instead of continuing.
 
-  Modified certain code in preparation for teamsapi module.
+  Modified certain code in preparation for teamsapi module. 
 
 
 2026-09-19
