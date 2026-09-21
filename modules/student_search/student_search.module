@@ -1265,7 +1265,7 @@ function student_search_query_advisees($sql, $params = array(), $limit = 20, $bo
 
   $db = get_global_database_handler();
 
-  $rank_in = "( '" . join("', '", csv_to_array(variable_get("allowed_student_ranks",''))) . "' )";
+  $rank_in = "( '" . join("', '", csv_to_array(variable_get("allowed_student_ranks",'FR,SO,JR,SR'))) . "' )";
   $order_by = "";
 
   if (!$bool_only_return_adv_array) {
