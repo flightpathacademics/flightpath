@@ -1,0 +1,183 @@
+<?php
+/**
+ * @file
+ * GitHub Actions test settings template for FlightPath.
+ *
+ * DO NOT rename this file to test-settings.php on your development machine
+ * unless you intend to use the GitHub test defaults.
+ *
+ * The GitHub Actions workflow copies this file to:
+ *
+ *   tests/test-settings.php
+ *
+ * before running the PHPUnit test suite.
+ *
+ * Database connection settings are supplied through environment variables
+ * by the GitHub Actions workflow.  Nothing in this file should contain
+ * credentials, internal hostnames, or paths specific to a developer's
+ * machine.
+ */
+
+// Set the PHP error reporting level for FlightPath.
+error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
+
+// Set the PHP max time limit which any one page is allowed to take up.
+set_time_limit(300);
+
+
+/**
+ * All system settings will be placed (at the end of this script)
+ * into a $GLOBALS variable, but for now will be placed into an array.
+ */
+
+$system_settings = array();
+
+
+////////////////////////////////////
+// !!!  *** IMPORTANT !!!  ***    //
+////////////////////////////////////
+// If this variable is set to TRUE, then anyone who attempts to log in
+// will have full, admin access.
+// Only set this to TRUE if you have run into trouble, and cannot log into
+// FlightPath normally!
+// Otherwise, leave it set to FALSE!
+$system_settings["GRANT_FULL_ACCESS"] = FALSE;
+////////////////////////////////////
+
+
+// This should be the actual filesystem path to the directory
+// where FlightPath is installed.
+//
+// dirname(__DIR__) works both on the local development machine and
+// on the GitHub Actions runner.
+$system_settings["file_system_path"] = dirname(__DIR__);
+
+
+// The base URL is not used by the PHPUnit tests themselves, but FlightPath
+// expects it to be present in the system settings.
+//
+// GitHub may override this with FP_TEST_BASE_URL if necessary.
+$system_settings["base_url"] = getenv('FP_TEST_BASE_URL') ?: 'http://localhost';
+
+
+// The base path is related to the base URL.
+//
+// GitHub may override this with FP_TEST_BASE_PATH if necessary.
+// "/" is appropriate for the default localhost test configuration.
+$system_settings["base_path"] = getenv('FP_TEST_BASE_PATH') ?: "/";
+
+
+////////////////////////////////////
+// *** Database-related settings ***
+////////////////////////////////////
+
+// GitHub Actions supplies these values through environment variables.
+// The defaults are intentionally generic and contain no developer-specific
+// hostnames or credentials.
+$db_host = getenv('FP_TEST_DB_HOST') ?: '127.0.0.1';
+$db_port = getenv('FP_TEST_DB_PORT') ?: '3306';
+$db_user = getenv('FP_TEST_DB_USER') ?: 'flightpath_test';
+$db_pass = getenv('FP_TEST_DB_PASS') ?: 'flightpath_test';
+$db_name = getenv('FP_TEST_DB_NAME') ?: 'flightpath_test';
+
+
+////////////////////////////////////
+// *** Cron-related ***
+////////////////////////////////////
+
+$system_settings["cron_security_token"] = "github-test-cron-token";
+
+
+////////////////////////////////////////////
+/// Custom Settings? ///////////////////////
+////////////////////////////////////////////
+
+$GLOBALS['encryption_key_string'] = 'github-test-encryption-key-string';
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////
+// END OF SETTINGS FILE /////////////
+/////////////////////////////////////
+// *** Do not alter or remove below this line!
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+// This will load the contents of the variables
+// table into the $system_settings variable.  These are extra settings
+// which were set via the web, usually in the Admin Console.
+
+
+// Have the database credentials changed since the last time we connected?
+$db_fingerprint = sha1($db_host . $db_port . $db_user . $db_pass . $db_name);
+
+if (isset($_SESSION["fp_db_fingerprint"]) && $_SESSION["fp_db_fingerprint"] !== $db_fingerprint) {
+  unset($_SESSION["fp_db_host_ip"]);
+}
+
+$_SESSION["fp_db_fingerprint"] = $db_fingerprint;
+
+
+// Connection by IP address is fastest, so let's always try to do that.
+// It can be time-consuming to convert our hostname to IP address.  Cache it in our SESSION.
+if (isset($_SESSION["fp_db_host_ip"])) {
+  $db_host_ip = $_SESSION["fp_db_host_ip"];
+}
+else {
+  // Convert our db_host into an IP address, then save to simple SESSION cache.
+  $db_host_ip = trim(gethostbyname($db_host));
+  if (!$db_host_ip) {
+    $db_host_ip = $db_host;
+  }
+
+  $_SESSION["fp_db_host_ip"] = $db_host_ip;
+}
+
+
+// Connect using PDO.
+$GLOBALS["pdo"] = new PDO(
+  "mysql:host=$db_host_ip;port=$db_port;dbname=$db_name;charset=utf8mb4",
+  $db_user,
+  $db_pass,
+  array(
+    PDO::MYSQL_ATTR_LOCAL_INFILE => TRUE,
+  )
+);
+
+
+// Set our error handling.
+$GLOBALS["pdo"]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+if (!isset($skip_table_queries) || $skip_table_queries !== TRUE) {
+
+  $res = $GLOBALS["pdo"]->prepare("SELECT * FROM modules WHERE enabled = 1
+                ORDER BY weight, name");
+  $res->execute();
+
+  while ($cur = $res->fetch(PDO::FETCH_ASSOC)) {
+    $system_settings["modules"][$cur["name"]] = $cur;
+  }
+
+  // We want to make sure the "system" module is enabled, so we will
+  // hard-code its values.
+  if ($system_settings["modules"]["system"]["enabled"] != 1) {
+    $system_settings["modules"]["system"]["path"] = "modules/system";
+    $system_settings["modules"]["system"]["enabled"] = 1;
+  }
+
+}
+
+
+////////////////////////////////////////////
+////////////////////////////////////////////
+// This must appear at the VERY end!  Nothing involving "system_settings"
+// should come after this.
+//
+// Assign our system_settings to the GLOBALS array so we can access it anywhere in FlightPath.
+$GLOBALS["fp_system_settings"] = $system_settings;
+
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+// PUT NOTHING BELOW THIS LINE ///////////////

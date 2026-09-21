@@ -1,0 +1,64 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches:
+      - flightpath-7.x
+  pull_request:
+    branches:
+      - flightpath-7.x
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: flightpath_test
+          MARIADB_USER: flightpath_test
+          MARIADB_PASSWORD: flightpath_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      FP_TEST_DB_HOST: 127.0.0.1
+      FP_TEST_DB_PORT: 3306
+      FP_TEST_DB_USER: flightpath_test
+      FP_TEST_DB_PASS: flightpath_test
+      FP_TEST_DB_NAME: flightpath_test
+      FP_TEST_BASE_URL: http://localhost
+      FP_TEST_BASE_PATH: /
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install PHPUnit
+        run: |
+          curl -L https://phar.phpunit.de/phpunit-11.phar -o phpunit.phar
+
+      - name: Create test settings
+        run: |
+          cp tests/test-settings.php.github_template tests/test-settings.php
+
+      - name: Install test database
+        run: |
+          php tests/install.php
+
+      - name: Run PHPUnit
+        run: |
+          php phpunit.phar tests
