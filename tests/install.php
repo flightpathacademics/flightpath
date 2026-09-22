@@ -31,7 +31,6 @@ foreach ($tables as $table) {
 }
 
 
-
 system_install();
 
 $new_pass = user_hash_password("password");

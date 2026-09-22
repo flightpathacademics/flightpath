@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-21
+  Fixed bug where level-1 degrees with an underscore in the major code were being excluded
+  in the student search.
+  
+
 2026-09-20
   Made it so all forms used enctype multipart/form-data, to be able to handle uploads automatically.
 

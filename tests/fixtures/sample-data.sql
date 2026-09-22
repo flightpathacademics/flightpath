@@ -53,7 +53,8 @@ INSERT INTO `transfer_eqv_per_student` VALUES (153617, '999999999', 42946, 98844
 INSERT INTO `advisor_student` VALUES ('1', '1003210');
 INSERT INTO `advisor_student` VALUES ('1', '10035744'), ('1', '1011155'), ('1', '1027891'), ('1', '1033154'), ('1', '1033678'), ('1', '1056351'), ('1', '1076654'), ('1', '9999999'), ('1', '999999999'), ('55588992', '999999999');
 
--- degrees (2 rows)
+-- degree
+INSERT INTO `degrees` VALUES (1001, 100001, 'TEST|_ONE', 'BA', 'UG', 'MAJOR', 'Test Degree One', '', 'Foundations,Knowledge Building,Preparing for Completion,Capstone,', 2020, 0, 0, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
 INSERT INTO `degrees` VALUES (6068, 742224, 'ENGL', 'BA', 'UG', 'MAJOR', 'English', '', 'Foundations,Knowledge Building,Preparing for Completion,Capstone,', 2020, 0, 0, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
 INSERT INTO `degrees` VALUES (6104, 5450264, 'COSC', 'BS', 'UG', 'MAJOR', 'Computer Science', '', ',,,,', 2020, 0, 1, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
 

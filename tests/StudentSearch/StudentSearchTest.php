@@ -45,4 +45,24 @@ class StudentSearchTest extends TestCase {
       'CWID' => ['999999999'],
     ];
   }
-}
+
+
+  /**
+   * A level-1 major may contain an underscore in its major code.
+   *
+   * This is a regression test for a bug where major codes containing "_"
+   * were incorrectly treated as degree options and excluded from the
+   * student major search.
+   */
+  public function testLevelOneMajorWithUnderscoreIsIncluded(): void {
+    $majors = student_search_get_majors_for_fapi();
+
+    // We added a level-1 degree with major_code TEST|_ONE explicitly for this test.
+    $this->assertArrayHasKey('TEST|_ONE~~school_0', $majors);
+  }
+
+
+
+
+
+} // class

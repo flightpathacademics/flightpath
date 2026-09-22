@@ -496,9 +496,8 @@ function student_search_get_majors_for_fapi() {
     $degree_class_details = fp_get_degree_classification_details($cur->degree_class);
 
 
-    // Exclude major codes if they are "degree options", meaning, the code has an
-    // underscore in it.
-    if (strpos($cur->major_code, "_")) continue;
+    // Exclude major codes that are level_num 3 (tracks and degree options)
+    if (intval($degree_class_details['level_num']) === 3) continue;
 
     // If the title is risking being too long, let's truncate it
     $title = $cur->title;
