@@ -877,10 +877,19 @@ function student_search_search_form() {
     if ($major_code != "")
     {
       $mjsearch = $major_code;
+
       $other_table = ", degrees b";
+
+      /*
       $major_search = " AND substring_index(c.major_code,'|',1) = b.major_code
                         AND b.school_id = :b_school_id
                         AND (b.major_code LIKE :like_mjsearch ) ";
+      */
+
+      $major_search = " AND c.major_code = b.major_code
+                        AND b.school_id = :b_school_id
+                        AND (b.major_code LIKE :like_mjsearch ) ";
+
 
       $params[":like_mjsearch"] = "%$mjsearch%";
       $params[":b_school_id"] = $selected_school_id;

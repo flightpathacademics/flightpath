@@ -8,6 +8,8 @@ FlightPath 7.x Changelog
   Fixed bug in fp_http_request where if url returned a "moved temporary" or "moved permanently"
   it needed to look for both Location and location, as sometimes it is either.
 
+  Fixed bug so that the Student Search can search for majors with |_ in the major code.
+
 
 2026-09-21
   Fixed bug where level-1 degrees with an underscore in the major code were being excluded

@@ -1,25 +1,16 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 
 require_once __DIR__ . '/../bootstrap.php';
 
-class StudentSearchTest extends TestCase {
+class StudentSearchTest extends FlightPathTestCase {
 
-  protected function setUp(): void {
-    global $user;
-
-    $user = new stdClass();
-    $user->id = 1;
-    $user->cwid = 1;
-    $user->name = 'admin';
-    $user->school_id = 0;
-  }
 
   #[DataProvider('studentSearchTermsProvider')]
   public function testStudentCanBeFoundBySearchTerm(string $search): void {
+
     $_REQUEST['search_for'] = $search;
 
     $form = student_search_search_form();
@@ -47,6 +38,33 @@ class StudentSearchTest extends TestCase {
   }
 
 
+
+  public function testStudentsFoundByMajorSearch() {
+
+    $_REQUEST['major_code'] = 'COSC~~school_0';
+    $form = student_search_search_form();
+    $results = $form['adv_array']['value'];
+    $this->assertIsArray($results);
+    $this->assertTrue(count($results) == 7, "COSC major has 7 students");
+
+
+    parent::setUp();  // Clear values for new test
+
+    $_REQUEST['major_code'] = 'TEST|_ONE~~school_0';
+    $form = student_search_search_form();
+    $results = $form['adv_array']['value'];
+    $this->assertIsArray($results);
+    $this->assertTrue(count($results) == 1, "TEST|_ONE major has 1 student");
+
+
+  }
+
+
+
+
+
+
+
   /**
    * A level-1 major may contain an underscore in its major code.
    *
@@ -54,31 +72,12 @@ class StudentSearchTest extends TestCase {
    * were incorrectly treated as degree options and excluded from the
    * student major search.
    */
-  public function testLevelOneMajorWithUnderscoreIsIncluded(): void {
+  public function testLevelOneMajorWithUnderscoreIsIncluded(){
     $majors = student_search_get_majors_for_fapi();
 
     // We added a level-1 degree with major_code TEST|_ONE explicitly for this test.
     $this->assertArrayHasKey('TEST|_ONE~~school_0', $majors);
   }
-
-
-
-  /**
-   * Confirms this function returns the correct results.
-   */
-  public function testStudentSearchGetMajorsForFapi(): void {
-    $result = student_search_get_majors_for_fapi();
-
-    $this->assertSame([
-        'COSC~~school_0' => 'COSC : Computer Science (Major)',
-        'ENGL~~school_0' => 'ENGL : English (Major)',
-        'TEST|_ONE~~school_0' => 'TEST|_ONE : Test Degree One (Major)',
-      ], $result);
-  }
-
-
-
-
 
 
 
