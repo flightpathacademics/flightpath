@@ -1060,14 +1060,18 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
     case 301: // Moved permanently
     case 302: // Moved temporarily
     case 307: // Moved temporarily
-      $location = $result->headers['Location'];
+      // Could be Location or location.  Which is annoying!
+      $location = $result->headers['location'] ?? NULL;
+      if (!$location) {
+        $location = $result->headers['Location'] ?? NULL;
+      }
       $timeout -= timer_read(__FUNCTION__) / 1000;
       if ($timeout <= 0) {
         $result->code = HTTP_REQUEST_TIMEOUT;
         $result->error = 'request timed out';
       }
       elseif ($retry) {
-        $result = fp_http_request($result->headers['Location'], $headers, $method, $data, --$retry, $timeout);
+        $result = fp_http_request($location, $headers, $method, $data, --$retry, $timeout);
         $result->redirect_code = $result->code;
       }
       $result->redirect_url = $location;
@@ -1078,6 +1082,7 @@ function fp_http_request($url, $headers = array(), $method = 'GET', $data = NULL
   }
 
   $result->code = $code;
+
   return $result;
 }
 

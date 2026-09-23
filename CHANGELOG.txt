@@ -1,10 +1,18 @@
 FlightPath 7.x Changelog
 ========================
 
+
+2026-09-23
+  Updated ICS Parser library (in Calendar module) to latest version.
+
+  Fixed bug in fp_http_request where if url returned a "moved temporary" or "moved permanently"
+  it needed to look for both Location and location, as sometimes it is either.
+
+
 2026-09-21
   Fixed bug where level-1 degrees with an underscore in the major code were being excluded
   in the student search.
-  
+
 
 2026-09-20
   Made it so all forms used enctype multipart/form-data, to be able to handle uploads automatically.
@@ -12,7 +20,7 @@ FlightPath 7.x Changelog
   Altered the function "csv_multiline_to_array()" in misc.inc, so that if there are the wrong
   number of elements in a row, the function returns NULL instead of continuing.
 
-  Modified certain code in preparation for teamsapi module. 
+  Modified certain code in preparation for teamsapi module.
 
 
 2026-09-19
