@@ -63,6 +63,23 @@ class StudentSearchTest extends TestCase {
 
 
 
+  /**
+   * Confirms this function returns the correct results.
+   */
+  public function testStudentSearchGetMajorsForFapi(): void {
+    $result = student_search_get_majors_for_fapi();
+
+    $this->assertSame([
+        'COSC~~school_0' => 'COSC : Computer Science (Major)',
+        'ENGL~~school_0' => 'ENGL : English (Major)',
+        'TEST|_ONE~~school_0' => 'TEST|_ONE : Test Degree One (Major)',
+      ], $result);
+  }
+
+
+
+
+
 
 
 } // class
