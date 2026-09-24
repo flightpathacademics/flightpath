@@ -496,8 +496,8 @@ function calendar_confirm_cancel_appointment_form($cid) {
 
     if ($video_provider == "zoom" && module_enabled('zoomapi')) {
       $id = $data->id;
-      if (strlen($disp_id) > 50) {
-        $disp_id = substr($disp_id, 50) . "...";
+      if (strlen($disp_id) > 20) {
+        $disp_id = substr($disp_id, 20) . "...";
       }
       $form['video_msg_markup'] = array(
         'type' => 'markup',
@@ -507,8 +507,8 @@ function calendar_confirm_cancel_appointment_form($cid) {
 
     if ($video_provider == "teams" && module_enabled('teamsapi')) {
       $id = $disp_id = $data->id;
-      if (strlen($disp_id) > 50) {
-        $disp_id = substr($disp_id, 50) . "...";
+      if (strlen($disp_id) > 20) {
+        $disp_id = substr($disp_id, 20) . "...";
       }
       $form['video_msg_markup'] = array(
         'type' => 'markup',
