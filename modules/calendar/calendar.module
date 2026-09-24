@@ -496,17 +496,23 @@ function calendar_confirm_cancel_appointment_form($cid) {
 
     if ($video_provider == "zoom" && module_enabled('zoomapi')) {
       $id = $data->id;
+      if (strlen($disp_id) > 50) {
+        $disp_id = substr($disp_id, 50) . "...";
+      }
       $form['video_msg_markup'] = array(
         'type' => 'markup',
-        'value' => t("<strong>Zoom Meeting:</strong> By cancelling this appointment, the scheduled Zoom meeting (ID: $id) will also be cancelled."),
+        'value' => t("<strong>Zoom Meeting:</strong> By cancelling this appointment, the scheduled Zoom meeting (ID: $disp_id) will also be cancelled."),
       );
     }
 
     if ($video_provider == "teams" && module_enabled('teamsapi')) {
-      $id = $data->id;
+      $id = $disp_id = $data->id;
+      if (strlen($disp_id) > 50) {
+        $disp_id = substr($disp_id, 50) . "...";
+      }
       $form['video_msg_markup'] = array(
         'type' => 'markup',
-        'value' => t("<strong>Microsoft Teams Meeting:</strong> By cancelling this appointment, the scheduled Microsoft Teams meeting (ID: $id) will also be cancelled."),
+        'value' => t("<strong>Microsoft Teams Meeting:</strong> By cancelling this appointment, the scheduled Microsoft Teams meeting (ID: $disp_id) will also be cancelled."),
       );
     }
 
