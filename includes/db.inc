@@ -968,6 +968,17 @@ function variable_get_for_school($name, $default_value = "", $school_id = 0, $bo
 
 
 
+function variable_set_for_school($name, $value, $school_id = 0) {
+  $school_id = intval($school_id);
+
+  if ($school_id === 0) {
+    variable_set($name, $value);
+  }
+  else {
+    variable_set($name . '~~school_' . $school_id, $value);
+  }
+}
+
 
 
 /**
@@ -984,7 +995,6 @@ function variable_set($name, $value) {
   // Save back to our "cache" GLOBALS array:
   $GLOBALS["fp_system_settings"][$name] = $value;
 
-
   // Boolean FALSE presents unusual problems when we try to tell if it got unserialized correctly.
   // We will convert it to a placeholder so we can positively store it.
   if ($value === FALSE) {
@@ -995,13 +1005,10 @@ function variable_set($name, $value) {
     $value = "NULL_PLACEHOLDER";
   }
 
-
   db_query("DELETE FROM variables WHERE name = ?", $name);
 
   db_query("INSERT INTO variables (name, value)
               VALUES (?, ?) ", $name, serialize($value));
-
-
 }
 
 
@@ -1013,6 +1020,16 @@ function variable_delete($name) {
   db_query("DELETE FROM variables WHERE name = ?", $name);
 }
 
+function variable_delete_for_school($name, $school_id = 0) {
+  $school_id = intval($school_id);
+
+  if ($school_id === 0) {
+    variable_delete($name);
+  }
+  else {
+    variable_delete($name . '~~school_' . $school_id);
+  }
+}
 
 
 

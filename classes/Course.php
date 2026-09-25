@@ -529,7 +529,7 @@ class Course extends stdClass
    * @see set_details_by_degree()
    */
   function get_details_by_degree($degree_id, $key) {
-    return @$this->details_by_degree_array[$degree_id][$key];
+    return $this->details_by_degree_array[$degree_id][$key] ?? NULL;
   }
 
 

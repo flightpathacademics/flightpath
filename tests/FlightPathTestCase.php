@@ -42,6 +42,10 @@ abstract class FlightPathTestCase extends TestCase
           }
         }
 
+        // Reset various variables to default...
+        variable_delete_for_school("course_repeat_policy", 0);
+
+
 
 
     }
