@@ -92,6 +92,11 @@ class Group extends stdClass
 			$c->assigned_to_semester_num = $semester_num;
 		}
 		$this->list_courses->i = $temp_i;
+
+		// We intentionally are NOT assigning the semester_num to any possible subgroups,
+		// as this could mess up logic later on when we assign courses to groups.
+
+
 	}
 
 

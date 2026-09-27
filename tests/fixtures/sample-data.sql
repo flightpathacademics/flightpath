@@ -57,6 +57,8 @@ INSERT INTO `advisor_student` VALUES ('1', '10035744'), ('1', '1011155'), ('1', 
 INSERT INTO `degrees` VALUES (1001, 100001, 'TEST|_ONE', 'BA', 'UG', 'MAJOR', 'Test Degree One', '', 'Foundations,Knowledge Building,Preparing for Completion,Capstone,', 2020, 0, 0, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
 INSERT INTO `degrees` VALUES (6068, 742224, 'ENGL', 'BA', 'UG', 'MAJOR', 'English', '', 'Foundations,Knowledge Building,Preparing for Completion,Capstone,', 2020, 0, 0, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
 INSERT INTO `degrees` VALUES (6104, 5450264, 'COSC', 'BS', 'UG', 'MAJOR', 'Computer Science', '', ',,,,', 2020, 0, 1, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
+INSERT INTO `degrees` VALUES (6379, 8030111, 'COSC|_MATH', 'BS', 'UG', 'CONC', 'Computer Science', '', ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,', 2020, 0, 1, 0, '', 0, 0, '', 'CONC~0~0~\n', 0);
+
 
 -- degree_tracks (2 rows)
 INSERT INTO `degree_tracks` VALUES (4473, 2020, 'COSC', 'MATH', 'Math Focus', '', 'This version of the Computer Science degree focuses on Mathematics as it applies to computing theory.', 0);

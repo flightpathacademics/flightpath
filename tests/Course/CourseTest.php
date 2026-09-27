@@ -183,4 +183,17 @@ class CourseTest extends FlightPathTestCase
     $this->assertSame("test", $restored->extra_attribs); // extra attributes should survive serialization
     $this->assertSame("course-test-123", $restored->unique_id); // unique ID should survive serialization
   }
-}
+
+
+
+} // class
+
+
+
+
+
+
+
+
+
+//

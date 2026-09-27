@@ -25,6 +25,15 @@ abstract class FlightPathTestCase extends TestCase
         unset($_POST);
 
 
+        foreach ($GLOBALS as $key => $val) {
+          if (strstr($key, "cache")) {
+            unset($GLOBALS[$key]);
+          }
+        }
+
+
+
+
         // Clear SESSION of unneeded vars...
         $keep_array = [
           'fp_db_fingerprint',
@@ -49,4 +58,23 @@ abstract class FlightPathTestCase extends TestCase
 
 
     }
-}
+
+
+    /**
+     * When ending a particular test, call the garbage collector, just to make sure we
+     * free up memory immediately.
+     */
+    protected function tearDown(): void
+    {
+      gc_collect_cycles();
+      parent::tearDown();
+    }
+
+
+} // class
+
+
+
+
+
+//
