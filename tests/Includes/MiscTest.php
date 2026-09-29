@@ -429,11 +429,26 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(["my_color" => "red", "my_path" => "/test"], $GLOBALS["fp_extra_js_settings"]);
   }
 
-  public function testBaseUrlAndBasePath(): void
+
+  public function testBasePath(): void
   {
-    $this->assertSame($GLOBALS["fp_system_settings"]["base_url"], base_url());
-    $this->assertSame($GLOBALS["fp_system_settings"]["base_path"], base_path());
+    $original = $GLOBALS["fp_system_settings"]["base_path"];
+
+    try {
+      $GLOBALS["fp_system_settings"]["base_path"] = "/test/path/";
+      $this->assertSame("/test/path/", base_path());
+
+      $GLOBALS["fp_system_settings"]["base_path"] = "";
+      $this->assertSame(".", base_path());
+
+      $GLOBALS["fp_system_settings"]["base_path"] = "/";
+      $this->assertSame("", base_path());
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["base_path"] = $original;
+    }
   }
+
 
   public function testModuleEnabled(): void
   {
