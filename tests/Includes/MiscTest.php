@@ -809,6 +809,1056 @@ class MiscTest extends FlightPathTestCase
   }
 
 
+  public function testGetTimezoneOffset(): void
+  {
+    $origin = new DateTime("now", new DateTimeZone("UTC"));
+    $remote = new DateTime("now", new DateTimeZone("America/Chicago"));
+
+    $expected = $origin->getOffset() - $remote->getOffset();
+
+    $this->assertSame($expected, get_timezone_offset("America/Chicago", "UTC"));
+  }
+
+  public function testGetTimezoneOffsetUsesDefaultTimezoneWhenOriginIsOmitted(): void
+  {
+    $original_timezone = date_default_timezone_get();
+
+    try {
+      date_default_timezone_set("UTC");
+
+      $origin = new DateTime("now", new DateTimeZone("UTC"));
+      $remote = new DateTime("now", new DateTimeZone("America/Chicago"));
+
+      $expected = $origin->getOffset() - $remote->getOffset();
+
+      $this->assertSame($expected, get_timezone_offset("America/Chicago"));
+    }
+    finally {
+      date_default_timezone_set($original_timezone);
+    }
+  }
+
+  public function testTimerStartAndRead(): void
+  {
+    global $timers;
+
+    $name = "test_timer_" . uniqid();
+    unset($timers[$name]);
+
+    timer_start($name);
+    $elapsed = timer_read($name);
+
+    $this->assertIsFloat($elapsed);
+    $this->assertGreaterThanOrEqual(0, $elapsed);
+    $this->assertSame(1, $timers[$name]["count"]);
+  }
+
+  public function testTimerStartIncrementsCount(): void
+  {
+    global $timers;
+
+    $name = "test_timer_" . uniqid();
+    unset($timers[$name]);
+
+    timer_start($name);
+    timer_start($name);
+
+    $this->assertSame(2, $timers[$name]["count"]);
+  }
+
+  public function testTimerReadReturnsNullForUnknownTimer(): void
+  {
+    global $timers;
+
+    $name = "does_not_exist_" . uniqid();
+    unset($timers[$name]);
+
+    $this->assertNull(timer_read($name));
+  }
+
+
+  public function testGetRandomStringCanReturnEmptyString(): void
+  {
+    $this->assertSame("", fp_get_random_string(0));
+  }
+
+  public function testGetRandomStringCanIncludeSymbols(): void
+  {
+    $result = fp_get_random_string(100, true, true, true);
+
+    $this->assertSame(100, strlen($result));
+    $this->assertMatchesRegularExpression('/^[a-zA-Z0-9!@#$%^&*()_+=\-]+$/', $result);
+  }
+
+
+  public function testGetDegreeClassifications(): void
+  {
+    $classifications = fp_get_degree_classifications();
+
+    $this->assertIsArray($classifications);
+
+    $this->assertSame("Major", $classifications["levels"][1]["MAJOR"]);
+    $this->assertSame("Minor", $classifications["levels"][2]["MINOR"]);
+    $this->assertSame("Concentration", $classifications["levels"][3]["CONC"]);
+
+    $this->assertSame(1, $classifications["machine_name_to_level_num"]["MAJOR"]);
+    $this->assertSame(2, $classifications["machine_name_to_level_num"]["MINOR"]);
+    $this->assertSame(3, $classifications["machine_name_to_level_num"]["CONC"]);
+  }
+
+  public function testGetDegreeClassificationDetails(): void
+  {
+    $details = fp_get_degree_classification_details("MAJOR");
+
+    $this->assertSame(1, $details["level_num"]);
+    $this->assertSame("Major", $details["title"]);
+    $this->assertSame("MAJOR", $details["degree_class"]);
+  }
+
+  public function testGetDegreeClassificationDetailsForUnknownClass(): void
+  {
+    $details = fp_get_degree_classification_details("UNKNOWN_CLASS");
+
+    $this->assertSame(0, $details["level_num"]);
+    $this->assertSame("UNKNOWN_CLASS", $details["title"]);
+    $this->assertSame("UNKNOWN_CLASS", $details["degree_class"]);
+  }
+
+  public function testGetDegreeClassificationDetailsCanReturnEmptyForUnknownClass(): void
+  {
+    $details = fp_get_degree_classification_details("UNKNOWN_CLASS", FALSE);
+
+    $this->assertSame([], $details);
+  }
+
+  public function testGetTermStructures(): void
+  {
+    $name = "term_id_structure";
+
+    $original = variable_get($name, "");
+
+    try {
+      variable_set($name, "[Y4]40, Fall, Fall of [Y4-1], Fall '[Y2-1],");
+      unset($GLOBALS["fp_cache_get_term_description"]);
+
+      $structures = get_term_structures(0);
+
+      $this->assertArrayHasKey("40", $structures);
+      $this->assertSame("40", $structures["40"]["term_suffix"]);
+      $this->assertSame("[Y4]40", $structures["40"]["term_def"]);
+      $this->assertSame("Fall", $structures["40"]["short"]);
+      $this->assertSame("Fall of [Y4-1]", $structures["40"]["full"]);
+      $this->assertSame("Fall '[Y2-1]", $structures["40"]["abbr"]);
+    }
+    finally {
+      variable_set($name, $original);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+    }
+  }
+
+  public function testGetTermStructuresReturnsEmptyArrayWhenUnset(): void
+  {
+    $name = "term_id_structure";
+
+    $original = variable_get($name, "");
+
+    try {
+      variable_delete($name);
+
+      $this->assertSame([], get_term_structures(0));
+    }
+    finally {
+      variable_set($name, $original);
+    }
+  }
+
+  public function testGetRequirementTypes(): void
+  {
+    unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
+
+    $name = "requirement_types";
+    $original = variable_get($name, "");
+
+    try {
+      variable_set($name, "g ~ General\nc ~ Core\nm ~ Major\nx ~ Additional");
+
+      $types = fp_get_requirement_types(0);
+
+      $this->assertSame("General", $types["g"]);
+      $this->assertSame("Core", $types["c"]);
+      $this->assertSame("Major", $types["m"]);
+      $this->assertSame("Additional", $types["x"]);
+    }
+    finally {
+      variable_set($name, $original);
+      unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
+    }
+  }
+
+  public function testGetRequirementTypesAddsRequiredDefaults(): void
+  {
+    unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
+
+    $name = "requirement_types";
+    $original = variable_get($name, "");
+
+    try {
+      variable_set($name, "g ~ General");
+
+      $types = fp_get_requirement_types(0);
+
+      $this->assertSame("General", $types["g"]);
+      $this->assertArrayHasKey("x", $types);
+      $this->assertArrayHasKey("e", $types);
+      $this->assertArrayHasKey("m", $types);
+    }
+    finally {
+      variable_set($name, $original);
+      unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
+    }
+  }
+
+  public function testGetRequirementTypesCachesResult(): void
+  {
+    unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
+
+    $name = "requirement_types";
+    $original = variable_get($name, "");
+
+    try {
+      variable_set($name, "g ~ General");
+
+      $first = fp_get_requirement_types(0);
+
+      variable_set($name, "g ~ Changed");
+
+      $second = fp_get_requirement_types(0);
+
+      $this->assertSame("General", $first["g"]);
+      $this->assertSame("General", $second["g"]);
+    }
+    finally {
+      variable_set($name, $original);
+      unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
+    }
+  }
+
+
+  public function testFpTokenCreatesAndPersistsSiteToken(): void
+  {
+    $original = variable_get("site_token", "");
+
+    try {
+      variable_delete("site_token");
+
+      $token = fp_token();
+
+      $this->assertIsString($token);
+      $this->assertSame(32, strlen($token));
+      $this->assertSame($token, variable_get("site_token", ""));
+      $this->assertSame($token, fp_token());
+    }
+    finally {
+      if ($original === "") {
+        variable_delete("site_token");
+      }
+      else {
+        variable_set("site_token", $original);
+      }
+    }
+  }
+
+  public function testGetSessionStringCanBeValidated(): void
+  {
+    $original_ip = $_SERVER["REMOTE_ADDR"] ?? NULL;
+
+    try {
+      $_SERVER["REMOTE_ADDR"] = "127.0.0.1";
+
+      $session_string = fp_get_session_str();
+
+      $this->assertStringContainsString("~_", $session_string);
+      $this->assertSame(session_id(), fp_get_session_id_from_str($session_string));
+    }
+    finally {
+      if ($original_ip === NULL) {
+        unset($_SERVER["REMOTE_ADDR"]);
+      }
+      else {
+        $_SERVER["REMOTE_ADDR"] = $original_ip;
+      }
+    }
+  }
+
+  public function testGetSessionIdFromStringRejectsInvalidHash(): void
+  {
+    $this->assertFalse(fp_get_session_id_from_str(session_id() . "~_invalid"));
+  }
+
+  public function testGetSessionIdFromStringRejectsMalformedString(): void
+  {
+    $this->assertFalse(fp_get_session_id_from_str("not-a-valid-session-string"));
+  }
+
+
+  public function testTranslationFunctionReplacesVariables(): void
+  {
+    $this->assertSame("Hello Richard", t("Hello @name", ["@name" => "Richard"]));
+  }
+
+  public function testTranslationFunctionReplacesNullAndFalseWithEmptyString(): void
+  {
+    $this->assertSame("Hello ", t("Hello @name", ["@name" => NULL]));
+    $this->assertSame("Hello ", t("Hello @name", ["@name" => FALSE]));
+  }
+
+  public function testTranslationFunctionItalicizesPercentVariables(): void
+  {
+    $this->assertSame("<em>Richard</em>", t("%name", ["%name" => "Richard"]));
+  }
+
+  public function testStaticTranslationFunctionMatchesTranslationBehavior(): void
+  {
+    $this->assertSame("Hello Richard", st("Hello @name", ["@name" => "Richard"]));
+  }
+
+  public function testStaticTranslationFunctionItalicizesPercentVariables(): void
+  {
+    $this->assertSame("<em>Richard</em>", st("%name", ["%name" => "Richard"]));
+  }
+
+  public function testBaseUrl(): void
+  {
+    $original = $GLOBALS["fp_system_settings"]["base_url"];
+
+    try {
+      $GLOBALS["fp_system_settings"]["base_url"] = "https://example.com/flightpath";
+
+      $this->assertSame("https://example.com/flightpath", base_url());
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["base_url"] = $original;
+    }
+  }
+
+  public function testGetFilesPath(): void
+  {
+    $original = $GLOBALS["fp_system_settings"]["file_system_path"];
+
+    try {
+      $GLOBALS["fp_system_settings"]["file_system_path"] = "/var/www/flightpath";
+
+      $this->assertSame("/var/www/flightpath/custom/files", fp_get_files_path());
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["file_system_path"] = $original;
+    }
+  }
+
+  public function testGetTmpPathUsesConfiguredPath(): void
+  {
+    $name = "tmp_path";
+    $original = variable_get($name, "/tmp");
+
+    try {
+      variable_set($name, "/var/tmp/flightpath-tests");
+
+      $this->assertSame("/var/tmp/flightpath-tests", fp_get_tmp_path());
+    }
+    finally {
+      variable_set($name, $original);
+    }
+  }
+
+
+  public function testFpUrlWithCleanUrlsDisabled(): void
+  {
+    $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
+    $original_clean_urls = variable_get("clean_urls", FALSE);
+
+    try {
+      $GLOBALS["fp_system_settings"]["base_path"] = "/flightpath";
+      variable_set("clean_urls", FALSE);
+
+      $this->assertSame("/flightpath/index.php?q=student-search", fp_url("student-search"));
+      $this->assertSame("/flightpath/index.php?q=student-search&foo=bar", fp_url("student-search", "foo=bar"));
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["base_path"] = $original_base_path;
+      variable_set("clean_urls", $original_clean_urls);
+    }
+  }
+
+  public function testFpUrlWithCleanUrlsEnabled(): void
+  {
+    $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
+    $original_clean_urls = variable_get("clean_urls", FALSE);
+
+    try {
+      $GLOBALS["fp_system_settings"]["base_path"] = "/flightpath";
+      variable_set("clean_urls", TRUE);
+
+      $this->assertSame("/flightpath/student-search", fp_url("student-search"));
+      $this->assertSame("/flightpath/student-search?foo=bar", fp_url("student-search", "foo=bar"));
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["base_path"] = $original_base_path;
+      variable_set("clean_urls", $original_clean_urls);
+    }
+  }
+
+  public function testFpUrlCanExcludeBasePath(): void
+  {
+    $original_clean_urls = variable_get("clean_urls", FALSE);
+
+    try {
+      variable_set("clean_urls", TRUE);
+
+      $this->assertSame("student-search", fp_url("student-search", "", FALSE));
+    }
+    finally {
+      variable_set("clean_urls", $original_clean_urls);
+    }
+  }
+
+  public function testFpUrlAbsolute(): void
+  {
+    $original_base_url = $GLOBALS["fp_system_settings"]["base_url"];
+    $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
+    $original_clean_urls = variable_get("clean_urls", FALSE);
+
+    try {
+      $GLOBALS["fp_system_settings"]["base_url"] = "https://example.com/flightpath";
+      $GLOBALS["fp_system_settings"]["base_path"] = "/flightpath";
+      variable_set("clean_urls", TRUE);
+
+      $this->assertSame("https://example.com/flightpath/student-search?foo=bar", fp_url_absolute("student-search", "foo=bar"));
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["base_url"] = $original_base_url;
+      $GLOBALS["fp_system_settings"]["base_path"] = $original_base_path;
+      variable_set("clean_urls", $original_clean_urls);
+    }
+  }
+
+  public function testLinkHelperCreatesLink(): void
+  {
+    $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
+    $original_clean_urls = variable_get("clean_urls", FALSE);
+
+    try {
+      $GLOBALS["fp_system_settings"]["base_path"] = "/flightpath";
+      variable_set("clean_urls", TRUE);
+
+      $result = l("View Student", "student/12345", "foo=bar", ["class" => "student-link"]);
+
+      $this->assertSame('<a href="/flightpath/student/12345?foo=bar" class="student-link" >View Student</a>', $result);
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["base_path"] = $original_base_path;
+      variable_set("clean_urls", $original_clean_urls);
+    }
+  }
+
+  public function testScreenIsMobileDetectsAndroid(): void
+  {
+    $original_agent = $_SERVER["HTTP_USER_AGENT"] ?? NULL;
+    $original_mobile = $GLOBALS["fp_page_is_mobile"] ?? NULL;
+
+    try {
+      unset($GLOBALS["fp_page_is_mobile"]);
+      $_SERVER["HTTP_USER_AGENT"] = "Mozilla/5.0 Android 14";
+
+      $this->assertTrue(fp_screen_is_mobile());
+    }
+    finally {
+      if ($original_agent === NULL) {
+        unset($_SERVER["HTTP_USER_AGENT"]);
+      }
+      else {
+        $_SERVER["HTTP_USER_AGENT"] = $original_agent;
+      }
+
+      if ($original_mobile === NULL) {
+        unset($GLOBALS["fp_page_is_mobile"]);
+      }
+      else {
+        $GLOBALS["fp_page_is_mobile"] = $original_mobile;
+      }
+    }
+  }
+
+  public function testScreenIsMobileReturnsFalseForDesktopBrowser(): void
+  {
+    $original_agent = $_SERVER["HTTP_USER_AGENT"] ?? NULL;
+    $original_mobile = $GLOBALS["fp_page_is_mobile"] ?? NULL;
+
+    try {
+      unset($GLOBALS["fp_page_is_mobile"]);
+      $_SERVER["HTTP_USER_AGENT"] = "Mozilla/5.0 Windows NT 10.0 Win64 x64";
+
+      $this->assertFalse(fp_screen_is_mobile());
+    }
+    finally {
+      if ($original_agent === NULL) {
+        unset($_SERVER["HTTP_USER_AGENT"]);
+      }
+      else {
+        $_SERVER["HTTP_USER_AGENT"] = $original_agent;
+      }
+
+      if ($original_mobile === NULL) {
+        unset($GLOBALS["fp_page_is_mobile"]);
+      }
+      else {
+        $GLOBALS["fp_page_is_mobile"] = $original_mobile;
+      }
+    }
+  }
+
+  public function testScreenIsMobileUsesCachedResult(): void
+  {
+    $original_mobile = $GLOBALS["fp_page_is_mobile"] ?? NULL;
+
+    try {
+      $GLOBALS["fp_page_is_mobile"] = TRUE;
+
+      $this->assertTrue(fp_screen_is_mobile());
+
+      $GLOBALS["fp_page_is_mobile"] = FALSE;
+
+      $this->assertFalse(fp_screen_is_mobile());
+    }
+    finally {
+      if ($original_mobile === NULL) {
+        unset($GLOBALS["fp_page_is_mobile"]);
+      }
+      else {
+        $GLOBALS["fp_page_is_mobile"] = $original_mobile;
+      }
+    }
+  }
+
+
+  public function testFpStrEndsWith(): void
+  {
+    $this->assertTrue(fp_str_ends_with("FlightPath", "Path"));
+    $this->assertFalse(fp_str_ends_with("FlightPath", "Flight"));
+    $this->assertFalse(fp_str_ends_with("FlightPath", ""));
+  }
+
+  public function testJoinAssocWithCustomSeparators(): void
+  {
+    $result = fp_join_assoc(["first" => "one", "second" => "two"], ";", ":");
+
+    $this->assertSame("first:one;second:two", $result);
+  }
+
+  public function testExplodeAssocConvertsNumericValuesBackToNumbers(): void
+  {
+    $result = fp_explode_assoc("hours_S-3,gpa_S-3.5,name_S-Richard");
+
+    $this->assertSame(3, $result["hours"]);
+    $this->assertSame(3.5, $result["gpa"]);
+    $this->assertSame("Richard", $result["name"]);
+  }
+
+  public function testJoinAssocWithEmptyArray(): void
+  {
+    $this->assertSame("", fp_join_assoc([]));
+  }
+
+  public function testExplodeAssocIgnoresEmptyEntries(): void
+  {
+    $result = fp_explode_assoc("one_S-1,,two_S-2,");
+
+    $this->assertSame(["one" => 1, "two" => 2], $result);
+  }
+
+  public function testGetModuleDetailsForFlightPathCore(): void
+  {
+    $result = fp_get_module_details("flightpath");
+
+    $this->assertIsArray($result);
+    $this->assertSame("FlightPath (Core)", $result["info"]["name"]);
+    $this->assertSame(FLIGHTPATH_VERSION, $result["version"]);
+  }
+
+  public function testLoadDegreeCachesTheDegreePlan(): void
+  {
+    unset($GLOBALS["fp_temp_cache"]["fp_load_degree"]);
+
+    $first = fp_load_degree(5450264);
+    $second = fp_load_degree(5450264);
+
+    $this->assertInstanceOf(DegreePlan::class, $first);
+    $this->assertSame($first, $second);
+  }
+
+  public function testHtmlPrintRDisplaysSimpleValues(): void
+  {
+    $result = fp_html_print_r("Hello", "message");
+
+    $this->assertStringContainsString("message", $result);
+    $this->assertStringContainsString("Hello", $result);
+    $this->assertStringContainsString("(string", $result);
+  }
+
+  public function testHtmlPrintRDisplaysArrays(): void
+  {
+    $result = fp_html_print_r(["name" => "Rex"], "pet");
+
+    $this->assertStringContainsString("pet", $result);
+    $this->assertStringContainsString("(array", $result);
+    $this->assertStringContainsString("name", $result);
+    $this->assertStringContainsString("Rex", $result);
+  }
+
+  public function testHtmlPrintRDisplaysBooleanValues(): void
+  {
+    $true_result = fp_html_print_r(TRUE, "enabled");
+    $false_result = fp_html_print_r(FALSE, "enabled");
+
+    $this->assertStringContainsString("TRUE", $true_result);
+    $this->assertStringContainsString("FALSE", $false_result);
+  }
+
+  public function testHtmlPrintRStopsAtMaximumDepth(): void
+  {
+    $value = ["level" => ["nested" => "value"]];
+
+    $result = fp_html_print_r($value, "test", 0, 0);
+
+    $this->assertStringContainsString("Depth too great", $result);
+  }
+
+  public function testQueryStringEncodeCanExcludeKeys(): void
+  {
+    $query = [
+      "name" => "John Doe",
+      "major" => "Computer Science",
+      "student_id" => 12345,
+    ];
+
+    $result = fp_query_string_encode($query, ["major"]);
+
+    $this->assertSame("name=John%20Doe&student_id=12345", $result);
+  }
+
+
+  public function testQueryStringEncodeCanExcludeNestedKeys(): void
+  {
+    $query = [
+      "student" => [
+        "name" => "John Doe",
+        "id" => 12345,
+      ],
+    ];
+
+    $result = fp_query_string_encode($query, ["student[id]"]);
+
+    $this->assertSame("student[name]=John%20Doe", $result);
+  }
+
+
+  public function testMapPhpErrorCode(): void
+  {
+    $this->assertSame("Fatal Error", _fp_map_php_error_code(E_ERROR));
+    $this->assertSame("Fatal Error", _fp_map_php_error_code(E_PARSE));
+    $this->assertSame("Fatal Error", _fp_map_php_error_code(E_CORE_ERROR));
+    $this->assertSame("Fatal Error", _fp_map_php_error_code(E_COMPILE_ERROR));
+    $this->assertSame("Fatal Error", _fp_map_php_error_code(E_USER_ERROR));
+
+    $this->assertSame("Warning", _fp_map_php_error_code(E_WARNING));
+    $this->assertSame("Warning", _fp_map_php_error_code(E_USER_WARNING));
+    $this->assertSame("Warning", _fp_map_php_error_code(E_COMPILE_WARNING));
+    $this->assertSame("Warning", _fp_map_php_error_code(E_RECOVERABLE_ERROR));
+
+    $this->assertSame("Notice", _fp_map_php_error_code(E_NOTICE));
+    $this->assertSame("Notice", _fp_map_php_error_code(E_USER_NOTICE));
+
+    $this->assertSame("Strict", _fp_map_php_error_code(E_STRICT));
+    $this->assertSame("Deprecated", _fp_map_php_error_code(E_DEPRECATED));
+    $this->assertSame("Deprecated", _fp_map_php_error_code(E_USER_DEPRECATED));
+
+    $this->assertSame("", _fp_map_php_error_code(123456789));
+  }
+
+  public function testFilterUntrustedInputForMajorCode(): void
+  {
+    $input = ' COSC (BS); #1010="test" ';
+
+    $result = filter_untrusted_input($input, "major_code");
+
+    $this->assertSame("COSCBS1010test", $result);
+  }
+
+  public function testFilterUntrustedInputRemovesHtml(): void
+  {
+    $result = filter_untrusted_input('<script>alert("x")</script>COSC', "major_code");
+
+    $this->assertStringNotContainsString("<script>", $result);
+    $this->assertStringNotContainsString("</script>", $result);
+    $this->assertStringContainsString("alert", $result);
+    $this->assertStringContainsString("COSC", $result);
+  }
+
+  public function testFilterUntrustedInputReturnsOtherTypesUnchanged(): void
+  {
+    $this->assertSame("Hello World", filter_untrusted_input("Hello World", "other"));
+  }
+
+  public function testFilterUntrustedInputHandlesEmptyInput(): void
+  {
+    $this->assertSame("", filter_untrusted_input("", "major_code"));
+    $this->assertSame("", filter_untrusted_input(NULL, "major_code"));
+  }
+
+  public function testFilterMarkupReturnsEmptyInputUnchanged(): void
+  {
+    $this->assertSame("", filter_markup(""));
+    $this->assertSame(NULL, filter_markup(NULL));
+  }
+
+  public function testFilterMarkupReturnsNonStringInputUnchanged(): void
+  {
+    $this->assertSame(123, filter_markup(123));
+    $this->assertSame(["test"], filter_markup(["test"]));
+  }
+
+  public function testFilterMarkupFullAllowsHtml(): void
+  {
+    $html = "<strong>Hello</strong><script>alert('x')</script>";
+
+    $this->assertSame($html, filter_markup($html, "full"));
+  }
+
+  public function testFilterMarkupBasicConvertsNewlinesToSafeMarkup(): void
+  {
+    $result = filter_markup("Hello\nWorld", "basic");
+
+    $this->assertStringContainsString("Hello", $result);
+    $this->assertStringContainsString("World", $result);
+  }
+
+  public function testRepairHtmlRepairsMismatchedTags(): void
+  {
+    $result = repair_html("<strong>Hello");
+
+    $this->assertStringContainsString("<strong>Hello</strong>", $result);
+  }
+
+  public function testRepairHtmlPreservesValidMarkup(): void
+  {
+    $result = repair_html("<p>Hello <strong>world</strong></p>");
+
+    $this->assertStringContainsString("<p>Hello <strong>world</strong></p>", $result);
+  }
+
+  public function testRepairHtmlHandlesPlainText(): void
+  {
+    $this->assertSame("Hello world", repair_html("Hello world"));
+  }
+
+  public function testFilterXssBadProtocolAllowsSafeHttpUrl(): void
+  {
+    $this->assertSame("http://example.com", filter_xss_bad_protocol("http://example.com"));
+  }
+
+  public function testFilterXssBadProtocolRemovesJavascriptUrl(): void
+  {
+    $result = filter_xss_bad_protocol("javascript:alert(1)");
+
+    $this->assertStringNotContainsString("javascript:", strtolower($result));
+    $this->assertStringContainsString("alert(1)", $result);
+  }
+
+  public function testFilterXssBadProtocolDecodesHtmlEntitiesBeforeFiltering(): void
+  {
+    $result = filter_xss_bad_protocol("javascript&#58;alert(1)");
+
+    $this->assertStringNotContainsString("javascript:", strtolower($result));
+  }
+
+  public function testFilterXssAttributesKeepsSafeAttributes(): void
+  {
+    $result = filter_xss_attributes('class="student" id="student-123"');
+
+    $this->assertContains('class="student"', $result);
+    $this->assertContains('id="student-123"', $result);
+  }
+
+  public function testFilterXssAttributesRemovesStyleAttribute(): void
+  {
+    $result = filter_xss_attributes('style="display:none" class="student"');
+
+    $this->assertNotContains('style="display:none"', $result);
+    $this->assertContains('class="student"', $result);
+  }
+
+  public function testFilterXssAttributesRemovesEventHandlers(): void
+  {
+    $result = filter_xss_attributes('onclick="alert(1)" class="student"');
+
+    $this->assertNotContains('onclick="alert(1)"', $result);
+    $this->assertContains('class="student"', $result);
+  }
+
+  public function testFilterXssAttributesHandlesValuelessAttributes(): void
+  {
+    $result = filter_xss_attributes("disabled class=\"student\"");
+
+    $this->assertContains("disabled", $result);
+    $this->assertContains('class="student"', $result);
+  }
+
+  public function testStripDangerousProtocolsAllowsCommonSafeProtocols(): void
+  {
+    $this->assertSame("ftp://example.com", fp_strip_dangerous_protocols("ftp://example.com"));
+    $this->assertSame("mailto:test@example.com", fp_strip_dangerous_protocols("mailto:test@example.com"));
+    $this->assertSame("tel:5551234", fp_strip_dangerous_protocols("tel:5551234"));
+    $this->assertSame("https://example.com", fp_strip_dangerous_protocols("https://example.com"));
+  }
+
+  public function testStripDangerousProtocolsHandlesRepeatedDangerousProtocols(): void
+  {
+    $result = fp_strip_dangerous_protocols("javascript:javascript:alert(1)");
+
+    $this->assertSame("alert(1)", $result);
+  }
+
+  public function testStripDangerousProtocolsDoesNotTreatColonInRelativePathAsProtocol(): void
+  {
+    $result = fp_strip_dangerous_protocols("/path/to:file");
+
+    $this->assertSame("/path/to:file", $result);
+  }
+
+  public function testGetMachineReadableReplacesRunsOfInvalidCharacters(): void
+  {
+    $this->assertSame("Hello_World", fp_get_machine_readable("Hello---World"));
+    $this->assertSame("Hello_World", fp_get_machine_readable("Hello & World"));
+  }
+
+  public function testGetMachineReadablePreservesUnderscores(): void
+  {
+    $this->assertSame("TEST_ONE", fp_get_machine_readable("TEST_ONE"));
+  }
+
+  public function testGetMachineReadablePreservesNumbers(): void
+  {
+    $this->assertSame("Course_1010", fp_get_machine_readable("Course 1010"));
+  }
+
+  public function testGetTermDescriptionUsesConfiguredTermStructure(): void
+  {
+    $original = variable_get_for_school("term_id_structure", "", 0);
+
+    try {
+      variable_set_for_school("term_id_structure", "[Y4]40, Fall, Fall of [Y4], Fall '[Y2]", 0);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+
+      $this->assertSame("Fall of 2020", get_term_description("202040", FALSE, 0));
+    }
+    finally {
+      variable_set_for_school("term_id_structure", $original, 0);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+    }
+  }
+
+  public function testGetTermDescriptionCanReturnAbbreviatedDescription(): void
+  {
+    $original = variable_get_for_school("term_id_structure", "", 0);
+
+    try {
+      variable_set_for_school("term_id_structure", "[Y4]40, Fall, Fall of [Y4], Fall '[Y2]", 0);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+
+      $this->assertSame("Fall '20", get_term_description("202040", TRUE, 0));
+    }
+    finally {
+      variable_set_for_school("term_id_structure", $original, 0);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+    }
+  }
+
+  public function testGetTermDescriptionReturnsTermIdWhenNoStructureMatches(): void
+  {
+    $original = variable_get_for_school("term_id_structure", "", 0);
+
+    try {
+      variable_set_for_school("term_id_structure", "[Y4]40, Fall, Fall of [Y4], Fall '[Y2]", 0);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+
+      $this->assertSame("202099", get_term_description("202099", FALSE, 0));
+    }
+    finally {
+      variable_set_for_school("term_id_structure", $original, 0);
+      unset($GLOBALS["fp_cache_get_term_description"]);
+    }
+  }
+
+  public function testGetTermDescriptionReturnsUnavailableFor1111Terms(): void
+  {
+    $this->assertSame("(data unavailable at this time)", get_term_description("201111", FALSE, 0));
+  }
+
+
+  public function testGetTermStructuresIncludesDisplayAdjustment(): void
+  {
+    $original = variable_get_for_school("term_id_structure", "", 0);
+
+    try {
+      variable_set_for_school("term_id_structure", "[Y4]40, Fall, Fall of [Y4], Fall '[Y2], -1", 0);
+
+      $structures = get_term_structures(0);
+
+      $this->assertSame("-1", $structures["40"]["disp_adjust"]);
+    }
+    finally {
+      variable_set_for_school("term_id_structure", $original, 0);
+    }
+  }
+
+  public function testDebugCurrentTimeMillisStartsNewTimer(): void
+  {
+    $original = $GLOBALS["current_time_millis_test"] ?? NULL;
+
+    try {
+      unset($GLOBALS["current_time_millis_test"]);
+
+      $result = fp_debug_current_time_millis("Starting test", TRUE, "_test");
+
+      $this->assertStringContainsString("DEBUG:", $result);
+      $this->assertStringContainsString("Starting test", $result);
+      $this->assertStringContainsString("---", $result);
+      $this->assertArrayHasKey("current_time_millis_test", $GLOBALS);
+    }
+    finally {
+      if ($original === NULL) {
+        unset($GLOBALS["current_time_millis_test"]);
+      }
+      else {
+        $GLOBALS["current_time_millis_test"] = $original;
+      }
+    }
+  }
+
+  public function testDebugCurrentTimeMillisReportsElapsedTime(): void
+  {
+    $original = $GLOBALS["current_time_millis_test"] ?? NULL;
+
+    try {
+      $GLOBALS["current_time_millis_test"] = microtime(TRUE) * 1000 - 100;
+
+      $result = fp_debug_current_time_millis("Finished test", TRUE, "_test");
+
+      $this->assertStringContainsString("DEBUG:", $result);
+      $this->assertStringContainsString("Finished test", $result);
+      $this->assertStringContainsString("ms since last call", $result);
+    }
+    finally {
+      if ($original === NULL) {
+        unset($GLOBALS["current_time_millis_test"]);
+      }
+      else {
+        $GLOBALS["current_time_millis_test"] = $original;
+      }
+    }
+  }
+
+  public function testDebugCurrentTimeMillisCanDisplayArrays(): void
+  {
+    $result = fp_debug_current_time_millis(["name" => "Rex"], TRUE, "_array_test");
+
+    $this->assertStringContainsString("<pre>", $result);
+    $this->assertStringContainsString("name", $result);
+    $this->assertStringContainsString("Rex", $result);
+
+    unset($GLOBALS["current_time_millis_array_test"]);
+  }
+
+  public function testGetJsConfirmLink(): void
+  {
+    $result = fp_get_js_confirm_link("Are you sure?", "deleteStudent(123)", "Delete", "danger", "Delete this student");
+
+    $this->assertStringStartsWith("<a href='javascript: fp_confirm(", $result);
+    $this->assertStringContainsString("class='danger'", $result);
+    $this->assertStringContainsString("title='Delete this student'", $result);
+    $this->assertStringContainsString(">Delete</a>", $result);
+    $this->assertStringContainsString(base64_encode("Are you sure?"), $result);
+    $this->assertStringContainsString(base64_encode("deleteStudent(123)"), $result);
+  }
+
+  public function testGetJsConfirmLinkConvertsNewlines(): void
+  {
+    $result = fp_get_js_confirm_link("Line one\nLine two", "doSomething()", "Go");
+
+    $this->assertStringContainsString(base64_encode("Line one<br>Line two"), $result);
+  }
+
+  public function testGetJsPromptLink(): void
+  {
+    $result = fp_get_js_prompt_link("Enter name", "Richard", "saveName(response)", "Save", "prompt-link");
+
+    $this->assertStringContainsString("prompt-link", $result);
+    $this->assertStringContainsString("Enter name", $result);
+    $this->assertStringContainsString("Richard", $result);
+    $this->assertStringContainsString("saveName(response)", $result);
+    $this->assertStringContainsString(">Save</a>", $result);
+  }
+
+  public function testGetJsAlertLink(): void
+  {
+    $result = fp_get_js_alert_link("This is a helpful message", "Help", "help-link", "Helpful information");
+
+    $this->assertStringContainsString("fp-alert-link help-link", $result);
+    $this->assertStringContainsString("title='Helpful information'", $result);
+    $this->assertStringContainsString(">Help</a>", $result);
+    $this->assertStringContainsString(base64_encode("This is a helpful message"), $result);
+  }
+
+  public function testGetJsAlertLinkUsesQuestionMarkWhenLinkTextIsOmitted(): void
+  {
+    $result = fp_get_js_alert_link("Help text");
+
+    $this->assertStringContainsString("pop-q-mark", $result);
+    $this->assertStringContainsString("fa-question-circle", $result);
+  }
+
+  public function testModulesImplementHookFindsImplementedHooks(): void
+  {
+    $GLOBALS["hook_cache"] = [];
+
+    $original_modules = $GLOBALS["fp_system_settings"]["modules"];
+
+    try {
+      $GLOBALS["fp_system_settings"]["modules"] = [
+        "testhookmodule" => ["enabled" => "1"],
+      ];
+
+      if (!function_exists("testhookmodule_test_characterization_hook")) {
+        eval('function testhookmodule_test_characterization_hook() { return TRUE; }');
+      }
+
+      $result = modules_implement_hook("test_characterization_hook");
+
+      $this->assertSame(["testhookmodule"], $result);
+    }
+    finally {
+      $GLOBALS["fp_system_settings"]["modules"] = $original_modules;
+      unset($GLOBALS["hook_cache"]["test_characterization_hook"]);
+    }
+  }
+
+
+
+
+
+
+
+
+
 
 
 
