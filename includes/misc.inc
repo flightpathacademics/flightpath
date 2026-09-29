@@ -475,7 +475,7 @@ function get_timezones($bool_include_offset = FALSE) {
     if ($bool_include_offset) $pretty_offset = "(UTC$offset_prefix$offset_formatted) ";
 
     if (isset($us_desc_timezones[$timezone])) {
-      $extra = "  - (" . $us_desc_timezones[$timezone] . ")";
+      $extra = " - (" . $us_desc_timezones[$timezone] . ")";
     }
 
     $disp_timezone = str_replace("_", " ", $timezone);

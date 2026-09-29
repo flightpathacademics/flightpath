@@ -481,4 +481,348 @@ class MiscTest extends FlightPathTestCase
 
     $this->assertCount(2, $_SESSION["fp_messages"]);
   }
-}
+
+
+  public function testUserIsStudentUsesGlobalUserWhenAccountIsOmitted(): void
+  {
+    global $user;
+
+    $original_user = $user;
+
+    try {
+      $user = new stdClass();
+      $user->is_student = 1;
+
+      $this->assertTrue(fp_user_is_student());
+
+      $user->is_student = 0;
+
+      $this->assertFalse(fp_user_is_student());
+    }
+    finally {
+      $user = $original_user;
+    }
+  }
+
+
+  public function testGetTermsByYearRange(): void
+  {
+    $result = fp_get_terms_by_year_range(2020, 2020);
+
+    $this->assertIsArray($result);
+    $this->assertArrayHasKey(2020, $result);
+    $this->assertNotEmpty($result[2020]);
+
+    foreach ($result[2020] as $term_id => $description) {
+      $this->assertIsString((string) $term_id);
+      $this->assertStringStartsWith("[2020", $description);
+    }
+  }
+
+
+  public function testGetTermsByYearRangeCanOmitTermIdFromDescription(): void
+  {
+    $with_ids = fp_get_terms_by_year_range(2020, 2020, 0, TRUE);
+    $without_ids = fp_get_terms_by_year_range(2020, 2020, 0, FALSE);
+
+    $this->assertNotEmpty($with_ids[2020]);
+    $this->assertNotEmpty($without_ids[2020]);
+
+    foreach ($without_ids[2020] as $term_id => $description) {
+      $this->assertStringStartsNotWith("[", $description);
+    }
+  }
+
+
+
+  public function testGetDepartments(): void
+  {
+    unset($GLOBALS["fp_cache_departments"]);
+
+    variable_set_for_school("departments", "COSC~Computer Science\nMATH~Mathematics", 0);
+
+    try {
+      $result = fp_get_departments(0);
+
+      $this->assertSame("Computer Science", $result["COSC"]);
+      $this->assertSame("Mathematics", $result["MATH"]);
+    }
+    finally {
+      variable_delete_for_school("departments", 0);
+      unset($GLOBALS["fp_cache_departments"]);
+    }
+  }
+
+  public function testGetDepartmentsCachesResult(): void
+  {
+    unset($GLOBALS["fp_cache_departments"]);
+
+    variable_set_for_school("departments", "COSC~Computer Science", 0);
+
+    try {
+      $first = fp_get_departments(0);
+
+      variable_set_for_school("departments", "COSC~Changed Name", 0);
+
+      $second = fp_get_departments(0);
+
+      $this->assertSame("Computer Science", $first["COSC"]);
+      $this->assertSame("Computer Science", $second["COSC"]);
+    }
+    finally {
+      variable_delete_for_school("departments", 0);
+      unset($GLOBALS["fp_cache_departments"]);
+    }
+  }
+
+  public function testTranslateNumericGrade(): void
+  {
+    unset($GLOBALS["fp_translate_numeric_grade"]);
+
+    variable_set_for_school("numeric_to_letter_grades", "0~59.99~F\n60~69.99~D\n70~79.99~C\n80~89.99~B\n90~100~A", 0);
+
+    try {
+      $this->assertSame("A", fp_translate_numeric_grade("95", 0));
+      $this->assertSame("B", fp_translate_numeric_grade("85", 0));
+      $this->assertSame("C", fp_translate_numeric_grade("75", 0));
+      $this->assertSame("D", fp_translate_numeric_grade("65", 0));
+      $this->assertSame("F", fp_translate_numeric_grade("50", 0));
+    }
+    finally {
+      variable_delete_for_school("numeric_to_letter_grades", 0);
+      unset($GLOBALS["fp_translate_numeric_grade"]);
+    }
+  }
+
+  public function testTranslateNumericGradePreservesMidtermSuffix(): void
+  {
+    unset($GLOBALS["fp_translate_numeric_grade"]);
+
+    variable_set_for_school("numeric_to_letter_grades", "80~89.99~B\n90~100~A", 0);
+
+    try {
+      $this->assertSame("B", fp_translate_numeric_grade("85", 0));
+      $this->assertSame("BMID", fp_translate_numeric_grade("85MID", 0));
+      $this->assertSame("AMID", fp_translate_numeric_grade("95MID", 0));
+    }
+    finally {
+      variable_delete_for_school("numeric_to_letter_grades", 0);
+      unset($GLOBALS["fp_translate_numeric_grade"]);
+    }
+  }
+
+  public function testReArrayFiles(): void
+  {
+    $file_post = [
+      "name" => ["one.txt", "two.txt"],
+      "type" => ["text/plain", "text/plain"],
+      "tmp_name" => ["/tmp/php1", "/tmp/php2"],
+      "error" => [0, 0],
+      "size" => [100, 200],
+    ];
+
+    $result = fp_re_array_files($file_post);
+
+    $this->assertSame("one.txt", $result[0]["name"]);
+    $this->assertSame("two.txt", $result[1]["name"]);
+    $this->assertSame("/tmp/php1", $result[0]["tmp_name"]);
+    $this->assertSame("/tmp/php2", $result[1]["tmp_name"]);
+    $this->assertSame(100, $result[0]["size"]);
+    $this->assertSame(200, $result[1]["size"]);
+  }
+
+
+
+  public function testHttpBuildQueryWithSimpleValues(): void
+  {
+    $result = fp_http_build_query([
+      "name" => "John Doe",
+      "age" => 42,
+    ]);
+
+    $this->assertSame("name=John%20Doe&age=42", $result);
+  }
+
+  public function testHttpBuildQueryWithNestedArray(): void
+  {
+    $result = fp_http_build_query([
+      "student" => [
+        "name" => "John Doe",
+        "id" => 12345,
+      ],
+    ]);
+
+    $this->assertSame("student%5Bname%5D=John%20Doe&student%5Bid%5D=12345", $result);
+  }
+
+  public function testHttpBuildQueryWithNullValue(): void
+  {
+    $result = fp_http_build_query([
+      "foo" => null,
+      "bar" => "value",
+    ]);
+
+    $this->assertSame("foo&bar=value", $result);
+  }
+
+  public function testHttpBuildQueryPreservesSlashes(): void
+  {
+    $result = fp_http_build_query([
+      "path" => "/student/12345",
+      "url" => "foo/bar",
+    ]);
+
+    $this->assertSame("path=/student/12345&url=foo/bar", $result);
+  }
+
+  public function testHttpBuildQueryWithMixedValues(): void
+  {
+    $result = fp_http_build_query([
+      "student_id" => 12345,
+      "path" => "/student/12345",
+      "options" => [
+        "active" => 1,
+        "type" => "student",
+      ],
+      "empty" => null,
+    ]);
+
+    $this->assertSame("student_id=12345&path=/student/12345&options%5Bactive%5D=1&options%5Btype%5D=student&empty", $result);
+  }
+
+
+  public function testHttpBuildQueryWithParent(): void
+  {
+    $result = fp_http_build_query([
+      "name" => "John Doe",
+      "id" => 12345,
+    ], "student");
+
+    $this->assertSame("student%5Bname%5D=John%20Doe&student%5Bid%5D=12345", $result);
+  }
+
+
+  public function testArg(): void
+  {
+    $original_request = $_REQUEST;
+
+    try {
+      $_REQUEST["q"] = "student-search/12345/edit";
+
+      $this->assertSame("student-search", arg(0));
+      $this->assertSame("12345", arg(1));
+      $this->assertSame("edit", arg(2));
+      $this->assertSame("", arg(3));
+    }
+    finally {
+      $_REQUEST = $original_request;
+    }
+  }
+
+  public function testArgTrimsWhitespace(): void
+  {
+    $original_request = $_REQUEST;
+
+    try {
+      $_REQUEST["q"] = "  student-search / 12345 / edit  ";
+
+      $this->assertSame("student-search", arg(0));
+      $this->assertSame("12345", arg(1));
+      $this->assertSame("edit", arg(2));
+    }
+    finally {
+      $_REQUEST = $original_request;
+    }
+  }
+
+  public function testArgHandlesMissingQueryString(): void
+  {
+    $original_request = $_REQUEST;
+
+    try {
+      unset($_REQUEST["q"]);
+
+      $this->assertSame("", arg(0));
+    }
+    finally {
+      $_REQUEST = $original_request;
+    }
+  }
+
+  public function testGetTimezones(): void
+  {
+    $timezones = get_timezones();
+
+    $this->assertIsArray($timezones);
+    $this->assertArrayHasKey("America/Chicago", $timezones);
+    $this->assertArrayHasKey("America/New_York", $timezones);
+    $this->assertArrayHasKey("America/Los_Angeles", $timezones);
+
+    $this->assertSame("America/Chicago - (Central)", $timezones["America/Chicago"]);
+    $this->assertSame("America/New York - (Eastern)", $timezones["America/New_York"]);
+    $this->assertSame("America/Los Angeles - (Pacific)", $timezones["America/Los_Angeles"]);
+  }
+
+  public function testGetTimezonesCanIncludeOffsets(): void
+  {
+    $timezones = get_timezones(TRUE);
+
+    $this->assertIsArray($timezones);
+    $this->assertArrayHasKey("America/Chicago", $timezones);
+
+    $this->assertStringContainsString("America/Chicago", $timezones["America/Chicago"]);
+    $this->assertStringContainsString("(Central)", $timezones["America/Chicago"]);
+    $this->assertMatchesRegularExpression('/^\(UTC[+-]\d{2}:\d{2}\) /', $timezones["America/Chicago"]);
+  }
+
+  public function testHttpBuildQueryWithEmptyArray(): void
+  {
+    $this->assertSame("", fp_http_build_query([]));
+  }
+
+  public function testHttpBuildQueryWithEmptyString(): void
+  {
+    $result = fp_http_build_query([
+      "foo" => "",
+      "bar" => "value",
+    ]);
+
+    $this->assertSame("foo=&bar=value", $result);
+  }
+
+
+  public function testQueryStringEncodeWithEmptyArray(): void
+  {
+    $this->assertSame("", fp_query_string_encode([]));
+  }
+
+  public function testQueryStringEncodeWithSpecialCharacters(): void
+  {
+    $query = [
+      "name" => "John & Jane",
+      "path" => "/student/123",
+    ];
+
+    $result = fp_query_string_encode($query);
+
+    $this->assertSame("name=John%20%26%20Jane&path=%2Fstudent%2F123", $result);
+  }
+
+
+
+
+
+
+} // class
+
+
+
+
+
+
+
+
+
+
+
+//
