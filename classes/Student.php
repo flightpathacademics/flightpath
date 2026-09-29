@@ -298,7 +298,6 @@ class Student extends stdClass
         // We are at a new test.  Add the old test to our list.
         if ($st != null) {
           $this->list_standardized_tests->add($st);
-
         }
 
         $st = new StandardizedTest();
@@ -310,7 +309,7 @@ class Student extends stdClass
           $st->bool_date_unavailable = TRUE;
         }
 
-        $st->description = $cur['test_description'] ?? '';
+        $st->description = $test_description;
         $old_row = $cur['date_taken'] . $cur['test_id'];
 
       }

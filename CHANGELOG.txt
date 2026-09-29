@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-09-28
+  Fixed bug where standardized test descriptions were not displaying.
+
+
 2026-09-24
   Fixed bug where "spinner" buttons remained disabled after form submission, then clicking Back
   in the browser.
