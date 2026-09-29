@@ -31,7 +31,10 @@ abstract class FlightPathTestCase extends TestCase
           }
         }
 
-
+        unset($GLOBALS["fp_temp_degree_major_codes"]);
+        unset($GLOBALS["fp_temp_degree_advising_weights"]);
+        unset($GLOBALS["fp_load_user"]);
+        unset($GLOBALS["fp_translate_numeric_grade"]);
 
 
         // Clear SESSION of unneeded vars...

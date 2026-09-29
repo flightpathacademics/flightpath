@@ -2000,7 +2000,7 @@ function csv_to_array($csv_string) {
 /**
  * Splits a basic csv but returns an array suitable for the form_api, retuns assoc array.
  */
-function csv_to_form_api_array($csv_string, $delimeter = ",", $bool_make_keys_machine_readable = TRUE) {
+function csv_to_form_api_array($csv_string, $delimeter = ",") {
   $rtn = array();
   $temp = explode($delimeter, $csv_string);
   foreach ($temp as $line) {
@@ -2024,15 +2024,13 @@ function csv_to_form_api_array($csv_string, $delimeter = ",", $bool_make_keys_ma
  *   key2 ~ Value Two
  * And returns an assoc array suitable for the form_api.
  */
-function csv_multiline_to_form_api_array($csv_string, $delim = '~', $bool_make_keys_machine_readable = TRUE) {
+function csv_multiline_to_form_api_array($csv_string, $delim = '~') {
   $rtn = [];
 
   foreach (explode("\n", trim($csv_string)) as $line) {
     [$key, $value] = array_map('trim', explode($delim, $line, 2));
 
-    if ($bool_make_keys_machine_readable) {
-      $key = strtolower(fp_get_machine_readable($key));
-    }
+    $key = strtolower(fp_get_machine_readable($key));
 
     $rtn[$key] = $value;
 
@@ -2047,7 +2045,7 @@ function csv_multiline_to_form_api_array($csv_string, $delim = '~', $bool_make_k
 /**
  * From https://www.php.net/manual/en/function.str-getcsv.php#117692
  */
-function csv_multiline_to_array($csv_str, $bool_first_row_is_headers = TRUE) {
+function csv_multiline_to_array($csv_str, $bool_keep_header_row = TRUE) {
   $csv = array_map('str_getcsv', explode("\n", trim($csv_str)));
   array_walk($csv, function(&$a) use ($csv) {
     if (count($a) == count($csv[0])) {
@@ -2058,7 +2056,7 @@ function csv_multiline_to_array($csv_str, $bool_first_row_is_headers = TRUE) {
       return NULL;
     }
   });
-  if (!$bool_first_row_is_headers) {
+  if (!$bool_keep_header_row) {
     array_shift($csv); # remove column header
   }
 

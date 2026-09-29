@@ -769,16 +769,6 @@ function db_insert_id() {
 }
 
 
-/**
- * Return the array from the user_settings table.
- *
- * @param int $user_id
- */
-function db_get_user_settings($user_id) {
-  $db = get_global_database_handler();
-
-  return $db->get_user_settings($user_id);
-}
 
 function db_get_school_id_for_student_id($student_id) {
   $db = get_global_database_handler();
@@ -791,34 +781,6 @@ function db_get_school_id_for_user_id($user_id) {
   return $db->get_school_id_for_user_id($user_id);
 }
 
-
-/**
- * Return a specific setting's value, based on the var_name given.
- *
- * @param int $user_id
- * @param string $var_name
- */
-function db_get_user_setting($user_id, $var_name = "", $default_value = "") {
-  $settings = db_get_user_settings($user_id);
-  $val = @$settings[$var_name];
-  if (!$val) {
-    $val = $default_value;
-  }
-
-  return $val;
-}
-
-
-function db_set_user_setting($user_id, $var_name, $value) {
-  $settings = db_get_user_settings($user_id);
-  $settings[$var_name] = $value;
-
-  $ser = serialize($settings);
-
-  db_query("DELETE FROM user_settings WHERE user_id = '?' ", $user_id);
-  db_query("INSERT INTO user_settings (user_id, settings, posted)
-            VALUES ('?', '?', '?') ", $user_id, $ser, time());
-}
 
 
 
@@ -863,9 +825,8 @@ function db_affected_rows($result_handler) {
  * Returns TRUE if the table specified exists or not.
  */
 function db_table_exists($table_name) {
-  $res = db_query("SHOW TABLES LIKE ? ", $table_name);
-  $cur = db_fetch_array($res);
-  if (($cur[0] ?? '') == $table_name) {
+  $test = db_result(db_query("SHOW TABLES LIKE ? ", $table_name));
+  if ($test === $table_name) {
     return TRUE;
   }
 

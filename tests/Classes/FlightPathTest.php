@@ -302,6 +302,29 @@ class FlightPathTest extends FlightPathTestCase
 
 
 
+  public function testAdvisingCalculatesExpectedProgressHours(): void
+  {
+    $fp = $this->buildAdvisingFlightPath();
+    $degree_plan = $fp->degree_plan;
+
+    // Build the advising screen before calculating progress because group
+    // fulfillment requires fulfilled courses to have been marked as displayed.
+    $screen = new AdvisingScreen("", $fp);
+    $screen->view = "year";
+    $screen->build_screen_elements();
+
+    $degree_plan->calculate_progress_hours(FALSE, ["c" => "Core Requirements", "m" => "Major Requirements", "degree" => "Degree Progress"]);
+
+    // Major requirements.
+    $this->assertSame(42.0, (float) $degree_plan->gpa_calculations[0]["m"]["total_hours"]);
+    $this->assertSame(17.65, (float) $degree_plan->gpa_calculations[0]["m"]["fulfilled_hours"]);
+
+    // Overall degree progress.
+    $this->assertSame(118.0, (float) $degree_plan->gpa_calculations[0]["degree"]["total_hours"]);
+    $this->assertSame(48.65, (float) $degree_plan->gpa_calculations[0]["degree"]["fulfilled_hours"]);
+  }
+
+
 
 
 
