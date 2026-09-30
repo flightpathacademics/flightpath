@@ -3,51 +3,53 @@
 
 class DbTest extends FlightPathTestCase
 {
-  public function testMaxCatalogRepeatsReturnsNullForUnknownCourse(): void
+  public function testMaxCatalogRepeatsReturnsNullForUnknownCourse()
   {
     $this->assertNull(fp_get_max_catalog_repeats_for_course("XXXX", "9999", 2020, false, 0));
   }
 
-  public function testMaxCatalogRepeatsReturnsOneForNonRepeatableCourse(): void
+  public function testMaxCatalogRepeatsReturnsOneForNonRepeatableCourse()
   {
     $repeats = fp_get_max_catalog_repeats_for_course("FINA", "2003", 2020, false, 0);
 
     $this->assertSame(1, $repeats);
   }
 
-  public function testMaxCatalogRepeatsCalculatesRepeatAttempts(): void
+  // This course is configured to allow one repeat, producing two total attempts.
+  public function testMaxCatalogRepeatsCalculatesRepeatAttempts()
   {
     $repeats = fp_get_max_catalog_repeats_for_course("ANTG", "423", 2020, false, 0);
 
     $this->assertSame(2, $repeats);
   }
 
-  public function testGetDegreeMajorCode(): void
+  // Use a known sample degree so the expected major code comes from the test database.
+  public function testGetDegreeMajorCode()
   {
     $this->assertSame("COSC", fp_get_degree_major_code(5450264, true));
   }
 
-  public function testGetDegreeMajorCodeReturnsEmptyForUnknownDegree(): void
+  public function testGetDegreeMajorCodeReturnsEmptyForUnknownDegree()
   {
     $this->assertSame("", fp_get_degree_major_code(999999999, true));
   }
 
-  public function testGetDegreeTitle(): void
+  public function testGetDegreeTitle()
   {
     $this->assertSame("Computer Science", fp_get_degree_title(5450264));
   }
 
-  public function testGetFacultyName(): void
+  public function testGetFacultyName()
   {
     $this->assertSame("Lisa Tester", fp_get_faculty_name("55588992"));
   }
 
-  public function testGetFacultyNameReturnsUnknownForMissingFaculty(): void
+  public function testGetFacultyNameReturnsUnknownForMissingFaculty()
   {
     $this->assertSame("Unknown Advisor", fp_get_faculty_name("does-not-exist"));
   }
 
-  public function testLoadUser(): void
+  public function testLoadUser()
   {
     $user = fp_load_user(661);
 
@@ -61,12 +63,13 @@ class DbTest extends FlightPathTestCase
     $this->assertFalse($user->is_faculty);
   }
 
-  public function testLoadUserReturnsNullForMissingUser(): void
+  public function testLoadUserReturnsNullForMissingUser()
   {
     $this->assertNull(fp_load_user(999999999));
   }
 
-  public function testLoadAnonymousUser(): void
+  // User ID 0 represents the built-in anonymous user rather than a database user.
+  public function testLoadAnonymousUser()
   {
     $user = fp_load_user(0);
 
@@ -78,53 +81,54 @@ class DbTest extends FlightPathTestCase
     $this->assertFalse($user->is_faculty);
   }
 
-  public function testGetUserId(): void
+  public function testGetUserId()
   {
     $this->assertSame("661", (string) db_get_user_id("teststudent"));
     $this->assertFalse(db_get_user_id("does-not-exist"));
   }
 
-  public function testGetCwidFromUserId(): void
+  public function testGetCwidFromUserId()
   {
     $this->assertSame("999999999", db_get_cwid_from_user_id(661));
   }
 
-  public function testGetUserIdFromCwid(): void
+  // Verify both faculty and student lookups, including a type mismatch that should fail.
+  public function testGetUserIdFromCwid()
   {
     $this->assertSame("671", (string) db_get_user_id_from_cwid("55588992", "faculty"));
     $this->assertSame("661", (string) db_get_user_id_from_cwid("999999999", "student"));
     $this->assertFalse(db_get_user_id_from_cwid("999999999", "faculty"));
   }
 
-  public function testGetUserIdFromUserName(): void
+  public function testGetUserIdFromUserName()
   {
     $this->assertSame("671", (string) db_get_user_id_from_user_name("TESTFACULTY", "faculty"));
     $this->assertSame("661", (string) db_get_user_id_from_user_name("TESTSTUDENT", "student"));
     $this->assertFalse(db_get_user_id_from_user_name("teststudent", "faculty"));
   }
 
-  public function testGetStudentName(): void
+  public function testGetStudentName()
   {
     $this->assertSame("Test Student", fp_get_student_name("999999999", false));
     $this->assertSame("Test Student (999999999)", fp_get_student_name("999999999", true));
   }
 
-  public function testGetStudentNameHandlesAnonymousUser(): void
+  public function testGetStudentNameHandlesAnonymousUser()
   {
     $this->assertSame("Anonymous", fp_get_student_name(0));
   }
 
-  public function testGetStudentEmailReturnsFalseWhenEmailIsMissing(): void
+  public function testGetStudentEmailReturnsFalseWhenEmailIsMissing()
   {
     $this->assertFalse(fp_get_student_email("999999999"));
   }
 
-  public function testGetFacultyEmailReturnsFalseWhenEmailIsMissing(): void
+  public function testGetFacultyEmailReturnsFalseWhenEmailIsMissing()
   {
     $this->assertFalse(fp_get_faculty_email("55588992"));
   }
 
-  public function testGetStudentMajors(): void
+  public function testGetStudentMajors()
   {
     $majors = fp_get_student_majors("999999999");
 
@@ -132,7 +136,7 @@ class DbTest extends FlightPathTestCase
     $this->assertArrayHasKey("COSC", $majors);
   }
 
-  public function testGetStudentMajorsCanReturnCsv(): void
+  public function testGetStudentMajorsCanReturnCsv()
   {
     $majors = fp_get_student_majors("999999999", true);
 
@@ -140,7 +144,8 @@ class DbTest extends FlightPathTestCase
   }
 
 
-  public function testVariableExistsAndRoundTrip(): void
+  // Use a unique variable name so this test does not interfere with existing configuration.
+  public function testVariableExistsAndRoundTrip()
   {
     $name = "db_test_variable_" . uniqid();
 
@@ -156,7 +161,8 @@ class DbTest extends FlightPathTestCase
     $this->assertFalse(variable_exists($name));
   }
 
-  public function testVariableCanStoreFalse(): void
+  // False is a legitimate stored value and must not be confused with a missing variable.
+  public function testVariableCanStoreFalse()
   {
     $name = "db_test_false_" . uniqid();
 
@@ -167,7 +173,8 @@ class DbTest extends FlightPathTestCase
     variable_delete($name);
   }
 
-  public function testVariableCanStoreNull(): void
+  // Null is also a legitimate stored value for the variable system.
+  public function testVariableCanStoreNull()
   {
     $name = "db_test_null_" . uniqid();
 
@@ -178,7 +185,8 @@ class DbTest extends FlightPathTestCase
     variable_delete($name);
   }
 
-  public function testSchoolSpecificVariable(): void
+  // A school-specific value takes precedence over the default value.
+  public function testSchoolSpecificVariable()
   {
     $name = "db_test_school_variable_" . uniqid();
 
@@ -193,7 +201,8 @@ class DbTest extends FlightPathTestCase
     variable_delete("school_override__{$name}~~school_1");
   }
 
-  public function testSchoolSpecificVariableFallsBackToDefault(): void
+  // With no school-specific override, the default variable value should be returned.
+  public function testSchoolSpecificVariableFallsBackToDefault()
   {
     $name = "db_test_school_fallback_" . uniqid();
 
@@ -206,7 +215,8 @@ class DbTest extends FlightPathTestCase
 
 
 
-  public function testSchoolSpecificVariableDelete(): void
+  // The fourth argument requests the fallback rather than the deleted school-specific value.
+  public function testSchoolSpecificVariableDelete()
   {
     $name = "db_test_school_delete_" . uniqid();
 
@@ -219,7 +229,7 @@ class DbTest extends FlightPathTestCase
     $this->assertFalse(variable_exists($name . "~~school_1"));
   }
 
-  public function testDatabaseTableExists(): void
+  public function testDatabaseTableExists()
   {
     $this->assertTrue(db_table_exists("users"));
     $this->assertTrue(db_table_exists("degrees"));

@@ -83,7 +83,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * these objects from FlightPath so that its display methods operate on
    * the same calculated advising state.
    */
-  public function testAdvisingScreenUsesFlightPathState(): void
+  public function testAdvisingScreenUsesFlightPathState()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -107,7 +107,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * semester in the test data is the special "courses added by advisor"
    * semester and is handled separately by build_added_courses().
    */
-  public function testBuildScreenElementsCreatesSemesterSections(): void
+  public function testBuildScreenElementsCreatesSemesterSections()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -133,7 +133,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * This tests the important handoff from calculated DegreePlan state to
    * rendered semester content without asserting the complete HTML structure.
    */
-  public function testSemesterDisplayContainsCalculatedCourse(): void
+  public function testSemesterDisplayContainsCalculatedCourse()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -162,7 +162,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * CSCI 2000 provides a simple representative course because FlightPath
    * assigns it directly to the first semester of the COSC degree.
    */
-  public function testDisplayingSemesterMarksCourseAsDisplayed(): void
+  public function testDisplayingSemesterMarksCourseAsDisplayed()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -191,7 +191,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * The test fixture contains transfer record 42946, which is equivalent to
    * local course 988445 (CSCI 3010).
    */
-  public function testTransferCreditSectionContainsTransferCourse(): void
+  public function testTransferCreditSectionContainsTransferCourse()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -221,7 +221,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * The test fixture gives ART 1001 two unassigned groups and BIOL 1020 one,
    * so both courses should appear in this section.
    */
-  public function testFootnotesContainMovedCourseInformation(): void
+  public function testFootnotesContainMovedCourseInformation()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -239,7 +239,7 @@ class AdvisingScreenTest extends FlightPathTestCase
   }
 
 
-  public function testDisplayScreenContainsRepresentativeDegreeContent(): void
+  public function testDisplayScreenContainsRepresentativeDegreeContent()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -275,7 +275,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    *
    * AdvisingScreen groups these records into the Test Scores section.
    */
-  public function testTestScoresSectionContainsStudentScores(): void
+  public function testTestScoresSectionContainsStudentScores()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -311,7 +311,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * explicitly gives them student-level unassignments and they remain
    * outside the normal assigned degree-plan course display.
    */
-  public function testExcessCreditSectionContainsUnassignedCourse(): void
+  public function testExcessCreditSectionContainsUnassignedCourse()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -340,7 +340,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * responsible for displaying the fulfilled course in the appropriate
    * degree-plan group.
    */
-  public function testSemesterDisplayContainsSubstitutedCourse(): void
+  public function testSemesterDisplayContainsSubstitutedCourse()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -362,7 +362,7 @@ class AdvisingScreenTest extends FlightPathTestCase
    * This protects the display-state mechanism that prevents a course
    * from appearing both in its requirement and again as excess credit.
    */
-  public function testDisplayedCourseIsNotShownAsExcessCredit(): void
+  public function testDisplayedCourseIsNotShownAsExcessCredit()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -379,7 +379,7 @@ class AdvisingScreenTest extends FlightPathTestCase
   }
 
 
-  public function testProgressBoxesDisplayExpectedValues(): void
+  public function testProgressBoxesDisplayExpectedValues()
   {
     $fp = $this->buildAdvisingFlightPath();
 

@@ -3,14 +3,13 @@
 /**
  * Tests basic CourseList behavior and course matching.
  */
-require_once __DIR__ . '/../bootstrap.php';
 
 class CourseListTest extends FlightPathTestCase
 {
     /**
      * Adding courses should update the list and its count.
      */
-    public function testAddingCoursesUpdatesList(): void
+    public function testAddingCoursesUpdatesList()
     {
         $list = new CourseList();
 
@@ -32,7 +31,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_all_matches should return every course with the same course ID.
      */
-    public function testFindAllMatchesUsesCourseId(): void
+    public function testFindAllMatchesUsesCourseId()
     {
         $list = new CourseList();
 
@@ -60,7 +59,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_all_matches should return false when there are no matches.
      */
-    public function testFindAllMatchesReturnsFalseWhenNoMatchExists(): void
+    public function testFindAllMatchesReturnsFalseWhenNoMatchExists()
     {
         $list = new CourseList();
 
@@ -80,7 +79,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_first_unfulfilled_match should skip already-fulfilled requirements.
      */
-    public function testFindFirstUnfulfilledMatchSkipsFulfilledCourse(): void
+    public function testFindFirstUnfulfilledMatchSkipsFulfilledCourse()
     {
         $list = new CourseList();
 
@@ -102,7 +101,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_first_unfulfilled_match should return false when every match is fulfilled.
      */
-    public function testFindFirstUnfulfilledMatchReturnsFalseWhenAllAreFulfilled(): void
+    public function testFindFirstUnfulfilledMatchReturnsFalseWhenAllAreFulfilled()
     {
         $list = new CourseList();
 
@@ -125,7 +124,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_courses_with_grade should return only courses with the requested grade.
      */
-    public function testFindCoursesWithGrade(): void
+    public function testFindCoursesWithGrade()
     {
         $list = new CourseList();
 
@@ -156,7 +155,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * assign_min_grade should assign the requested minimum grade to every course.
      */
-    public function testAssignMinGrade(): void
+    public function testAssignMinGrade()
     {
         $list = new CourseList();
 
@@ -178,7 +177,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * mark_repeats_exclude should mark matching courses for exclusion.
      */
-    public function testMarkRepeatsExclude(): void
+    public function testMarkRepeatsExclude()
     {
         $list = new CourseList();
 
@@ -208,7 +207,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_most_recent_match should choose the most recently taken matching course.
      */
-    public function testFindMostRecentMatchChoosesMostRecentCourse(): void
+    public function testFindMostRecentMatchChoosesMostRecentCourse()
     {
       $list = new CourseList();
 
@@ -242,7 +241,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_most_recent_match should skip a course that does not meet the minimum grade.
      */
-    public function testFindMostRecentMatchSkipsCourseBelowMinimumGrade(): void
+    public function testFindMostRecentMatchSkipsCourseBelowMinimumGrade()
     {
       $list = new CourseList();
 
@@ -276,7 +275,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_most_recent_match should skip a course marked as excluded from repeats.
      */
-    public function testFindMostRecentMatchSkipsExcludedRepeat(): void
+    public function testFindMostRecentMatchSkipsExcludedRepeat()
     {
       $list = new CourseList();
 
@@ -311,7 +310,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_best_grade_match should choose the matching course with the best grade.
      */
-    public function testFindBestGradeMatchChoosesBestGrade(): void
+    public function testFindBestGradeMatchChoosesBestGrade()
     {
       $list = new CourseList();
 
@@ -345,7 +344,7 @@ class CourseListTest extends FlightPathTestCase
     /**
      * find_best_grade_match should skip a course that does not meet the minimum grade.
      */
-    public function testFindBestGradeMatchSkipsCourseBelowMinimumGrade(): void
+    public function testFindBestGradeMatchSkipsCourseBelowMinimumGrade()
     {
       $list = new CourseList();
 
@@ -374,7 +373,7 @@ class CourseListTest extends FlightPathTestCase
           $this->assertSame($course_a, $match); // only the A should qualify
     }
 
-    public function testFindBestMatchUsesMostRecentRepeatPolicy(): void
+    public function testFindBestMatchUsesMostRecentRepeatPolicy()
     {
       variable_set_for_school(
           "course_repeat_policy",
@@ -415,7 +414,7 @@ class CourseListTest extends FlightPathTestCase
     }
 
 
-    public function testFindBestMatchUsesBestGradeRepeatPolicy(): void
+    public function testFindBestMatchUsesBestGradeRepeatPolicy()
     {
       variable_set_for_school("course_repeat_policy", "best_grade_exclude_others", 0);
 

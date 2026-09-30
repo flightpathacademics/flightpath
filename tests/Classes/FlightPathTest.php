@@ -89,7 +89,7 @@ class FlightPathTest extends FlightPathTestCase
    * could still pass while producing an advising result for the wrong
    * academic program.
    */
-  public function testAdvisingLoadsCorrectDegree(): void
+  public function testAdvisingLoadsCorrectDegree()
   {
     $fp = $this->buildAdvisingFlightPath();
 
@@ -113,7 +113,7 @@ class FlightPathTest extends FlightPathTestCase
    * semester/group assignment logic without trying to assert the entire
    * advising result course-by-course.
    */
-  public function testAdvisingAssignsRepresentativeCourses(): void
+  public function testAdvisingAssignsRepresentativeCourses()
   {
     $fp = $this->buildAdvisingFlightPath();
     $courses = $fp->student->list_courses_taken;
@@ -153,7 +153,7 @@ class FlightPathTest extends FlightPathTestCase
    * ID, because that method's transfer mode compares against the underlying
    * transfer course ID.
    */
-  public function testAdvisingProcessesTransferEquivalency(): void
+  public function testAdvisingProcessesTransferEquivalency()
   {
     $fp = $this->buildAdvisingFlightPath();
     $courses = $fp->student->list_courses_taken;
@@ -202,7 +202,7 @@ class FlightPathTest extends FlightPathTestCase
    * The remainder assertion is particularly important because losing those
    * hours would silently change the student's degree-audit result.
    */
-  public function testAdvisingProcessesSubstitutions(): void
+  public function testAdvisingProcessesSubstitutions()
   {
     $fp = $this->buildAdvisingFlightPath();
     $student = $fp->student;
@@ -269,7 +269,7 @@ class FlightPathTest extends FlightPathTestCase
    * IDs so that a regression that drops, merges, or replaces an unassignment
    * is visible.
    */
-  public function testAdvisingPreservesUnassignments(): void
+  public function testAdvisingPreservesUnassignments()
   {
     $fp = $this->buildAdvisingFlightPath();
     $courses = $fp->student->list_courses_taken;
@@ -302,7 +302,7 @@ class FlightPathTest extends FlightPathTestCase
 
 
 
-  public function testAdvisingCalculatesExpectedProgressHours(): void
+  public function testAdvisingCalculatesExpectedProgressHours()
   {
     $fp = $this->buildAdvisingFlightPath();
     $degree_plan = $fp->degree_plan;

@@ -3,14 +3,13 @@
 /**
  * Tests the basic behavior and state management of the Course class.
  */
-require_once __DIR__ . '/../bootstrap.php';
 
 class CourseTest extends FlightPathTestCase
 {
   /**
    * A new Course should have its expected default state.
    */
-  public function testNewCourseHasExpectedDefaults(): void
+  public function testNewCourseHasExpectedDefaults()
   {
     $course = new Course();
 
@@ -30,7 +29,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * A blank Course should stop initialization before normal course setup.
    */
-  public function testBlankCourseStopsInitialization(): void
+  public function testBlankCourseStopsInitialization()
   {
     $course = new Course("", false, null, true);
 
@@ -42,7 +41,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * A real course should load its catalog information from the database.
    */
-  public function testCourseLoadsFromDatabase(): void
+  public function testCourseLoadsFromDatabase()
   {
     $course = new Course(181405, false, null, false, 2020);
 
@@ -59,7 +58,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * Degree-specific values should remain separate for different degrees.
    */
-  public function testDegreeSpecificDetailsAreIndependent(): void
+  public function testDegreeSpecificDetailsAreIndependent()
   {
     $course = new Course();
 
@@ -74,7 +73,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * Hours awarded should be stored as a numeric value.
    */
-  public function testHoursAwardedAreStoredAsNumbers(): void
+  public function testHoursAwardedAreStoredAsNumbers()
   {
     $course = new Course();
 
@@ -86,7 +85,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * Substitution state should be tracked independently by degree.
    */
-  public function testSubstitutionStateIsDegreeSpecific(): void
+  public function testSubstitutionStateIsDegreeSpecific()
   {
     $course = new Course();
 
@@ -101,7 +100,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * Exclude-repeat state should be tracked independently by degree.
    */
-  public function testExcludeRepeatStateIsDegreeSpecific(): void
+  public function testExcludeRepeatStateIsDegreeSpecific()
   {
     $course = new Course();
 
@@ -115,7 +114,7 @@ class CourseTest extends FlightPathTestCase
   /**
    * Course data should survive a serialization round trip.
    */
-  public function testDataStringRoundTripPreservesCourseState(): void
+  public function testDataStringRoundTripPreservesCourseState()
   {
     // Load a real course from the test database.
     $course = new Course(181405, false, null, false, 2020);

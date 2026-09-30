@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../bootstrap.php';
 
 class SemesterTest extends FlightPathTestCase
 {
@@ -8,7 +7,7 @@ class SemesterTest extends FlightPathTestCase
    * Verifies that a new Semester initializes its number, title, and course
    * and group collections with the expected defaults.
    */
-  public function testNewSemesterHasExpectedDefaults(): void
+  public function testNewSemesterHasExpectedDefaults()
   {
     $semester = new Semester(0);
 
@@ -25,7 +24,7 @@ class SemesterTest extends FlightPathTestCase
    * Verifies that assign_title() produces the expected default title for
    * each standard semester/year number.
    */
-  public function testAssignTitleUsesExpectedDefaultTitles(): void
+  public function testAssignTitleUsesExpectedDefaultTitles()
   {
     $expected_titles = [
       0 => "Freshman Year",
@@ -48,7 +47,7 @@ class SemesterTest extends FlightPathTestCase
    * Verifies that assign_title() continues the "Year N" pattern for
    * semester numbers beyond the explicitly named years.
    */
-  public function testAssignTitleUsesYearPatternForLaterSemesters(): void
+  public function testAssignTitleUsesYearPatternForLaterSemesters()
   {
     $semester = new Semester(10);
 
@@ -60,7 +59,7 @@ class SemesterTest extends FlightPathTestCase
    * Verifies that two Semester objects are considered equal when they have
    * the same semester number, regardless of their other properties.
    */
-  public function testEqualsUsesSemesterNumber(): void
+  public function testEqualsUsesSemesterNumber()
   {
     $first = new Semester(2);
     $second = new Semester(2);
@@ -74,7 +73,7 @@ class SemesterTest extends FlightPathTestCase
    * Verifies that reset_list_counters() resets the iteration state of both
    * the course and group collections.
    */
-  public function testResetListCountersResetsCourseAndGroupLists(): void
+  public function testResetListCountersResetsCourseAndGroupLists()
   {
     $semester = new Semester(0);
 

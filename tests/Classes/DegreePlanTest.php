@@ -3,14 +3,13 @@
 /**
  * Tests the structure, loading, and progress calculations of the DegreePlan class.
  */
-require_once __DIR__ . '/../bootstrap.php';
 
 class DegreePlanTest extends FlightPathTestCase
 {
   /**
    * Verifies that a new DegreePlan starts with the expected empty collections and defaults.
    */
-  public function testNewDegreePlanHasExpectedDefaults(): void
+  public function testNewDegreePlanHasExpectedDefaults()
   {
     $degree_plan = new DegreePlan();
 
@@ -30,7 +29,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that loading a real degree plan assembles its basic descriptive data,
    * semesters, courses, and groups from the test database.
    */
-  public function testDegreePlanLoadsFromDatabase(): void
+  public function testDegreePlanLoadsFromDatabase()
   {
     $degree_plan = new DegreePlan(5450264);
 
@@ -48,7 +47,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that loading a complete degree plan creates the special "Courses Added
    * by Advisor" semester and its corresponding special group.
    */
-  public function testDegreePlanAddsCoursesAddedSemester(): void
+  public function testDegreePlanAddsCoursesAddedSemester()
   {
     $degree_plan = new DegreePlan(5450264);
 
@@ -69,7 +68,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that find_group() locates both top-level groups and groups nested
    * one level down in a branch.
    */
-  public function testFindGroupFindsTopLevelAndNestedGroups(): void
+  public function testFindGroupFindsTopLevelAndNestedGroups()
   {
     $degree_plan = new DegreePlan();
 
@@ -95,7 +94,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that add_to_required_course_id_array() merges course requirement
    * information without losing the degree and group relationships already stored.
    */
-  public function testAddToRequiredCourseIdArrayMergesRequirements(): void
+  public function testAddToRequiredCourseIdArrayMergesRequirements()
   {
     $degree_plan = new DegreePlan();
 
@@ -141,7 +140,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that required progress hours include bare courses and groups,
    * while excluding special negative-ID groups such as "Courses Added by Advisor".
    */
-  public function testGetProgressHoursCountsCoursesAndGroupsByRequirementType(): void
+  public function testGetProgressHoursCountsCoursesAndGroupsByRequirementType()
   {
     $degree_plan = new DegreePlan();
 
@@ -185,7 +184,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that a requirement type of "degree" is treated as the overall
    * degree total rather than as a literal requirement type.
    */
-  public function testGetProgressHoursTreatsDegreeAsOverallTotal(): void
+  public function testGetProgressHoursTreatsDegreeAsOverallTotal()
   {
     $degree_plan = new DegreePlan();
 
@@ -210,7 +209,7 @@ class DegreePlanTest extends FlightPathTestCase
    * Verifies that calculate_progress_hours() stores the requested totals and
    * fulfilled hours in gpa_calculations and marks the calculation as complete.
    */
-  public function testCalculateProgressHoursStoresResults(): void
+  public function testCalculateProgressHoursStoresResults()
   {
     $degree_plan = new DegreePlan();
     $degree_plan->degree_id = 5450264;
@@ -239,7 +238,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Parses track-selection configuration text into the structured configuration array used by the degree plan.
    */
-  public function testParseTrackSelectionConfig(): void
+  public function testParseTrackSelectionConfig()
   {
     $degree_plan = new DegreePlan();
 
@@ -274,7 +273,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns the degree title alone by default, and appends the track title when requested.
    */
-  public function testGetTitleIncludesTrackTitleWhenRequested(): void
+  public function testGetTitleIncludesTrackTitleWhenRequested()
   {
     $degree_plan = new DegreePlan();
 
@@ -289,7 +288,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns the major code directly for a normal, non-combined degree plan.
    */
-  public function testGetMajorCodeCsvForRegularDegree(): void
+  public function testGetMajorCodeCsvForRegularDegree()
   {
     $degree_plan = new DegreePlan();
 
@@ -303,7 +302,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Builds a comma-separated major-code list from the component degree plans of a combined degree.
    */
-  public function testGetMajorCodeCsvForCombinedDegree(): void
+  public function testGetMajorCodeCsvForCombinedDegree()
   {
     $degree_plan = new DegreePlan();
 
@@ -316,7 +315,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns FALSE when the degree plan has no track title.
    */
-  public function testGetTrackTitleReturnsFalseWhenNoTrackExists(): void
+  public function testGetTrackTitleReturnsFalseWhenNoTrackExists()
   {
     $degree_plan = new DegreePlan();
 
@@ -329,7 +328,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns the degree title wrapped in the default HTML markup.
    */
-  public function testGetTitle2ReturnsHtmlTitleByDefault(): void
+  public function testGetTitle2ReturnsHtmlTitleByDefault()
   {
     $degree_plan = new DegreePlan();
 
@@ -347,7 +346,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns the degree title as plain text when HTML output is disabled.
    */
-  public function testGetTitle2CanReturnPlainTitle(): void
+  public function testGetTitle2CanReturnPlainTitle()
   {
     $degree_plan = new DegreePlan();
 
@@ -366,7 +365,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Includes the track title in plain-text output when requested.
    */
-  public function testGetTitle2IncludesTrackTitleAsPlainText(): void
+  public function testGetTitle2IncludesTrackTitleAsPlainText()
   {
     $degree_plan = new DegreePlan();
 
@@ -384,7 +383,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Includes the track title with the expected separator and HTML markup when requested.
    */
-  public function testGetTitle2IncludesTrackTitleAsHtml(): void
+  public function testGetTitle2IncludesTrackTitleAsHtml()
   {
     $degree_plan = new DegreePlan();
 
@@ -402,7 +401,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Finds a course in the specified semester and returns the matching CourseList.
    */
-  public function testFindCoursesFindsCourseInSpecifiedSemester(): void
+  public function testFindCoursesFindsCourseInSpecifiedSemester()
   {
     $degree_plan = new DegreePlan();
 
@@ -424,7 +423,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns FALSE when the requested course is not present in the specified semester.
    */
-  public function testFindCoursesReturnsFalseWhenCourseIsNotFound(): void
+  public function testFindCoursesReturnsFalseWhenCourseIsNotFound()
   {
     $degree_plan = new DegreePlan();
 
@@ -443,7 +442,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Keeps published and draft degree data separate when loading the same degree ID.
    */
-  public function testDegreePlanPublishedAndDraftUseSeparateDegreeData(): void
+  public function testDegreePlanPublishedAndDraftUseSeparateDegreeData()
   {
     $result = db_query("SELECT title FROM degrees WHERE degree_id = ?", [5450264]);
     $published_title = db_result($result);
@@ -479,7 +478,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Uses published degree data by default rather than draft degree data.
    */
-  public function testDegreePlanDraftFlagDefaultsToFalse(): void
+  public function testDegreePlanDraftFlagDefaultsToFalse()
   {
     $degree_plan = new DegreePlan();
 
@@ -490,7 +489,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Loads descriptive degree data from the draft tables when the draft flag is explicitly enabled.
    */
-  public function testDegreePlanExplicitDraftFlagIsHonored(): void
+  public function testDegreePlanExplicitDraftFlagIsHonored()
   {
     $degree_plan = new DegreePlan();
     $degree_plan->bool_use_draft = TRUE;
@@ -506,7 +505,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Finds and returns an existing semester by its semester number.
    */
-  public function testGetSemesterFindsExistingSemester(): void
+  public function testGetSemesterFindsExistingSemester()
   {
     $degree_plan = new DegreePlan();
 
@@ -521,7 +520,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Returns FALSE when no semester with the requested number exists.
    */
-  public function testGetSemesterReturnsFalseWhenSemesterDoesNotExist(): void
+  public function testGetSemesterReturnsFalseWhenSemesterDoesNotExist()
   {
     $degree_plan = new DegreePlan();
 
@@ -534,7 +533,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Finds a placeholder group in the specified semester.
    */
-  public function testFindPlaceholderGroupFindsGroupInSpecifiedSemester(): void
+  public function testFindPlaceholderGroupFindsGroupInSpecifiedSemester()
   {
     $degree_plan = new DegreePlan();
 
@@ -553,7 +552,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Falls back to the degree table to obtain a title when the DegreePlan has no title of its own.
    */
-  public function testGetTitle2FallsBackToDegreeData(): void
+  public function testGetTitle2FallsBackToDegreeData()
   {
     $degree_plan = new DegreePlan();
     $degree_plan->bool_loaded_descriptive_data = TRUE;
@@ -569,7 +568,7 @@ class DegreePlanTest extends FlightPathTestCase
   /**
    * Loads a real track degree and returns the track title associated with it.
    */
-  public function testGetTrackTitleReturnsTrackTitle(): void
+  public function testGetTrackTitleReturnsTrackTitle()
   {
     $db = get_global_database_handler();
     $degree_id = $db->get_degree_id("COSC|_MATH", 2020, FALSE, 0);

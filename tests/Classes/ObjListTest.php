@@ -1,13 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../bootstrap.php';
 
 class ObjListTest extends FlightPathTestCase
 {
   /**
    * Verifies that a new ObjList starts empty with its counters initialized.
    */
-  public function testNewObjListHasExpectedDefaults(): void
+  public function testNewObjListHasExpectedDefaults()
   {
     $list = new ObjList();
 
@@ -22,7 +21,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that add() appends objects and updates the list's empty and
    * count state.
    */
-  public function testAddAppendsObject(): void
+  public function testAddAppendsObject()
   {
     $list = new ObjList();
     $object = new stdClass();
@@ -38,7 +37,7 @@ class ObjListTest extends FlightPathTestCase
   /**
    * Verifies that add() can insert an object at the beginning of the list.
    */
-  public function testAddCanInsertAtTop(): void
+  public function testAddCanInsertAtTop()
   {
     $list = new ObjList();
     $first = new stdClass();
@@ -56,7 +55,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that index_of() uses an object's equals() method to determine
    * whether two objects represent the same value.
    */
-  public function testIndexOfUsesEquals(): void
+  public function testIndexOfUsesEquals()
   {
     $first = new Course();
     $first->course_id = 988445;
@@ -74,7 +73,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that object_index_of() distinguishes object identity from
    * equals()-based matching.
    */
-  public function testObjectIndexOfUsesObjectIdentity(): void
+  public function testObjectIndexOfUsesObjectIdentity()
   {
     $first = new Course();
     $first->course_id = 988445;
@@ -93,7 +92,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that find_match() returns the matching object rather than its
    * array index, and returns FALSE when no match exists.
    */
-  public function testFindMatchReturnsObjectOrFalse(): void
+  public function testFindMatchReturnsObjectOrFalse()
   {
     $first = new Course();
     $first->course_id = 988445;
@@ -115,7 +114,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that the iterator starts at the beginning after
    * reset_counter() and advances with get_next().
    */
-  public function testIteratorBehavior(): void
+  public function testIteratorBehavior()
   {
     $first = new stdClass();
     $second = new stdClass();
@@ -139,7 +138,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that find_all_matches() returns every object matching the
    * supplied object and returns FALSE when there are no matches.
    */
-  public function testFindAllMatches(): void
+  public function testFindAllMatches()
   {
     $first = new Course();
     $first->course_id = 988445;
@@ -172,7 +171,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that insert_after_index() inserts the new object at the
    * specified index while preserving the existing objects.
    */
-  public function testInsertAfterIndex(): void
+  public function testInsertAfterIndex()
   {
     $first = new stdClass();
     $second = new stdClass();
@@ -194,7 +193,7 @@ class ObjListTest extends FlightPathTestCase
    * Verifies that refresh_indexes() rebuilds the underlying array and
    * resets the iterator state and count.
    */
-  public function testRefreshIndexesResetsIteratorState(): void
+  public function testRefreshIndexesResetsIteratorState()
   {
     $first = new stdClass();
     $second = new stdClass();

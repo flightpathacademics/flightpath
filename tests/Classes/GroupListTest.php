@@ -3,11 +3,11 @@
 /**
  * Tests Group-specific behavior provided by GroupList.
  */
-require_once __DIR__ . '/../bootstrap.php';
+
 
 class GroupListTest extends FlightPathTestCase
 {
-  public function testNewGroupListIsEmpty(): void
+  public function testNewGroupListIsEmpty()
   {
     $list = new GroupList();
 
@@ -16,7 +16,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertSame(0, $list->get_size());
   }
 
-  public function testAddListAddsAllGroups(): void
+  public function testAddListAddsAllGroups()
   {
     $source = new GroupList();
 
@@ -37,7 +37,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertSame("1002_101", $target->array_list[1]->group_id);
   }
 
-  public function testFindMatchWithDegreeIdRequiresBothGroupAndDegree(): void
+  public function testFindMatchWithDegreeIdRequiresBothGroupAndDegree()
   {
     $list = new GroupList();
 
@@ -60,7 +60,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertSame($second, $match);
   }
 
-  public function testFindMatchWithDegreeIdReturnsFalseWhenDegreeDoesNotMatch(): void
+  public function testFindMatchWithDegreeIdReturnsFalseWhenDegreeDoesNotMatch()
   {
     $list = new GroupList();
 
@@ -76,7 +76,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertFalse($list->find_match_with_degree_id($search, 999));
   }
 
-  public function testSetReqByDegreeIdPropagatesToEveryGroup(): void
+  public function testSetReqByDegreeIdPropagatesToEveryGroup()
   {
     $list = new GroupList();
 
@@ -100,7 +100,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertSame(123, $second_course->req_by_degree_id);
   }
 
-  public function testGetGroupCourseIdArrayReturnsCoursesGroupedByGroupId(): void
+  public function testGetGroupCourseIdArrayReturnsCoursesGroupedByGroupId()
   {
     $list = new GroupList();
 
@@ -134,7 +134,7 @@ class GroupListTest extends FlightPathTestCase
     );
   }
 
-  public function testGetAdvisedCoursesListFindsAdvisedCourses(): void
+  public function testGetAdvisedCoursesListFindsAdvisedCourses()
   {
     $list = new GroupList();
 
@@ -159,7 +159,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertSame(2001, $result->array_list[0]->course_id);
   }
 
-  public function testGetAdvisedCoursesListRemovesDuplicates(): void
+  public function testGetAdvisedCoursesListRemovesDuplicates()
   {
     $list = new GroupList();
 
@@ -186,7 +186,7 @@ class GroupListTest extends FlightPathTestCase
     $this->assertSame(2001, $result->array_list[0]->course_id);
   }
 
-  public function testResetListCountersRecursivelyResetsGroups(): void
+  public function testResetListCountersRecursivelyResetsGroups()
   {
     $list = new GroupList();
 

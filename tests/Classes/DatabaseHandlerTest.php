@@ -21,7 +21,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_course_id() finds a known course.
    */
-  public function testGetCourseIdFindsKnownCourse(): void
+  public function testGetCourseIdFindsKnownCourse()
   {
     $db = $this->getDatabaseHandler();
 
@@ -34,7 +34,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_course_id() returns FALSE when the course does not exist.
    */
-  public function testGetCourseIdReturnsFalseForUnknownCourse(): void
+  public function testGetCourseIdReturnsFalseForUnknownCourse()
   {
     $db = $this->getDatabaseHandler();
 
@@ -51,7 +51,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * FlightPath sometimes receives course numbers with additional information
    * after a colon. The database lookup should use only the portion before it.
    */
-  public function testGetCourseIdIgnoresCourseNumberSuffixAfterColon(): void
+  public function testGetCourseIdIgnoresCourseNumberSuffixAfterColon()
   {
     $db = $this->getDatabaseHandler();
 
@@ -64,7 +64,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_degree_id() finds the test COSC degree.
    */
-  public function testGetDegreeIdFindsKnownDegree(): void
+  public function testGetDegreeIdFindsKnownDegree()
   {
     $db = $this->getDatabaseHandler();
 
@@ -80,7 +80,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * The fixture contains COSC|_MATH specifically so track lookup is tested
    * independently of the base COSC degree.
    */
-  public function testGetDegreeIdFindsDegreeTrack(): void
+  public function testGetDegreeIdFindsDegreeTrack()
   {
     $db = $this->getDatabaseHandler();
 
@@ -93,7 +93,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_degree_id() returns FALSE for an unknown degree.
    */
-  public function testGetDegreeIdReturnsFalseForUnknownDegree(): void
+  public function testGetDegreeIdReturnsFalseForUnknownDegree()
   {
     $db = $this->getDatabaseHandler();
 
@@ -106,7 +106,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_group_id() finds a known group.
    */
-  public function testGetGroupIdFindsKnownGroup(): void
+  public function testGetGroupIdFindsKnownGroup()
   {
     $db = $this->getDatabaseHandler();
 
@@ -122,7 +122,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Course/group identifiers in advising data may contain the degree ID after
    * an underscore, while the database lookup uses only the base group ID.
    */
-  public function testGetGroupNameHandlesCompositeGroupId(): void
+  public function testGetGroupNameHandlesCompositeGroupId()
   {
     $db = $this->getDatabaseHandler();
 
@@ -135,7 +135,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_institution_name() finds a known transfer institution.
    */
-  public function testGetInstitutionNameFindsKnownInstitution(): void
+  public function testGetInstitutionNameFindsKnownInstitution()
   {
     $db = $this->getDatabaseHandler();
 
@@ -149,7 +149,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that set_variable() and get_variable() persist and retrieve a
    * value from the variables table.
    */
-  public function testSetAndGetVariable(): void
+  public function testSetAndGetVariable()
   {
     $db = $this->getDatabaseHandler();
 
@@ -172,7 +172,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that get_course_db_row() returns the current database row for a
    * known course.
    */
-  public function testGetCourseDbRowFindsKnownCourse(): void
+  public function testGetCourseDbRowFindsKnownCourse()
   {
     $db = $this->getDatabaseHandler();
 
@@ -189,7 +189,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_student_name() returns the student's formatted name.
    */
-  public function testGetStudentName(): void
+  public function testGetStudentName()
   {
     $db = $this->getDatabaseHandler();
 
@@ -202,7 +202,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_student_name() can include the student's CWID.
    */
-  public function testGetStudentNameCanIncludeCwid(): void
+  public function testGetStudentNameCanIncludeCwid()
   {
     $db = $this->getDatabaseHandler();
 
@@ -216,7 +216,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that get_student_name() returns the expected fallback for an
    * unknown student.
    */
-  public function testGetStudentNameReturnsUnknownForMissingStudent(): void
+  public function testGetStudentNameReturnsUnknownForMissingStudent()
   {
     $db = $this->getDatabaseHandler();
 
@@ -230,7 +230,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that get_faculty_name() returns the faculty member's formatted
    * name.
    */
-  public function testGetFacultyName(): void
+  public function testGetFacultyName()
   {
     $db = $this->getDatabaseHandler();
 
@@ -243,7 +243,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_faculty_name() can include the faculty member's CWID.
    */
-  public function testGetFacultyNameCanIncludeCwid(): void
+  public function testGetFacultyNameCanIncludeCwid()
   {
     $db = $this->getDatabaseHandler();
 
@@ -257,7 +257,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that get_student_catalog_year() returns the student's catalog
    * year.
    */
-  public function testGetStudentCatalogYear(): void
+  public function testGetStudentCatalogYear()
   {
     $db = $this->getDatabaseHandler();
 
@@ -271,7 +271,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that get_student_cumulative_hours() returns the student's stored
    * cumulative hours.
    */
-  public function testGetStudentCumulativeHours(): void
+  public function testGetStudentCumulativeHours()
   {
     $db = $this->getDatabaseHandler();
 
@@ -284,7 +284,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_student_gpa() returns the student's stored GPA.
    */
-  public function testGetStudentGpa(): void
+  public function testGetStudentGpa()
   {
     $db = $this->getDatabaseHandler();
 
@@ -297,7 +297,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_student_rank() returns the student's rank code.
    */
-  public function testGetStudentRank(): void
+  public function testGetStudentRank()
   {
     $db = $this->getDatabaseHandler();
 
@@ -310,7 +310,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_student_majors_from_db() returns the student's major.
    */
-  public function testGetStudentMajorsFromDb(): void
+  public function testGetStudentMajorsFromDb()
   {
     $db = $this->getDatabaseHandler();
 
@@ -323,7 +323,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_degrees_in_catalog_year() includes the test COSC degree.
    */
-  public function testGetDegreesInCatalogYear(): void
+  public function testGetDegreesInCatalogYear()
   {
     $db = $this->getDatabaseHandler();
 
@@ -339,7 +339,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_degrees_in_catalog_year() can include degree tracks.
    */
-  public function testGetDegreesInCatalogYearIncludesTracks(): void
+  public function testGetDegreesInCatalogYearIncludesTracks()
   {
     $db = $this->getDatabaseHandler();
 
@@ -354,7 +354,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that the normal level-1/level-2 query excludes level-3 tracks.
    */
-  public function testGetDegreesInCatalogYearExcludesLevelThreeTracksByDefault(): void
+  public function testGetDegreesInCatalogYearExcludesLevelThreeTracksByDefault()
   {
     $db = $this->getDatabaseHandler();
 
@@ -370,7 +370,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
   /**
    * Verify that get_degree_tracks() returns the tracks configured for a major.
    */
-  public function testGetDegreeTracks(): void
+  public function testGetDegreeTracks()
   {
     $db = $this->getDatabaseHandler();
 
@@ -384,7 +384,7 @@ class DatabaseHandlerTest extends FlightPathTestCase
    * Verify that the school lookup methods return the school IDs associated
    * with the test data.
    */
-  public function testSchoolIdLookups(): void
+  public function testSchoolIdLookups()
   {
     $db = $this->getDatabaseHandler();
 

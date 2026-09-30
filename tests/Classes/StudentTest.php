@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../bootstrap.php';
 
 class StudentTest extends FlightPathTestCase
 {
@@ -8,7 +7,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that a new Student initializes its course, test, substitution,
    * settings, and significant-course collections with the expected defaults.
    */
-  public function testNewStudentHasExpectedDefaults(): void
+  public function testNewStudentHasExpectedDefaults()
   {
     $student = new Student();
 
@@ -26,7 +25,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that loading a real student populates the student's descriptive
    * data, academic standing, major information, and school information.
    */
-  public function testStudentLoadsFromDatabase(): void
+  public function testStudentLoadsFromDatabase()
   {
     $student = new Student("999999999");
 
@@ -43,7 +42,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that the student's completed courses are loaded as Course objects
    * with their historical term, grade, awarded hours, and completion status.
    */
-  public function testStudentLoadsCoursesTaken(): void
+  public function testStudentLoadsCoursesTaken()
   {
     $student = new Student("999999999");
 
@@ -54,7 +53,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that the student's transfer course is loaded and retains its
    * transfer-course information and local equivalency.
    */
-  public function testStudentLoadsTransferCourseAndEquivalency(): void
+  public function testStudentLoadsTransferCourseAndEquivalency()
   {
     $student = new Student("999999999");
 
@@ -74,7 +73,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that courses loaded for the student are recorded in the
    * significant-course lookup used later by FlightPath's course assignment.
    */
-  public function testStudentBuildsSignificantCourseList(): void
+  public function testStudentBuildsSignificantCourseList()
   {
     $student = new Student("999999999");
 
@@ -86,7 +85,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that get_best_grade_for_course() finds the student's best grade
    * for a course already present in the student's course history.
    */
-  public function testGetBestGradeForCourse(): void
+  public function testGetBestGradeForCourse()
   {
     $student = new Student("999999999");
 
@@ -100,7 +99,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that get_transfer_course_eqv() resolves the student's transfer
    * course to its local equivalent.
    */
-  public function testGetTransferCourseEqvReturnsLocalCourse(): void
+  public function testGetTransferCourseEqvReturnsLocalCourse()
   {
     $student = new Student("999999999");
 
@@ -111,7 +110,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that the student's active database substitutions are loaded into
    * the SubstitutionList when load_student_substitutions() is called.
    */
-  public function testStudentLoadsSubstitutions(): void
+  public function testStudentLoadsSubstitutions()
   {
     $student = new Student("999999999");
 
@@ -137,7 +136,7 @@ class StudentTest extends FlightPathTestCase
    * requirement, replacement course, degree, group, semester, and
    * administrative metadata.
    */
-  public function testStudentLoadsSubstitutionDetails(): void
+  public function testStudentLoadsSubstitutionDetails()
   {
     $student = new Student("999999999");
 
@@ -217,7 +216,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that courses used in substitutions are marked as substitutions
    * and retain the database substitution ID associated with the degree.
    */
-  public function testStudentMarksSubstitutedCourses(): void
+  public function testStudentMarksSubstitutedCourses()
   {
     $student = new Student("999999999");
 
@@ -247,7 +246,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that calculate_cumulative_hours_and_gpa() returns totals and GPA
    * consistent with the student's loaded course history.
    */
-  public function testCalculateCumulativeHoursAndGpa(): void
+  public function testCalculateCumulativeHoursAndGpa()
   {
     $student = new Student("999999999");
 
@@ -285,7 +284,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that get_transfer_course_eqv() returns FALSE when no equivalency
    * exists and when the local equivalent cannot satisfy the requested hours.
    */
-  public function testGetTransferCourseEqvRejectsInvalidMatches(): void
+  public function testGetTransferCourseEqvRejectsInvalidMatches()
   {
     $student = new Student("999999999");
 
@@ -298,7 +297,7 @@ class StudentTest extends FlightPathTestCase
    * Verifies that load_unassignments() loads each active unassignment onto
    * the corresponding student's Course object.
    */
-  public function testStudentLoadsUnassignments(): void
+  public function testStudentLoadsUnassignments()
   {
     $student = new Student("999999999");
 

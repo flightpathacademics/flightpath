@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../bootstrap.php';
 
 class SubstitutionListTest extends FlightPathTestCase
 {
@@ -8,7 +7,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that a new SubstitutionList starts empty and behaves as an
    * ObjList-based collection.
    */
-  public function testNewSubstitutionListHasExpectedDefaults(): void
+  public function testNewSubstitutionListHasExpectedDefaults()
   {
     $list = new SubstitutionList();
 
@@ -21,7 +20,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_requirement() matches a substitution by the required
    * course ID.
    */
-  public function testFindRequirementMatchesCourseRequirement(): void
+  public function testFindRequirementMatchesCourseRequirement()
   {
     $requirement = new Course();
     $requirement->course_id = 988445;
@@ -42,7 +41,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_requirement() returns FALSE when no substitution
    * matches the required course.
    */
-  public function testFindRequirementReturnsFalseWhenNoMatchExists(): void
+  public function testFindRequirementReturnsFalseWhenNoMatchExists()
   {
     $requirement = new Course();
     $requirement->course_id = 988445;
@@ -63,7 +62,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_requirement() can exclude substitutions that have
    * already been applied.
    */
-  public function testFindRequirementCanExcludeAppliedSubstitutions(): void
+  public function testFindRequirementCanExcludeAppliedSubstitutions()
   {
     $requirement = new Course();
     $requirement->course_id = 988445;
@@ -83,7 +82,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_requirement() filters substitutions by assigned
    * degree when a degree ID is supplied.
    */
-  public function testFindRequirementFiltersByDegree(): void
+  public function testFindRequirementFiltersByDegree()
   {
     $requirement = new Course();
     $requirement->course_id = 988445;
@@ -107,7 +106,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_requirement() only returns a substitution when the
    * required course is assigned to the requested group.
    */
-  public function testFindRequirementFiltersByGroup(): void
+  public function testFindRequirementFiltersByGroup()
   {
     $matching_requirement = new Course();
     $matching_requirement->course_id = 988445;
@@ -134,7 +133,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_requirement() excludes substitutions whose database
    * IDs appear in the exclusion list.
    */
-  public function testFindRequirementExcludesSpecifiedIDs(): void
+  public function testFindRequirementExcludesSpecifiedIDs()
   {
     $requirement = new Course();
     $requirement->course_id = 988445;
@@ -158,7 +157,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_group_additions() returns the substitution course when
    * the group-addition requirement is assigned to the requested group.
    */
-  public function testFindGroupAdditionsReturnsMatchingCourses(): void
+  public function testFindGroupAdditionsReturnsMatchingCourses()
   {
     $group = new Group();
     $group->group_id = 12345;
@@ -202,7 +201,7 @@ class SubstitutionListTest extends FlightPathTestCase
    * Verifies that find_group_additions() returns FALSE when the requested
    * group has no matching group-addition substitutions.
    */
-  public function testFindGroupAdditionsReturnsFalseWhenNoMatchExists(): void
+  public function testFindGroupAdditionsReturnsFalseWhenNoMatchExists()
   {
     $group = new Group();
     $group->group_id = 12345;

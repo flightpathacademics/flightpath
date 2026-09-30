@@ -2,7 +2,7 @@
 
 class MiscTest extends FlightPathTestCase
 {
-  public function testFriendlyTimezone(): void
+  public function testFriendlyTimezone()
   {
     $this->assertSame("Central Time - US & Canada", friendly_timezone("America/Chicago"));
     $this->assertSame("Pacific Time - US & Canada", friendly_timezone("America/Los_Angeles"));
@@ -10,7 +10,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("America/Nowhere", friendly_timezone("America/Nowhere"));
   }
 
-  public function testUtf8EncodeAndDecode(): void
+  public function testUtf8EncodeAndDecode()
   {
     // These functions intentionally replicate the old PHP utf8_encode()/decode()
     // behavior, which is ISO-8859-1 <-> UTF-8 rather than general UTF-8 conversion.
@@ -23,7 +23,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("Hello", fp_utf8_decode("Hello"));
   }
 
-  public function testStringCompatibilityFunctions(): void
+  public function testStringCompatibilityFunctions()
   {
     $this->assertTrue(str_starts_with("FlightPath", "Flight"));
     $this->assertFalse(str_starts_with("FlightPath", "Path"));
@@ -34,7 +34,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testConvertTimeFromUtcToLocalTimezone(): void
+  public function testConvertTimeFromUtcToLocalTimezone()
   {
     $timestamp = time();
 
@@ -46,7 +46,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testConvertTimeWithSameTimezoneDoesNotChangeTimestamp(): void
+  public function testConvertTimeWithSameTimezoneDoesNotChangeTimestamp()
   {
     $date = new DateTime("2026-01-15 12:00:00", new DateTimeZone("UTC"));
     $timestamp = $date->getTimestamp();
@@ -57,7 +57,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testIsSerializedString(): void
+  public function testIsSerializedString()
   {
     $this->assertTrue(is_serialized_string("b:0;"));
     $this->assertTrue(is_serialized_string(serialize("hello")));
@@ -66,26 +66,26 @@ class MiscTest extends FlightPathTestCase
     $this->assertFalse(is_serialized_string(""));
   }
 
-  public function testConvertTimeWithoutFormatting(): void
+  public function testConvertTimeWithoutFormatting()
   {
     $timestamp = 1609459200;
 
     $this->assertSame($timestamp, convert_time($timestamp, "UTC", "UTC"));
   }
 
-  public function testConvertTimeWithFormatting(): void
+  public function testConvertTimeWithFormatting()
   {
     $timestamp = 1609459200;
 
     $this->assertSame("2021-01-01", convert_time($timestamp, "UTC", "UTC", "Y-m-d"));
   }
 
-  public function testConvertTimeReturnsFalseForEmptyTime(): void
+  public function testConvertTimeReturnsFalseForEmptyTime()
   {
     $this->assertFalse(convert_time(0, "UTC", "UTC"));
   }
 
-  public function testGetRandomString(): void
+  public function testGetRandomString()
   {
     $result = fp_get_random_string(20);
 
@@ -93,7 +93,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertMatchesRegularExpression('/^[a-zA-Z0-9]+$/', $result);
   }
 
-  public function testGetRandomStringCanGenerateOnlyNumericCharacters(): void
+  public function testGetRandomStringCanGenerateOnlyNumericCharacters()
   {
     $result = fp_get_random_string(20, false, true, false);
 
@@ -101,7 +101,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertMatchesRegularExpression('/^[0-9]+$/', $result);
   }
 
-  public function testGetRandomStringCanGenerateOnlyAlphabeticCharacters(): void
+  public function testGetRandomStringCanGenerateOnlyAlphabeticCharacters()
   {
     $result = fp_get_random_string(20, true, false, false);
 
@@ -109,23 +109,23 @@ class MiscTest extends FlightPathTestCase
     $this->assertMatchesRegularExpression('/^[a-zA-Z]+$/', $result);
   }
 
-  public function testNoHtmlXss(): void
+  public function testNoHtmlXss()
   {
     $this->assertSame("&lt;script&gt;alert(&#039;x&#039;);&lt;/script&gt;", fp_no_html_xss("<script>alert('x');</script>"));
   }
 
-  public function testFilterPlainRemovesHtml(): void
+  public function testFilterPlainRemovesHtml()
   {
     $this->assertSame("Hello world", filter_plain("<strong>Hello</strong> world"));
     $this->assertSame("Hello world", filter_plain("  <strong>Hello</strong> world  "));
   }
 
-  public function testFilterMarkupPlainRemovesHtml(): void
+  public function testFilterMarkupPlainRemovesHtml()
   {
     $this->assertSame("Hello world", filter_markup("<strong>Hello</strong> world", "plain"));
   }
 
-  public function testFilterMarkupBasicAllowsSafeTags(): void
+  public function testFilterMarkupBasicAllowsSafeTags()
   {
     $result = filter_markup("<strong>Hello</strong> <em>world</em>", "basic");
 
@@ -133,7 +133,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("<em>world</em>", $result);
   }
 
-  public function testFilterMarkupBasicRemovesDisallowedTags(): void
+  public function testFilterMarkupBasicRemovesDisallowedTags()
   {
     $result = filter_markup("<script>alert('x')</script><strong>Hello</strong>", "basic");
 
@@ -142,7 +142,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("<strong>Hello</strong>", $result);
   }
 
-  public function testFilterXssRemovesDangerousProtocol(): void
+  public function testFilterXssRemovesDangerousProtocol()
   {
     $result = filter_xss('<a href="javascript:alert(1)">Click</a>', ["a"]);
 
@@ -150,7 +150,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("<a", $result);
   }
 
-  public function testFilterXssRemovesEventHandlerAndStyleAttributes(): void
+  public function testFilterXssRemovesEventHandlerAndStyleAttributes()
   {
     $result = filter_xss('<div onclick="alert(1)" style="color:red" class="safe">Hello</div>', ["div"]);
 
@@ -159,7 +159,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString('class="safe"', $result);
   }
 
-  public function testStripDangerousProtocols(): void
+  public function testStripDangerousProtocols()
   {
     $this->assertSame("http://example.com", fp_strip_dangerous_protocols("http://example.com"));
     $this->assertSame("example.com", fp_strip_dangerous_protocols("javascript:example.com"));
@@ -167,7 +167,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("/some/path", fp_strip_dangerous_protocols("/some/path"));
   }
 
-  public function testValidateUtf8(): void
+  public function testValidateUtf8()
   {
     $this->assertTrue(fp_validate_utf8(""));
     $this->assertTrue(fp_validate_utf8("Hello"));
@@ -175,7 +175,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertFalse(fp_validate_utf8("\xFF\xFE"));
   }
 
-  public function testGetMachineReadable(): void
+  public function testGetMachineReadable()
   {
     $this->assertSame("Computer_Science", fp_get_machine_readable("Computer Science"));
     $this->assertSame("Computer_Science", fp_get_machine_readable("Computer & Science"));
@@ -183,18 +183,18 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("", fp_get_machine_readable(""));
   }
 
-  public function testSpaceCsv(): void
+  public function testSpaceCsv()
   {
     $this->assertSame("one, two, three", fp_space_csv("one,two,three"));
     $this->assertSame("one, two, three", fp_space_csv(" one,  two,   three "));
   }
 
-  public function testCsvToArray(): void
+  public function testCsvToArray()
   {
     $this->assertSame(["one", "two", "three"], csv_to_array("one, two ,three"));
   }
 
-  public function testCsvToFormApiArray(): void
+  public function testCsvToFormApiArray()
   {
     $result = csv_to_form_api_array("Computer Science, Mathematics, English");
 
@@ -203,14 +203,14 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("English", $result["english"]);
   }
 
-  public function testCsvMultilineToFormApiArray(): void
+  public function testCsvMultilineToFormApiArray()
   {
     $result = csv_multiline_to_form_api_array("foo ~ Foo Value\nbar ~ Bar Value");
 
     $this->assertSame(["foo" => "Foo Value", "bar" => "Bar Value"], $result);
   }
 
-  public function testCsvMultilineToArrayKeepsFirstRowByDefault(): void
+  public function testCsvMultilineToArrayKeepsFirstRowByDefault()
   {
     $csv = "subject,course,hours\nCOSC,1010,3\nMATH,1010,4";
 
@@ -224,7 +224,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("3", $result[1]["hours"]);
   }
 
-  public function testCsvMultilineToArrayCanRemoveFirstRow(): void
+  public function testCsvMultilineToArrayCanRemoveFirstRow()
   {
     $csv = "subject,course,hours\nCOSC,1010,3\nMATH,1010,4";
 
@@ -236,7 +236,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testJoinAndExplodeAssocRoundTrip(): void
+  public function testJoinAndExplodeAssocRoundTrip()
   {
     $original = [
       "pet" => "dog",
@@ -250,7 +250,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame($original, $result);
   }
 
-  public function testGetShorterCatalogYearRange(): void
+  public function testGetShorterCatalogYearRange()
   {
     $this->assertSame("08-09", get_shorter_catalog_year_range("2008-2009"));
     $this->assertSame("2008-09", get_shorter_catalog_year_range("2008-2009", false, true));
@@ -258,27 +258,27 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("2008-2009", get_shorter_catalog_year_range("2008-2009", false, false));
   }
 
-  public function testReduceWhitespace(): void
+  public function testReduceWhitespace()
   {
     $this->assertSame("one two three", fp_reduce_whitespace("one  two   three"));
     $this->assertSame("one\ntwo", fp_reduce_whitespace("one\n two"));
   }
 
-  public function testNumberPad(): void
+  public function testNumberPad()
   {
     $this->assertSame("001", fp_number_pad(1, 3));
     $this->assertSame("020", fp_number_pad(20, 3));
     $this->assertSame("1234", fp_number_pad(1234, 3));
   }
 
-  public function testTruncateDecimals(): void
+  public function testTruncateDecimals()
   {
     $this->assertSame("1.99", fp_truncate_decimals(1.99999, 2));
     $this->assertSame("1.20", fp_truncate_decimals(1.2, 2));
     $this->assertSame("10.000", fp_truncate_decimals(10, 3));
   }
 
-  public function testQueryStringEncode(): void
+  public function testQueryStringEncode()
   {
     $query = [
       "name" => "John Doe",
@@ -288,7 +288,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("name=John%20Doe&major=Computer%20Science", fp_query_string_encode($query));
   }
 
-  public function testQueryStringEncodeHandlesNestedArrays(): void
+  public function testQueryStringEncodeHandlesNestedArrays()
   {
     $query = [
       "student" => [
@@ -302,7 +302,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("student[name]=John%20Doe&student[id]=123", $result);
   }
 
-  public function testFpTrim(): void
+  public function testFpTrim()
   {
     $this->assertSame("hello", fp_trim("  hello  "));
     $this->assertSame("123", fp_trim(123));
@@ -311,7 +311,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("", fp_trim(false));
   }
 
-  public function testUserIsStudent(): void
+  public function testUserIsStudent()
   {
     $student = new stdClass();
     $student->is_student = 1;
@@ -323,7 +323,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertFalse(fp_user_is_student($faculty));
   }
 
-  public function testUserHasRole(): void
+  public function testUserHasRole()
   {
     $account = new stdClass();
     $account->id = 661;
@@ -339,7 +339,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertTrue(user_has_role("anything", $admin));
   }
 
-  public function testUserHasPermission(): void
+  public function testUserHasPermission()
   {
     $account = new stdClass();
     $account->id = 661;
@@ -354,7 +354,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertTrue(user_has_permission("anything", $admin));
   }
 
-  public function testSetPageTabs(): void
+  public function testSetPageTabs()
   {
     $tabs = [
       ["title" => "Students", "path" => "student-search"],
@@ -366,7 +366,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame($tabs, $GLOBALS["fp_set_page_tabs"]);
   }
 
-  public function testSetPageSubTabs(): void
+  public function testSetPageSubTabs()
   {
     $tabs = [
       ["title" => "Overview", "path" => "overview"],
@@ -377,7 +377,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame($tabs, $GLOBALS["fp_set_page_sub_tabs"]);
   }
 
-  public function testSetBreadcrumbs(): void
+  public function testSetBreadcrumbs()
   {
     $breadcrumbs = [
       ["text" => "Students", "path" => "student-search"],
@@ -389,7 +389,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame($breadcrumbs, $GLOBALS["fp_breadcrumbs"]);
   }
 
-  public function testAddBodyClassSanitizesDangerousCharacters(): void
+  public function testAddBodyClassSanitizesDangerousCharacters()
   {
     unset($GLOBALS["fp_add_body_classes"]);
 
@@ -398,7 +398,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("student-profilescriptbadscript", $GLOBALS["fp_add_body_classes"]);
   }
 
-  public function testAddCssDoesNotDuplicateFiles(): void
+  public function testAddCssDoesNotDuplicateFiles()
   {
     $GLOBALS["fp_extra_css"] = [];
 
@@ -409,7 +409,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(["/css/test.css", "/css/other.css"], $GLOBALS["fp_extra_css"]);
   }
 
-  public function testAddJsDoesNotDuplicateFiles(): void
+  public function testAddJsDoesNotDuplicateFiles()
   {
     $GLOBALS["fp_extra_js"] = [];
 
@@ -420,7 +420,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(["/js/test.js", "/js/other.js"], $GLOBALS["fp_extra_js"]);
   }
 
-  public function testAddJsSettings(): void
+  public function testAddJsSettings()
   {
     unset($GLOBALS["fp_extra_js_settings"]);
 
@@ -430,7 +430,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testBasePath(): void
+  public function testBasePath()
   {
     $original = $GLOBALS["fp_system_settings"]["base_path"];
 
@@ -450,7 +450,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testModuleEnabled(): void
+  public function testModuleEnabled()
   {
     $GLOBALS["fp_system_settings"]["modules"]["test_module"] = ["enabled" => "1"];
 
@@ -460,7 +460,7 @@ class MiscTest extends FlightPathTestCase
     unset($GLOBALS["fp_system_settings"]["modules"]["test_module"]);
   }
 
-  public function testAlertMessagesDoNotRepeatWhenRequested(): void
+  public function testAlertMessagesDoNotRepeatWhenRequested()
   {
     $_SESSION["fp_messages"] = [];
 
@@ -472,7 +472,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("status", $_SESSION["fp_messages"][0]["type"]);
   }
 
-  public function testAlertMessagesCanRepeatByDefault(): void
+  public function testAlertMessagesCanRepeatByDefault()
   {
     $_SESSION["fp_messages"] = [];
 
@@ -483,7 +483,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testUserIsStudentUsesGlobalUserWhenAccountIsOmitted(): void
+  public function testUserIsStudentUsesGlobalUserWhenAccountIsOmitted()
   {
     global $user;
 
@@ -505,7 +505,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testGetTermsByYearRange(): void
+  public function testGetTermsByYearRange()
   {
     $result = fp_get_terms_by_year_range(2020, 2020);
 
@@ -520,7 +520,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testGetTermsByYearRangeCanOmitTermIdFromDescription(): void
+  public function testGetTermsByYearRangeCanOmitTermIdFromDescription()
   {
     $with_ids = fp_get_terms_by_year_range(2020, 2020, 0, TRUE);
     $without_ids = fp_get_terms_by_year_range(2020, 2020, 0, FALSE);
@@ -535,7 +535,7 @@ class MiscTest extends FlightPathTestCase
 
 
 
-  public function testGetDepartments(): void
+  public function testGetDepartments()
   {
     unset($GLOBALS["fp_cache_departments"]);
 
@@ -553,7 +553,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetDepartmentsCachesResult(): void
+  public function testGetDepartmentsCachesResult()
   {
     unset($GLOBALS["fp_cache_departments"]);
 
@@ -575,7 +575,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testTranslateNumericGrade(): void
+  public function testTranslateNumericGrade()
   {
     unset($GLOBALS["fp_translate_numeric_grade"]);
 
@@ -594,7 +594,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testTranslateNumericGradePreservesMidtermSuffix(): void
+  public function testTranslateNumericGradePreservesMidtermSuffix()
   {
     unset($GLOBALS["fp_translate_numeric_grade"]);
 
@@ -611,7 +611,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testReArrayFiles(): void
+  public function testReArrayFiles()
   {
     $file_post = [
       "name" => ["one.txt", "two.txt"],
@@ -633,7 +633,7 @@ class MiscTest extends FlightPathTestCase
 
 
 
-  public function testHttpBuildQueryWithSimpleValues(): void
+  public function testHttpBuildQueryWithSimpleValues()
   {
     $result = fp_http_build_query([
       "name" => "John Doe",
@@ -643,7 +643,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("name=John%20Doe&age=42", $result);
   }
 
-  public function testHttpBuildQueryWithNestedArray(): void
+  public function testHttpBuildQueryWithNestedArray()
   {
     $result = fp_http_build_query([
       "student" => [
@@ -655,7 +655,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("student%5Bname%5D=John%20Doe&student%5Bid%5D=12345", $result);
   }
 
-  public function testHttpBuildQueryWithNullValue(): void
+  public function testHttpBuildQueryWithNullValue()
   {
     $result = fp_http_build_query([
       "foo" => null,
@@ -665,7 +665,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("foo&bar=value", $result);
   }
 
-  public function testHttpBuildQueryPreservesSlashes(): void
+  public function testHttpBuildQueryPreservesSlashes()
   {
     $result = fp_http_build_query([
       "path" => "/student/12345",
@@ -675,7 +675,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("path=/student/12345&url=foo/bar", $result);
   }
 
-  public function testHttpBuildQueryWithMixedValues(): void
+  public function testHttpBuildQueryWithMixedValues()
   {
     $result = fp_http_build_query([
       "student_id" => 12345,
@@ -691,7 +691,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testHttpBuildQueryWithParent(): void
+  public function testHttpBuildQueryWithParent()
   {
     $result = fp_http_build_query([
       "name" => "John Doe",
@@ -702,7 +702,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testArg(): void
+  public function testArg()
   {
     $original_request = $_REQUEST;
 
@@ -719,7 +719,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testArgTrimsWhitespace(): void
+  public function testArgTrimsWhitespace()
   {
     $original_request = $_REQUEST;
 
@@ -735,7 +735,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testArgHandlesMissingQueryString(): void
+  public function testArgHandlesMissingQueryString()
   {
     $original_request = $_REQUEST;
 
@@ -749,7 +749,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetTimezones(): void
+  public function testGetTimezones()
   {
     $timezones = get_timezones();
 
@@ -763,7 +763,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("America/Los Angeles - (Pacific)", $timezones["America/Los_Angeles"]);
   }
 
-  public function testGetTimezonesCanIncludeOffsets(): void
+  public function testGetTimezonesCanIncludeOffsets()
   {
     $timezones = get_timezones(TRUE);
 
@@ -775,12 +775,12 @@ class MiscTest extends FlightPathTestCase
     $this->assertMatchesRegularExpression('/^\(UTC[+-]\d{2}:\d{2}\) /', $timezones["America/Chicago"]);
   }
 
-  public function testHttpBuildQueryWithEmptyArray(): void
+  public function testHttpBuildQueryWithEmptyArray()
   {
     $this->assertSame("", fp_http_build_query([]));
   }
 
-  public function testHttpBuildQueryWithEmptyString(): void
+  public function testHttpBuildQueryWithEmptyString()
   {
     $result = fp_http_build_query([
       "foo" => "",
@@ -791,12 +791,12 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testQueryStringEncodeWithEmptyArray(): void
+  public function testQueryStringEncodeWithEmptyArray()
   {
     $this->assertSame("", fp_query_string_encode([]));
   }
 
-  public function testQueryStringEncodeWithSpecialCharacters(): void
+  public function testQueryStringEncodeWithSpecialCharacters()
   {
     $query = [
       "name" => "John & Jane",
@@ -809,7 +809,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testGetTimezoneOffset(): void
+  public function testGetTimezoneOffset()
   {
     $origin = new DateTime("now", new DateTimeZone("UTC"));
     $remote = new DateTime("now", new DateTimeZone("America/Chicago"));
@@ -819,7 +819,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame($expected, get_timezone_offset("America/Chicago", "UTC"));
   }
 
-  public function testGetTimezoneOffsetUsesDefaultTimezoneWhenOriginIsOmitted(): void
+  public function testGetTimezoneOffsetUsesDefaultTimezoneWhenOriginIsOmitted()
   {
     $original_timezone = date_default_timezone_get();
 
@@ -838,7 +838,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testTimerStartAndRead(): void
+  public function testTimerStartAndRead()
   {
     global $timers;
 
@@ -853,7 +853,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(1, $timers[$name]["count"]);
   }
 
-  public function testTimerStartIncrementsCount(): void
+  public function testTimerStartIncrementsCount()
   {
     global $timers;
 
@@ -866,7 +866,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(2, $timers[$name]["count"]);
   }
 
-  public function testTimerReadReturnsNullForUnknownTimer(): void
+  public function testTimerReadReturnsNullForUnknownTimer()
   {
     global $timers;
 
@@ -877,12 +877,12 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testGetRandomStringCanReturnEmptyString(): void
+  public function testGetRandomStringCanReturnEmptyString()
   {
     $this->assertSame("", fp_get_random_string(0));
   }
 
-  public function testGetRandomStringCanIncludeSymbols(): void
+  public function testGetRandomStringCanIncludeSymbols()
   {
     $result = fp_get_random_string(100, true, true, true);
 
@@ -891,7 +891,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testGetDegreeClassifications(): void
+  public function testGetDegreeClassifications()
   {
     $classifications = fp_get_degree_classifications();
 
@@ -906,7 +906,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(3, $classifications["machine_name_to_level_num"]["CONC"]);
   }
 
-  public function testGetDegreeClassificationDetails(): void
+  public function testGetDegreeClassificationDetails()
   {
     $details = fp_get_degree_classification_details("MAJOR");
 
@@ -915,7 +915,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("MAJOR", $details["degree_class"]);
   }
 
-  public function testGetDegreeClassificationDetailsForUnknownClass(): void
+  public function testGetDegreeClassificationDetailsForUnknownClass()
   {
     $details = fp_get_degree_classification_details("UNKNOWN_CLASS");
 
@@ -924,14 +924,14 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("UNKNOWN_CLASS", $details["degree_class"]);
   }
 
-  public function testGetDegreeClassificationDetailsCanReturnEmptyForUnknownClass(): void
+  public function testGetDegreeClassificationDetailsCanReturnEmptyForUnknownClass()
   {
     $details = fp_get_degree_classification_details("UNKNOWN_CLASS", FALSE);
 
     $this->assertSame([], $details);
   }
 
-  public function testGetTermStructures(): void
+  public function testGetTermStructures()
   {
     $name = "term_id_structure";
 
@@ -956,7 +956,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetTermStructuresReturnsEmptyArrayWhenUnset(): void
+  public function testGetTermStructuresReturnsEmptyArrayWhenUnset()
   {
     $name = "term_id_structure";
 
@@ -972,7 +972,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetRequirementTypes(): void
+  public function testGetRequirementTypes()
   {
     unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
 
@@ -995,7 +995,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetRequirementTypesAddsRequiredDefaults(): void
+  public function testGetRequirementTypesAddsRequiredDefaults()
   {
     unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
 
@@ -1018,7 +1018,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetRequirementTypesCachesResult(): void
+  public function testGetRequirementTypesCachesResult()
   {
     unset($GLOBALS["fp_temp_cache"]["fp_get_requirement_types"][0]);
 
@@ -1044,7 +1044,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testFpTokenCreatesAndPersistsSiteToken(): void
+  public function testFpTokenCreatesAndPersistsSiteToken()
   {
     $original = variable_get("site_token", "");
 
@@ -1068,7 +1068,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetSessionStringCanBeValidated(): void
+  public function testGetSessionStringCanBeValidated()
   {
     $original_ip = $_SERVER["REMOTE_ADDR"] ?? NULL;
 
@@ -1090,44 +1090,44 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetSessionIdFromStringRejectsInvalidHash(): void
+  public function testGetSessionIdFromStringRejectsInvalidHash()
   {
     $this->assertFalse(fp_get_session_id_from_str(session_id() . "~_invalid"));
   }
 
-  public function testGetSessionIdFromStringRejectsMalformedString(): void
+  public function testGetSessionIdFromStringRejectsMalformedString()
   {
     $this->assertFalse(fp_get_session_id_from_str("not-a-valid-session-string"));
   }
 
 
-  public function testTranslationFunctionReplacesVariables(): void
+  public function testTranslationFunctionReplacesVariables()
   {
     $this->assertSame("Hello Richard", t("Hello @name", ["@name" => "Richard"]));
   }
 
-  public function testTranslationFunctionReplacesNullAndFalseWithEmptyString(): void
+  public function testTranslationFunctionReplacesNullAndFalseWithEmptyString()
   {
     $this->assertSame("Hello ", t("Hello @name", ["@name" => NULL]));
     $this->assertSame("Hello ", t("Hello @name", ["@name" => FALSE]));
   }
 
-  public function testTranslationFunctionItalicizesPercentVariables(): void
+  public function testTranslationFunctionItalicizesPercentVariables()
   {
     $this->assertSame("<em>Richard</em>", t("%name", ["%name" => "Richard"]));
   }
 
-  public function testStaticTranslationFunctionMatchesTranslationBehavior(): void
+  public function testStaticTranslationFunctionMatchesTranslationBehavior()
   {
     $this->assertSame("Hello Richard", st("Hello @name", ["@name" => "Richard"]));
   }
 
-  public function testStaticTranslationFunctionItalicizesPercentVariables(): void
+  public function testStaticTranslationFunctionItalicizesPercentVariables()
   {
     $this->assertSame("<em>Richard</em>", st("%name", ["%name" => "Richard"]));
   }
 
-  public function testBaseUrl(): void
+  public function testBaseUrl()
   {
     $original = $GLOBALS["fp_system_settings"]["base_url"];
 
@@ -1141,7 +1141,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetFilesPath(): void
+  public function testGetFilesPath()
   {
     $original = $GLOBALS["fp_system_settings"]["file_system_path"];
 
@@ -1155,7 +1155,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetTmpPathUsesConfiguredPath(): void
+  public function testGetTmpPathUsesConfiguredPath()
   {
     $name = "tmp_path";
     $original = variable_get($name, "/tmp");
@@ -1171,7 +1171,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testFpUrlWithCleanUrlsDisabled(): void
+  public function testFpUrlWithCleanUrlsDisabled()
   {
     $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
     $original_clean_urls = variable_get("clean_urls", FALSE);
@@ -1189,7 +1189,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testFpUrlWithCleanUrlsEnabled(): void
+  public function testFpUrlWithCleanUrlsEnabled()
   {
     $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
     $original_clean_urls = variable_get("clean_urls", FALSE);
@@ -1207,7 +1207,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testFpUrlCanExcludeBasePath(): void
+  public function testFpUrlCanExcludeBasePath()
   {
     $original_clean_urls = variable_get("clean_urls", FALSE);
 
@@ -1221,7 +1221,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testFpUrlAbsolute(): void
+  public function testFpUrlAbsolute()
   {
     $original_base_url = $GLOBALS["fp_system_settings"]["base_url"];
     $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
@@ -1241,7 +1241,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testLinkHelperCreatesLink(): void
+  public function testLinkHelperCreatesLink()
   {
     $original_base_path = $GLOBALS["fp_system_settings"]["base_path"];
     $original_clean_urls = variable_get("clean_urls", FALSE);
@@ -1260,7 +1260,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testScreenIsMobileDetectsAndroid(): void
+  public function testScreenIsMobileDetectsAndroid()
   {
     $original_agent = $_SERVER["HTTP_USER_AGENT"] ?? NULL;
     $original_mobile = $GLOBALS["fp_page_is_mobile"] ?? NULL;
@@ -1288,7 +1288,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testScreenIsMobileReturnsFalseForDesktopBrowser(): void
+  public function testScreenIsMobileReturnsFalseForDesktopBrowser()
   {
     $original_agent = $_SERVER["HTTP_USER_AGENT"] ?? NULL;
     $original_mobile = $GLOBALS["fp_page_is_mobile"] ?? NULL;
@@ -1316,7 +1316,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testScreenIsMobileUsesCachedResult(): void
+  public function testScreenIsMobileUsesCachedResult()
   {
     $original_mobile = $GLOBALS["fp_page_is_mobile"] ?? NULL;
 
@@ -1340,21 +1340,21 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testFpStrEndsWith(): void
+  public function testFpStrEndsWith()
   {
     $this->assertTrue(fp_str_ends_with("FlightPath", "Path"));
     $this->assertFalse(fp_str_ends_with("FlightPath", "Flight"));
     $this->assertFalse(fp_str_ends_with("FlightPath", ""));
   }
 
-  public function testJoinAssocWithCustomSeparators(): void
+  public function testJoinAssocWithCustomSeparators()
   {
     $result = fp_join_assoc(["first" => "one", "second" => "two"], ";", ":");
 
     $this->assertSame("first:one;second:two", $result);
   }
 
-  public function testExplodeAssocConvertsNumericValuesBackToNumbers(): void
+  public function testExplodeAssocConvertsNumericValuesBackToNumbers()
   {
     $result = fp_explode_assoc("hours_S-3,gpa_S-3.5,name_S-Richard");
 
@@ -1363,19 +1363,19 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("Richard", $result["name"]);
   }
 
-  public function testJoinAssocWithEmptyArray(): void
+  public function testJoinAssocWithEmptyArray()
   {
     $this->assertSame("", fp_join_assoc([]));
   }
 
-  public function testExplodeAssocIgnoresEmptyEntries(): void
+  public function testExplodeAssocIgnoresEmptyEntries()
   {
     $result = fp_explode_assoc("one_S-1,,two_S-2,");
 
     $this->assertSame(["one" => 1, "two" => 2], $result);
   }
 
-  public function testGetModuleDetailsForFlightPathCore(): void
+  public function testGetModuleDetailsForFlightPathCore()
   {
     $result = fp_get_module_details("flightpath");
 
@@ -1384,7 +1384,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame(FLIGHTPATH_VERSION, $result["version"]);
   }
 
-  public function testLoadDegreeCachesTheDegreePlan(): void
+  public function testLoadDegreeCachesTheDegreePlan()
   {
     unset($GLOBALS["fp_temp_cache"]["fp_load_degree"]);
 
@@ -1395,7 +1395,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame($first, $second);
   }
 
-  public function testHtmlPrintRDisplaysSimpleValues(): void
+  public function testHtmlPrintRDisplaysSimpleValues()
   {
     $result = fp_html_print_r("Hello", "message");
 
@@ -1404,7 +1404,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("(string", $result);
   }
 
-  public function testHtmlPrintRDisplaysArrays(): void
+  public function testHtmlPrintRDisplaysArrays()
   {
     $result = fp_html_print_r(["name" => "Rex"], "pet");
 
@@ -1414,7 +1414,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("Rex", $result);
   }
 
-  public function testHtmlPrintRDisplaysBooleanValues(): void
+  public function testHtmlPrintRDisplaysBooleanValues()
   {
     $true_result = fp_html_print_r(TRUE, "enabled");
     $false_result = fp_html_print_r(FALSE, "enabled");
@@ -1423,7 +1423,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("FALSE", $false_result);
   }
 
-  public function testHtmlPrintRStopsAtMaximumDepth(): void
+  public function testHtmlPrintRStopsAtMaximumDepth()
   {
     $value = ["level" => ["nested" => "value"]];
 
@@ -1432,7 +1432,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("Depth too great", $result);
   }
 
-  public function testQueryStringEncodeCanExcludeKeys(): void
+  public function testQueryStringEncodeCanExcludeKeys()
   {
     $query = [
       "name" => "John Doe",
@@ -1446,7 +1446,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testQueryStringEncodeCanExcludeNestedKeys(): void
+  public function testQueryStringEncodeCanExcludeNestedKeys()
   {
     $query = [
       "student" => [
@@ -1461,7 +1461,7 @@ class MiscTest extends FlightPathTestCase
   }
 
 
-  public function testMapPhpErrorCode(): void
+  public function testMapPhpErrorCode()
   {
     $this->assertSame("Fatal Error", _fp_map_php_error_code(E_ERROR));
     $this->assertSame("Fatal Error", _fp_map_php_error_code(E_PARSE));
@@ -1484,7 +1484,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("", _fp_map_php_error_code(123456789));
   }
 
-  public function testFilterUntrustedInputForMajorCode(): void
+  public function testFilterUntrustedInputForMajorCode()
   {
     $input = ' COSC (BS); #1010="test" ';
 
@@ -1493,7 +1493,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("COSCBS1010test", $result);
   }
 
-  public function testFilterUntrustedInputRemovesHtml(): void
+  public function testFilterUntrustedInputRemovesHtml()
   {
     $result = filter_untrusted_input('<script>alert("x")</script>COSC', "major_code");
 
@@ -1503,37 +1503,37 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("COSC", $result);
   }
 
-  public function testFilterUntrustedInputReturnsOtherTypesUnchanged(): void
+  public function testFilterUntrustedInputReturnsOtherTypesUnchanged()
   {
     $this->assertSame("Hello World", filter_untrusted_input("Hello World", "other"));
   }
 
-  public function testFilterUntrustedInputHandlesEmptyInput(): void
+  public function testFilterUntrustedInputHandlesEmptyInput()
   {
     $this->assertSame("", filter_untrusted_input("", "major_code"));
     $this->assertSame("", filter_untrusted_input(NULL, "major_code"));
   }
 
-  public function testFilterMarkupReturnsEmptyInputUnchanged(): void
+  public function testFilterMarkupReturnsEmptyInputUnchanged()
   {
     $this->assertSame("", filter_markup(""));
     $this->assertSame(NULL, filter_markup(NULL));
   }
 
-  public function testFilterMarkupReturnsNonStringInputUnchanged(): void
+  public function testFilterMarkupReturnsNonStringInputUnchanged()
   {
     $this->assertSame(123, filter_markup(123));
     $this->assertSame(["test"], filter_markup(["test"]));
   }
 
-  public function testFilterMarkupFullAllowsHtml(): void
+  public function testFilterMarkupFullAllowsHtml()
   {
     $html = "<strong>Hello</strong><script>alert('x')</script>";
 
     $this->assertSame($html, filter_markup($html, "full"));
   }
 
-  public function testFilterMarkupBasicConvertsNewlinesToSafeMarkup(): void
+  public function testFilterMarkupBasicConvertsNewlinesToSafeMarkup()
   {
     $result = filter_markup("Hello\nWorld", "basic");
 
@@ -1541,31 +1541,31 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("World", $result);
   }
 
-  public function testRepairHtmlRepairsMismatchedTags(): void
+  public function testRepairHtmlRepairsMismatchedTags()
   {
     $result = repair_html("<strong>Hello");
 
     $this->assertStringContainsString("<strong>Hello</strong>", $result);
   }
 
-  public function testRepairHtmlPreservesValidMarkup(): void
+  public function testRepairHtmlPreservesValidMarkup()
   {
     $result = repair_html("<p>Hello <strong>world</strong></p>");
 
     $this->assertStringContainsString("<p>Hello <strong>world</strong></p>", $result);
   }
 
-  public function testRepairHtmlHandlesPlainText(): void
+  public function testRepairHtmlHandlesPlainText()
   {
     $this->assertSame("Hello world", repair_html("Hello world"));
   }
 
-  public function testFilterXssBadProtocolAllowsSafeHttpUrl(): void
+  public function testFilterXssBadProtocolAllowsSafeHttpUrl()
   {
     $this->assertSame("http://example.com", filter_xss_bad_protocol("http://example.com"));
   }
 
-  public function testFilterXssBadProtocolRemovesJavascriptUrl(): void
+  public function testFilterXssBadProtocolRemovesJavascriptUrl()
   {
     $result = filter_xss_bad_protocol("javascript:alert(1)");
 
@@ -1573,14 +1573,14 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("alert(1)", $result);
   }
 
-  public function testFilterXssBadProtocolDecodesHtmlEntitiesBeforeFiltering(): void
+  public function testFilterXssBadProtocolDecodesHtmlEntitiesBeforeFiltering()
   {
     $result = filter_xss_bad_protocol("javascript&#58;alert(1)");
 
     $this->assertStringNotContainsString("javascript:", strtolower($result));
   }
 
-  public function testFilterXssAttributesKeepsSafeAttributes(): void
+  public function testFilterXssAttributesKeepsSafeAttributes()
   {
     $result = filter_xss_attributes('class="student" id="student-123"');
 
@@ -1588,7 +1588,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertContains('id="student-123"', $result);
   }
 
-  public function testFilterXssAttributesRemovesStyleAttribute(): void
+  public function testFilterXssAttributesRemovesStyleAttribute()
   {
     $result = filter_xss_attributes('style="display:none" class="student"');
 
@@ -1596,7 +1596,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertContains('class="student"', $result);
   }
 
-  public function testFilterXssAttributesRemovesEventHandlers(): void
+  public function testFilterXssAttributesRemovesEventHandlers()
   {
     $result = filter_xss_attributes('onclick="alert(1)" class="student"');
 
@@ -1604,7 +1604,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertContains('class="student"', $result);
   }
 
-  public function testFilterXssAttributesHandlesValuelessAttributes(): void
+  public function testFilterXssAttributesHandlesValuelessAttributes()
   {
     $result = filter_xss_attributes("disabled class=\"student\"");
 
@@ -1612,7 +1612,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertContains('class="student"', $result);
   }
 
-  public function testStripDangerousProtocolsAllowsCommonSafeProtocols(): void
+  public function testStripDangerousProtocolsAllowsCommonSafeProtocols()
   {
     $this->assertSame("ftp://example.com", fp_strip_dangerous_protocols("ftp://example.com"));
     $this->assertSame("mailto:test@example.com", fp_strip_dangerous_protocols("mailto:test@example.com"));
@@ -1620,37 +1620,37 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("https://example.com", fp_strip_dangerous_protocols("https://example.com"));
   }
 
-  public function testStripDangerousProtocolsHandlesRepeatedDangerousProtocols(): void
+  public function testStripDangerousProtocolsHandlesRepeatedDangerousProtocols()
   {
     $result = fp_strip_dangerous_protocols("javascript:javascript:alert(1)");
 
     $this->assertSame("alert(1)", $result);
   }
 
-  public function testStripDangerousProtocolsDoesNotTreatColonInRelativePathAsProtocol(): void
+  public function testStripDangerousProtocolsDoesNotTreatColonInRelativePathAsProtocol()
   {
     $result = fp_strip_dangerous_protocols("/path/to:file");
 
     $this->assertSame("/path/to:file", $result);
   }
 
-  public function testGetMachineReadableReplacesRunsOfInvalidCharacters(): void
+  public function testGetMachineReadableReplacesRunsOfInvalidCharacters()
   {
     $this->assertSame("Hello_World", fp_get_machine_readable("Hello---World"));
     $this->assertSame("Hello_World", fp_get_machine_readable("Hello & World"));
   }
 
-  public function testGetMachineReadablePreservesUnderscores(): void
+  public function testGetMachineReadablePreservesUnderscores()
   {
     $this->assertSame("TEST_ONE", fp_get_machine_readable("TEST_ONE"));
   }
 
-  public function testGetMachineReadablePreservesNumbers(): void
+  public function testGetMachineReadablePreservesNumbers()
   {
     $this->assertSame("Course_1010", fp_get_machine_readable("Course 1010"));
   }
 
-  public function testGetTermDescriptionUsesConfiguredTermStructure(): void
+  public function testGetTermDescriptionUsesConfiguredTermStructure()
   {
     $original = variable_get_for_school("term_id_structure", "", 0);
 
@@ -1666,7 +1666,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetTermDescriptionCanReturnAbbreviatedDescription(): void
+  public function testGetTermDescriptionCanReturnAbbreviatedDescription()
   {
     $original = variable_get_for_school("term_id_structure", "", 0);
 
@@ -1682,7 +1682,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetTermDescriptionReturnsTermIdWhenNoStructureMatches(): void
+  public function testGetTermDescriptionReturnsTermIdWhenNoStructureMatches()
   {
     $original = variable_get_for_school("term_id_structure", "", 0);
 
@@ -1698,13 +1698,13 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testGetTermDescriptionReturnsUnavailableFor1111Terms(): void
+  public function testGetTermDescriptionReturnsUnavailableFor1111Terms()
   {
     $this->assertSame("(data unavailable at this time)", get_term_description("201111", FALSE, 0));
   }
 
 
-  public function testGetTermStructuresIncludesDisplayAdjustment(): void
+  public function testGetTermStructuresIncludesDisplayAdjustment()
   {
     $original = variable_get_for_school("term_id_structure", "", 0);
 
@@ -1720,7 +1720,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testDebugCurrentTimeMillisStartsNewTimer(): void
+  public function testDebugCurrentTimeMillisStartsNewTimer()
   {
     $original = $GLOBALS["current_time_millis_test"] ?? NULL;
 
@@ -1744,7 +1744,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testDebugCurrentTimeMillisReportsElapsedTime(): void
+  public function testDebugCurrentTimeMillisReportsElapsedTime()
   {
     $original = $GLOBALS["current_time_millis_test"] ?? NULL;
 
@@ -1767,7 +1767,7 @@ class MiscTest extends FlightPathTestCase
     }
   }
 
-  public function testDebugCurrentTimeMillisCanDisplayArrays(): void
+  public function testDebugCurrentTimeMillisCanDisplayArrays()
   {
     $result = fp_debug_current_time_millis(["name" => "Rex"], TRUE, "_array_test");
 
@@ -1778,7 +1778,7 @@ class MiscTest extends FlightPathTestCase
     unset($GLOBALS["current_time_millis_array_test"]);
   }
 
-  public function testGetJsConfirmLink(): void
+  public function testGetJsConfirmLink()
   {
     $result = fp_get_js_confirm_link("Are you sure?", "deleteStudent(123)", "Delete", "danger", "Delete this student");
 
@@ -1790,14 +1790,14 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString(base64_encode("deleteStudent(123)"), $result);
   }
 
-  public function testGetJsConfirmLinkConvertsNewlines(): void
+  public function testGetJsConfirmLinkConvertsNewlines()
   {
     $result = fp_get_js_confirm_link("Line one\nLine two", "doSomething()", "Go");
 
     $this->assertStringContainsString(base64_encode("Line one<br>Line two"), $result);
   }
 
-  public function testGetJsPromptLink(): void
+  public function testGetJsPromptLink()
   {
     $result = fp_get_js_prompt_link("Enter name", "Richard", "saveName(response)", "Save", "prompt-link");
 
@@ -1808,7 +1808,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString(">Save</a>", $result);
   }
 
-  public function testGetJsAlertLink(): void
+  public function testGetJsAlertLink()
   {
     $result = fp_get_js_alert_link("This is a helpful message", "Help", "help-link", "Helpful information");
 
@@ -1818,7 +1818,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString(base64_encode("This is a helpful message"), $result);
   }
 
-  public function testGetJsAlertLinkUsesQuestionMarkWhenLinkTextIsOmitted(): void
+  public function testGetJsAlertLinkUsesQuestionMarkWhenLinkTextIsOmitted()
   {
     $result = fp_get_js_alert_link("Help text");
 
@@ -1826,7 +1826,7 @@ class MiscTest extends FlightPathTestCase
     $this->assertStringContainsString("fa-question-circle", $result);
   }
 
-  public function testModulesImplementHookFindsImplementedHooks(): void
+  public function testModulesImplementHookFindsImplementedHooks()
   {
     $GLOBALS["hook_cache"] = [];
 

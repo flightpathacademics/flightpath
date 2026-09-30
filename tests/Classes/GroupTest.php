@@ -3,14 +3,14 @@
 /**
  * Tests the basic behavior and recursive state management of the Group class.
  */
-require_once __DIR__ . '/../bootstrap.php';
+
 
 class GroupTest extends FlightPathTestCase
 {
   /**
    * Verifies that a new Group starts with the expected default property values and empty child lists.
    */
-  public function testNewGroupHasExpectedDefaults(): void
+  public function testNewGroupHasExpectedDefaults()
   {
     $group = new Group();
 
@@ -29,7 +29,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that constructing a Group with an existing group ID loads its basic identifying information from the database.
    */
-  public function testGroupLoadsFromDatabase(): void
+  public function testGroupLoadsFromDatabase()
   {
     $group = new Group("1001_101");
 
@@ -42,7 +42,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that get_db_group_id() extracts the underlying database group ID from a degree-specific group ID.
    */
-  public function testGetDbGroupIdRemovesDegreeId(): void
+  public function testGetDbGroupIdRemovesDegreeId()
   {
     $group = new Group();
 
@@ -54,7 +54,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that two groups with the same group ID are considered equal.
    */
-  public function testGroupsWithSameIdAreEqual(): void
+  public function testGroupsWithSameIdAreEqual()
   {
     $first = new Group();
     $first->group_id = "12345_101";
@@ -68,7 +68,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that groups with different group IDs are not considered equal.
    */
-  public function testGroupsWithDifferentIdsAreNotEqual(): void
+  public function testGroupsWithDifferentIdsAreNotEqual()
   {
     $first = new Group();
     $first->group_id = "12345_101";
@@ -82,7 +82,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that groups with the same underlying database group ID but different degree IDs can be considered equal when the degree ID is ignored.
    */
-  public function testGroupsCanBeEqualIgnoringDegreeId(): void
+  public function testGroupsCanBeEqualIgnoringDegreeId()
   {
     $first = new Group();
     $first->group_id = "12345_101";
@@ -97,7 +97,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies the distinction between an unset minimum-hours value, a positive minimum that has not been met, and the resulting fulfillment status.
    */
-  public function testMinHoursAllowedBehavior(): void
+  public function testMinHoursAllowedBehavior()
   {
     $group = new Group();
 
@@ -119,7 +119,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that zero is a valid minimum-hours requirement rather than the special value used to mean that no minimum was set.
    */
-  public function testZeroMinHoursAllowedIsAValidMinimum(): void
+  public function testZeroMinHoursAllowedIsAValidMinimum()
   {
     $group = new Group();
 
@@ -133,7 +133,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that assigning a semester to a group updates the group and its direct courses but intentionally leaves subgroups and their courses at their existing semester assignment.
    */
-  public function testAssignToSemesterDoesNotPropagateToSubgroups(): void
+  public function testAssignToSemesterDoesNotPropagateToSubgroups()
   {
     $group = new Group();
 
@@ -156,7 +156,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that assigning a minimum grade to a group recursively applies it to the group's courses, subgroups, and courses within those subgroups.
    */
-  public function testAssignMinGradePropagatesToCoursesAndSubgroups(): void
+  public function testAssignMinGradePropagatesToCoursesAndSubgroups()
   {
     $group = new Group();
 
@@ -179,7 +179,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that the requirement-by-degree ID is propagated from a group to all nested courses and subgroups.
    */
-  public function testSetReqByDegreeIdPropagatesRecursively(): void
+  public function testSetReqByDegreeIdPropagatesRecursively()
   {
     $group = new Group();
 
@@ -202,7 +202,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that the requirement type is propagated from a group to all nested courses and subgroups.
    */
-  public function testSetRequirementTypePropagatesRecursively(): void
+  public function testSetRequirementTypePropagatesRecursively()
   {
     $group = new Group();
 
@@ -225,7 +225,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that get_course_id_array() recursively collects course IDs from the group and all nested subgroups.
    */
-  public function testGetCourseIdArrayIncludesCoursesFromSubgroups(): void
+  public function testGetCourseIdArrayIncludesCoursesFromSubgroups()
   {
     $group = new Group();
 
@@ -263,7 +263,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that get_course_id_array() returns each course ID only once when the same course appears multiple times.
    */
-  public function testGetCourseIdArrayDoesNotDuplicateCourseIds(): void
+  public function testGetCourseIdArrayDoesNotDuplicateCourseIds()
   {
     $group = new Group();
 
@@ -284,7 +284,7 @@ class GroupTest extends FlightPathTestCase
   /**
    * Verifies that get_hours_remaining() calculates the remaining hours by subtracting fulfilled hours from the group's required hours.
    */
-  public function testGetHoursRemainingUsesRequiredHoursAndFulfilledHours(): void
+  public function testGetHoursRemainingUsesRequiredHoursAndFulfilledHours()
   {
     $group = new Group();
 
