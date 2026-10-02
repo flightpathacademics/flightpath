@@ -22,6 +22,13 @@ function comments_menu() {
   );
 
 
+  $items["comments/ajax-generate-advising-summary"] = array(
+    "page_callback" => "comments_ajax_generate_advising_summary",
+    "access_arguments" => array("can_save_comments"),
+    "type" => MENU_TYPE_CALLBACK,
+  );
+
+
   $items["comments/delete-comment"] = array(
     "page_callback" => "comments_perform_delete_comment",
     "access_arguments" => array("can_save_comments"),
@@ -170,23 +177,7 @@ function comments_perform_delete_comment() {
 
 function comments_comment_form_submit($form, $form_state) {
   global $user, $current_student_id;
-  if (!empty($form_state["values"]["generate_advising_summary"])) {
-    if (!function_exists("advise_can_access_view") || !advise_can_access_view($current_student_id)) {
-      fp_add_message(t("Sorry, but you do not have permission to view this student's advising sessions."), "error");
-      return;
-    }
-    $summary = comments_get_most_recent_advising_summary($current_student_id);
-    if ($summary === FALSE) {
-      fp_add_message(t("No saved advising session with course recommendations was found for this student."), "error");
-      return;
-    }
-    $existing_comment = trim($form_state["values"]["comment"]);
-    if ($existing_comment != "") $summary .= "\n\n" . $existing_comment;
-    $_SESSION["comments_generated_advising_summary_$current_student_id"] = $summary;
-    fp_add_message(t("An advising-session summary has been added to the comment editor.  Review and edit it before saving."));
-    watchdog("comments", "generated advising-session summary for:$current_student_id", array(), WATCHDOG_DEBUG);
-    return;
-  }
+
   $faculty_cwid = $user->cwid;
   $type = $form_state["values"]["type"];
   $term_id = $form_state["values"]["term_id"];
@@ -220,8 +211,6 @@ function comments_comment_form() {
   $school_id = db_get_school_id_for_student_id($current_student_id);
 
   $term_id = variable_get_for_school("advising_term_id", '', $school_id);
-  $generated_summary = $_SESSION["comments_generated_advising_summary_$current_student_id"] ?? "";
-  unset($_SESSION["comments_generated_advising_summary_$current_student_id"]);
 
   fp_set_title("");
 
@@ -246,13 +235,13 @@ function comments_comment_form() {
 
   $form["comment"] = array(
     "type" => "textarea_editor",
-    "value" => $generated_summary,
   );
 
   $form["generate_advising_summary"] = array(
-    "type" => "submit",
+    "type" => "button",
     "value" => t("Generate advising summary"),
-    "description" => t("Creates an editable first-person draft from the student's most recent saved advising session."),
+    "description" => t("Creates an editable first-person draft from your most recent saved advising session for this student."),
+    "attributes" => array("onclick" => "commentsGenerateAdvisingSummary();"),
     "weight" => 10,
   );
 
@@ -271,19 +260,57 @@ function comments_comment_form() {
 
 
 /**
+ * AJAX callback which returns an advising-session summary for the comment form.
+ */
+function comments_ajax_generate_advising_summary() {
+  global $user;
+
+  $rtn = array();
+  $student_id = filter_untrusted_input(@$_POST["current_student_id"]);
+  $form_token = trim((string) @$_POST["form_token"]);
+
+  if (!hash_equals(md5("comments_comment_form" . fp_token()), $form_token)) {
+    $rtn["error"] = t("The summary request could not be validated.  Please reload the page and try again.");
+    watchdog("comments", "Invalid form token while generating advising-session summary.", array(), WATCHDOG_ERROR);
+  }
+  else if (!comments_can_access_comments() || !user_has_permission("can_save_comments")) {
+    $rtn["error"] = t("Sorry, but you do not have permission to generate an advising summary for this student.");
+  }
+  else if (!function_exists("advise_can_access_view") || !advise_can_access_view($student_id)) {
+    $rtn["error"] = t("Sorry, but you do not have permission to view this student's advising sessions.");
+  }
+  else {
+    $summary = comments_get_most_recent_advising_summary($student_id, $user->cwid);
+    if ($summary === FALSE) {
+      $rtn["error"] = t("No saved advising session with course recommendations from you was found for this student.");
+    }
+    else {
+      $rtn["summary"] = $summary;
+      $rtn["success"] = TRUE;
+      watchdog("comments", "generated advising-session summary for:$student_id, faculty:$user->cwid", array(), WATCHDOG_DEBUG);
+    }
+  }
+
+  header("Content-Type: application/json");
+  print json_encode($rtn);
+  exit();
+}
+
+
+/**
  * Creates an editable, first-person summary of a student's most recent saved
  * advising session.  A multi-term session is identified by its shared token.
  */
-function comments_get_most_recent_advising_summary($student_id) {
+function comments_get_most_recent_advising_summary($student_id, $faculty_id) {
   $db = get_global_database_handler();
-  $res = db_query("SELECT * FROM advising_sessions WHERE student_id = ? AND delete_flag = 0 AND is_draft = 0 AND is_empty = 0 ORDER BY posted DESC LIMIT 1", array($student_id));
+  $res = db_query("SELECT * FROM advising_sessions WHERE student_id = ? AND faculty_id = ? AND delete_flag = 0 AND is_draft = 0 AND is_empty = 0 ORDER BY posted DESC, advising_session_id DESC LIMIT 1", array($student_id, $faculty_id));
   $most_recent_session = db_fetch_array($res);
   if (!$most_recent_session) return FALSE;
 
   $sessions = array();
   $token = trim($most_recent_session["advising_session_token"]);
   if ($token != "") {
-    $res = db_query("SELECT * FROM advising_sessions WHERE student_id = ? AND advising_session_token = ? AND delete_flag = 0 AND is_draft = 0 AND is_empty = 0 ORDER BY term_id", array($student_id, $token));
+    $res = db_query("SELECT * FROM advising_sessions WHERE student_id = ? AND faculty_id = ? AND advising_session_token = ? AND delete_flag = 0 AND is_draft = 0 AND is_empty = 0 ORDER BY term_id", array($student_id, $faculty_id, $token));
     while ($cur = db_fetch_array($res)) $sessions[] = $cur;
   }
   else {
@@ -292,7 +319,7 @@ function comments_get_most_recent_advising_summary($student_id) {
   }
 
   $school_id = db_get_school_id_for_student_id($student_id);
-  $student_name = htmlspecialchars($db->get_student_name($student_id, FALSE), ENT_QUOTES, "UTF-8");
+  $student_name = html_entity_decode(strip_tags($db->get_student_name($student_id, FALSE)), ENT_QUOTES, "UTF-8");
   $is_what_if = intval($most_recent_session["is_whatif"]) === 1;
   $summary = "I met with $student_name to ";
   if ($is_what_if) {
@@ -316,7 +343,7 @@ function comments_get_most_recent_advising_summary($student_id) {
       $course->set_catalog_year_from_term_id();
       $course->load_descriptive_data(FALSE);
       $course_name = trim("$course->subject_id $course->course_num");
-      $course_title = htmlspecialchars(strip_tags($course->title), ENT_QUOTES, "UTF-8");
+      $course_title = html_entity_decode(strip_tags($course->title), ENT_QUOTES, "UTF-8");
       $hours = floatval($advised_course["var_hours"]);
       $hours_text = ($hours > 0) ? " (" . $hours . " hours)" : "";
       $summary .= "- I recommended that the student take $course_name";
@@ -344,7 +371,7 @@ function comments_get_advising_session_degree_title($session) {
   $degree_plan = new DegreePlan();
   $degree_plan->degree_id = intval($session["degree_id"]);
   $degree_plan->load_descriptive_data();
-  return htmlspecialchars($degree_plan->get_title(TRUE), ENT_QUOTES, "UTF-8");
+  return html_entity_decode(strip_tags($degree_plan->get_title(TRUE)), ENT_QUOTES, "UTF-8");
 }
 
 /**

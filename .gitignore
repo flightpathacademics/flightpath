@@ -3,6 +3,7 @@ custom/*
 .settings/*
 .project
 .buildpath
+*/Thumbs.db
 
 tests/test-settings.php
 
