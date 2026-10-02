@@ -16,9 +16,9 @@
 .comments-comment-buttons {
   text-align: right;
 
-} 
+}
 
-.fp-form-comments_comment_form .form-radios-type div, 
+.fp-form-comments_comment_form .form-radios-type div,
 .fp-form-comments_comment_form .form-radios-type label {
   font-size: 10pt;
   display: inline;
@@ -30,11 +30,11 @@
 }
 
 .comment-comment .comment-by-line {
-  float: left;  
+  float: left;
 }
 
 .comment-comment-public .comment-by-line {
-  background-color: #FFFFE0; 
+  background-color: #FFFFE0;
 }
 
 .comment-comment .comment-datetime {
@@ -52,3 +52,21 @@
   margin-top: 5px;
   font-size: 0.8em;
 }
+
+#element-wrapper-type {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.markup-element-mark_generate_summary {
+  display: inline-block;
+  cursor: pointer;
+  color: #0080ff;
+}
+
+.markup-element-mark_generate_summary:hover {
+  text-decoration: underline;
+}
+
+
+

@@ -645,6 +645,7 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
 
 
   $extra_wrapper_class = "";  // We will give the wrapper a similar class as are defined in attributes, if any.
+
   if (is_array($attributes)) {
     // Convert the attributes array into a string.
 
