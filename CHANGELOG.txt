@@ -2,6 +2,8 @@ FlightPath 7.x Changelog
 ========================
 
 2026-10-02
+  Added new "Generate Advising Summary" functionality to comments.
+
   Cleaned up, hardened old code.
 
   Fixed bug in announcements.install where DATETIME field was malformed.
