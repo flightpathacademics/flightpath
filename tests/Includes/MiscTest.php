@@ -1477,7 +1477,6 @@ class MiscTest extends FlightPathTestCase
     $this->assertSame("Notice", _fp_map_php_error_code(E_NOTICE));
     $this->assertSame("Notice", _fp_map_php_error_code(E_USER_NOTICE));
 
-    $this->assertSame("Strict", _fp_map_php_error_code(E_STRICT));
     $this->assertSame("Deprecated", _fp_map_php_error_code(E_DEPRECATED));
     $this->assertSame("Deprecated", _fp_map_php_error_code(E_USER_DEPRECATED));
 

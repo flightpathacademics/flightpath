@@ -51,7 +51,7 @@ class DegreePlan extends stdClass
   **/
 
 
-  function __construct($degree_id = "", DatabaseHandler $db = NULL, $bool_load_minimal = FALSE, $array_significant_courses = FALSE, $bool_use_draft = FALSE) {
+  function __construct($degree_id = "", ?DatabaseHandler $db = NULL, $bool_load_minimal = FALSE, $array_significant_courses = FALSE, $bool_use_draft = FALSE) {
     $this->list_semesters = new ObjList();
     $this->list_groups = new GroupList();
     $this->bool_use_draft = $bool_use_draft;

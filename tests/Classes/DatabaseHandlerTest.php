@@ -394,7 +394,34 @@ class DatabaseHandlerTest extends FlightPathTestCase
     $this->assertSame(0, $db->get_school_id_for_group_id(7958642));
   }
 
+  /**
+   * Verify that a failing query returns NULL and is recorded in the watchdog log
+   * (type "database", severity WATCHDOG_ERROR) instead of failing silently.
+   */
+  public function testFailedQueryIsLoggedToWatchdog()
+  {
+    $old_error_log = ini_set("error_log", "/dev/null");  // keep PHPUnit output clean
 
+    $marker = "phpunit_missing_table_" . mt_rand(1000, 9999);
+    $before = (int) db_result(db_query("SELECT COUNT(*) FROM watchdog WHERE type = 'database'"));
+
+    $result = db_query("SELECT * FROM $marker");
+
+    ini_set("error_log", $old_error_log);
+
+    $this->assertNull($result);
+
+    $after = (int) db_result(db_query("SELECT COUNT(*) FROM watchdog WHERE type = 'database'"));
+    $this->assertSame($before + 1, $after);
+
+    $row = db_fetch_array(db_query("SELECT * FROM watchdog WHERE type = 'database' ORDER BY wid DESC LIMIT 1"));
+    $this->assertSame(WATCHDOG_ERROR, (int) $row["severity"]);
+    $variables = unserialize($row["variables"]);
+    $this->assertStringContainsString($marker, $variables["@message"]);
+    $this->assertStringContainsString("SELECT * FROM $marker", $variables["@query"]);
+
+    db_query("DELETE FROM watchdog WHERE type = 'database'");
+  }
 
 
 

@@ -1118,3 +1118,22 @@ function course_search_display_search() {
 }
 
 
+/**
+ * File extensions allowed for course syllabus uploads.
+ */
+function course_search_allowed_syllabus_extensions() {
+  return array('pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'ppt', 'pptx', 'xls', 'xlsx', 'zip', '7z');
+}
+
+
+/**
+ * Return TRUE if this uploaded filename has an allowed syllabus extension.
+ */
+function course_search_is_allowed_syllabus_filename($filename) {
+  $ext = strtolower(pathinfo((string) $filename, PATHINFO_EXTENSION));
+  return ($ext !== '' && in_array($ext, course_search_allowed_syllabus_extensions(), TRUE));
+}
+
+
+
+

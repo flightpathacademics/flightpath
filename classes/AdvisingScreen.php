@@ -33,7 +33,7 @@ class AdvisingScreen extends stdClass
    *       not draw certain elements.
    *
    */
-  function __construct($script_filename = "", FlightPath $flightpath = null, $screen_mode = "")
+  function __construct($script_filename = "", ?FlightPath $flightpath = null, $screen_mode = "")
   {
     $this->width_array = Array("10%", "8%","8%", "17%", "26%", "10%", "10%", "9%");
     $this->popup_width_array = Array("17%", "1%", "1%", "15%", "26%", "15%", "15%", "10%");
@@ -2422,7 +2422,7 @@ function draw_menu_items($menu_array) {
    *
    * @return string
    */
-  function display_popup_course_description($course_id = 0, Course $course = NULL, $group = NULL, $show_advising_buttons = FALSE)
+  function display_popup_course_description($course_id = 0, $course = NULL, $group = NULL, $show_advising_buttons = FALSE)
   {
     $pC = "";
 
@@ -6096,7 +6096,7 @@ function draw_menu_items($menu_array) {
    * @param int $group_hours_remaining
    * @return string|false
    */
-  function display_popup_group_select_course_list(CourseList $course_list = null, $group_hours_remaining = 0)
+  function display_popup_group_select_course_list(?CourseList $course_list = NULL, $group_hours_remaining = 0)
   {
     // Accepts a CourseList object and draws it out to the screen.  Meant to
     // be called by display_popup_group_select().

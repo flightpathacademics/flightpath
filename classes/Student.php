@@ -9,7 +9,7 @@ class Student extends stdClass
   public $list_transfer_eqvs_unassigned;
   public $array_settings, $array_significant_courses, $array_hide_grades_terms, $school_id;
 
-  function __construct($student_id = "", DatabaseHandler $db = NULL, $school_id = NULL)
+  function __construct($student_id = "", ?DatabaseHandler $db = NULL, $school_id = NULL)
   {
 
     $this->student_id = $student_id;

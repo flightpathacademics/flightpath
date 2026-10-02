@@ -45,7 +45,7 @@ class Group extends stdClass
 	**/
 
 
-	function __construct($group_id = "", DatabaseHandler $db = NULL, $semester_num = -1, $array_significant_courses = false, $bool_use_draft = false, $requirement_type = "")
+	function __construct($group_id = "", ?DatabaseHandler $db = NULL, $semester_num = -1, $array_significant_courses = false, $bool_use_draft = false, $requirement_type = "")
 	{
 		$this->group_id = $group_id;
 		$this->assigned_to_semester_num = $semester_num;

@@ -194,7 +194,7 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
 
     $vars = array();
     if ($cur->variables) {
-      $vars = @unserialize($cur->variables);
+      $vars = @unserialize($cur->variables, array('allowed_classes' => FALSE));
     }
     if (!$vars) $vars = array();
 

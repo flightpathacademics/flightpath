@@ -999,7 +999,7 @@ function schools_form_alter(&$form, $form_id) {
       $fields_to_edit = array('textfield', 'textarea', 'select', 'checkboxes');
       $fields_to_check_override = "";
       foreach ($form as $fieldname => $element) {
-        if (in_array($element['type'], $fields_to_edit)) {
+        if (in_array(($element['type'] ?? ''), $fields_to_edit)) {
           // Add an "override" checkbox for this field.
           $checked = "";
           if (variable_get("school_override__$fieldname", "") === "yes") {
@@ -1054,7 +1054,10 @@ function schools_override_elements_form_submit($form, $form_state) {
     $temp = explode("~~", $fieldname);
     $base_fieldname = $temp[0];
 
-    if (@$form_state['POST']["school_override__$fieldname"] === 'yes') {
+    //if (@$form_state['POST']["school_override__$fieldname"] === 'yes') {
+    // Checkboxes fields name their override box "school_override__inner-wrapper-<field>" (see schools_form_alter), so check both names.
+    $posted = $form_state['POST']["school_override__$fieldname"] ?? ($form_state['POST']["school_override__inner-wrapper-$fieldname"] ?? '');
+    if ($posted === 'yes') {
       // We are overriding the fieldname.
       variable_set("school_override__$fieldname", "yes");
 

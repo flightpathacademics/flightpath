@@ -410,11 +410,11 @@ function stats_report_course_use_summary() {
   $subject_id = $course_num = $draft_check = "";
 
   if (isset($_GET["subject_id"])) {
-    $subject_id = trim($_GET["subject_id"]);
-    $course_num = trim($_GET["course_num"]);
+    $subject_id = htmlentities(trim($_GET["subject_id"] ?? ''));
+    $course_num = htmlentities(trim($_GET["course_num"] ?? ''));
     // $school_id = intval($_GET["school_id"]);  // TODO: not supported yet.
     if (isset($_GET['draft'])) {
-      $draft_check = $_GET["draft"];
+      $draft_check = ($_GET["draft"] === "checked") ? "checked" : '';
     }
   }
 
@@ -708,9 +708,11 @@ function stats_select_school_form() {
 
   // change breadcrumbs based on REQUEST
   if (isset($_REQUEST['crumbs'])) {
-    $crumbs = unserialize(base64_decode($_REQUEST['crumbs']));
+    $crumbs = @unserialize(base64_decode((string) $_REQUEST['crumbs']), array('allowed_classes' => FALSE));
 
-    fp_set_breadcrumbs($crumbs);
+    if (is_array($crumbs)) {
+      fp_set_breadcrumbs($crumbs);
+    }
   }
 
 
@@ -1105,6 +1107,10 @@ function stats_get_date_range_form_elements($bool_inline = TRUE, $start_date = '
 function stats_draw_date_range_form($path, $start_date = "", $end_date = "", $additional_form_elements = "") {
   $rtn = "";
 
+  // These usually come straight from the request, so escape them before printing them in value='...'.
+  $start_date = htmlentities((string) $start_date, ENT_QUOTES);
+  $end_date = htmlentities((string) $end_date, ENT_QUOTES);
+
   $rtn .= "<form action='" . fp_url($path) . "' method='GET' >
             " . t("Select a date range to begin:") . "
             <br>
@@ -1423,7 +1429,7 @@ function stats_report_access_stats() {
 
     $minago = round((time() - $cur['timestamp']) / 60, 0);
 
-    $vars = @unserialize($cur['variables']);
+    $vars = @unserialize((string) $cur['variables'], array('allowed_classes' => FALSE));
     if (!$vars) $vars = '';
 
     $message = strip_tags(t($cur['message'], $vars));

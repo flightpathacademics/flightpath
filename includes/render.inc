@@ -762,7 +762,12 @@ function fp_render_element($name, $element, $use_session_submission_values_for_c
   }
 
   if ($type == "hidden" || $type == "value") {
-    if (!$value) $value = '';  // Force it to be a string
+    // Force it to be a string, but keep a zero value ("0" or 0) instead of blanking it.
+    if ($value === NULL || $value === FALSE || is_array($value)) {
+      $value = '';
+    }
+    $value = (string) $value;
+
     $value = htmlentities($value, ENT_QUOTES);
     $rtn .= "<input type='hidden' name='$name' id='element-$cssname' value='$value' data-type='$type'>";
   }

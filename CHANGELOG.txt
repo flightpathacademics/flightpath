@@ -1,6 +1,31 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-10-02
+  Cleaned up, hardened old code.
+
+  Fixed bug in announcements.install where DATETIME field was malformed.
+
+  Made it so "override degree hours" can't be a negative number.
+
+  Added explicit nullable types to certain method parameters for PHP 8.4.
+
+  Fixed minor bug in Calendar which was preventing scheduling appointments up to midnight.
+
+  Fixed bug with audit module where it was not handling multi-school data correctly.
+
+  Security hardening in a few places.
+
+
+2026-10-01
+  Remove references to PHP constant E_STRICT, since it is no longer used since PHP 8.0.
+
+  Logs database errors to watchdog and php error log (recursion-proof) if there's
+  an error with the database.
+
+  Security hardening in a few places.
+
+
 2026-09-28
   Fixed bug where standardized test descriptions were not displaying.
 

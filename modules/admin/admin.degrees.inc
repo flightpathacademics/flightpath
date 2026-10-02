@@ -1726,6 +1726,14 @@ function admin_edit_degree_form_validate($form, &$form_state) {
   $values = $form_state['values'];
   $perform_action2 = trim($values["perform_action2"]);
 
+  // Override Degree Hours must be blank or a non-negative number, otherwise it is silently treated as 0.
+  $override_degree_hours = trim((string) ($values["override_degree_hours"] ?? ''));
+  if ($override_degree_hours !== "" && (!is_numeric($override_degree_hours) || floatval($override_degree_hours) < 0)) {
+    form_error("override_degree_hours", t("Override Degree Hours must be zero, a positive number (eg, 120), or left
+                                          blank."));
+    return;
+  }
+
   $semester_nums_in_use = array();
 
   $school_id = 0;

@@ -113,6 +113,24 @@ class RenderTest extends FlightPathTestCase
     $this->assertStringContainsString("data-type='value'", $value);
   }
 
+
+  /**
+   * A hidden element with a zero value must keep "0" (e.g. alerts exclude_advisor),
+   * otherwise it posts '' and strict-mode MySQL rejects it for integer columns.
+   */
+  public function testRenderElementHiddenKeepsZeroValue()
+  {
+    $str0 = fp_render_element('exclude_advisor', ['type' => 'hidden', 'value' => '0']);
+    $int0 = fp_render_element('exclude_advisor', ['type' => 'hidden', 'value' => 0]);
+    $null = fp_render_element('exclude_advisor', ['type' => 'hidden', 'value' => NULL]);
+
+    $this->assertStringContainsString("value='0'", $str0);
+    $this->assertStringContainsString("value='0'", $int0);
+    $this->assertStringContainsString("value=''", $null);
+  }
+
+
+
   /**
    * Verifies that a checkbox renders its checked state based on its value.
    */

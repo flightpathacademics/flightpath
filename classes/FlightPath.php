@@ -6,7 +6,7 @@ class FlightPath extends stdClass
   public $course_list_advised_courses;
 
 
-  function __construct($student = "", $degree_plan = "", DatabaseHandler $db = null, $bool_perform_full_init = false)
+  function __construct($student = "", $degree_plan = "", ?DatabaseHandler $db = NULL, $bool_perform_full_init = FALSE)
   {
     if ($student != "")
     {
@@ -655,7 +655,7 @@ class FlightPath extends stdClass
 
 
 
-  function assign_courses_to_list(CourseList $list_requirements, Student $student, $bool_perform_assignment = TRUE, Group $group = NULL, $bool_check_significant_courses = FALSE, $assign_to_semester_num = -1) {
+  function assign_courses_to_list(CourseList $list_requirements, Student $student, $bool_perform_assignment = TRUE, ?Group $group = NULL, $bool_check_significant_courses = FALSE, $assign_to_semester_num = -1) {
 
     $count = 0;
     $school_id = 0;

@@ -335,7 +335,7 @@ function user_check_password($password, $stored_hash) {
     default:
       return FALSE;
   }
-  return ($hash && $stored_hash == $hash);
+  return ($hash && hash_equals((string) $stored_hash, (string) $hash));
 }
 
 

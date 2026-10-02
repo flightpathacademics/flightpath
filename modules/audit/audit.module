@@ -192,7 +192,7 @@ function audit_settings_form_validate($form, $form_state) {
 function audit_get_approval_types($school_id = 0) {
   $rtn = array();
 
-  $val = variable_get_for_school("audit_approval_types", "coursework ~ Coursework\nmajor_gpa ~ Major GPA\ngraduation_gpa ~ Graduation GPA", '', $school_id);
+  $val = variable_get_for_school("audit_approval_types", "coursework ~ Coursework\nmajor_gpa ~ Major GPA\ngraduation_gpa ~ Graduation GPA", $school_id);
   $lines = explode("\n", $val);
   foreach ($lines as $line) {
     if (trim($line) == "") continue;
@@ -344,7 +344,7 @@ function audit_display_audit() {
 
   // Get this from settings
   $audit_requirement_types = array();
-  $tlines = explode("\n", variable_get_for_school("audit_requirement_types", "g ~ General Requirements\nc ~ Core\nm ~ Major\ndegree ~ Degree", '', $school_id));
+  $tlines = explode("\n", variable_get_for_school("audit_requirement_types", "g ~ General Requirements\nc ~ Core\nm ~ Major\ndegree ~ Degree", $school_id));
   foreach ($tlines as $tline) {
     $temp = explode("~", trim($tline));
     if (trim($temp[0]) != "") {

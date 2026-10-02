@@ -658,9 +658,6 @@ function _fp_map_php_error_code($code) {
         case E_USER_NOTICE:
             $error = 'Notice';
             break;
-        case E_STRICT:
-            $error = 'Strict';
-            break;
         case E_DEPRECATED:
         case E_USER_DEPRECATED:
             $error = 'Deprecated';
@@ -2491,9 +2488,8 @@ function fp_goto($path, $query = "") {
 
   // Were we sent an array instead of separate values?  That's OK if so, let's separate them back out.
   if (is_array($path)) {
-    $path = @$path[0];
-    $query = (string) @$path[1];
-
+    $path = $path[0] ?? '';
+    $query = (string) ($path[1] ?? '');
   }
 
 

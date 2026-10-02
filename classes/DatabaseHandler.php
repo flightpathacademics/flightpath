@@ -154,7 +154,12 @@ class DatabaseHandler extends stdClass
     //////////////////////////////////////////////
 
     // Run the sqlQuery and return the result set.
-    if (!isset($this->pdo) || $this->pdo == NULL) fpm(debug_backtrace());
+    if (!isset($this->pdo) || $this->pdo == NULL) {
+      // No database connection.  Calling prepare() on NULL would be a fatal error, so log it and bail out.
+      fpm(debug_backtrace());
+      error_log("FlightPath: db_query() called with no database connection. Query: " . substr((string) $sql_query, 0, 500));
+      return NULL;
+    }
 
 
     try {
@@ -168,7 +173,7 @@ class DatabaseHandler extends stdClass
     }
     catch (Exception $ex) {
       // Some error happened!
-      $this->db_error($ex);
+      $this->db_error($ex, $sql_query);
     }
 
 
@@ -178,10 +183,54 @@ class DatabaseHandler extends stdClass
 
 
   /**
+   * Write a database error to the PHP error log and to the watchdog table (severity WATCHDOG_ERROR).
+   *
+   * A static flag prevents endless recursion if the watchdog INSERT itself fails
+   * (for example, when the database connection has been lost).
+   */
+  function db_error_log(Exception $ex, $sql_query = "") {
+    static $bool_logging = FALSE;  // Prevents enless loops
+    if ($bool_logging) return;
+    $bool_logging = TRUE;
+
+    $arr = $ex->getTrace();
+    $location = "";
+    foreach (array(2, 1, 0) as $idx) {
+      if (isset($arr[$idx]["file"])) {
+        $location = $arr[$idx]["file"] . ":" . ($arr[$idx]["line"] ?? "");
+        break;
+      }
+    }
+
+    // Use the query passed in directly; the trace's "args" are empty when zend.exception_ignore_args is On (PHP 8 production default).
+    $query = (string) $sql_query;
+    if ($query == "" && isset($arr[1]["args"][0]) && is_string($arr[1]["args"][0])) {
+      $query = $arr[1]["args"][0];
+    }
+    $query = substr(preg_replace("/\s+/", " ", $query), 0, 1000);
+
+    @error_log("FlightPath database error: " . $ex->getMessage() . " at $location. Query: $query");
+
+    if (function_exists("watchdog") && isset($this->pdo) && $this->pdo != NULL) {
+      try {
+        watchdog("database", "Database error: @message<br>Location: @location<br>Query: @query",
+            array("@message" => $ex->getMessage(), "@location" => $location, "@query" => $query),
+            WATCHDOG_ERROR);
+      }
+      catch (Throwable $t) {
+        // Never let logging break the page.
+      }
+    }
+
+    $bool_logging = FALSE;
+  }
+
+
+  /**
    * Draw out the error onto the screen.
    *
    */
-  function db_error(Exception $ex)
+  function db_error(Exception $ex, $sql_query = "")
   {
     global $user;
 
@@ -191,6 +240,10 @@ class DatabaseHandler extends stdClass
     $when_english = format_date($when_ts);
 
     $message = $ex->getMessage();
+
+    // Record the error in the watchdog log (and the PHP error log) so failed queries are no longer silent.
+    // Previously the error only went to fpm() (visible only to users with the debug permission) and an optional email.
+    $this->db_error_log($ex, $sql_query);
 
     // If the message involves a complaint about the sql_mode, point the user to a
     // help page about setting the sql_mode.
@@ -1131,12 +1184,12 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
               $school_line
               $catalog_line
                ORDER BY catalog_year DESC LIMIT 1 ", $params) ;
-    if ($this->db_num_rows($res7) > 0)
-    {
-      $cur7 = $this->db_fetch_array($res7);
-      return intval($cur7["course_id"]);
-    }
-    return FALSE;
+              if ($this->db_num_rows($res7) > 0)
+              {
+                $cur7 = $this->db_fetch_array($res7);
+                return intval($cur7["course_id"]);
+              }
+              return FALSE;
 
   }
 
@@ -1491,56 +1544,56 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
                               $undergrad_line
                               $degree_class_line
                             ORDER BY title, major_code ", $catalog_year, $school_id);
-    if ($this->db_num_rows($res) < 1) {
-      return false;
-    }
+                              if ($this->db_num_rows($res) < 1) {
+                                return false;
+                              }
 
-    while ($cur = $this->db_fetch_array($res))
-    {
-      $degree_id = $cur["degree_id"];
-      $major = trim($cur["major_code"]);
-      $title = trim($cur["title"]);
-      $track_code = "";
-      $major_code = $major;
+                              while ($cur = $this->db_fetch_array($res))
+                              {
+                                $degree_id = $cur["degree_id"];
+                                $major = trim($cur["major_code"]);
+                                $title = trim($cur["title"]);
+                                $track_code = "";
+                                $major_code = $major;
 
-      // The major may have a track specified.  If so, take out
-      // the track and make it seperate.
-      if (strstr($major, "_")) {
-        $temp = explode("_", $major);
-        $major_code = trim($temp[0]);
-        $track_code = trim($temp[1]);
-        // The major_code might now have a | at the very end.  If so,
-        // get rid of it.
-        if (substr($major_code, strlen($major_code)-1, 1) == "|")
-        {
-          $major_code = str_replace("|","",$major_code);
-        }
+                                // The major may have a track specified.  If so, take out
+                                // the track and make it seperate.
+                                if (strstr($major, "_")) {
+                                  $temp = explode("_", $major);
+                                  $major_code = trim($temp[0]);
+                                  $track_code = trim($temp[1]);
+                                  // The major_code might now have a | at the very end.  If so,
+                                  // get rid of it.
+                                  if (substr($major_code, strlen($major_code)-1, 1) == "|")
+                                  {
+                                    $major_code = str_replace("|","",$major_code);
+                                  }
 
 
-      }
+                                }
 
-      // Leave the track in if requested.
-      if ($bool_include_tracks == true)
-      {
-        // Set it back to what we got from the db.
-        $major_code = $major;
-        $temp_degree = $this->get_degree_plan($major, $catalog_year, true);
-        if ($temp_degree->track_code != "")
-        {
-          $title .= " - " . $temp_degree->track_title;
-        }
-      }
+                                // Leave the track in if requested.
+                                if ($bool_include_tracks == true)
+                                {
+                                  // Set it back to what we got from the db.
+                                  $major_code = $major;
+                                  $temp_degree = $this->get_degree_plan($major, $catalog_year, true);
+                                  if ($temp_degree->track_code != "")
+                                  {
+                                    $title .= " - " . $temp_degree->track_title;
+                                  }
+                                }
 
-      $rtn_array[$major_code]["title"] = $title;
-      $rtn_array[$major_code]["degree_id"] = $degree_id;
-      $rtn_array[$major_code]["degree_class"] = trim(strtoupper($cur["degree_class"]));
-      $rtn_array[$major_code]["school_id"] = intval($cur['school_id']);
-      $rtn_array[$major_code]["catalog_year"] = $cur['catalog_year'];
-      $rtn_array[$major_code]["db_id"] = $cur['id'];
+                                $rtn_array[$major_code]["title"] = $title;
+                                $rtn_array[$major_code]["degree_id"] = $degree_id;
+                                $rtn_array[$major_code]["degree_class"] = trim(strtoupper($cur["degree_class"]));
+                                $rtn_array[$major_code]["school_id"] = intval($cur['school_id']);
+                                $rtn_array[$major_code]["catalog_year"] = $cur['catalog_year'];
+                                $rtn_array[$major_code]["db_id"] = $cur['id'];
 
-    }
+                              }
 
-    return $rtn_array;
+                              return $rtn_array;
 
   }
 

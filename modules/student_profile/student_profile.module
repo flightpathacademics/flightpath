@@ -9,7 +9,7 @@
  */
 function student_profile_menu() {
   $items = array();
-  
+
 
   // Make sure the student-profile has not been disabled in the System Settings. If it hasn't been disabled, we will display this menu entry.
   $disabled_tabs = variable_get('system_disable_student_tabs', array());
@@ -27,17 +27,17 @@ function student_profile_menu() {
         "screen_mode" => "not_advising",
       ),
     );
-    
-    
+
+
   }
-  
 
 
 
 
-    
-  
-  
+
+
+
+
   return $items;
 }
 
@@ -47,7 +47,7 @@ function student_profile_menu() {
 /**
  * Returns an array where we show the percentage of grades that the student has, compared to the whole.
  * For example:  50% A's, 10% B's, and so on.
- * 
+ *
  * For convenience, we will also include the courses in an array so it can be displayed if desired.
  */
 function student_profile_get_grade_percentages_for_student($student) {
@@ -60,39 +60,39 @@ function student_profile_get_grade_percentages_for_student($student) {
   $rtn['grade_counts']['A']['count'] = 0;
   $rtn['grade_counts']['B']['count'] = 0;
   $rtn['grade_counts']['C']['count'] = 0;
-  
+
   $total_courses = count($student->list_courses_taken->array_list);
   if ($total_courses == 0) return $rtn;
-  
+
   foreach ($student->list_courses_taken->array_list as $course) {
     $grade = $course->grade;
 
     if (!isset($rtn['grade_counts'][$grade]['count'])) $rtn['grade_counts'][$grade]['count'] = 0;
-    
+
     $rtn['grade_counts'][$grade]['count']++;
-    
+
     $rtn['grade_counts'][$grade]['courses'][] = $course;
-    
-    
-    
-          
+
+
+
+
   }
-  
+
   foreach ($rtn['grade_counts'] as $grade => $val) {
     $count = $rtn['grade_counts'][$grade]['count'];
     $percent = round(($count / $total_courses) * 100, 1);
     $rtn['grade_counts'][$grade]['percent'] = $percent;
-    
+
     $html = "";
-    if ($count > 0) {      
+    if ($count > 0) {
       foreach ($val['courses'] as $course) {
         $html .= "<div class='grade-perc-course-row'>$course->subject_id $course->course_num $course->grade ($course->term_id)</div>";
-      }      
+      }
     }
     $rtn['grade_counts'][$grade]['courses_html'] = $html;
-    
-  }  
-  
+
+  }
+
   return $rtn;
 } // student_profile_get_grade_percentages_for_student($student)
 
@@ -101,40 +101,40 @@ function student_profile_get_grade_percentages_for_student($student) {
 
 function student_profile_display_student_profile_page() {
   global $current_student_id, $user, $student;
-  
+
   if (!isset($student) || $student == null || !is_object($student)) {
     $student = new Student($current_student_id);
-  }  
-  
-    
+  }
+
+
   $student_id = $current_student_id;
   $rtn = "";
-  
+
   $student_user_id = db_get_user_id_from_cwid($student_id, 'student');
   $student_user = fp_load_user($student_user_id);
-    
-  
+
+
   fp_add_css(fp_get_module_path('student_profile') . '/css/style.css');
   fp_add_js(fp_get_module_path('advise') . '/js/advise.js');
-    
-  
+
+
   fp_set_title('');
-  
+
   $rtn .= "";
-  
-  
+
+
   $grade_percentages = student_profile_get_grade_percentages_for_student($student);
-  
-  
+
+
   $percent_D = @floatval($grade_percentages['grade_counts']['D']['percent']);
   $percent_D_html = @$grade_percentages['grade_counts']['D']['courses_html'];
-  
+
   $percent_F = @floatval($grade_percentages['grade_counts']['F']['percent']);
   $percent_F_html = @$grade_percentages['grade_counts']['F']['courses_html'];
-  
+
   $percent_W = @floatval($grade_percentages['grade_counts']['W']['percent']);
   $percent_W_html = @$grade_percentages['grade_counts']['W']['courses_html'];
-  
+
   $D_link = "D's";
   if ($percent_D_html != "") {
     $D_link = "<a class='grade-percent-link' href='javascript:fp_alert(\"" . base64_encode($percent_D_html) . "\",\"base64\");'>D's</a>";
@@ -150,28 +150,28 @@ function student_profile_display_student_profile_page() {
     $W_link = "<a class='grade-percent-link' href='javascript:fp_alert(\"" . base64_encode($percent_W_html) . "\",\"base64\");'>W's</a>";
   }
 
-  
-    
+
+
   $profile_items = array();
-  
+
   $active_status = t('Active');
   if ($student->is_active !== 1) {
     $active_status = t('Inactive');
   }
-  
+
   $profile_items['left_side']['active_status'] = array(
     'label' => t('Status:'),
     'content' => $active_status,
   );
-  
-  
+
+
   if (@$student_user->attributes['athlete'] == 'yes') {
     $profile_items['left_side']['athlete'] = array(
       'label' => t('Athlete?:'),
       'content' => t('Yes'),
       'mobile_content' => t('Athlete'),
-    );    
-  }    
+    );
+  }
   else {
     $profile_items['left_side']['athlete'] = array(
       'label' => t('Athlete?:'),
@@ -179,87 +179,105 @@ function student_profile_display_student_profile_page() {
       'mobile_content' => t('Non-Athlete'),
     );
   }
-  
+
   $profile_items['left_side']['d_f_percent'] = array(
     'label' => 'D%/F%:',
     'content' => "$percent_D% $D_link / $percent_F% $F_link",
   );
-  
+
   $url = fp_url('student-profile/priority-calculations');
   $title = t("Academic Priority Calculations");
-  
-  if ($user->is_faculty) {
-    
+
+  // Only show Academic Priority when the Student Priority module is enabled
+  if ($user->is_faculty && function_exists('student_priority_get_academic_priority_value')) {
+
     $priority_val = student_priority_get_academic_priority_value($student_id, 300);  // Frequently re-calculate, so we get a "fresh" number.
     $temp = student_priority_get_student_academic_priority_label($priority_val);
     $machine = $temp['machine'];
     $label = $temp['label'];
-    
+
     $profile_items['left_side']['academic_priority'] = array(
       'label' => t('Academic Priority:'),
       'content' => "<span class='profile-priority-bar priority-$machine'>$label</span> <a href='javascript:popupLargeIframeDialog(\"$url\",\"$title\");'><i class='fa fa-question-circle'></i></a>",
     );
   }
   //////
-  
-  
+
+
   $enrollment_code = @$student_user->attributes['enrollment_code'];
   if (!$enrollment_code || $enrollment_code == '') $enrollment_code = "N/A";
-  
+
   $profile_items['right_side']['enrollment_code'] = array(
     'label' => t('Enrollment Code:'),
-    'content' => $enrollment_code,  
+    'content' => $enrollment_code,
     'mobile_content' => t('Enrollment Code:') . ' ' . $enrollment_code,
   );
-  
-  
+
+
   $financial_aid = @$student_user->attributes['financial_aid'];
   if (!$financial_aid || $financial_aid == "") $financial_aid = t("None");
-    
+
   $profile_items['right_side']['financial_aid'] = array(
     'label' => t('Financial Aid:'),
-    'content' => $financial_aid,  
+    'content' => $financial_aid,
     'mobile_content' => t("Fin. Aid:") . ' ' . $financial_aid,
   );
-  
-  
+
+
   $profile_items['right_side']['w_percent'] = array(
     'label' => 'W%:',
-    'content' => "$percent_W% $W_link",  
+    'content' => "$percent_W% $W_link",
   );
-  
-  
-  
- 
-  
-  
+
+
+
+
+
+
   $rtn .= "<div class='student-profile-header-full'>";
   $rtn .= fp_render_student_profile_header(FALSE, $profile_items); // Send more items since this is a "full" profile.
-  $rtn .= "</div><div class='clear'></div>";  
-  
+  $rtn .= "</div><div class='clear'></div>";
+
+
+  // Only show the Alerts section when the Alerts module is enabled
+  if (function_exists('alerts_advisees_alerts_form')) {
+    $rtn .= fp_render_section_title(t("Alerts"), "student-profile-alerts");
+
+    if (user_has_permission('add_alert_content')) {
+      $url = fp_url('content/add/alert', 'student_id=' . $student_id);
+      $title = t("Add New Alert");
+      $rtn .= "<a class='button student-profile-add-new-alert-button' href='javascript:popupLargeIframeDialog(\"$url\",\"$title\");'><i class='fa fa-bell'></i> " . t("Add New Alert") . "</a>";
+    }
+
+    // Take advantage of our "alerts form" from the alerts module.
+    $rtn .= fp_render_form("alerts_advisees_alerts_form", "normal", $student_id, 5);
+  }
+
+
+  /*
   $rtn .= fp_render_section_title(t("Alerts"), "student-profile-alerts");
-  
+
   if (user_has_permission('add_alert_content')) {
     $url = fp_url('content/add/alert', 'student_id=' . $student_id);
-    $title = t("Add New Alert");  
+    $title = t("Add New Alert");
     $rtn .= "<a class='button student-profile-add-new-alert-button' href='javascript:popupLargeIframeDialog(\"$url\",\"$title\");'><i class='fa fa-bell'></i> " . t("Add New Alert") . "</a>";
   }
-  
-  // Take advantage of our "alerts form" from the alerts module.  
+
+  // Take advantage of our "alerts form" from the alerts module.
   $rtn .= fp_render_form("alerts_advisees_alerts_form", "normal", $student_id, 5);
-  
-  
-    
-  
+  */
+
+
+
   watchdog("student_profile", "view $student_id");
-  
-    
-  
+
+
+
   // Let's set our breadcrumbs
   fp_set_standard_advising_breadcrumbs();
-  
-  
-    
+
+
+
   return $rtn;
 } // display student profile page
 

@@ -1551,10 +1551,11 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
 
             $et_plus_one_sec = $et; // default
             $stop_hour = intval($ut_content->field__day_stop_hour['value']);
-            if ($stop_hour < 23) {
-              $et_plus_one_sec = ($stop_hour + 1) . ":00:01";
+            // Unavailable from 1 second after the stop hour.  A stop hour of 0 means midnight,
+            // so keep the default ($et is already 23:59:59).
+            if ($stop_hour > 0) {
+              $et_plus_one_sec = $stop_hour . ":00:01";
             }
-
 
 
             // The first one is the start.  We go from midnight to $st minus 1 second.
@@ -1610,8 +1611,8 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
             }
             // The start and end times are now in the original faculty member's timezone.
             $unavailable_by_days[$dow][] = array(
-              'start_time' => date("H:i", $tz_st),
-              'end_time' => date("H:i", $tz_et),
+              'start_time' => date("H:i:s", $tz_st),
+              'end_time' => date("H:i:s", $tz_et),
               'tz' => $tz,
             );
           }
@@ -1635,7 +1636,12 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
   // we'd see a slot at:  11:30am, 11:50am, 12:10pm, 12:30pm, and so on.
 
   $how_long_min = intval($event_type_content->field__event_duration_minutes['value']) + intval($event_type_content->field__event_buffer_minutes['value']);
+
   $how_long_sec = $how_long_min * 60;
+
+  // Earliest real (UTC) time a slot may begin, based on the event type's lead time (aka "prevent less than X hours...").
+  $earliest_allowed_ts = strtotime("NOW + $prevent_less_than_hours HOURS");
+  $tz_obj = new DateTimeZone($tz);
 
   // Next, we are going to go through every single day of this month, to find out what all our slots are.
   $total_days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
@@ -1661,7 +1667,12 @@ function calendar_get_available_faculty_schedule($faculty_id, $event_type_cid, $
 
 
       // Skip if it's before X hours from now, based on the event_type_content. This will also catch all the days that have already passed.
-      if ($begin_slot_ts < strtotime("NOW + $prevent_less_than_hours HOURS")) {
+      //if ($begin_slot_ts < strtotime("NOW + $prevent_less_than_hours HOURS")) {
+
+      // begin_slot_ts is a wall-clock time in the faculty member's timezone (stored as if it were UTC), so
+      // convert it to a real instant (DST-aware, for that date) before comparing with the real current time.
+      $begin_slot_dt = new DateTime(date('Y-m-d H:i:s', $begin_slot_ts), $tz_obj);
+      if ($begin_slot_dt->getTimestamp() < $earliest_allowed_ts) {
 
         // get ready for next time through the loop
         $begin_slot_ts = $end_slot_ts;
@@ -3789,12 +3800,10 @@ function calendar_get_ics_invitation_string($event_title, $location, $descriptio
   $rtn = "";
 
   if ($description == "") $description = $event_title;
-  $description = strip_tags($description);
-
-  $description = str_replace("\r\n", "\n", $description); // Convert from windows to unix style linebreaks.
-  $description = str_replace("\n", "\\n", $description); // required if we have line breaks in the description.  We have to escape the slash.
-  $description = str_replace(";", "\\;", $description); // We have to escape semi-colons the same way
-  $description = str_replace(",", "\\,", $description); // And commas.
+  // Escape TEXT values per RFC 5545 3.3.11, so user-supplied text (ex: the student's name) can't start new ICS lines/properties.
+  $description = calendar_ics_escape($description);
+  $event_title_escaped = calendar_ics_escape($event_title);
+  $location = calendar_ics_escape($location);
 
   // We have to do "line folding" for the description if it is longer than 75 chars.  See: https://icalendar.org/iCalendar-RFC-5545/3-1-content-lines.html
 
@@ -3808,10 +3817,10 @@ function calendar_get_ics_invitation_string($event_title, $location, $descriptio
   $rtn .= "UID:" . sha1("FlightPath ~~" . $event_title . $start_dt . $end_dt) . "\n";
   $rtn .= "SEQUENCE:0\n";
   $rtn .= "DTSTAMP:" . date("Ymd\THis\Z", time()) . "\n";
-  $rtn .= "LOCATION:$location\n";
+  $rtn .= "LOCATION:" . calendar_ics_split("LOCATION:", $location) . "\n";
   $rtn .= "DESCRIPTION:" . calendar_ics_split("DESCRIPTION:", $description) . "\n";
   //$rtn .= "URL;VALUE=URI: http://mydomain.com/events/blah\n";
-  $rtn .= "SUMMARY:$event_title\n";
+  $rtn .= "SUMMARY:" . calendar_ics_split("SUMMARY:", $event_title_escaped) . "\n";
   $rtn .= "DTSTART:$start_dt\n";
   $rtn .= "END:VEVENT\n";
   $rtn .= "END:VCALENDAR";
@@ -3820,6 +3829,18 @@ function calendar_get_ics_invitation_string($event_title, $location, $descriptio
   return $rtn;
 } // get_ics_invitation_string
 
+
+/**
+ * Escape a TEXT value for an ics file, per RFC 5545 section 3.3.11:
+ * backslash, semicolon and comma get a backslash, and any line break (CRLF, LF or CR)
+ * becomes the two characters \n.
+ */
+function calendar_ics_escape($value = "") {
+  $value = str_replace("\\", "\\\\", (string) $value);  // backslash first
+  $value = str_replace(array(";", ","), array("\\;", "\\,"), $value);
+  $value = str_replace(array("\r\n", "\r", "\n"), "\\n", $value);
+  return $value;
+}
 
 /**
  * This lets us split up a line for ics into 75-char octets, according to the rules

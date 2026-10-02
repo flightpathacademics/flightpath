@@ -130,7 +130,7 @@ class CourseList extends ObjList
    *
    * @return Course|false
    */
-  function find_specific_course($course_id = 0, $term_id = 0, $bool_transfer = false, $bool_exclude_substitutions = true, Course $use_course = null, $sub_req_by_degree_id = 0)
+  function find_specific_course($course_id = 0, $term_id = 0, $bool_transfer = FALSE, $bool_exclude_substitutions = TRUE, ?Course $use_course = NULL, $sub_req_by_degree_id = 0)
   {
     if ($use_course != null && is_object($use_course))
     {
@@ -277,7 +277,7 @@ class CourseList extends ObjList
    * @param Course $course
    * @return bool
    */
-  function mark_repeats_exclude(Course $course, $degree_id = 0, Course $except_for_course = NULL)
+  function mark_repeats_exclude(Course $course, $degree_id = 0, ?Course $except_for_course = NULL)
   {
     // Set the bool_exclude_repeat flag to TRUE for all
     // occurances of $course in THIS list.
@@ -616,7 +616,7 @@ class CourseList extends ObjList
    * to order a Group's list of courses based on what the student has taken and the grades they made.
    *
    */
-  function sort_best_grade_first(Student $student = NULL, $school_id = 0) {
+  function sort_best_grade_first(?Student $student = NULL, $school_id = 0) {
 
     if ($student) {
       $school_id = $student->school_id;

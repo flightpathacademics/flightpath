@@ -75,7 +75,7 @@ class Course extends stdClass
  *
  * @param bool $bool_use_draft
  */
-  function __construct($course_id = 0, $is_transfer = FALSE, DatabaseHandler $db = NULL, $is_blank = FALSE, $catalog_year = 0, $bool_use_draft = FALSE)
+  function __construct($course_id = 0, $is_transfer = FALSE, ?DatabaseHandler $db = NULL, $is_blank = FALSE, $catalog_year = 0, $bool_use_draft = FALSE)
   {
 
     $this->advised_hours = -1;
@@ -294,7 +294,7 @@ class Course extends stdClass
 
 
 
-  function set_course_substitution($degree_id = 0, Course $course = NULL) {
+  function set_course_substitution($degree_id = 0, $course = NULL) {
     // If degree_id is zero, then use the course's currently req_by_degree_id.
     if ($degree_id == 0) $degree_id = $this->req_by_degree_id;
 
@@ -1021,7 +1021,7 @@ class Course extends stdClass
    *
    * @return bool
    */
-  function meets_min_grade_requirement_of(Course $course_req = NULL, $m_grade = "", $bool_exclude_W_and_F = TRUE)
+  function meets_min_grade_requirement_of(?Course $course_req = NULL, $m_grade = "", $bool_exclude_W_and_F = TRUE)
   {
     // Does $this course meet the min grade requirement
     // of the supplied course requirement?
@@ -1262,7 +1262,7 @@ class Course extends stdClass
    * @param Course $course_c
    * @return bool
    */
-  function equals(Course $course_c = null)
+  function equals(?Course $course_c = NULL)
   {
     if ($course_c != null && $this->course_id == $course_c->course_id)
     {

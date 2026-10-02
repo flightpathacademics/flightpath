@@ -329,17 +329,30 @@ function course_search_edit_course_details_form_submit($form, $form_state) {
   }
 
   // Did the user try to upload a file?
-  if (trim($_FILES["syllabus"]["tmp_name"][0]) != "")
+  if (trim((string) ($_FILES["syllabus"]["tmp_name"][0] ?? '')) != '')
   {
-    $test = course_search_upload_attachment($course_id, $subject_id, $course_num);
+    //    $test = course_search_upload_attachment($course_id, $subject_id, $course_num);
+
+    $test = FALSE;
+    //  Only allow document types.  The syllabi folder is web-readable, so a .php (or similar) upload could be run by the server.
+    if (!course_search_is_allowed_syllabus_filename($_FILES["syllabus"]["name"][0] ?? "")) {
+      fp_add_message(t("The syllabus was not uploaded.  Allowed file types are: @types", array("@types" => implode(", ", course_search_allowed_syllabus_extensions()))), "error");
+      watchdog('course_search', "rejected syllabus upload with disallowed extension for course_id:$course_id", array(), WATCHDOG_ERROR);
+    }
+    else {
+      $test = course_search_upload_attachment($course_id, $subject_id, $course_num);
+    }
+
     if (!$test)
     {
       fp_add_message(t("There was an error uploading attachment.  It is possible this is a write-permission
                         issue with the server."));
-    } else {
+    } else
+    {
       // success.
     }
-  }
+
+  } // if trim....
 
 
   watchdog('course_search', "edit_course_details course_id:$course_id, subject_id:$subject_id, course_num:$course_num, school_id:$school_id", array());
