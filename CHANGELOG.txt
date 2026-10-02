@@ -18,6 +18,8 @@ FlightPath 7.x Changelog
 
   Security hardening in a few places.
 
+  Removed code to force names through ucwords().
+
 
 2026-10-01
   Remove references to PHP constant E_STRICT, since it is no longer used since PHP 8.0.

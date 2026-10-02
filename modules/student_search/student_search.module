@@ -1313,8 +1313,8 @@ function student_search_query_advisees($sql, $params = array(), $limit = 20, $bo
 
     $rtn_array[$student_id]["student_id"] = $student_id;
     $rtn_array[$student_id]["school_id"] = intval($cur['school_id']);
-    $rtn_array[$student_id]["first_name"] = ucwords(strtolower($cur["f_name"]));
-    $rtn_array[$student_id]["last_name"] = ucwords(strtolower($cur["l_name"]));
+    $rtn_array[$student_id]["first_name"] = $cur["f_name"];
+    $rtn_array[$student_id]["last_name"] = $cur["l_name"];
     $rtn_array[$student_id]["rank"] = $cur["rank_code"];
     $rtn_array[$student_id]["catalog_year"] = $cur["catalog_year"];
     $rtn_array[$student_id]["priority_value"] = $cur["priority_value"];

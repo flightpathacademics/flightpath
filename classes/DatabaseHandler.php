@@ -1327,9 +1327,9 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
       $name = t("Unknown Student");
     }
 
-    // Force into pretty capitalization.
-    // turns JOHN SMITH into John Smith
-    $name = trim(ucwords(strtolower($name)));
+
+
+
 
     if ($bool_include_cwid) {
       $name .= " ($cwid)";
@@ -1360,11 +1360,6 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
     $cur = $this->db_fetch_array($res);
     if ($cur) {
       $name = $cur["f_name"] . " " . $cur["l_name"];
-
-
-      // Force into pretty capitalization.
-      // turns JOHN SMITH into John Smith
-      $name = trim(ucwords(strtolower($name)));
 
       if ($bool_include_cwid) {
         $name .= " ($cwid)";
