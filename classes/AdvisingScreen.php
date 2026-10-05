@@ -2194,7 +2194,7 @@ function draw_menu_items($menu_array) {
 
     foreach ($this->degree_plan->public_notes_array as $degree_id => $note) {
 
-      if (trim($note) != "") {
+      if (trim($note ?? '') != "") {
 
         $pC .= "<tr><td colspan='8'>
             <div class=' '
