@@ -1201,7 +1201,7 @@ function engagements_mass_sms_perform_batch_operation(&$batch, $recipients, $mes
         'To' => $num,
         'Body' => $message,
         'NumMedia' => 0,
-        'NumSegements' => $num_segments,
+        'NumSegments' => $num_segments,
         'direction' => 'outbound-api',
         'date_sent_ts' => $batch['date_sent_ts'],
       );
@@ -2367,7 +2367,7 @@ function engagements_sms_get_all_messages()
       $vars['Body'] = $body;
       $vars['date_sent_ts'] = $date_sent_ts;
       $vars['direction'] = $direction;
-      $vars['NumSegements'] = $num_segments;
+      $vars['NumSegments'] = $num_segments;
       $vars['delivery_status'] = $status;
       $vars['err_code'] = $error_code;
       $vars['err_message'] = $error_message;
