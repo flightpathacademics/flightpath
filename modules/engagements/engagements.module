@@ -1723,7 +1723,12 @@ function engagements_handle_incoming_sms($vars = array())
 
 
       // To tell not to retry this message, we need to deliver a 200 response.  Otherwise they will keep trying.
-      http_response_code(200); exit;
+      //http_response_code(200); exit;
+      http_response_code(200);
+      header('Content-Type: text/xml; charset=utf-8');
+      print '<?xml version="1.0" encoding="UTF-8"?>';
+      print '<Response></Response>';
+      exit;
     }
 
   } // if signing_key
@@ -2093,6 +2098,11 @@ function engagements_handle_incoming_sms($vars = array())
   // Allow other modules would like to handle in incoming SMS or even make changes to what is in $vars.
   invoke_hook('engagements_handle_incoming_sms_post_save', array(&$vars, $sms_history_mid, $content_created));
 
+
+  header('Content-Type: text/xml; charset=utf-8');
+  print '<?xml version="1.0" encoding="UTF-8"?>';
+  print '<Response></Response>';
+  exit;
 
 
 } // engagements_handle_incoming_sms
