@@ -123,4 +123,20 @@ class UpdateStatusTest extends FlightPathTestCase {
     );
     $this->assertArrayNotHasKey('comments', $query['modules']);
   }
+
+  /**
+   * Ensures a recently completed update check prevents cron from making an
+   * unnecessary external request and preserves the previously cached results.
+   */
+  public function testCronSkipsCheckWhenStatusWasRecentlyFetched(): void {
+    variable_set('update_status_need_updates_modules', array('lassie' => '9.9.9'));
+    variable_set('update_status_need_updates_release_types', array('lassie' => 'security'));
+    variable_set('update_status_last_run', time());
+
+    update_status_cron();
+
+    $this->assertSame(array('lassie' => '9.9.9'), variable_get('update_status_need_updates_modules'));
+    $this->assertSame(array('lassie' => 'security'), variable_get('update_status_need_updates_release_types'));
+    $this->assertGreaterThan(time() - 5, intval(variable_get('update_status_last_run')));
+  }
 }

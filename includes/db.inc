@@ -882,11 +882,11 @@ function variable_get($name, $default_value = "") {
     $GLOBALS["fp_system_settings"][$name] = $val;
 
   }
-
-
+  
   if (!$val) {
     $val = $default_value;
   }
+
 
   // We must have this down here again, just in case what got stored in the GLOBALS
   // array was this placeholder.  This can happen, because the settings file doesn't do
@@ -899,6 +899,14 @@ function variable_get($name, $default_value = "") {
   if ($val === "NULL_PLACEHOLDER") {
     $val = NULL;
   }
+
+  if ($val === NULL) {
+    // If val is still NULL, set to default value.
+    // We don't do this for FALSE, as it might intentionally be
+    // false.
+    $val = $default_value;
+  }
+
 
   return $val;
 }

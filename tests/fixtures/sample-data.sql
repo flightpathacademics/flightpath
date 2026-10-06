@@ -34,6 +34,10 @@ TRUNCATE TABLE transfer_institutions;
 TRUNCATE TABLE transfer_eqv_per_student;
 TRUNCATE TABLE menu_router;
 
+
+-- Create tables in case they don't exist 
+CREATE TABLE IF NOT EXISTS `schools` (`school_id` int(10) unsigned NOT NULL AUTO_INCREMENT,`school_code` varchar(5) NOT NULL,`name` varchar(255) NOT NULL, PRIMARY KEY (`school_id`), KEY `name` (`name`), KEY `school_code` (`school_code`));
+
 -- users (testadmin user with id = 1 and cwid = 1, and anonymous user with id = 2, are already added in the install script)
 INSERT INTO `users` VALUES (16, 'testprimary', '', 0, 1, '', '9999998', 'Test', 'Primary', 0, 0, 0);
 INSERT INTO `users` VALUES (17, 'testsecondary', '', 0, 1, '', '9999997', 'Test', 'Secondary', 0, 0, 0), (660, 'teststudent1', '', 1, 0, '', '9999999', 'Other', 'Student', 0, 0, 0), (661, 'teststudent', '', 1, 0, '', '999999999', 'Test', 'Student', 0, 0, 0), (662, 'xstudent', '', 1, 0, '', 'ABCDEFG', 'XTest', 'Student', 1, 0, 0), (663, 'jsmith', '', 1, 0, '', '10035744', 'Jamale', 'Smith', 0, 0, 1), (664, 'ejonston', '', 1, 0, '', '1076654', 'Evalain', 'Jonston', 0, 0, 0), (665, 'mtashi', '', 1, 0, '', '1033154', 'Maiku', 'Tashi', 0, 0, 0), (666, 'dsmithe', '', 1, 0, '', '1027891', 'Daniel', 'Smithe', 0, 0, 0), (667, 'rdeangello', '', 1, 0, '', '1011155', 'Ramon', 'DeAngello', 0, 0, 0), (668, 'dfunnie', '', 1, 0, '', '1056351', 'Doug', 'Funnie', 0, 0, 0), (669, 'tranci', '', 1, 0, '', '1033678', 'Thom', 'Ranci', 0, 0, 0), (670, 'jtonies', '', 1, 0, '', '1003210', 'Jaques', 'Tonies', 0, 0, 0), (671, 'testfaculty', '', 0, 1, '', '55588992', 'Lisa', 'Tester', 0, 0, 0);

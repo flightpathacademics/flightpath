@@ -124,4 +124,52 @@ class EncryptionTest extends FlightPathTestCase {
       unset($GLOBALS[$name]);
     }
   }
+
+  /**
+   * Confirms the settings form documents the detected cryptographic algorithms,
+   * exposes encryption controls, and recognizes the configured settings key.
+   */
+  public function testSettingsFormDescribesAlgorithmsAndConfiguredKey(): void {
+    $form = encryption_settings_form();
+
+    $this->assertStringContainsString(encryption_get_hash_protocol(), strip_tags($form['encryption_markup_1']['value']));
+    $this->assertStringContainsString(encryption_get_cipher_algorithm(), strip_tags($form['encryption_markup_2']['value']));
+    $this->assertArrayHasKey('mark_encryption_key_string__found', $form);
+    $this->assertSame('select', $form['encryption_files_encryption']['type']);
+    $this->assertSame(array('yes' => 'Yes', 'no' => 'No'), $form['encryption_files_encryption']['options']);
+    $this->assertTrue($form['encryption_confirm']['required']);
+  }
+
+  /**
+   * Verifies the destructive encryption-settings form requires its explicit
+   * all-caps confirmation while accepting a no-file-path configuration.
+   */
+  public function testSettingsValidationRequiresExplicitConfirmation(): void {
+    $errorsExisted = array_key_exists('fp_form_errors', $_SESSION);
+    $originalErrors = $_SESSION['fp_form_errors'] ?? NULL;
+    $messagesExisted = array_key_exists('fp_messages', $_SESSION);
+    $originalMessages = $_SESSION['fp_messages'] ?? NULL;
+    try {
+      $_SESSION['fp_form_errors'] = array();
+      $_SESSION['fp_messages'] = array();
+      encryption_settings_form_validate(array(), array('values' => array(
+        'encryption_confirm' => 'yes',
+        'encryption_key_path' => '',
+      )));
+
+      $this->assertTrue(form_has_errors());
+      $this->assertSame('encryption_confirm', $_SESSION['fp_form_errors'][0]['name']);
+
+      $_SESSION['fp_form_errors'] = array();
+      encryption_settings_form_validate(array(), array('values' => array(
+        'encryption_confirm' => 'YES',
+        'encryption_key_path' => '',
+      )));
+      $this->assertFalse(form_has_errors());
+    }
+    finally {
+      if ($errorsExisted) $_SESSION['fp_form_errors'] = $originalErrors; else unset($_SESSION['fp_form_errors']);
+      if ($messagesExisted) $_SESSION['fp_messages'] = $originalMessages; else unset($_SESSION['fp_messages']);
+    }
+  }
 }

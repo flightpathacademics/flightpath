@@ -106,4 +106,49 @@ class PrereqsTest extends FlightPathTestCase {
     $this->assertSame('Administer prereq settings', $permissions['administer_prereqs']['title']);
     $this->assertSame('Override course locks', $permissions['override_course_locks']['title']);
   }
+
+  /**
+   * Confirms stored prerequisite text removes Windows line endings and
+   * normalizes case or zero-based typos in the logical "or" separator.
+   */
+  public function testPrereqStringNormalizesLogicalOrAndLineEndings(): void {
+    $courseId = random_int(800000000, 899999999);
+    try {
+      db_query(
+        'INSERT INTO prereqs_prereqs (course_id, prereq_data) VALUES (?, ?)',
+        array($courseId, "MATH 1011 OR MATH 1012\r\nENGL 1001 0R ENGL 1002")
+      );
+
+      $this->assertSame(
+        "MATH 1011 or MATH 1012\nENGL 1001 or ENGL 1002",
+        prereqs_get_prereq_string_for_course($courseId)
+      );
+    }
+    finally {
+      db_query('DELETE FROM prereqs_prereqs WHERE course_id = ?', array($courseId));
+    }
+  }
+
+  /**
+   * Verifies parser output groups alternatives on one line and retains the
+   * required grade independently for every prerequisite course branch.
+   */
+  public function testPrereqParserGroupsAlternativesAndExtractsMinimumGrades(): void {
+    $prereqs = prereqs_get_prereq_array_from_string(
+      "CSCI 3020 (c) or CSCI 3026\nMATH 1013(A)",
+      0
+    );
+
+    $this->assertCount(2, $prereqs);
+    $this->assertCount(2, $prereqs[0]);
+    $this->assertSame('CSCI', $prereqs[0][0]['subject_id']);
+    $this->assertSame('3020', $prereqs[0][0]['course_num']);
+    $this->assertSame('C', $prereqs[0][0]['min_grade']);
+    $this->assertSame('CSCI', $prereqs[0][1]['subject_id']);
+    $this->assertSame('3026', $prereqs[0][1]['course_num']);
+    $this->assertSame('', $prereqs[0][1]['min_grade']);
+    $this->assertSame('MATH', $prereqs[1][0]['subject_id']);
+    $this->assertSame('1013', $prereqs[1][0]['course_num']);
+    $this->assertSame('A', $prereqs[1][0]['min_grade']);
+  }
 }

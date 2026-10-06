@@ -53,4 +53,62 @@ class ContentTest extends FlightPathTestCase {
   public function testBlocksDeclaresPrimaryContentBlock(): void {
     $this->assertSame(array('primary' => 'Primary content block'), content_blocks());
   }
+
+  /**
+   * Ensures file-icon selection recognizes specific MIME families first, then
+   * common extensions, and falls back to the generic file icon when unknown.
+   */
+  public function testFileIconSelectionSupportsMimeExtensionAndFallbackCases(): void {
+    $this->assertSame('fa-file-pdf-o', content_get_fontawesome_icon_for_mimetype('application/pdf'));
+    $this->assertSame('fa-file-image-o', content_get_fontawesome_icon_for_mimetype('image/webp'));
+    $this->assertSame('fa-file-excel-o', content_get_fontawesome_icon_for_mimetype('', 'xlsx'));
+    $this->assertSame('fa-file-archive-o', content_get_fontawesome_icon_for_mimetype('', 'zip'));
+    $this->assertSame('fa-file-o', content_get_fontawesome_icon_for_mimetype('application/octet-stream', 'unknown'));
+  }
+
+  /**
+   * Verifies content access honors publication, visibility, student ownership,
+   * and own-versus-any edit rights without leaking protected records.
+   */
+  public function testContentUserAccessHonorsVisibilityOwnershipAndPermissions(): void {
+    global $user;
+    $contentId = random_int(800000000, 899999999);
+    $originalUser = $user;
+    $cacheExisted = array_key_exists('content_cache', $GLOBALS);
+    $originalCache = $GLOBALS['content_cache'] ?? NULL;
+    $content = (object) array(
+      'cid' => $contentId,
+      'type' => 'announcement',
+      'published' => 1,
+      'user_id' => 62,
+      'field__visibility' => array('value' => 'faculty'),
+      'field__student_id' => array('value' => 'STUDENT_A'),
+    );
+    try {
+      $GLOBALS['content_cache'][$contentId] = $content;
+
+      $user = (object) array('id' => 1, 'cwid' => 'ADMIN', 'is_student' => FALSE, 'permissions' => array());
+      $this->assertTrue(content_user_access('view', $contentId));
+
+      $user = (object) array('id' => 62, 'cwid' => 'FACULTY', 'is_student' => FALSE, 'permissions' => array('view_announcement_content', 'edit_own_announcement_content'));
+      $this->assertTrue(content_user_access('view', $contentId));
+      $this->assertTrue(content_user_access('edit', $contentId));
+
+      $user = (object) array('id' => 63, 'cwid' => 'STUDENT_A', 'is_student' => TRUE, 'permissions' => array('view_announcement_content'));
+      $this->assertFalse(content_user_access('view', $contentId));
+
+      $content->field__visibility['value'] = 'public';
+      $this->assertTrue(content_user_access('view', $contentId));
+      $content->field__student_id['value'] = 'STUDENT_B';
+      $this->assertFalse(content_user_access('view', $contentId));
+
+      $user = (object) array('id' => 64, 'cwid' => 'FACULTY_OTHER', 'is_student' => FALSE, 'permissions' => array('edit_any_announcement_content', 'add_announcement_content'));
+      $this->assertTrue(content_user_access('edit', $contentId));
+      $this->assertTrue(content_user_access('add', 'announcement'));
+    }
+    finally {
+      $user = $originalUser;
+      if ($cacheExisted) $GLOBALS['content_cache'] = $originalCache; else unset($GLOBALS['content_cache']);
+    }
+  }
 }

@@ -76,4 +76,69 @@ class AdminTest extends FlightPathTestCase {
     $this->assertArrayHasKey('display_watchdog', $permissions);
     $this->assertSame('Access administrative console', $permissions['can_access_admin']['title']);
   }
+
+  /**
+   * Ensures the requested catalog year is preserved when valid, but an absent
+   * or earlier value falls back to the configured earliest catalog year.
+   */
+  public function testCatalogYearUsesRequestOrConfiguredEarliestFallback(): void {
+    global $current_student_id;
+    $variableExisted = variable_exists('earliest_catalog_year');
+    $originalVariable = variable_get('earliest_catalog_year', NULL);
+    $requestWasArray = is_array($_REQUEST);
+    $originalRequest = $requestWasArray ? $_REQUEST : NULL;
+    if (!$requestWasArray) $_REQUEST = array();
+    $currentStudentExisted = array_key_exists('current_student_id', $GLOBALS);
+    $originalCurrentStudent = $GLOBALS['current_student_id'] ?? NULL;
+    try {
+      $current_student_id = '';
+      variable_set('earliest_catalog_year', 2024);
+      unset($_REQUEST['de_catalog_year']);
+      $this->assertSame(2024, intval(admin_get_de_catalog_year()));
+      $_REQUEST['de_catalog_year'] = 2023;
+      $this->assertSame(2024, intval(admin_get_de_catalog_year()));
+      $_REQUEST['de_catalog_year'] = 2026;
+      $this->assertSame(2026, intval(admin_get_de_catalog_year()));
+      $_REQUEST['de_catalog_year'] = 2023;
+      $this->assertSame(2023, intval(admin_get_de_catalog_year(FALSE)));
+    }
+    finally {
+      if ($variableExisted) variable_set('earliest_catalog_year', $originalVariable); else variable_delete('earliest_catalog_year');
+      if ($requestWasArray) $_REQUEST = $originalRequest; else unset($_REQUEST);
+      if ($currentStudentExisted) $GLOBALS['current_student_id'] = $originalCurrentStudent; else unset($GLOBALS['current_student_id']);
+    }
+  }
+
+  /**
+   * Verifies Admin menu token replacement retains catalog and watchdog filter
+   * context, including rejecting array-shaped pagination input.
+   */
+  public function testMenuReplacementPatternsUseCatalogAndScalarFilters(): void {
+    $requestWasArray = is_array($_REQUEST);
+    $originalRequest = $requestWasArray ? $_REQUEST : NULL;
+    if (!$requestWasArray) $_REQUEST = array();
+    $getWasArray = is_array($_GET);
+    $originalGet = $getWasArray ? $_GET : NULL;
+    if (!$getWasArray) $_GET = array();
+    try {
+      $_REQUEST['de_catalog_year'] = 2031;
+      $_GET['sev_filter'] = 'error';
+      $_GET['type_filter'] = 'admin';
+      $_GET['page'] = '4';
+      $this->assertSame(
+        'query?year=2031&severity=error&type=admin&page=4',
+        admin_menu_handle_replacement_pattern('query?year=%DE_CATALOG_YEAR%&severity=%SEV_FILTER%&type=%TYPE_FILTER%&page=%PAGE%')
+      );
+
+      $_GET['page'] = array('unexpected');
+      $this->assertSame(
+        'query?page=',
+        admin_menu_handle_replacement_pattern('query?page=%PAGE%')
+      );
+    }
+    finally {
+      if ($requestWasArray) $_REQUEST = $originalRequest; else unset($_REQUEST);
+      if ($getWasArray) $_GET = $originalGet; else unset($_GET);
+    }
+  }
 }

@@ -340,7 +340,7 @@ function advise_cron() {
 function advise_get_count_of_advised_course_for_term($course_id, $term_id) {
 
   // Okay, now find the most recent advising session for this student.
-  $res = db_query("SELECT count(a.student_id) as mycount
+  $res = db_query("SELECT count(distinct a.student_id) as mycount
                    FROM advising_sessions a, users b, advised_courses c, students d
                    WHERE a.advising_session_id = c.advising_session_id
                    AND c.course_id = ?

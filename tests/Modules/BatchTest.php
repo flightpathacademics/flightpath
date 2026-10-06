@@ -8,6 +8,8 @@ require_once __DIR__ . '/../bootstrap.php';
 class BatchTest extends FlightPathTestCase {
 
   private array $batchIds = array();
+  private bool $tempFileCheckExisted;
+  private mixed $originalTempFileCheck;
 
   protected function setUp(): void {
     parent::setUp();
@@ -15,6 +17,9 @@ class BatchTest extends FlightPathTestCase {
     if (!function_exists('batch_menu')) {
       require_once __DIR__ . '/../../modules/batch/batch.module';
     }
+
+    $this->tempFileCheckExisted = variable_exists('batch_check_to_delete_temp_files');
+    $this->originalTempFileCheck = variable_get('batch_check_to_delete_temp_files');
   }
 
   protected function tearDown(): void {
@@ -23,6 +28,14 @@ class BatchTest extends FlightPathTestCase {
     }
 
     unset($_SESSION['fp_batch_id']);
+
+    if ($this->tempFileCheckExisted) {
+      variable_set('batch_check_to_delete_temp_files', $this->originalTempFileCheck);
+    }
+    else {
+      variable_delete('batch_check_to_delete_temp_files');
+    }
+
     parent::tearDown();
   }
 
@@ -95,6 +108,56 @@ class BatchTest extends FlightPathTestCase {
    */
   public function testGetReturnsFalseForMissingBatch(): void {
     $this->assertFalse(batch_get(999999999));
+  }
+
+  /**
+   * Ensures processing-page access rejects a queue item whose session token no
+   * longer matches, preventing another browser session from running the job.
+   */
+  public function testProcessingPageRejectsMismatchedToken(): void {
+    $batchId = batch_set(array('operation' => array('batch_test_operation', array())));
+    $this->batchIds[] = $batchId;
+    db_query('UPDATE batch_queue SET token = ? WHERE batch_id = ?', array('different-session-token', $batchId));
+
+    $output = batch_processing_page($batchId);
+
+    $this->assertStringContainsString('token mismatch', strip_tags($output));
+  }
+
+  /**
+   * Confirms completion callbacks receive the same session-token protection as
+   * processing, so a stale or shared completion URL cannot finalize a batch.
+   */
+  public function testFinishedPageRejectsMismatchedToken(): void {
+    $batchId = batch_set(array(
+      'operation' => array('batch_test_operation', array()),
+      'finished_callback' => array('batch_test_finished_page', array(1)),
+    ));
+    $this->batchIds[] = $batchId;
+    db_query('UPDATE batch_queue SET token = ? WHERE batch_id = ?', array('different-session-token', $batchId));
+
+    $output = batch_finished_page($batchId);
+
+    $this->assertStringContainsString('token mismatch', strip_tags($output));
+  }
+
+  /**
+   * Verifies cron removes only queue entries older than two hours while keeping
+   * recent work available; file cleanup is deferred to avoid touching files.
+   */
+  public function testCronRemovesExpiredQueueEntriesAndKeepsRecentBatches(): void {
+    $expiredId = batch_set(array('operation' => array('batch_test_operation', array())));
+    $recentId = batch_set(array('operation' => array('batch_test_operation', array())));
+    $this->batchIds[] = $expiredId;
+    $this->batchIds[] = $recentId;
+    db_query('UPDATE batch_queue SET created = ? WHERE batch_id = ?', array(time() - 10800, $expiredId));
+    db_query('UPDATE batch_queue SET created = ? WHERE batch_id = ?', array(time(), $recentId));
+    variable_set('batch_check_to_delete_temp_files', time() + 3600);
+
+    batch_cron();
+
+    $this->assertFalse(batch_get($expiredId));
+    $this->assertSame(intval($recentId), intval(batch_get($recentId)['batch_id']));
   }
 
   /**

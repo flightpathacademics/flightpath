@@ -173,14 +173,16 @@ class DbTest extends FlightPathTestCase
     variable_delete($name);
   }
 
-  // Null is also a legitimate stored value for the variable system.
-  public function testVariableCanStoreNull()
+  // Null is NOT a legitimate stored value for the variable system.
+  public function testVariableCanNotStoreNull()
   {
     $name = "db_test_null_" . uniqid();
 
     variable_set($name, null);
 
-    $this->assertNull(variable_get($name));
+    // Since this variable is set to NULL, it should use the default_value of 'test'
+    // which we are passing it, since NULL is not a legitimate value.
+    $this->assertSame(variable_get($name, 'test'), 'test');
 
     variable_delete($name);
   }

@@ -62,4 +62,49 @@ class UserModuleTest extends FlightPathTestCase {
     $this->assertTrue($permissions['can_edit_permissions']['admin_restricted']);
     $this->assertTrue($permissions['delete_users']['admin_restricted']);
   }
+
+  /**
+   * Confirms user-scoped settings and attributes persist independently and
+   * return their caller-supplied fallback when no value has been stored.
+   */
+  public function testSettingsAndAttributesRoundTripWithIndependentDefaults(): void {
+    $userId = random_int(800000000, 899999999);
+    try {
+      $this->assertSame('fallback-setting', user_get_setting($userId, 'dashboard_layout', 'fallback-setting'));
+      $this->assertSame('fallback-attribute', user_get_attribute($userId, 'mobile_phone', 'fallback-attribute'));
+
+      user_set_setting($userId, 'dashboard_layout', 'compact');
+      user_set_attribute($userId, 'mobile_phone', '5551234567');
+
+      $this->assertSame('compact', user_get_setting($userId, 'dashboard_layout'));
+      $this->assertSame('5551234567', user_get_attribute($userId, 'mobile_phone'));
+      $this->assertSame('fallback-attribute', user_get_attribute($userId, 'timezone', 'fallback-attribute'));
+    }
+    finally {
+      db_query('DELETE FROM user_settings WHERE user_id = ?', array($userId));
+      db_query('DELETE FROM user_attributes WHERE user_id = ?', array($userId));
+    }
+  }
+
+  /**
+   * Verifies role-select options omit baseline anonymous/authenticated roles by
+   * default but include them when the caller explicitly requests both entries.
+   */
+  public function testRolesForFapiHonorsBaselineRoleExclusions(): void {
+    db_query('INSERT INTO roles (name) VALUES (?)', array('User Module PHPUnit Role'));
+    $roleId = intval(db_insert_id());
+    try {
+      $standard = user_get_roles_for_fapi();
+      $allRoles = user_get_roles_for_fapi(FALSE, FALSE);
+
+      $this->assertSame('User Module PHPUnit Role', $standard[$roleId]);
+      $this->assertArrayNotHasKey(1, $standard);
+      $this->assertArrayNotHasKey(2, $standard);
+      $this->assertSame('anonymous user', $allRoles[1]);
+      $this->assertSame('authenticated user', $allRoles[2]);
+    }
+    finally {
+      db_query('DELETE FROM roles WHERE rid = ?', array($roleId));
+    }
+  }
 }
