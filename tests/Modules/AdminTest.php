@@ -16,6 +16,7 @@ class AdminTest extends FlightPathTestCase {
     if (!function_exists('admin_menu')) {
       require_once __DIR__ . '/../../modules/admin/admin.module';
     }
+    require_once __DIR__ . '/../../modules/admin/admin.groups.inc';
 
     $this->urgentMessageExisted = variable_exists('urgent_msg');
     $this->originalUrgentMessage = variable_get('urgent_msg', '');
@@ -75,6 +76,18 @@ class AdminTest extends FlightPathTestCase {
     $this->assertArrayHasKey('can_apply_draft_changes', $permissions);
     $this->assertArrayHasKey('display_watchdog', $permissions);
     $this->assertSame('Access administrative console', $permissions['can_access_admin']['title']);
+  }
+
+  /**
+   * Confirms Admin's large-list difference helper retains duplicate source
+   * values while excluding every value already present in the comparison list.
+   */
+  public function testArrayDiffHandlesDuplicateAcademicRecordIds(): void {
+    $this->assertSame(
+      array('degree-1', 'degree-1', 'degree-3'),
+      admin_array_diff(array('degree-1', 'degree-2', 'degree-1', 'degree-3'), array('degree-2', 'degree-4'))
+    );
+    $this->assertSame(array(), admin_array_diff(array('degree-2'), array('degree-2')));
   }
 
   /**

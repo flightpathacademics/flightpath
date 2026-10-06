@@ -673,6 +673,52 @@ class AdviseTest extends FlightPathTestCase {
   }
 
   /**
+   * Verifies enabled cron cleanup permanently removes soft-deleted advising
+   * sessions and their child records while preserving current advising data.
+   */
+  public function testCronPurgesEnabledFlaggedAdvisingData(): void {
+    $marker = 'AC' . substr(sha1(uniqid('', TRUE)), 0, 16);
+    $deletedSessionId = $this->insertAdvisingSession(array(
+      'student_id' => $marker,
+      'advising_session_token' => 'cleanup-deleted-' . $marker,
+      'delete_flag' => 1,
+    ));
+    $activeSessionId = $this->insertAdvisingSession(array(
+      'student_id' => $marker,
+      'advising_session_token' => 'cleanup-active-' . $marker,
+      'delete_flag' => 0,
+    ));
+    $this->insertAdvisedCourse($deletedSessionId, 998001);
+    db_query('INSERT INTO student_substitutions (student_id, delete_flag) VALUES (?, ?)', array($marker, 1));
+    db_query('INSERT INTO student_unassign_group (student_id, delete_flag) VALUES (?, ?)', array($marker, 1));
+    db_query('INSERT INTO student_unassign_transfer_eqv (student_id, delete_flag) VALUES (?, ?)', array($marker, 1));
+
+    try {
+      variable_set('advise_last_run_delete_flag_removal', 0);
+      variable_set('delete_flagged_data_from_db', array(
+        'advising_sessions' => 1,
+        'student_substitutions' => 1,
+        'student_unassign_group' => 1,
+        'student_unassign_transfer_eqv' => 1,
+      ));
+
+      advise_cron();
+
+      $this->assertSame(0, intval(db_result(db_query('SELECT COUNT(*) FROM advising_sessions WHERE advising_session_id = ?', array($deletedSessionId)))));
+      $this->assertSame(0, intval(db_result(db_query('SELECT COUNT(*) FROM advised_courses WHERE advising_session_id = ?', array($deletedSessionId)))));
+      $this->assertSame(1, intval(db_result(db_query('SELECT COUNT(*) FROM advising_sessions WHERE advising_session_id = ?', array($activeSessionId)))));
+      $this->assertSame(0, intval(db_result(db_query('SELECT COUNT(*) FROM student_substitutions WHERE student_id = ?', array($marker)))));
+      $this->assertSame(0, intval(db_result(db_query('SELECT COUNT(*) FROM student_unassign_group WHERE student_id = ?', array($marker)))));
+      $this->assertSame(0, intval(db_result(db_query('SELECT COUNT(*) FROM student_unassign_transfer_eqv WHERE student_id = ?', array($marker)))));
+    }
+    finally {
+      db_query('DELETE FROM student_substitutions WHERE student_id = ?', array($marker));
+      db_query('DELETE FROM student_unassign_group WHERE student_id = ?', array($marker));
+      db_query('DELETE FROM student_unassign_transfer_eqv WHERE student_id = ?', array($marker));
+    }
+  }
+
+  /**
    * Confirms the term picker lists configured terms, marks the active one, and
    * retains the JavaScript action that applies the selected advising term.
    */

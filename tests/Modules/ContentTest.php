@@ -7,12 +7,22 @@ require_once __DIR__ . '/../bootstrap.php';
  */
 class ContentTest extends FlightPathTestCase {
 
+  private array $lastAccessRows = array();
+
   protected function setUp(): void {
     parent::setUp();
 
     if (!function_exists('content_menu')) {
       require_once __DIR__ . '/../../modules/content/content.module';
     }
+  }
+
+  protected function tearDown(): void {
+    foreach ($this->lastAccessRows as $row) {
+      db_query('DELETE FROM content_last_access WHERE cid = ? AND user_id = ?', array($row['cid'], $row['user_id']));
+    }
+
+    parent::tearDown();
   }
 
   /**
@@ -64,6 +74,24 @@ class ContentTest extends FlightPathTestCase {
     $this->assertSame('fa-file-excel-o', content_get_fontawesome_icon_for_mimetype('', 'xlsx'));
     $this->assertSame('fa-file-archive-o', content_get_fontawesome_icon_for_mimetype('', 'zip'));
     $this->assertSame('fa-file-o', content_get_fontawesome_icon_for_mimetype('application/octet-stream', 'unknown'));
+  }
+
+  /**
+   * Verifies recording content access replaces the prior timestamp for the
+   * same user and record, which keeps unread-alert state deterministic.
+   */
+  public function testLastAccessPersistsAndUpdatesForSameUser(): void {
+    $cid = random_int(900000000, 999999999);
+    $account = (object) array('id' => 918273, 'cwid' => 'CONTENT-TEST');
+    $this->lastAccessRows[] = array('cid' => $cid, 'user_id' => $account->id);
+
+    $this->assertSame(0, content_get_last_access($cid, $account));
+    content_set_last_access($cid, $account);
+    $first = content_get_last_access($cid, $account);
+    content_set_last_access($cid, $account);
+
+    $this->assertGreaterThan(0, $first);
+    $this->assertSame(1, intval(db_result(db_query('SELECT COUNT(*) FROM content_last_access WHERE cid = ? AND user_id = ?', array($cid, $account->id)))));
   }
 
   /**

@@ -328,6 +328,64 @@ class FlightPathTest extends FlightPathTestCase
 
 
 
+
+
+  /**
+   * Saves a draft across two advising terms, reloads it, and rejects an
+   * identical browser refresh so the advising history cannot gain duplicates.
+   *
+   * A draft uses a unique test faculty identifier to avoid altering the
+   * fixture student's real advising history while still exercising the same
+   * multi-term persistence path used by advisors.
+   */
+  public function testDraftSessionRoundTripsAcrossTermsAndRejectsRefresh()
+  {
+    $facultyId = 'PHPUNIT-DRAFT';
+    $termOne = '991001';
+    $termTwo = '991002';
+    $sessionIds = array();
+    $termsVariableExisted = variable_exists('available_advising_term_ids');
+    $originalTerms = variable_get('available_advising_term_ids', NULL);
+    $postWasArray = is_array($_POST);
+    $originalPost = $postWasArray ? $_POST : NULL;
+    $previousPostMd5Existed = array_key_exists('fp_previous_advising_post_md5', $_SESSION);
+    $previousPostMd5 = $_SESSION['fp_previous_advising_post_md5'] ?? NULL;
+
+    try {
+      variable_set('available_advising_term_ids', $termOne . ',' . $termTwo);
+      unset($_SESSION['fp_previous_advising_post_md5']);
+      $_POST = array(
+        'advising_update_student_settings_flag' => '',
+        'advcr_264383_0_0_3_roundtrip1_' . $termOne . '_5450264' => 'true',
+        'advcr_509710_2_0_3_roundtrip2_' . $termTwo . '_5450264' => 'true',
+      );
+
+      $fp = $this->buildAdvisingFlightPath();
+      $sessionIds = $fp->save_advising_session_from_post($facultyId, TRUE);
+
+      $this->assertArrayHasKey($termOne, $sessionIds);
+      $this->assertArrayHasKey($termTwo, $sessionIds);
+      $this->assertGreaterThan(0, intval($sessionIds[$termOne]));
+      $this->assertGreaterThan(0, intval($sessionIds[$termTwo]));
+      $this->assertSame(2, intval(db_result(db_query('SELECT COUNT(*) FROM advised_courses WHERE advising_session_id IN (?, ?)', array($sessionIds[$termOne], $sessionIds[$termTwo])))));
+
+      $this->assertSame(array(), $fp->save_advising_session_from_post($facultyId, TRUE));
+      $this->assertSame(2, intval(db_result(db_query('SELECT COUNT(*) FROM advised_courses WHERE advising_session_id IN (?, ?)', array($sessionIds[$termOne], $sessionIds[$termTwo])))));
+
+      $loaded = $this->buildAdvisingFlightPath();
+      $loaded->load_advising_session_from_database($facultyId, '', FALSE, TRUE);
+      $this->assertSame(2, $loaded->course_list_advised_courses->get_size());
+    }
+    finally {
+      if (!empty($sessionIds)) {
+        db_query('DELETE FROM advised_courses WHERE advising_session_id IN (?, ?)', array($sessionIds[$termOne], $sessionIds[$termTwo]));
+        db_query('DELETE FROM advising_sessions WHERE advising_session_id IN (?, ?)', array($sessionIds[$termOne], $sessionIds[$termTwo]));
+      }
+      if ($termsVariableExisted) variable_set('available_advising_term_ids', $originalTerms); else variable_delete('available_advising_term_ids');
+      if ($postWasArray) $_POST = $originalPost; else unset($_POST);
+      if ($previousPostMd5Existed) $_SESSION['fp_previous_advising_post_md5'] = $previousPostMd5; else unset($_SESSION['fp_previous_advising_post_md5']);
+    }
+  }
 }
 
 

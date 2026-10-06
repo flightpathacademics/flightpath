@@ -4,6 +4,8 @@ FlightPath 7.x Changelog
 2026-10-06
   Minor bug fixes.
   
+  Refined testing suite for PHPUnit.
+  
 
 2026-10-05
   Added enhancements to the Generate Advising Summary feature.
