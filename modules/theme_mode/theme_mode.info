@@ -1,0 +1,3 @@
+name = Theme mode
+description = Lets users choose light, dark, or system appearance preferences.
+core = 7.x

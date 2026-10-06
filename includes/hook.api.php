@@ -102,6 +102,18 @@ function hook_user_menu_links_alter(&$links) {
 }
 
 
+/**
+ * Returns markup for a control in the desktop top navigation.
+ *
+ * Controls are displayed after the student search, when present, and before
+ * the alerts icon. Return an empty string when no control should be shown.
+ *
+ * @param bool $bool_for_hamburger_menu
+ *   TRUE when the mobile hamburger navigation is being rendered.
+ */
+function hook_top_nav_controls($bool_for_hamburger_menu = FALSE) {
+  return '';
+}
 
 
 /**

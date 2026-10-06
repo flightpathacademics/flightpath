@@ -1570,6 +1570,10 @@ function fp_render_top_nav_content($bool_for_hamburger_menu = FALSE) {
     if (user_has_permission('view_any_advising_session')) {
       $html .= "<li class='student-search'>" . student_search_render_small_search() . "</li>";
     }
+    $top_nav_controls = invoke_hook('top_nav_controls', array($bool_for_hamburger_menu));
+    foreach ($top_nav_controls as $top_nav_control) {
+      $html .= $top_nav_control;
+    }
     if (user_has_permission('view_advisee_alerts')) {
       $html .= "<li class='alerts'><span class='tub-icon-element-alert'><a href='" . fp_url('alerts') . "'><i class='fa fa-bell'></i>$badge</a></span></li>";
     }

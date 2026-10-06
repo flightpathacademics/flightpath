@@ -44,7 +44,7 @@ function system_enable() {
   // Let's perform installations on the other modules we want enabled by default.
   $modules = array("admin", "advise", "comments", "student_search", "update_status", "content", "announcements", "tinymce", "course_search", "blank_degrees", "user",
                     "batch", 'stats', 'smtp', 'prereqs', 'lassie', 'calendar', 'alerts', 'audit', 'engagements', 'notify', 'student_files', 'encryption',
-                    'student_priority', 'student_profile', 'masquerade');
+                    'student_priority', 'student_profile', 'masquerade', 'theme_mode');
   foreach ($modules as $module) {
 
     $info_contents = file_get_contents("modules/$module/$module.info");
@@ -103,6 +103,13 @@ function system_enable() {
 
 function system_update($old_schema, $new_schema) {
 
+  if (intval($old_schema) < 8) {
+    system_enable_module(array(
+      'module' => 'theme_mode',
+      'path' => 'modules/theme_mode',
+      'version' => 'core',
+    ));
+  }
   if (intval($old_schema) < 2) {
 
     db_query("CREATE TABLE `banned_ips` (

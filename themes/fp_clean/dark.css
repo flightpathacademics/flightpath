@@ -1,0 +1,260 @@
+/**
+ * @file
+ * Additive dark-mode styles for FlightPath Clean.
+ *
+ * The rules are intentionally scoped to the body classes supplied by the
+ * theme_mode module. Existing selectors and light-mode styling remain intact.
+ */
+
+body.fp-theme-mode-dark {
+  --fp-dark-page: #17191d;
+  --fp-dark-surface: #20242a;
+  --fp-dark-surface-raised: #292e36;
+  --fp-dark-surface-muted: #323842;
+  --fp-dark-text: #e6e9ee;
+  --fp-dark-text-muted: #b5bdc9;
+  --fp-dark-border: #596270;
+  --fp-dark-link: #8dc4ff;
+  --fp-dark-link-hover: #c6e2ff;
+  --fp-dark-input: #16191e;
+  --fp-dark-focus: #79b8ff;
+  --fp-dark-shadow: #08090b;
+  --fp-dark-active: #294866;
+}
+
+@media (prefers-color-scheme: dark) {
+  body.fp-theme-mode-system {
+    --fp-dark-page: #17191d;
+    --fp-dark-surface: #20242a;
+    --fp-dark-surface-raised: #292e36;
+    --fp-dark-surface-muted: #323842;
+    --fp-dark-text: #e6e9ee;
+    --fp-dark-text-muted: #b5bdc9;
+    --fp-dark-border: #596270;
+    --fp-dark-link: #8dc4ff;
+    --fp-dark-link-hover: #c6e2ff;
+    --fp-dark-input: #16191e;
+    --fp-dark-focus: #79b8ff;
+    --fp-dark-shadow: #08090b;
+    --fp-dark-active: #294866;
+  }
+}
+
+body.fp-theme-mode-dark,
+body.fp-theme-mode-system {
+  background-color: var(--fp-dark-page);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark a,
+body.fp-theme-mode-system a {
+  color: var(--fp-dark-link);
+}
+
+body.fp-theme-mode-dark a:hover,
+body.fp-theme-mode-system a:hover {
+  color: var(--fp-dark-link-hover);
+}
+
+body.fp-theme-mode-dark #header,
+body.fp-theme-mode-system #header,
+body.fp-theme-mode-dark .top-banner,
+body.fp-theme-mode-system .top-banner,
+body.fp-theme-mode-dark #page-content,
+body.fp-theme-mode-system #page-content,
+body.fp-theme-mode-dark .page-content,
+body.fp-theme-mode-system .page-content,
+body.fp-theme-mode-dark .inner-page-content-wrapper,
+body.fp-theme-mode-system .inner-page-content-wrapper {
+  background-color: var(--fp-dark-surface);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark #header,
+body.fp-theme-mode-system #header,
+body.fp-theme-mode-dark ul.top-nav-ul li,
+body.fp-theme-mode-system ul.top-nav-ul li,
+body.fp-theme-mode-dark ul.tabs,
+body.fp-theme-mode-system ul.tabs,
+body.fp-theme-mode-dark ul.tabs li,
+body.fp-theme-mode-system ul.tabs li,
+body.fp-theme-mode-dark .active_tab,
+body.fp-theme-mode-system .active_tab,
+body.fp-theme-mode-dark .inactive_tab,
+body.fp-theme-mode-system .inactive_tab,
+body.fp-theme-mode-dark table.tabs-search-table,
+body.fp-theme-mode-system table.tabs-search-table {
+  border-color: var(--fp-dark-border) !important;
+}
+
+body.fp-theme-mode-dark .active_tab,
+body.fp-theme-mode-system .active_tab,
+body.fp-theme-mode-dark ul.tabs li.active,
+body.fp-theme-mode-system ul.tabs li.active,
+body.fp-theme-mode-dark table.tabs-search-table,
+body.fp-theme-mode-system table.tabs-search-table {
+  background-color: var(--fp-dark-surface-raised);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark .inactive_tab,
+body.fp-theme-mode-system .inactive_tab,
+body.fp-theme-mode-dark .inactive_tab_over,
+body.fp-theme-mode-system .inactive_tab_over,
+body.fp-theme-mode-dark ul.tabs li.inactive a,
+body.fp-theme-mode-system ul.tabs li.inactive a,
+body.fp-theme-mode-dark .breadcrumbs li a,
+body.fp-theme-mode-system .breadcrumbs li a {
+  color: var(--fp-dark-text-muted);
+}
+
+body.fp-theme-mode-dark #top-nav form .smallinput,
+body.fp-theme-mode-system #top-nav form .smallinput,
+body.fp-theme-mode-dark input,
+body.fp-theme-mode-system input,
+body.fp-theme-mode-dark select,
+body.fp-theme-mode-system select,
+body.fp-theme-mode-dark textarea,
+body.fp-theme-mode-system textarea {
+  background-color: var(--fp-dark-input);
+  border-color: var(--fp-dark-border);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark input:focus,
+body.fp-theme-mode-system input:focus,
+body.fp-theme-mode-dark select:focus,
+body.fp-theme-mode-system select:focus,
+body.fp-theme-mode-dark textarea:focus,
+body.fp-theme-mode-system textarea:focus,
+body.fp-theme-mode-dark button:focus-visible,
+body.fp-theme-mode-system button:focus-visible {
+  outline: 2px solid var(--fp-dark-focus);
+  outline-offset: 2px;
+}
+
+body.fp-theme-mode-dark input[type='submit'],
+body.fp-theme-mode-system input[type='submit'],
+body.fp-theme-mode-dark button,
+body.fp-theme-mode-system button,
+body.fp-theme-mode-dark a.button,
+body.fp-theme-mode-system a.button {
+  background-color: var(--fp-dark-surface-muted);
+  border-color: var(--fp-dark-border);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark table th,
+body.fp-theme-mode-system table th,
+body.fp-theme-mode-dark table td,
+body.fp-theme-mode-system table td,
+body.fp-theme-mode-dark fieldset,
+body.fp-theme-mode-system fieldset,
+body.fp-theme-mode-dark .section-box,
+body.fp-theme-mode-system .section-box,
+body.fp-theme-mode-dark .fp-boxes,
+body.fp-theme-mode-system .fp-boxes {
+  border-color: var(--fp-dark-border);
+}
+
+body.fp-theme-mode-dark table tr:nth-child(even) td,
+body.fp-theme-mode-system table tr:nth-child(even) td,
+body.fp-theme-mode-dark .section-box,
+body.fp-theme-mode-system .section-box,
+body.fp-theme-mode-dark .fp-boxes,
+body.fp-theme-mode-system .fp-boxes {
+  background-color: var(--fp-dark-surface-raised);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark #tub-user-pulldown,
+body.fp-theme-mode-system #tub-user-pulldown,
+body.fp-theme-mode-dark #sidebar-left,
+body.fp-theme-mode-system #sidebar-left,
+body.fp-theme-mode-dark #mobile-hamburger-menu,
+body.fp-theme-mode-system #mobile-hamburger-menu {
+  background-color: var(--fp-dark-surface-raised);
+  border-color: var(--fp-dark-border);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark .ui-widget-content,
+body.fp-theme-mode-system .ui-widget-content,
+body.fp-theme-mode-dark .ui-widget-header,
+body.fp-theme-mode-system .ui-widget-header,
+body.fp-theme-mode-dark .ui-dialog,
+body.fp-theme-mode-system .ui-dialog {
+  background: var(--fp-dark-surface-raised);
+  border-color: var(--fp-dark-border);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark .ui-state-default,
+body.fp-theme-mode-system .ui-state-default,
+body.fp-theme-mode-dark .ui-button,
+body.fp-theme-mode-system .ui-button {
+  background: var(--fp-dark-surface-muted);
+  border-color: var(--fp-dark-border);
+  color: var(--fp-dark-text);
+}
+
+body.fp-theme-mode-dark .page-content,
+body.fp-theme-mode-system .page-content {
+  box-shadow: 0 0 50px var(--fp-dark-shadow);
+}
+
+/* The switcher is styled in every mode; its palette comes from the active mode. */
+.theme-mode-controls {
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+.theme-mode-controls form {
+  display: inline;
+}
+
+.theme-mode-control-group {
+  display: inline-flex;
+  gap: 2px;
+}
+
+button.theme-mode-control {
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.05em;
+}
+
+button.theme-mode-control:hover,
+button.theme-mode-control:focus-visible {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+button.theme-mode-control.is-active {
+  border-color: #6a7787;
+  background-color: #e6ebf0;
+  color: #17202a;
+}
+
+body.fp-theme-mode-dark button.theme-mode-control.is-active,
+body.fp-theme-mode-system button.theme-mode-control.is-active {
+  border-color: var(--fp-dark-focus);
+  background-color: var(--fp-dark-active);
+  color: var(--fp-dark-text);
+}
+
+@media screen and (max-width: 825px) {
+  .theme-mode-controls {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+
+  button.theme-mode-control {
+    min-width: 27px;
+  }
+}

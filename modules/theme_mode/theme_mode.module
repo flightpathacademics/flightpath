@@ -1,0 +1,163 @@
+<?php
+
+/**
+ * @file
+ * Per-user appearance mode controls.
+ */
+
+/**
+ * Implements hook_init().
+ */
+function theme_mode_init() {
+  global $user;
+
+  if (!is_object($user) || intval($user->id) <= 0) {
+    return;
+  }
+
+  fp_add_body_class('fp-theme-mode-' . theme_mode_get_user_preference($user));
+  fp_add_css(theme_mode_get_stylesheet_path());
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function theme_mode_form_alter(&$form, $form_id) {
+  global $user;
+
+  if ($form_id != 'user_user_settings_form') {
+    return;
+  }
+
+  $form['#submit_handlers'][] = 'theme_mode_user_settings_form_submit';
+  $form['submit_btn']['weight'] = 100;
+  $form['theme_mode_preference'] = array(
+    'type' => 'radios',
+    'label' => t('Appearance'),
+    'options' => theme_mode_get_options(),
+    'value' => theme_mode_get_user_preference($user),
+    'description' => t('Choose Light to keep the standard appearance, Dark for a dark appearance, or System to follow your device setting.'),
+    'weight' => 50,
+  );
+}
+
+/**
+ * Implements hook_top_nav_controls().
+ */
+function theme_mode_top_nav_controls($bool_for_hamburger_menu = FALSE) {
+  global $user;
+
+  if ($bool_for_hamburger_menu || !is_object($user) || intval($user->id) <= 0) {
+    return '';
+  }
+
+  return "<li class='theme-mode-controls'>" . fp_render_form('theme_mode_quick_switch_form') . '</li>';
+}
+
+/**
+ * Returns the available appearance preferences.
+ */
+function theme_mode_get_options() {
+  return array(
+    'light' => t('Light'),
+    'dark' => t('Dark'),
+    'system' => t('System'),
+  );
+}
+
+/**
+ * Returns a valid saved preference, defaulting to light.
+ */
+function theme_mode_get_user_preference($account = NULL) {
+  global $user;
+
+  if ($account === NULL) {
+    $account = $user;
+  }
+
+  $preference = '';
+  if (is_object($account) && isset($account->settings['theme_mode_preference'])) {
+    $preference = $account->settings['theme_mode_preference'];
+  }
+
+  return theme_mode_normalize_preference($preference);
+}
+
+/**
+ * Limits an appearance preference to the supported values.
+ */
+function theme_mode_normalize_preference($preference) {
+  $preference = fp_trim($preference);
+  $options = theme_mode_get_options();
+
+  if (!isset($options[$preference])) {
+    return 'light';
+  }
+
+  return $preference;
+}
+
+/**
+ * Returns the dark-mode stylesheet for the active theme, with a core fallback.
+ */
+function theme_mode_get_stylesheet_path() {
+  $theme_path = fp_theme_location(FALSE);
+  if (file_exists($theme_path . '/dark.css')) {
+    return fp_theme_location(TRUE) . '/dark.css';
+  }
+
+  return base_path() . '/themes/fp_clean/dark.css';
+}
+
+/**
+ * Adds the preference selector to the normal User Settings submission.
+ */
+function theme_mode_user_settings_form_submit($form, $form_state) {
+  global $user;
+
+  $preference = theme_mode_normalize_preference(@$form_state['values']['theme_mode_preference']);
+  user_set_setting($user->id, 'theme_mode_preference', $preference);
+}
+
+/**
+ * Builds the compact, CSRF-protected top-navigation switcher.
+ */
+function theme_mode_quick_switch_form() {
+  global $user;
+
+  $preference = theme_mode_get_user_preference($user);
+  $buttons = array(
+    'light' => array('icon' => 'fa-sun-o', 'label' => t('Use light appearance')),
+    'dark' => array('icon' => 'fa-moon-o', 'label' => t('Use dark appearance')),
+    'system' => array('icon' => 'fa-desktop', 'label' => t('Follow system appearance')),
+  );
+
+  $markup = "<div class='theme-mode-control-group' role='group' aria-label='" . htmlentities(t('Appearance'), ENT_QUOTES) . "'>";
+  foreach ($buttons as $mode => $details) {
+    $active = ($mode == $preference) ? ' is-active' : '';
+    $pressed = ($mode == $preference) ? 'true' : 'false';
+    $markup .= "<button type='submit' name='theme_mode_preference' value='$mode' class='theme-mode-control theme-mode-control-$mode$active' title='" . htmlentities($details['label'], ENT_QUOTES) . "' aria-label='" . htmlentities($details['label'], ENT_QUOTES) . "' aria-pressed='$pressed'><i class='fa {$details['icon']}' aria-hidden='true'></i></button>";
+  }
+  $markup .= '</div>';
+
+  return array(
+    'theme_mode_preference' => array(
+      'type' => 'hidden',
+      'value' => '',
+    ),
+    'theme_mode_buttons' => array(
+      'type' => 'markup_no_wrappers',
+      'value' => $markup,
+    ),
+  );
+}
+
+/**
+ * Saves the preference selected in the top navigation.
+ */
+function theme_mode_quick_switch_form_submit($form, $form_state) {
+  global $user;
+
+  $preference = theme_mode_normalize_preference(@$form_state['values']['theme_mode_preference']);
+  user_set_setting($user->id, 'theme_mode_preference', $preference);
+}
