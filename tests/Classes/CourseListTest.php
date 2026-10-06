@@ -451,6 +451,84 @@ class CourseListTest extends FlightPathTestCase
     }
 
 
+    /**
+     * Ensures descending hour sorting keeps the largest requirements first and
+     * treats ghost-hour placeholders as zero-hour display artifacts.
+     */
+    public function testSortLargestHoursPlacesGhostHoursLast()
+    {
+      $list = new CourseList();
+      $threeHours = new Course();
+      $threeHours->course_id = 1001;
+      $threeHours->min_hours = 3;
+      $oneHour = new Course();
+      $oneHour->course_id = 1002;
+      $oneHour->min_hours = 1;
+      $ghostHour = new Course();
+      $ghostHour->course_id = 1003;
+      $ghostHour->min_hours = 4;
+      $ghostHour->bool_ghost_hour = TRUE;
+
+      $list->add($oneHour);
+      $list->add($ghostHour);
+      $list->add($threeHours);
+      $list->sort_largest_hours_first();
+
+      $this->assertSame($threeHours, $list->get_element(0));
+      $this->assertSame($oneHour, $list->get_element(1));
+      $this->assertSame($ghostHour, $list->get_element(2));
+    }
+
+    /**
+     * Verifies duplicate cleanup retains the fulfilled instance of a course,
+     * preserving the record that explains why a requirement is satisfied.
+     */
+    public function testRemoveDuplicatesPrefersFulfilledCourse()
+    {
+      $list = new CourseList();
+      $unfulfilled = new Course();
+      $unfulfilled->course_id = 2001;
+      $fulfilled = new Course();
+      $fulfilled->course_id = 2001;
+      $fulfilled->course_list_fulfilled_by->add(new Course());
+      $different = new Course();
+      $different->course_id = 2002;
+
+      $list->add($unfulfilled);
+      $list->add($fulfilled);
+      $list->add($different);
+      $list->remove_duplicates();
+
+      $this->assertSame(2, $list->count);
+      $this->assertSame($fulfilled, $list->get_element(0));
+      $this->assertSame($different, $list->get_element(1));
+    }
+
+    /**
+     * Confirms hour totals honor requirement type and can exclude transfer
+     * credit when a report needs only institution-earned course hours.
+     */
+    public function testCountHoursFiltersRequirementTypeAndTransferCredit()
+    {
+      $list = new CourseList();
+      $core = new Course();
+      $core->min_hours = 3;
+      $core->requirement_type = 'c';
+      $transferCore = new Course();
+      $transferCore->min_hours = 4;
+      $transferCore->requirement_type = 'uc';
+      $transferCore->bool_transfer = TRUE;
+      $major = new Course();
+      $major->min_hours = 2;
+      $major->requirement_type = 'm';
+      $list->add($core);
+      $list->add($transferCore);
+      $list->add($major);
+
+      $this->assertSame(7.0, $list->count_hours('c'));
+      $this->assertSame(3.0, $list->count_hours('c', FALSE, TRUE, FALSE, TRUE));
+      $this->assertSame(2.0, $list->count_hours('m'));
+    }
 
 
 } // class

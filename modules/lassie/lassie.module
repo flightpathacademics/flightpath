@@ -65,7 +65,7 @@ function lassie_finish($job_machine_name) {
 
   // TODO:  Implement a hook?
 
-  db_query("DELETE FROM variables WHERE name = ?", array("lassie_job__$job_machine_name"));
+  variable_delete("lassie_job__$job_machine_name");
 
 
 }
@@ -108,8 +108,8 @@ function lassie_check($job_machine_name) {
       fp_mail($emails, "FlightPath job failed to end: $job_machine_name", $msg);
     }
 
-    // Delete from variables table.
-    db_query("DELETE FROM variables WHERE name = ?", array("lassie_job__$job_machine_name"));
+    // Delete the job and clear its in-request variable cache.
+    variable_delete("lassie_job__$job_machine_name");
     watchdog('lassie', t("Expired job: ") . $job_machine_name . ". " . $elapsed . " minutes elapsed.", array(), WATCHDOG_ERROR);
 
 

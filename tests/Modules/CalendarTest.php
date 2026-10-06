@@ -185,6 +185,39 @@ class CalendarTest extends FlightPathTestCase {
     $this->assertSame('Line one\\nC:\\\\temp\\, a\\; b', $props['DESCRIPTION']);
   }
 
+  /**
+   * Confirms date-range generation includes both boundary dates and honors
+   * non-daily intervals, which calendar navigation uses for date collections.
+   */
+  public function testDateRangeIncludesEndpointsAndHonorsStep(): void {
+    $this->assertSame(
+      array('2030-10-14', '2030-10-15', '2030-10-16'),
+      calendar_get_date_range('2030-10-14', '2030-10-16')
+    );
+    $this->assertSame(
+      array('08:00', '10:00', '12:00'),
+      calendar_get_date_range('2030-10-14 08:00:00', '2030-10-14 12:00:00', '+2 hours', 'H:i')
+    );
+  }
+
+  /**
+   * Verifies long multibyte invitation text folds into RFC-compatible physical
+   * lines and strips markup before the text is included in an ICS attachment.
+   */
+  public function testIcsSplitFoldsMultibyteTextWithoutMarkup(): void {
+    $folded = calendar_ics_split('SUMMARY:', '<b>Planning</b> ' . str_repeat('é', 60));
+    $lines = explode("\n", $folded);
+
+    $this->assertGreaterThan(1, count($lines));
+    $this->assertStringNotContainsString('<b>', $folded);
+    $this->assertStringContainsString('Planning', $folded);
+    $this->assertLessThanOrEqual(75 - strlen('SUMMARY:'), strlen($lines[0]));
+    foreach (array_slice($lines, 1) as $line) {
+      $this->assertLessThanOrEqual(75, strlen($line));
+      $this->assertStringStartsWith("\t", $line);
+    }
+  }
+
   public function testIcsEscape(): void {
     $this->assertTrue(function_exists('calendar_ics_escape'));
     $this->assertSame('a\\\\b\\;c\\,d\\ne\\nf\\ng', calendar_ics_escape("a\\b;c,d\r\ne\nf\rg"));

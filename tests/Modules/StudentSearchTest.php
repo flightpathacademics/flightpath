@@ -81,4 +81,57 @@ class StudentSearchTest extends FlightPathTestCase {
 
 
 
+
+  /**
+   * Confirms Student Search declares the separate settings and navigation
+   * permissions used to expose search and advisee-list subtabs safely.
+   */
+  public function testPermissionDefinesStudentSearchCapabilities(): void {
+    $permissions = student_search_perm();
+
+    $this->assertArrayHasKey('administer_student_search', $permissions);
+    $this->assertArrayHasKey('display_search_subtab', $permissions);
+    $this->assertArrayHasKey('display_my_advisees_subtab', $permissions);
+    $this->assertSame('Administer Student Search', $permissions['administer_student_search']['title']);
+  }
+
+  /**
+   * Ensures advanced-search help uses the configured system name and explains
+   * both inactive-student and major-code search syntax to advisors.
+   */
+  public function testAdvancedSearchTipsUseSystemNameAndExplainSearchSyntax(): void {
+    $variableExisted = variable_exists('system_name');
+    $originalVariable = variable_get('system_name', NULL);
+    try {
+      variable_set('system_name', 'Search Test FlightPath');
+      $tips = student_search_get_advanced_search_tips();
+      $semanticText = preg_replace('/\\s+/', ' ', strip_tags($tips));
+
+      $this->assertStringContainsString('Search Test FlightPath displays students', $semanticText);
+      $this->assertStringContainsString('inactive students', $semanticText);
+      $this->assertStringContainsString('major=CODE', $semanticText);
+      $this->assertStringContainsString('student-search-advanced-tips-wrapper', $tips);
+    }
+    finally {
+      if ($variableExisted) variable_set('system_name', $originalVariable); else variable_delete('system_name');
+    }
+  }
+
+  /**
+   * Verifies advisee-table headers retain sortable identity and academic fields,
+   * while callers can omit the priority column for lighter-weight displays.
+   */
+  public function testAdviseeTableHeadersHonorPriorityFlag(): void {
+    $withPriority = student_search_get_advisee_table_headers(TRUE);
+    $withoutPriority = student_search_get_advisee_table_headers(FALSE);
+    $withLabels = array_column($withPriority, 'label');
+    $withoutLabels = array_column($withoutPriority, 'label');
+
+    $this->assertContains('CWID', $withLabels);
+    $this->assertContains('Student', $withLabels);
+    $this->assertContains('Rank', $withLabels);
+    $this->assertContains('Catalog<span class=' . "'mobile-hidden'" . '> Year</span>', $withLabels);
+    $this->assertContains('<span class=' . "'mobile-hidden'" . '>Academic </span>Priority', $withLabels);
+    $this->assertNotContains('<span class=' . "'mobile-hidden'" . '>Academic </span>Priority', $withoutLabels);
+  }
 } // class
