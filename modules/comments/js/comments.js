@@ -27,11 +27,13 @@ function commentsGenerateAdvisingSummary() {
       return;
     }
 
-    var button = $("input[name=generate_advising_summary]");
-    var originalValue = button.val();
+    var generateSummaryLink = $(".markup-element-mark_generate_summary");
     var formToken = $("#fp-form-comments_comment_form input[name=form_token]").val();
+    var finishGenerating = function() {
+      generateSummaryLink.removeClass("generating").removeAttr("aria-disabled");
+    };
 
-    button.prop("disabled", true).val("Generating...");
+    generateSummaryLink.addClass("generating").attr("aria-disabled", "true");
 
     $.ajax({
       url: FlightPath.settings.basePath + "/index.php?q=comments/ajax-generate-advising-summary",
@@ -45,28 +47,62 @@ function commentsGenerateAdvisingSummary() {
     .done(function(data) {
       if (!data || data.error || !data.success || typeof data.summary !== "string") {
         fp_alert((data && data.error) ? data.error : "The advising summary could not be generated.");
+        finishGenerating();
         return;
       }
 
-      var editor = null;
-      if (typeof tinymce !== "undefined") {
-        editor = tinymce.get("element-comment");
-      }
-      if (editor) {
-        var summaryHtml = $("<div>").text(data.summary).html().replace(/\r?\n/g, "<br>");
-        editor.setContent(summaryHtml);
-        editor.save();
-        editor.focus();
-      }
-      else {
-        $("#element-comment").val(data.summary).trigger("change").focus();
-      }
+      commentsTypeAdvisingSummary(data.summary, finishGenerating);
     })
     .fail(function() {
       fp_alert("The advising summary could not be generated. Please try again.");
-    })
-    .always(function() {
-      button.prop("disabled", false).val(originalValue);
+      finishGenerating();
     });
   });
+}
+
+/**
+ * Quickly reveal an advising summary one word at a time in the comment editor.
+ */
+function commentsTypeAdvisingSummary(summary, complete) {
+  var editor = null;
+  var textarea = $("#element-comment");
+  var words = summary.match(/\S+\s*/g) || [summary];
+  var displayedSummary = "";
+  var wordIndex = 0;
+
+  if (typeof tinymce !== "undefined") {
+    editor = tinymce.get("element-comment");
+  }
+
+  function displayNextWord() {
+    displayedSummary += words[wordIndex];
+    wordIndex++;
+
+    if (editor) {
+      var summaryHtml = $("<div>").text(displayedSummary).html().replace(/\r?\n/g, "<br>");
+      editor.setContent(summaryHtml);
+    }
+    else {
+      textarea.val(displayedSummary);
+    }
+
+    if (wordIndex < words.length) {
+      window.setTimeout(displayNextWord, 15);
+      return;
+    }
+
+    if (editor) {
+      editor.save();
+      editor.focus();
+    }
+    else {
+      textarea.trigger("change").focus();
+    }
+
+    if (typeof complete === "function") {
+      complete();
+    }
+  }
+
+  displayNextWord();
 }
