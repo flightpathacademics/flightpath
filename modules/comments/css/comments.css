@@ -68,5 +68,12 @@
   text-decoration: underline;
 }
 
+.markup-element-mark_generate_summary.generating {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: wait;
+  text-decoration: none;
+}
+
 
 
