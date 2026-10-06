@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-10-05
+  Added enhancements to the Generate Advising Summary feature.
+  
+
 2026-10-02
   Added new "Generate Advising Summary" functionality to comments.
 
