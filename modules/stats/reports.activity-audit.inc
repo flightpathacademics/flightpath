@@ -121,7 +121,7 @@ function stats_report_activity_audit_perform_batch_operation(&$batch, $start, $e
   $csv = '';
 
   $types_exclude = array(
-    'access_denied', 'page_not_found', 'ban_ip', 'cron', 'debug', 'http_request', 'lassie', 'nightly_import_routine',
+    'access_denied', 'page_not_found', 'cron', 'debug', 'http_request', 'lassie', 'nightly_import_routine',
     'night_import_routine', 'php_error', 'system', 'engagements_debug',
     'php_warning', 'saml', 'update_status', 'save_adv_draft', 'save_adv_draft_whatif',
   );

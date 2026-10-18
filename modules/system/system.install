@@ -169,6 +169,14 @@ function system_update($old_schema, $new_schema) {
   }
 
 
+  if (intval($old_schema) < 8) {
+
+    db_query("DROP TABLE `banned_ips`");
+
+  }
+
+
+
 
 } // update
 
@@ -279,21 +287,6 @@ CREATE TABLE `advisor_student` (
 
 db_query($q);
 
-
-
-
-
-
-
-
-$q = "
-CREATE TABLE `banned_ips` (
-  `ip_address` varchar(64) NOT NULL,
-  `posted_ts` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`ip_address`),
-  KEY `posted_ts` (`posted_ts`)
-); ";
-db_query($q);
 
 
 $q = "

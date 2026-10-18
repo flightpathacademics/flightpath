@@ -30,6 +30,21 @@ To use FlightPath as an end-user, the following is required:
 	* JavaScript must be enabled
  * At least 4GB system memory for computers/laptops
  
+
+## Server Security Recommendations
+
+For production installations, we recommend following standard server security
+practices, including HTTPS, regular software updates, appropriate file permissions,
+firewall protection, and regular backups.
+
+We also recommend considering **Fail2ban** or an equivalent security tool to
+help protect against automated vulnerability scanning and repeated suspicious
+requests. Our [Server Security Recommendations](https://getflightpath.com/node/13576)
+guide includes step-by-step instructions for installing and configuring Fail2ban
+on Ubuntu with Apache, along with other server security recommendations.
+
+Fail2ban is optional and operates at the server level, independently of FlightPath.
+
 	
 ## Important Notice
 
