@@ -2099,11 +2099,13 @@ function engagements_handle_incoming_sms($vars = array())
   invoke_hook('engagements_handle_incoming_sms_post_save', array(&$vars, $sms_history_mid, $content_created));
 
 
-  header('Content-Type: text/xml; charset=utf-8');
-  print '<?xml version="1.0" encoding="UTF-8"?>';
-  print '<Response></Response>';
-  exit;
 
+  if (!strstr($direction, 'outbound')) {
+    header('Content-Type: text/xml; charset=utf-8');
+    print '<?xml version="1.0" encoding="UTF-8"?>';
+    print '<Response></Response>';
+    exit;
+  }
 
 } // engagements_handle_incoming_sms
 
