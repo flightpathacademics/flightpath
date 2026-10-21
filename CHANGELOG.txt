@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-10-21
+  Minor tweaks for PHP 8.4.
+
+
 2026-10-17
   Removed FP-based rules and code for automatically banning IP addresses.
   Official recommendation is to use fail2ban on the server.  See README.md file.

@@ -1757,7 +1757,7 @@ function fp_get_requirement_types($school_id) {
  * This function provides a pass-thru to $d = new DegreePlan(args).
  * However, it allows for quick caching look-up, so it should be used when possible instead of $x = new DegreePlan.
  */
-function fp_load_degree($degree_id = "", DatabaseHandler $db = NULL, $bool_load_minimal = false, $array_significant_courses = false, $bool_use_draft = false) {
+function fp_load_degree($degree_id = "", ?DatabaseHandler $db = NULL, $bool_load_minimal = false, $array_significant_courses = false, $bool_use_draft = false) {
 
   // Create a "cache key" based on the arguments, so we can look this degree up faster later.
   $cache_key = md5(serialize(func_get_args()));
