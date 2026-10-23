@@ -465,7 +465,7 @@ function prereqs_get_prereq_array_from_string($prereqs_str, $school_id = 0) {
  *
  * Returns an array of warning messages, or an empty array if the course is good to go.
  */
-function prereqs_get_prereq_warnings_for_course(Course $course, Student $student = null) {
+function prereqs_get_prereq_warnings_for_course(Course $course, ?Student $student = null) {
 
   $rtn = array();
 
