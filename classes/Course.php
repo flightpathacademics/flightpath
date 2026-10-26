@@ -11,6 +11,7 @@ class Course extends stdClass
 
 
   const COURSE_UNKNOWN_TERM_ID = 11111;
+  const ASSIGNMENT_REJECTION_MIN_GRADE = 'min_grade';
 
 
   // Database & misc related:
@@ -530,6 +531,64 @@ class Course extends stdClass
    */
   function get_details_by_degree($degree_id, $key) {
     return $this->details_by_degree_array[$degree_id][$key] ?? NULL;
+  }
+
+  /**
+   * Records why this student course could not fulfill a requirement.
+   *
+   * @param int $degree_id
+   * @param string $reason_code
+   */
+  function add_assignment_rejection_reason($degree_id, $reason_code) {
+    $degree_id = intval($degree_id);
+    if ($degree_id === 0) {
+      $degree_id = intval($this->req_by_degree_id);
+    }
+
+    $reason_code = trim((string) $reason_code);
+    if ($reason_code === '') {
+      return;
+    }
+
+    if (!isset($this->details_by_degree_array[$degree_id]['assignment_rejection_reasons'])) {
+      $this->details_by_degree_array[$degree_id]['assignment_rejection_reasons'] = array();
+    }
+
+    $this->details_by_degree_array[$degree_id]['assignment_rejection_reasons'][$reason_code] = TRUE;
+  }
+
+  /**
+   * Returns TRUE when an assignment rejection reason exists for a degree.
+   *
+   * A negative degree ID checks every degree. A degree ID of zero uses the
+   * course's current required-by degree ID.
+   *
+   * @param string $reason_code
+   * @param int $degree_id
+   * @return bool
+   */
+  function has_assignment_rejection_reason($reason_code, $degree_id = -1) {
+    $reason_code = trim((string) $reason_code);
+    if ($reason_code === '') {
+      return FALSE;
+    }
+
+    $degree_id = intval($degree_id);
+    if ($degree_id === 0) {
+      $degree_id = intval($this->req_by_degree_id);
+    }
+
+    if ($degree_id > 0) {
+      return !empty($this->details_by_degree_array[$degree_id]['assignment_rejection_reasons'][$reason_code]);
+    }
+
+    foreach ($this->details_by_degree_array as $details) {
+      if (!empty($details['assignment_rejection_reasons'][$reason_code])) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
 

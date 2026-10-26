@@ -898,6 +898,7 @@ class FlightPath extends stdClass
         // Make sure the course meets min grade requirements.
         if (!$c->meets_min_grade_requirement_of($course_requirement))
         {
+          $c->add_assignment_rejection_reason($req_by_degree_id, Course::ASSIGNMENT_REJECTION_MIN_GRADE);
           continue;
         }
 

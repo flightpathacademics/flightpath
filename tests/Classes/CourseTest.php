@@ -112,6 +112,23 @@ class CourseTest extends FlightPathTestCase
   }
 
   /**
+   * Assignment rejection reasons should be tracked independently by degree.
+   */
+  public function testAssignmentRejectionReasonsAreDegreeSpecific()
+  {
+    $course = new Course();
+
+    $course->add_assignment_rejection_reason(101, Course::ASSIGNMENT_REJECTION_MIN_GRADE);
+
+    $this->assertTrue($course->has_assignment_rejection_reason(Course::ASSIGNMENT_REJECTION_MIN_GRADE, 101));
+    $this->assertFalse($course->has_assignment_rejection_reason(Course::ASSIGNMENT_REJECTION_MIN_GRADE, 202));
+    $this->assertTrue($course->has_assignment_rejection_reason(Course::ASSIGNMENT_REJECTION_MIN_GRADE, -1));
+
+    $restored = unserialize(serialize($course));
+    $this->assertTrue($restored->has_assignment_rejection_reason(Course::ASSIGNMENT_REJECTION_MIN_GRADE, 101));
+  }
+
+  /**
    * Course data should survive a serialization round trip.
    */
   public function testDataStringRoundTripPreservesCourseState()
