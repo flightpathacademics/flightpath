@@ -350,7 +350,7 @@ function course_search_display_courses() {
 
   // catalog_year is always just whatever the current year is.
   $catalog_year = $current_catalog_year;
-  $subject_id = fp_trim(@$_REQUEST["subject_id"]);
+  $subject_id = trim($_REQUEST["subject_id"] ?? '');
 
 
 
@@ -401,7 +401,7 @@ function course_search_display_courses() {
   // Draw the term selector.
   $h_subject_id = htmlentities($subject_id);
   $html = "";
-  $only_term = @strip_tags($_REQUEST["only_term"]);
+  $only_term = htmlentities(strip_tags($_REQUEST["only_term"] ?? ''));
   $html .= "<form id='term_form' action='" . fp_url("tools/course-search/courses") . "' method='GET'>
            <input type='hidden' name='mode' value='$h_subject_id'>
            <input type='hidden' name='subject_id' value='$h_subject_id'>
