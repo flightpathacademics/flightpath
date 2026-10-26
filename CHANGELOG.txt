@@ -3,7 +3,11 @@ FlightPath 7.x Changelog
 
 2026-10-26
   Upgraded jQuery UI to 1.14.2
-  
+
+  Added concept to Course objects, for tracking "assignment reason" to document
+  why a Course was assigned to a specific block (eg, Excess Credits). Meant to be
+  useful for other modules and reports later.
+
 
 2026-10-25
   Small change to course_search CSS file.
