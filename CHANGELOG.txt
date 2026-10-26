@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-10-26
+  Upgraded jQuery UI to 1.14.2
+  
+
 2026-10-21
   Minor tweaks for PHP 8.4.
 

@@ -90,7 +90,7 @@ define("MENU_NOT_FOUND", 62);
 define('HTTP_REQUEST_TIMEOUT', -1);
 
 define('JQUERY_FILE', 'jquery-3.7.1.min.js');
-define('JQUERY_UI_DIRECTORY', 'jquery-ui-1.14.1');
+define('JQUERY_UI_DIRECTORY', 'jquery-ui-1.14.2');
 
 
 
