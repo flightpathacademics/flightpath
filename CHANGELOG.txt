@@ -5,6 +5,10 @@ FlightPath 7.x Changelog
   Upgraded jQuery UI to 1.14.2
   
 
+2026-10-25
+  Small change to course_search CSS file.
+
+
 2026-10-21
   Minor tweaks for PHP 8.4.
 

@@ -1,6 +1,6 @@
 
 .subject-title {
-  border-bottom: 3px solid #999;  
+  border-bottom: 3px solid #999;
 }
 
 
@@ -15,16 +15,15 @@
 }
 
 .course-search-course-block {
-  margin-bottom:50px; 
-  margin-left: 20px; 
+  margin-bottom:50px;
+  margin-left: 20px;
 }
 
 .course-search-sample-syllabus {
   font-size: 0.9em;
 }
-     
+
 table.fp-course-search-avail td {
-  width: 14%;
   text-align: center;
   font-size: 0.9em;
 }
@@ -52,7 +51,7 @@ table.fp-course-search-avail td {
 }
 
 .capacity-textfield {
-  width: 60px !important;  
+  width: 60px !important;
   padding: 5px !important;
   margin-left: 5px;
   font-size: 0.9em !important;
@@ -61,5 +60,5 @@ table.fp-course-search-avail td {
 .rotation-form-checkboxes div.course-search-edit-term-wrapper {
   display: inline-block;
   min-width: 200px;
-  margin-right: 20px;  
+  margin-right: 20px;
 }

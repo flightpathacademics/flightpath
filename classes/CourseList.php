@@ -373,6 +373,7 @@ class CourseList extends ObjList
       ///  Check for min grade, etc, here.
       if (!$c->meets_min_grade_requirement_of(null, $min_grade))
       {
+        $c->add_assignment_rejection_reason($degree_id, Course::ASSIGNMENT_REJECTION_MIN_GRADE);
         //if ($min_grade == "B-") fpm("[did not meet min grade requirement of $min_grade :: $c->subject_id $c->course_num $c->grade");
         if ($bool_mark_repeats_exclude == true)
         {
@@ -528,6 +529,7 @@ class CourseList extends ObjList
       ///  Check for min grade, etc, here.
       if (!$c->meets_min_grade_requirement_of(null, $min_grade))
       {
+        $c->add_assignment_rejection_reason($degree_id, Course::ASSIGNMENT_REJECTION_MIN_GRADE);
 
         if ($bool_mark_repeats_exclude == true)
         {
