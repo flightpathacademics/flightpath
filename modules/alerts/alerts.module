@@ -586,19 +586,38 @@ function alerts_advisees_alerts_form_submit($form, $form_state) {
  * then send an email to the advisor.
  * 
  */
-function alerts_content_save(&$content) {  
-  
+function alerts_content_save(&$content) {
   // Is content type alert, and is this a new creation?
   if ($content->type == 'alert' && isset($content->is_new) && $content->is_new == TRUE) {
+    $student_id = trim($content->field__student_id['value'] ?? '');
+    if ($student_id == '') {
+      return;
+    }
 
-    $student_id = $content->field__student_id['value'];
-    // TODO: get the advisors for this student.
-    // TODO: loop through each advisor, and see if they have
-    //       set that they want to be emailed when a new alert is posted
-    //       for their advisee.  Email them if so.
-    // example code: if ($testuser->settings['advisee_alert_send_email'] == 'yes')...
+    $db = get_global_database_handler();
 
+    $student_name = $db->get_student_name($student_id, TRUE, TRUE);
+    $student_url = fp_url_absolute('student-profile', 'current_student_id=' . urlencode($student_id));
+    $subject = t('New alert for @student', array('@student' => $student_name));
+    $message = t('A new alert has been created for @student.', array('@student' => $student_name));
+    $message .= "\n\n" . t('Alert: @alert', array('@alert' => $content->title));
+    $message .= "\n\n" . t('To view the alert, visit: @url', array('@url' => $student_url));
 
+    // Notify only advisors who have elected to receive these emails.
+    $advisors = advise_get_advisors_for_student($student_id);
+    foreach ($advisors as $faculty_id) {
+      $user_id = db_get_user_id_from_cwid($faculty_id, 'faculty');
+      if (!$user_id) {
+        continue;
+      }
+
+      $account = fp_load_user($user_id);
+      if (!$account || ($account->settings['advisee_alert_send_email'] ?? '') != 'yes' || !$account->email) {
+        continue;
+      }
+
+      fp_mail($account->email, $subject, $message);
+    }
   } // content type is NEW and is an alert.
 
 }

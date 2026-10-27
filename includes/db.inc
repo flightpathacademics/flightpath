@@ -680,14 +680,18 @@ function fp_get_student_majors($student_cwid, $bool_return_as_csv = FALSE, $bool
 
 
 
-function fp_get_student_name($cwid, $bool_include_cwid = FALSE ) {
+function fp_get_student_name($cwid, $bool_include_cwid = FALSE) {
   if (is_numeric($cwid) && ($cwid === 0 || $cwid === '0')) {
     return t("Anonymous");
   }
 
   // Already cached?
   if (isset($GLOBALS['fp_cache_get_student_name'][$cwid][intval($bool_include_cwid)])) {
-    return $GLOBALS['fp_cache_get_student_name'][$cwid][intval($bool_include_cwid)];
+    $name = $GLOBALS['fp_cache_get_student_name'][$cwid][intval($bool_include_cwid)];
+
+
+
+    return $name;
   }
 
   $db = get_global_database_handler();
@@ -696,6 +700,9 @@ function fp_get_student_name($cwid, $bool_include_cwid = FALSE ) {
 
 
   $GLOBALS['fp_cache_get_student_name'][$cwid][intval($bool_include_cwid)] = $name;
+
+
+
 
   return $name;
 }

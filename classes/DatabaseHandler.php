@@ -1310,9 +1310,11 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
    * @param bool $bool_include_cwid
    *        - If set to TRUE, the student's name will be returned
    *          with their CWID in parentheses. Ex: John Smith (12345)
+   * @param bool $bool_abbreviate_first_name
+   *        - If set to TRUE, the first name will just be a letter. Ex: J. Smith
    * @return string
    */
-  function get_student_name($cwid, $bool_include_cwid = FALSE) {
+  function get_student_name($cwid, $bool_include_cwid = FALSE, $bool_abbreviate_first_name = FALSE) {
 
     // Let's perform our queries.
     $res = $this->db_query("SELECT f_name, l_name FROM users
@@ -1320,6 +1322,12 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
                       AND is_student = 1 ", $cwid);
 
     $cur = $this->db_fetch_array($res);
+
+    if ($bool_abbreviate_first_name) {
+      $cur['f_name'] = strtoupper(substr($cur['f_name'], 0, 1)) . '.';
+    }
+
+
     if ($cur) {
       $name = $cur["f_name"] . " " . $cur["l_name"];
     }
