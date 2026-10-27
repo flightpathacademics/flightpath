@@ -782,7 +782,7 @@ function content_dialog_handle_after_save() {
   $rtn .= "<br><br><p>" . t("If this windows doesn't close within 3 seconds,") . " <a href='javascript:window.parent.location.reload();'>" . t("click here") . "</a>.</p>";
 
   // Add this javascript code to when the page loads.
-  ///*  DEV: comment out while testing
+  /*  DEV: comment out while testing
 
   $rtn .= "
       <script type='text/javascript'>
@@ -1869,7 +1869,7 @@ function content_save(&$content) {
 
   // First, see if any modules want to make changes before we save to the database.
   $modules = modules_implement_hook("content_save", array("content"));
-  foreach ($modules as $module) {
+  foreach ($modules as $module) {    
     call_user_func_array($module . "_content_save", array(&$content));
   }
 
@@ -1890,6 +1890,10 @@ function content_save(&$content) {
 function content_content_save(&$content) {
   global $user;
 
+  if (!isset($content->user_id) || $content->user_id === NULL) {
+    $content->user_id = $user->id;
+  }
+
   $types = content_get_types();
   $type = $content->type;
 
@@ -1906,8 +1910,10 @@ function content_content_save(&$content) {
   // If this is a NEW content, then insert once into content table to get cid.  Then, insert into content_versions to get vid.  Then update content table with vid.
   if ($content->cid == 'new') {
     db_query('INSERT INTO content (user_id, `type`, title, posted, updated, published, delete_flag, `log`)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array($user->id, $type, $content->title, time(), time(), $content->published, 0, $log));
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)', array($content->user_id, $type, $content->title, time(), time(), $content->published, 0, $log));
     $content->cid = db_insert_id();
+
+    $content->is_new = TRUE;
 
     // insert into content_versions to get the vid.
     db_query("INSERT INTO content_versions (cid, `user_id`) VALUES (?,?)", array($content->cid, $user->id));
@@ -1917,8 +1923,8 @@ function content_content_save(&$content) {
   else {
     // If this is an EXISTING content, then insert once into content_versions to get new vid.  Update title and vid in content table.
     // insert into content_versions to get the vid.
-    db_query("INSERT INTO content_versions (`cid`, `user_id`) VALUES (?,?)", array($content->cid, $user->id));
-    $content->vid = db_insert_id();
+    db_query("INSERT INTO content_versions (`cid`, `user_id`) VALUES (?,?)", array($content->cid, $content->user_id));
+    $content->vid = db_insert_id();    
   }
 
   if (!isset($content->delete_flag)) {

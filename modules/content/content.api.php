@@ -134,6 +134,7 @@ function hook_content_load(&$content) {
  * 
  * Note: we will always call "content_content_save" LAST, after calling the other modules' possible hooks.
  * 
+ * 
  */
 function hook_content_save(&$content) {
   $content->title = "Foo " . time();

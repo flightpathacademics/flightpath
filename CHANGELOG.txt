@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2027-10-27
+  Added user setting to be emailed if an advisee receives an alert.
+  
+
 2026-10-26
   Upgraded jQuery UI to 1.14.2
 
@@ -8,6 +12,9 @@ FlightPath 7.x Changelog
   why a Course was assigned to a specific block (eg, Excess Credits). Meant to be
   useful for other modules and reports later.
 
+  Modified content module so other modules can specify a user_id to associate
+  with a piece of content (like an alert).
+  
 
 2026-10-25
   Small change to course_search CSS file.

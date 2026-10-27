@@ -1059,7 +1059,7 @@ function user_user_settings_form() {
 
 
 
-  if (user_has_permission('view_any_advising_session')) {
+  if (user_has_permission('view_any_advising_session') || user_has_permission('view_advisee_advising_session')) {
 
     $value = @$user->settings['default_student_load_tab'];
     if (!$value || $value == "") {
@@ -1090,7 +1090,21 @@ function user_user_settings_form() {
       'value' => $value,
       'description' => t('If you are unsure what to select, choose "Student Profile" or leave set to its current setting.'),
     );
-  }
+
+    // If the Alerts module is enabled
+    if (function_exists('alerts_menu')) {
+      $value = 'yes';
+      
+      $form['advisee_alert_send_email'] = array(
+        'label' => 'Send me an email is an alert is created for one of my advisees?',
+        'type' => 'select',
+        'options' => array('yes' => 'Yes', 'no' => 'No'),
+        'hide_please_select' => TRUE,
+        'value' => ($user->settings['advisee_alert_send_email'] ?? 'yes'),
+      );
+    }
+
+  } // permission view_any and view_advisee ... advising_session
 
 
   $options = array('email' => t("Email"));
@@ -1101,7 +1115,7 @@ function user_user_settings_form() {
   }
 
   $form['default_notification_method'] = array(
-    'label' => t('Default notification method for important events'),
+    'label' => t('Default notification method for important system events'),
     'type' => 'select',
     'hide_please_select' => TRUE,
     'options' => $options,
@@ -1188,11 +1202,12 @@ function user_user_settings_form_validate($form, $form_state) {
 function user_user_settings_form_submit($form, $form_state) {
   global $user;
 
-  $timezone = fp_trim(@$form_state['values']['timezone']);
-  $hide_charts = fp_trim(@$form_state['values']['hide_charts']);
-  $image_url = fp_trim(@$form_state['values']['image_url']);
-  $default_student_load_tab = fp_trim(@$form_state['values']['default_student_load_tab']);
-  $default_notification_method = fp_trim(@$form_state['values']['default_notification_method']);
+  $timezone = trim($form_state['values']['timezone'] ?? '');
+  $hide_charts = trim($form_state['values']['hide_charts'] ?? '');
+  $image_url = trim($form_state['values']['image_url'] ?? '');
+  $default_student_load_tab = trim($form_state['values']['default_student_load_tab'] ?? '');
+  $default_notification_method = trim($form_state['values']['default_notification_method'] ?? '');
+  $advisee_alert_send_email = $form_state['values']['advisee_alert_send_email'] ?? '';
 
   $phone_number = user_get_attribute($user->id, 'mobile_phone', '');
   $phone_number = engagements_convert_to_valid_phone_number($phone_number);
@@ -1237,6 +1252,7 @@ function user_user_settings_form_submit($form, $form_state) {
   user_set_setting($user->id, "hide_charts", $hide_charts);
   user_set_setting($user->id, "default_student_load_tab", $default_student_load_tab);
   user_set_setting($user->id, "default_notification_method", $default_notification_method);
+  user_set_setting($user->id, "advisee_alert_send_email", $advisee_alert_send_email);
   user_set_setting($user->id, "sms_opt_out__" . $phone_number, $sms_opt_out);
   user_set_setting($user->id, "image_url", $image_url);
 
