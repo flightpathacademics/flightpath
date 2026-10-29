@@ -754,10 +754,10 @@ function fp_mail($to, $subject, $msg, $bool_html = FALSE, $attachments = array()
  */
 function arg($index) {
 
-  $q = $_REQUEST["q"];
+  $q = $_REQUEST["q"] ?? '';
   $temp = explode("/", $q);
 
-  $rtn = fp_trim(@$temp[$index]);
+  $rtn = trim($temp[$index] ?? '');
 
   return $rtn;
 

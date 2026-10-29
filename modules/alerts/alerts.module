@@ -580,15 +580,17 @@ function alerts_advisees_alerts_form_submit($form, $form_state) {
 
 /**
  * Implements hook_content_save
- * 
- * If this is a new alert being saved, and if any advisors have 
- * opted in to being emailed on one of their students' alerts, 
+ *
+ * If this is a new alert being saved, and if any advisors have
+ * opted in to being emailed on one of their students' alerts,
  * then send an email to the advisor.
- * 
+ *
  */
 function alerts_content_save(&$content) {
+
   // Is content type alert, and is this a new creation?
-  if ($content->type == 'alert' && isset($content->is_new) && $content->is_new == TRUE) {
+  if ($content->type == 'alert' && (isset($content->is_new) && $content->is_new == TRUE) || $content->cid === 'new') {
+
     $student_id = trim($content->field__student_id['value'] ?? '');
     if ($student_id == '') {
       return;
@@ -617,7 +619,9 @@ function alerts_content_save(&$content) {
       }
 
       fp_mail($account->email, $subject, $message);
-    }
+
+    } // foreach advisors
+
   } // content type is NEW and is an alert.
 
 }
