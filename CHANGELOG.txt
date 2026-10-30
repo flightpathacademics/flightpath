@@ -1,12 +1,15 @@
 FlightPath 7.x Changelog
 ========================
 
-2027-10-30
+
+2026-10-30
   Added global setting for Alerts to either enable or disable sending emails on new
   alert creation.
 
+  Tweak to fix minor display issue with prereqs.
 
-2027-10-27
+
+2026-10-27
   Added user setting to be emailed if an advisee receives an alert.
 
 

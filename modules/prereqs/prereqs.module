@@ -847,7 +847,7 @@ function prereqs_content_alter(&$render, $content_id) {
 
     $rotation_schedule = course_search_get_course_rotation_schedule($course->course_id, $year, 5);
     $bool_not_anticipated = course_search_get_course_rotation_schedule_not_anticipated($course->course_id);
-    //fpm($rotation_schedule);
+
 
     $bool_use_term_abbreviation = (variable_get("prereqs_use_term_desc_abbr_in_popup", "yes") == "yes");
 
@@ -862,10 +862,12 @@ function prereqs_content_alter(&$render, $content_id) {
       {
         $x .= " <span class='term-rot-avail'>" . htmlentities(get_term_description($term_id, $bool_use_term_abbreviation, $school_id), ENT_QUOTES) . "</span><span class='comma'>,</span>";
       }
-      $x = rtrim($x, ',');
 
+      $x = rtrim($x, "<span class='comma'>,</span>");
 
-      if ($x) $schedule_text = "<span class='term-rotation-schedule-terms'>$x</span>";
+      if ($x) {
+        $schedule_text = "<span class='term-rotation-schedule-terms'>$x</span>";
+      }
     }
 
 
@@ -873,7 +875,7 @@ function prereqs_content_alter(&$render, $content_id) {
     if ($schedule_text) {
       // Add it to our render array.  Weeee.
       $render["schedule"] = array(
-        "label" => t("<b>Anticipated availability:</b>"),
+        "label" => t("Anticipated availability:"),
         "value" => " <div class='prereqs-schedule-text'>" . $schedule_text . "</div>",
         "attributes" => array("class" => "popup-description-section tenpt"),
         "weight" => 510,
