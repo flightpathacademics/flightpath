@@ -1,9 +1,14 @@
 FlightPath 7.x Changelog
 ========================
 
+2027-10-30
+  Added global setting for Alerts to either enable or disable sending emails on new
+  alert creation.
+
+
 2027-10-27
   Added user setting to be emailed if an advisee receives an alert.
-  
+
 
 2026-10-26
   Upgraded jQuery UI to 1.14.2
@@ -14,7 +19,7 @@ FlightPath 7.x Changelog
 
   Modified content module so other modules can specify a user_id to associate
   with a piece of content (like an alert).
-  
+
 
 2026-10-25
   Small change to course_search CSS file.

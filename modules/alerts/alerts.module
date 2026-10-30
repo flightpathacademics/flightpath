@@ -92,13 +92,26 @@ function alerts_settings_form($school_id = 0) {
     }
   }
 
-  $form['school_id'] = array(
+  $form['school_id'] = [
     'type' => 'hidden',
     'value' => $school_id,
-  );
+  ];
 
 
-  $form['alerts_tags' . $fs] = array(
+  $form['alerts_global_emails_enabled' . $fs] = [
+    'label' => t('Enable email notifications?'),
+    'type' => 'select',
+    'options' => ['yes' => 'Yes - Enabled (default)', 'no' => 'No - Disable sending emails'],
+    'hide_please_select' => TRUE,
+    'value' => variable_get_for_school('alerts_global_emails_enabled', 'yes', $school_id, TRUE),
+    'description' => t("If enabled, the student's advisor(s) will be sent an email
+                        any time a new Alert is created, assuming that advisor has selected to receive
+                        such emails in their profile settings.
+                        <br>If disabled, the system will not attempt to send an email for new Alerts."),
+  ];
+
+
+  $form['alerts_tags' . $fs] = [
     'label' => t("Tags"),
     'type' => 'textarea',
     'value' => variable_get_for_school("alerts_tags", "", $school_id, TRUE),
@@ -106,7 +119,7 @@ function alerts_settings_form($school_id = 0) {
                         Enter tags one per line.  For example:
                         <br> &nbsp; Academics<br> &nbsp; Financial Aid<br> &nbsp; English"),
 
-  );
+  ];
 
 
 
@@ -596,6 +609,14 @@ function alerts_content_save(&$content) {
       return;
     }
 
+    $school_id = db_get_school_id_for_student_id($student_id);
+    $emails_enabled_val = variable_get_for_school('alerts_global_emails_enabled', 'yes', $school_id, TRUE);
+    if ($emails_enabled_val !== 'yes') {
+      // Emails have not been enabled for alerts, so ignore this new alert.
+      return;
+    }
+
+
     $db = get_global_database_handler();
 
     $student_name = $db->get_student_name($student_id, TRUE, TRUE);
@@ -614,7 +635,8 @@ function alerts_content_save(&$content) {
       }
 
       $account = fp_load_user($user_id);
-      if (!$account || ($account->settings['advisee_alert_send_email'] ?? '') != 'yes' || !$account->email) {
+      if (!$account || ($account->settings['advisee_alert_send_email'] ?? '') !== 'yes' || !$account->email) {
+        // The user has selected not to receive emails on new advisee alerts.
         continue;
       }
 
