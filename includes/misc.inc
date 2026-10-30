@@ -1204,7 +1204,7 @@ function repair_html($html){
 function filter_plain($str, $bool_trim = TRUE) {
   $x = filter_markup($str, "plain");
   if ($bool_trim) {
-    $x = fp_trim($x);
+    $x = trim($x ?? '');
   }
   return $x;
 }
