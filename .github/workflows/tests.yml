@@ -8,6 +8,10 @@ on:
     branches:
       - flightpath-7.x
 
+      
+permissions:
+  contents: read      
+      
 jobs:
   tests:
     runs-on: ubuntu-latest
