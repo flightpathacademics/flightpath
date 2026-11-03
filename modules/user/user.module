@@ -1094,9 +1094,9 @@ function user_user_settings_form() {
     // If the Alerts module is enabled
     if (function_exists('alerts_menu')) {
       $value = 'yes';
-      
+
       $form['advisee_alert_send_email'] = array(
-        'label' => 'Send me an email is an alert is created for one of my advisees?',
+        'label' => 'Send me an email if an alert is created for one of my advisees?',
         'type' => 'select',
         'options' => array('yes' => 'Yes', 'no' => 'No'),
         'hide_please_select' => TRUE,
