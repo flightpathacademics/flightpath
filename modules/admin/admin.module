@@ -1731,97 +1731,69 @@ function admin_display_watchdog() {
   $rtn .= "<p>View recent watchdog entries</p>";
 
   $severity_array = array(
-    5 => "notice",
-    1 => "alert",
-    3 => "error",
-    7 => "debug",
+    WATCHDOG_NOTICE => "notice",
+    WATCHDOG_ALERT => "alert",
+    WATCHDOG_ERROR => "error",
+    WATCHDOG_DEBUG => "debug",
   );
 
-  $results_per_page = 50;
+  $limit = 50;
 
+  $type_line = $severity_line = $date_line = "";
 
-
-  $type_line = $severity_line = $limit_start = "";
-
-  @$sev_filter = $_GET["sev_filter"];
-  @$type_filter = $_GET["type_filter"];
-  @$page = intval($_GET["page"]);
-
-  $limit_start = 0;
-  if ($page > 0) {
-    $limit_start = $results_per_page * ($page - 1);
+  $sev_filter = $_GET["sev_filter"] ?? "";
+  if (!is_string($sev_filter)) {
+    $sev_filter = "";
   }
 
-
-
-
-  // Filters:
-  $rtn .= "<form method='GET' action='" . fp_url("admin/config/watchdog") . "' class='watchdog-filters'>
-            ";
-
-  $rtn .= "Filter by:
-           <span class='type-filter'>
-            Type:
-            <select name='type_filter'>
-              <option value=''>-Any-</option>";
-  $res = db_query("SELECT distinct(type) as type
-                   FROM watchdog
-                   ORDER BY type");
-  while ($cur = db_fetch_object($res)) {
-    $sel = ($type_filter == $cur->type) ? "selected" : "";
-    $rtn .= "<option value='$cur->type' $sel>$cur->type</option>";
+  $type_filter = $_GET["type_filter"] ?? "";
+  if (!is_string($type_filter)) {
+    $type_filter = "";
   }
 
-
-  $rtn .= "</select>
-            </span>";
-
-
-  $rtn .= "
-            <span class='severity-filter'>
-            Severity:
-            <select name='sev_filter'>
-              <option value=''>-Any-</option>";
-  foreach ($severity_array as $key => $value) {
-    $sel = "";
-    if ($sev_filter == $key) $sel = "selected";
-
-    $rtn .= "<option value='$key' $sel>$value</option>";
+  $start_datetime = $_GET['start_datetime'] ?? '';
+  $start_timestamp = admin_watchdog_datetime_to_timestamp($start_datetime);
+  if ($start_timestamp === FALSE) {
+    $start_datetime = '';
   }
 
-  $rtn .= "</select>
-            </span>";
+  $end_datetime = $_GET['end_datetime'] ?? '';
+  $end_timestamp = admin_watchdog_datetime_to_timestamp($end_datetime);
+  if ($end_timestamp === FALSE) {
+    $end_datetime = '';
+  }
 
+  $page = $_GET["page"] ?? 0;
+  if (!is_scalar($page)) {
+    $page = 0;
+  }
+  $page = intval($page);
 
-
-
-  $rtn .= "<input type='submit' value='&gt;'>";
-  // Hack if clean URLs are not enabled:
-  $rtn .= "<input type='hidden' name='q' value='admin/config/watchdog'>";
-
-  $rtn .= "</form>";
-
-
-
-
+  $rtn .= fp_render_form("admin_watchdog_filter_form");
 
   $params = array();
 
-  if (@$_GET["type_filter"] != "") {
-    //$type_line = " AND type = '" . mysql_real_escape_string($_GET["type_filter"]) . "' ";
+  if ($type_filter != "") {
     $type_line = " AND `type` = :type ";
-    $params[":type"] = $_GET["type_filter"];
+    $params[":type"] = $type_filter;
   }
 
-  if (@$_GET["sev_filter"] != "") {
-    //$severity_line = " AND severity = '" . mysql_real_escape_string($_GET["sev_filter"]) . "' ";
+  if ($sev_filter != "") {
     $severity_line = " AND severity = :sev ";
-    $params[":sev"] = $_GET["sev_filter"];
+    $params[":sev"] = $sev_filter;
   }
 
+  if ($start_timestamp !== FALSE) {
+    $date_line .= " AND a.timestamp >= :start_timestamp ";
+    $params[":start_timestamp"] = $start_timestamp;
+  }
+
+  if ($end_timestamp !== FALSE) {
+    $date_line .= " AND a.timestamp <= :end_timestamp ";
+    $params[":end_timestamp"] = $end_timestamp;
+  }
 
   $pol = "even";
-
 
   $table_headers = array();
   $table_headers[] = array("label" => "ID", "field" => "wid");
@@ -1838,20 +1810,18 @@ function admin_display_watchdog() {
   // Draw our our table headers, with links....
   $rtn .= theme_table_header_sortable($table_headers);
 
-
-
   // Get our order by clause based on selected table header, if any.
   $order_by = theme_table_header_sortable_order_by($table_headers);
   $res = pager_query("SELECT * FROM watchdog a
                        WHERE 1
                        $type_line
                        $severity_line
-                       $order_by", $params, 50, 0, "SELECT COUNT(wid) FROM watchdog a
+                       $date_line
+                       $order_by", $params, $limit, 0, "SELECT COUNT(wid) FROM watchdog a
                                                      WHERE 1
                                                      $type_line
                                                      $severity_line
-                                                     $order_by", $params);
-
+                                                     $date_line");
 
   while ($cur = db_fetch_object($res)) {
     $pol = ($pol == "even") ? "odd" : "even";
@@ -1870,15 +1840,12 @@ function admin_display_watchdog() {
       $type = trim($type) . "...";
     }
 
-
-
     $severity = $severity_array[$cur->severity];
     $when = format_date(convert_time($cur->timestamp), "short");
 
-
     $rtn .= "
               <tr class='row-$pol row-$severity'>
-                <td valign='top'>" . l($cur->wid, "admin/config/watchdog/$cur->wid", "sev_filter=$sev_filter&type_filter=$type_filter&page=$page") . "</td>
+                <td valign='top'>" . l($cur->wid, "admin/config/watchdog/$cur->wid", fp_query_string_encode(array('sev_filter' => $sev_filter, 'type_filter' => $type_filter, 'start_datetime' => $start_datetime, 'end_datetime' => $end_datetime, 'page' => $page))) . "</td>
                 <td valign='top'>$when</td>
                 <td valign='top'>$type</td>
                 <td valign='top'>$msg</td>
@@ -1891,22 +1858,220 @@ function admin_display_watchdog() {
 
   }
 
-
   $rtn .= "</table>";
 
-
-
   // Display the pager that was generated by the pager_query above!
-  $rtn .= theme_pager();
-
-
+  $rtn .= theme_pager(array(), $limit);
 
   return $rtn;
 
 } // admin display watchdog
 
+/**
+ * Build the watchdog filter form.
+ *
+ * @return array
+ *   A FlightPath form array.
+ */
+function admin_watchdog_filter_form() {
+  $form = array();
+
+  $type_filter = $_GET['type_filter'] ?? '';
+  if (!is_string($type_filter)) {
+    $type_filter = '';
+  }
+
+  $sev_filter = $_GET['sev_filter'] ?? '';
+  if (!is_string($sev_filter)) {
+    $sev_filter = '';
+  }
+
+  $start_datetime = $_GET['start_datetime'] ?? '';
+  if (admin_watchdog_datetime_to_timestamp($start_datetime) === FALSE) {
+    $start_datetime = '';
+  }
+
+  $end_datetime = $_GET['end_datetime'] ?? '';
+  if (admin_watchdog_datetime_to_timestamp($end_datetime) === FALSE) {
+    $end_datetime = '';
+  }
+
+  $type_options = array('' => t('- Any -'));
+  $res = db_query("SELECT DISTINCT(type) AS type
+                   FROM watchdog
+                   ORDER BY type");
+  while ($cur = db_fetch_object($res)) {
+    $type_options[$cur->type] = $cur->type;
+  }
+
+  $form['#submit_method'] = 'GET';
+  $form['#attributes'] = array(
+    'class' => 'watchdog-filters',
+  );
+
+  $form['type_filter'] = array(
+    'type' => 'select',
+    'label' => t('Type:'),
+    'options' => $type_options,
+    'value' => $type_filter,
+    'hide_please_select' => TRUE,
+    'inline' => TRUE,
+    'weight' => 10,
+  );
+
+  $form['sev_filter'] = array(
+    'type' => 'select',
+    'label' => t('Severity:'),
+    'options' => array(
+      '' => t('- Any -'),
+      WATCHDOG_NOTICE => t('notice'),
+      WATCHDOG_ALERT => t('alert'),
+      WATCHDOG_ERROR => t('error'),
+      WATCHDOG_DEBUG => t('debug'),
+    ),
+
+    'value' => $sev_filter,
+    'hide_please_select' => TRUE,
+    'inline' => TRUE,
+    'attributes' => array(
+      'class' => 'watchdog-severity-filter',
+    ),
+    'weight' => 20,
+  );
+
+  $form['start_datetime'] = array(
+    'type' => 'datetime-local',
+    'label' => t('Start:'),
+    'value' => $start_datetime,
+    'inline' => TRUE,
+    'weight' => 30,
+  );
+
+  $form['end_datetime'] = array(
+    'type' => 'datetime-local',
+    'label' => t('End:'),
+    'value' => $end_datetime,
+    'inline' => TRUE,
+    'attributes' => array(
+      'class' => 'watchdog-end-datetime',
+    ),
+    'weight' => 40,
+  );
+
+  $form['apply_btn'] = array(
+    'type' => 'submit',
+    'value' => t('Apply'),
+    'inline' => TRUE,
+    'weight' => 100,
+  );
+
+  $form['reset_btn'] = array(
+    'type' => 'submit',
+    'value' => t('Reset'),
+    'inline' => TRUE,
+    'weight' => 110,
+  );
+
+  return $form;
+}
+
+/**
+ * Validate a watchdog filter form submission.
+ *
+ * @param array $form
+ *   The form definition.
+ * @param array $form_state
+ *   The submitted form state.
+ */
+function admin_watchdog_filter_form_validate($form, &$form_state) {
+  foreach (array('type_filter', 'sev_filter') as $name) {
+    $value = $form_state['values'][$name] ?? '';
+    if (!is_string($value) || !array_key_exists($value, $form[$name]['options'])) {
+      form_error($name, t('Please select a valid @label filter.', array('@label' => strtolower($form[$name]['label']))));
+    }
+  }
+
+  $start_value = $form_state['values']['start_datetime'] ?? '';
+  $end_value = $form_state['values']['end_datetime'] ?? '';
+  $start_timestamp = admin_watchdog_datetime_to_timestamp($start_value);
+  $end_timestamp = admin_watchdog_datetime_to_timestamp($end_value);
+
+  if ($start_value !== '' && $start_timestamp === FALSE) {
+    form_error('start_datetime', t('Please enter a valid start date and time.'));
+  }
+  if ($end_value !== '' && $end_timestamp === FALSE) {
+    form_error('end_datetime', t('Please enter a valid end date and time.'));
+  }
+  if ($start_timestamp !== FALSE && $end_timestamp !== FALSE && $start_timestamp > $end_timestamp) {
+    form_error('end_datetime', t('The end date and time must not be before the start date and time.'));
+  }
+}
+
+/**
+ * Redirect a watchdog filter submission to the filtered list.
+ *
+ * @param array $form
+ *   The form definition.
+ * @param array $form_state
+ *   The submitted form state.
+ */
+function admin_watchdog_filter_form_submit(&$form, &$form_state) {
+  $query = array();
+  $values = $form_state['values'];
+
+  if (!empty($values['apply_btn'])) {
+    if ($values['type_filter'] != '') {
+      $query['type_filter'] = $values['type_filter'];
+    }
+    if ($values['sev_filter'] != '') {
+      $query['sev_filter'] = $values['sev_filter'];
+    }
+    if ($values['start_datetime'] != '') {
+      $query['start_datetime'] = $values['start_datetime'];
+    }
+    if ($values['end_datetime'] != '') {
+      $query['end_datetime'] = $values['end_datetime'];
+    }
+  }
+
+  $form['#redirect'] = array(
+    'path' => 'admin/config/watchdog',
+    'query' => fp_query_string_encode($query),
+  );
+}
 
 
+
+
+
+
+
+/**
+ * Convert a local datetime filter value to a watchdog timestamp.
+ *
+ * @param mixed $value
+ *   A datetime-local value.
+ *
+ * @return int|false
+ *   The Unix timestamp, or FALSE when the value is blank or invalid.
+ */
+function admin_watchdog_datetime_to_timestamp($value) {
+  if (!is_string($value) || $value === '') {
+    return FALSE;
+  }
+
+  $timezone = new DateTimeZone(fp_get_user_timezone());
+  $datetime = DateTime::createFromFormat('!Y-m-d\TH:i', $value, $timezone);
+  $errors = DateTime::getLastErrors();
+  if ($datetime === FALSE || ($errors !== FALSE && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+    return FALSE;
+  }
+  if ($datetime->format('Y-m-d\TH:i') !== $value) {
+    return FALSE;
+  }
+
+  return $datetime->getTimestamp();
+}
 
 
 

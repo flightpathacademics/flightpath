@@ -194,8 +194,33 @@ table.admin-display-main-table td.system-configuration-left
   padding-top: 15px;
 }
 
-.watchdog-filters .severity-filter {
-  padding-left: 15px;
+.watchdog-filters .element-wrapper--watchdog-severity-filter {
+  padding-left: 5px;
+}
+
+.watchdog-filters .element-wrapper--watchdog-end-datetime {
+  padding-left: 5px;
+}
+
+.watchdog-filters > .element-type-submit {
+  margin-left: 5px;
+}
+
+/* Keep the watchdog filters compact without changing global form controls. */
+.watchdog-filters .element-type-select,
+.watchdog-filters .element-type-datetime-local,
+.watchdog-filters .element-type-submit {
+  display: inline-block;
+  margin-bottom: 0;
+  width: auto;
+}
+
+.watchdog-filters .element-type-select select,
+.watchdog-filters .element-type-datetime-local input,
+.watchdog-filters .element-type-submit input {
+  font-size: 0.9em;
+  padding: 0.4rem 0.8rem;
+  width: auto;
 }
 
 /*
