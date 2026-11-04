@@ -79,6 +79,83 @@ class AdminTest extends FlightPathTestCase {
   }
 
   /**
+   * Confirms the watchdog filter uses a GET Form API submission and reflects
+   * its URL-based filter values.
+   */
+  public function testWatchdogFilterFormUsesGetValues(): void {
+    $getWasArray = is_array($_GET);
+    $originalGet = $getWasArray ? $_GET : NULL;
+    if (!$getWasArray) $_GET = array();
+    try {
+      $_GET['type_filter'] = 'admin';
+      $_GET['sev_filter'] = (string) WATCHDOG_ERROR;
+      $_GET['start_datetime'] = '2026-11-01T08:30';
+      $_GET['end_datetime'] = '2026-11-02T17:15';
+
+      $form = fp_get_form('admin_watchdog_filter_form');
+
+      $this->assertSame('GET', $form['#submit_method']);
+      $this->assertSame('admin', $form['type_filter']['value']);
+      $this->assertSame((string) WATCHDOG_ERROR, $form['sev_filter']['value']);
+      $this->assertSame('datetime-local', $form['start_datetime']['type']);
+      $this->assertSame('2026-11-01T08:30', $form['start_datetime']['value']);
+      $this->assertSame('2026-11-02T17:15', $form['end_datetime']['value']);
+      $this->assertSame('submit', $form['apply_btn']['type']);
+      $this->assertSame('submit', $form['reset_btn']['type']);
+    }
+    finally {
+      if ($getWasArray) $_GET = $originalGet; else unset($_GET);
+    }
+  }
+
+  /**
+   * Confirms watchdog filter submissions redirect to a canonical list URL.
+   */
+  public function testWatchdogFilterFormSubmitBuildsFilterRedirect(): void {
+    $form = array();
+    $formState = array(
+      'values' => array(
+        'apply_btn' => 'Apply',
+        'reset_btn' => '',
+        'type_filter' => 'admin',
+        'sev_filter' => (string) WATCHDOG_ERROR,
+        'start_datetime' => '2026-11-01T08:30',
+        'end_datetime' => '2026-11-02T17:15',
+      ),
+    );
+
+    admin_watchdog_filter_form_submit($form, $formState);
+
+    $this->assertSame(
+      array(
+        'path' => 'admin/config/watchdog',
+        'query' => 'type_filter=admin&sev_filter=' . WATCHDOG_ERROR . '&start_datetime=2026-11-01T08%3A30&end_datetime=2026-11-02T17%3A15',
+      ),
+      $form['#redirect']
+    );
+
+    $formState['values']['apply_btn'] = '';
+    $formState['values']['reset_btn'] = 'Reset';
+    admin_watchdog_filter_form_submit($form, $formState);
+
+    $this->assertSame('', $form['#redirect']['query']);
+  }
+
+  /**
+   * Confirms watchdog date filter values must be valid local datetimes.
+   */
+  public function testWatchdogDatetimeFilterValidation(): void {
+    $start = admin_watchdog_datetime_to_timestamp('2026-11-01T08:30');
+    $end = admin_watchdog_datetime_to_timestamp('2026-11-01T09:30');
+
+    $this->assertIsInt($start);
+    $this->assertIsInt($end);
+    $this->assertGreaterThan($start, $end);
+    $this->assertFalse(admin_watchdog_datetime_to_timestamp('2026-11-01 08:30'));
+    $this->assertFalse(admin_watchdog_datetime_to_timestamp('not a datetime'));
+  }
+
+  /**
    * Confirms Admin's large-list difference helper retains duplicate source
    * values while excluding every value already present in the comparison list.
    */

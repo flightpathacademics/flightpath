@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-11-04
+  Revised the watchdog screen (admin/config/watchdog) to use the FAPI as well as
+  new filters for searching by date range.
+  
 
 2026-10-30
   Added global setting for Alerts to either enable or disable sending emails on new

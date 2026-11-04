@@ -2777,8 +2777,10 @@ function system_handle_form_submit() {
   if (!is_string($callback)) $callback = '';
   if (!is_string($form_type)) $form_type = '';
 
-  watchdog('system', "handle_form_submit callback:$callback, form_type:$form_type", array());
-
+  if ($callback !== 'admin_watchdog_filter_form') {
+    watchdog('system', "handle_form_submit callback:$callback, form_type:$form_type", array());
+  }
+  
   $form = array();
 
   $form_include = @$_REQUEST["form_include"];
@@ -2876,22 +2878,32 @@ function system_handle_form_submit() {
     }
     // Actually get the form now.
     $form = fp_get_form($callback, $form_params);
+
+    // Read submitted element values from the request method declared by the form.
+    $submitted_values = $_POST;
+    if (strtoupper($form['#submit_method'] ?? 'POST') === 'GET') {
+      $submitted_values = $_GET;
+    }
+
     foreach ($form as $name => $element) {
+      if (is_string($name) && substr($name, 0, 1) === '#') {
+        continue;
+      }
 
       // Save to our $values array, but we don't care about markup.
       if (@$element["type"] != "" && @$element["type"] != "markup" && @$element["type"] != "markup_no_wrappers") {
-        $values[$name] = @$_POST[$name];
+        $values[$name] = @$submitted_values[$name];
 
         // Save to safe_values, too, if this is not a password field.
         if (@$element["type"] != "password") {
-          $safe_values[$name] = @$_POST[$name];
+          $safe_values[$name] = @$submitted_values[$name];
         }
 
 
-        // If this is a checkbox, and we have any value in the POST, it should
+        // If this is a checkbox, and we have any submitted value, it should
         // be saved as boolean TRUE
         if (isset($element["type"]) && $element["type"] == "checkbox") {
-          if (isset($_POST[$name]) && $_POST[$name] === "1") {
+          if (isset($submitted_values[$name]) && $submitted_values[$name] === "1") {
             $values[$name] = TRUE;
           }
           else {
@@ -2916,7 +2928,7 @@ function system_handle_form_submit() {
 
 
       }
-      // Do we need to alter the value from the POST?
+      // Do we need to alter the submitted value?
 
       // If this element is a fieldset or cfieldset, it may contain other elements.  We should get
       // those values too.
@@ -2925,17 +2937,17 @@ function system_handle_form_submit() {
           foreach ($element["elements"][$k] as $cname => $celement) {
             // Save to our $values array, but we don't care about markup.
             if (@$celement["type"] != "" && @$celement["type"] != "markup" && @$element["type"] != "markup_no_wrappers") {
-              $values[$cname] = @$_POST[$cname];
+              $values[$cname] = @$submitted_values[$cname];
 
               // Save to save_values, too, if this is not a password field.
               if (@$celement["type"] != "password") {
-                $safe_values[$cname] = @$_POST[$cname];
+                $safe_values[$cname] = @$submitted_values[$cname];
               }
 
-              // If this is a checkbox, and we have any value in the POST, it should
+              // If this is a checkbox, and we have any submitted value, it should
               // be saved as boolean TRUE
               if (isset($celement["type"]) && $celement["type"] == "checkbox") {
-                if (isset($_POST[$cname]) && $_POST[$cname] === "1") {
+                if (isset($submitted_values[$cname]) && $submitted_values[$cname] === "1") {
                   $values[$cname] = TRUE;
                 }
                 else {
@@ -3000,7 +3012,7 @@ function system_handle_form_submit() {
     $_SESSION["fp_form_submissions"][$callback]["values"] = $safe_values;
   }
 
-  $form_state = array("values" => $values, "POST" => $_POST);
+  $form_state = array("values" => $values, "POST" => $_POST, 'GET' => $_GET);
 
   // Let's pass this through our default form validator (mainly to check for required fields
   // which do not have values entered)

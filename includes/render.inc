@@ -220,6 +220,20 @@ function fp_get_form($form_id, $params = array()) {
     call_user_func_array($module . '_form_alter', array(&$form, $form_id));
   }
 
+  // Form properties (that begin with #) are metadata, not renderable elements, and should not be
+  // passed through the element weight sorter.
+  $form_properties = array();
+  $form_elements = array();
+  foreach ($form as $key => $element) {
+    if (is_string($key) && substr($key, 0, 1) === '#') {
+      $form_properties[$key] = $element;
+    }
+    else {
+      $form_elements[$key] = $element;
+    }
+  }
+  $form = $form_elements;
+
   // Okay, now the fun part.  Re-order the elements by weight.  Lighter weights
   // should float to the top.  Elements w/o a weight listed are assumed to have a weight of 0.
   // Unfortunately we cannot use uasort, as it re-orders our indexes when weights are identical.
@@ -269,7 +283,7 @@ function fp_get_form($form_id, $params = array()) {
 
   // Okay, we should now be good to go!
 
-  return $new_form;
+  return $form_properties + $new_form;
 
 }
 
