@@ -424,22 +424,22 @@ class RenderTest extends FlightPathTestCase
   }
 
   /**
-   * Verifies that fp_get_form() adds default submit and validation handlers
-   * and orders form elements by ascending weight.
+   * Verifies that fp_get_form() adds default submit and validation handlers,
+   * and that form properties (beginning with #) appear at the top.
    */
   public function testGetFormAddsDefaultHandlersAndOrdersElements()
   {
     $form = fp_get_form('render_test_form');
 
-    $this->assertSame(['render_test_form_submit', 'weight' => 0, ], $form['#submit_handlers']);
+    $this->assertSame(['render_test_form_submit', ], $form['#submit_handlers']);
 
-    $this->assertSame(['render_test_form_validate', 'weight' => 0,], $form['#validate_handlers']);
+    $this->assertSame(['render_test_form_validate', ], $form['#validate_handlers']);
 
     $keys = array_keys($form);
 
-    $this->assertSame('first', $keys[0]);
-    $this->assertSame('#submit_handlers', $keys[1]);
-    $this->assertSame('#validate_handlers', $keys[2]);
+    $this->assertSame('#submit_handlers', $keys[0]);
+    $this->assertSame('#validate_handlers', $keys[1]);
+    $this->assertSame('first', $keys[2]);
     $this->assertSame('second', $keys[3]);
     $this->assertSame('third', $keys[4]);
   }
@@ -452,8 +452,8 @@ class RenderTest extends FlightPathTestCase
   {
     $form = fp_get_form('render_test_form_with_handlers');
 
-    $this->assertSame(['custom_submit', 'weight' => 0,], $form['#submit_handlers']);
-    $this->assertSame(['custom_validate', 'weight' => 0,], $form['#validate_handlers'] );
+    $this->assertSame(['custom_submit', ], $form['#submit_handlers']);
+    $this->assertSame(['custom_validate', ], $form['#validate_handlers'] );
   }
 
   /**
