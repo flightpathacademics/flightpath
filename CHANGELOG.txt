@@ -1,6 +1,14 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-11-07
+  Modified the Administrator's Toolbox's Courses tab, so that Name and Term are sortable
+  and then reverse-sortable.
+
+  Added function CourseList to sort courses by most recent LAST instead of most
+  recent first.
+
+
 2026-11-05
   Added default favicon.ico to the root of the project, for browsers and crawlers that are
   expecting it (and generating 404's if not found at the root).

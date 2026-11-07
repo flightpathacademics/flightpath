@@ -1419,13 +1419,44 @@ function draw_menu_items($menu_array) {
     $csid = @$_REQUEST["current_student_id"];
     $school_id = db_get_school_id_for_student_id($csid);
     $order = @$_REQUEST["order"];
+    $direction = @$_REQUEST["direction"];
+    if ($order != "name" && $order != "date")
+    {
+      $order = "date";
+    }
+    if ($direction != "asc" && $direction != "desc")
+    {
+      if ($order == "name")
+      {
+        $direction = "asc";
+      } else {
+        $direction = "desc";
+      }
+    }
+
+    $name_direction = "asc";
+    $term_direction = "desc";
     if ($order == "name")
     {
       $ns = "font-weight: bold; text-decoration: none;";
-      $fan = " <i class='fa fa-angle-up' style='font-weight:bold;'></i>";
-    } else {
+      if ($direction == "asc")
+      {
+        $name_direction = "desc";
+        $fan = " <i class='fa fa-angle-up' style='font-weight:bold;'></i>";
+      } else {
+        $fan = " <i class='fa fa-angle-down' style='font-weight:bold;'></i>";
+      }
+    } 
+    else {
       $os = "font-weight: bold; text-decoration: none;";
-      $fat = " <i class='fa fa-angle-down' style='font-weight:bold;'></i>";
+      if ($direction == "desc")
+      {
+        $term_direction = "asc";
+        $fat = " <i class='fa fa-angle-down' style='font-weight:bold;'></i>";
+      } 
+      else {
+        $fat = " <i class='fa fa-angle-up' style='font-weight:bold;'></i>";
+      }
     }
 
     /*
@@ -1440,19 +1471,19 @@ function draw_menu_items($menu_array) {
     $pC .= "
         <table border='0' cellpadding='2' cellspacing='3'>
           <tr>
-            <th colspan='2'>" . l(t("Name") . $fan, "advise/popup-toolbox/courses", "order=name&current_student_id=$csid", array("style" => $ns)) . "</th>
+            <th colspan='2'>" . l(t("Name") . $fan, "advise/popup-toolbox/courses", "order=name&direction=$name_direction&current_student_id=$csid", array("style" => $ns)) . "</th>
             <th>Hr</th>
             <th>Gr</th>
-            <th width=50>" . l(t("Term") . $fat, "advise/popup-toolbox/courses", "order=date&current_student_id=$csid", array("style" => $os)) . "</th>
+            <th width=50>" . l(t("Term") . $fat, "advise/popup-toolbox/courses", "order=date&direction=$term_direction&current_student_id=$csid", array("style" => $os)) . "</th>
             <th>Attributes</th>
           </tr>
           ";
     $is_empty = true;
-    if ($order == "name")
-    {
-      $this->student->list_courses_taken->sort_alphabetical_order();
-    } else {
-      $this->student->list_courses_taken->sort_most_recent_first();
+    if ($order == "name") {
+      $this->student->list_courses_taken->sort_alphabetical_order($direction == "desc");
+    } 
+    else {
+      $this->student->list_courses_taken->sort_most_recent_first(TRUE, $direction == "asc");
     }
     $this->student->list_courses_taken->reset_counter();
     while($this->student->list_courses_taken->has_more())

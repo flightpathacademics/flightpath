@@ -480,6 +480,42 @@ class CourseListTest extends FlightPathTestCase
     }
 
     /**
+     * Ensures term sorting supports both newest-first and oldest-first order
+     * while keeping courses in the same term alphabetical.
+     */
+    public function testSortMostRecentFirstSupportsBothDirections()
+    {
+      $list = new CourseList();
+      $newerCourse = new Course();
+      $newerCourse->subject_id = "BIOL";
+      $newerCourse->course_num = "102";
+      $newerCourse->term_id = 202520;
+      $olderMath = new Course();
+      $olderMath->subject_id = "MATH";
+      $olderMath->course_num = "101";
+      $olderMath->term_id = 202410;
+      $olderEnglish = new Course();
+      $olderEnglish->subject_id = "ENGL";
+      $olderEnglish->course_num = "101";
+      $olderEnglish->term_id = 202410;
+
+      $list->add($olderMath);
+      $list->add($newerCourse);
+      $list->add($olderEnglish);
+      $list->sort_most_recent_first();
+
+      $this->assertSame($newerCourse, $list->get_element(0));
+      $this->assertSame($olderEnglish, $list->get_element(1));
+      $this->assertSame($olderMath, $list->get_element(2));
+
+      $list->sort_most_recent_first(TRUE, TRUE);
+
+      $this->assertSame($olderEnglish, $list->get_element(0));
+      $this->assertSame($olderMath, $list->get_element(1));
+      $this->assertSame($newerCourse, $list->get_element(2));
+    }
+
+    /**
      * Verifies duplicate cleanup retains the fulfilled instance of a course,
      * preserving the record that explains why a requirement is satisfied.
      */
