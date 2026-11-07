@@ -1323,7 +1323,7 @@ fp_mail(variable_get("notify_mysql_error_email_address",''), "FlightPath MYSQL E
 
     $cur = $this->db_fetch_array($res);
 
-    if ($bool_abbreviate_first_name) {
+    if ($cur && $bool_abbreviate_first_name) {
       $cur['f_name'] = strtoupper(substr($cur['f_name'], 0, 1)) . '.';
     }
 
