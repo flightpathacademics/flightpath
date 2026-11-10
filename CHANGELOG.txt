@@ -1,6 +1,10 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-11-10
+  Added new "Outdated Substitutions" report to the core stats module.
+
+
 2026-11-07
   Modified the Administrator's Toolbox's Courses tab, so that Name and Term are sortable
   and then reverse-sortable.
