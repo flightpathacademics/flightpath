@@ -3356,7 +3356,7 @@ function get_modules_menus() {
  */
 function fp_array_to_csv_row($fields) {
   $handle = fopen('php://temp', 'r+');
-  fputcsv($handle, $fields);
+  fputcsv($handle, $fields, ',', '"', '');
   rewind($handle);
   $row = stream_get_contents($handle);
   fclose($handle);
