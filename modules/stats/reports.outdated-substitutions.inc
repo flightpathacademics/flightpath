@@ -189,7 +189,7 @@ function stats_report_outdated_substitutions_batch_operation(&$batch, $student_i
   $student_index = $batch['results']['student_index'];
   if ($student_index < count($student_ids)) {
     $student_id = $student_ids[$student_index];
-    watchdog('stats', 'Outdated substitutions report: processing CWID @cwid.', array('@cwid' => $student_id), WATCHDOG_DEBUG);
+    //watchdog('stats', 'Outdated substitutions report: processing CWID @cwid.', array('@cwid' => $student_id), WATCHDOG_DEBUG);
     $student = new Student($student_id, NULL, $school_id);
     $student->load_student_substitutions();
     $degree_plan = stats_report_outdated_substitutions_get_degree_plan($student);

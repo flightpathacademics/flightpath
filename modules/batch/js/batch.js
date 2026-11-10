@@ -72,8 +72,8 @@ function batchContinueBatch() {
 
   })
   .fail(function (data) {
-    alert("Error processing batch. Unable to continue.");
     console.log(data);
+    alert("Error processing batch. Unable to continue.");    
     return;
   });
 
