@@ -35,9 +35,9 @@ function batchContinueBatch() {
 
     if (data.success != "SUCCESS") {
       // We got some kind of error!
-      alert("Error processing batch.  Returned 'data' message: \n\n" + data);
       console.log("Error processing batch. Expecting data.success = SUCCESS");
       console.log(data);
+      alert("Error processing batch.  Returned 'data' message: \n\n" + data);
       return;
     }
 
