@@ -3343,6 +3343,28 @@ function get_modules_menus() {
 
 
 /**
+ * Converts an array of fields into one CSV-formatted row.
+ *
+ * PHP's fputcsv() automatically encloses and escapes values containing
+ * delimiters, enclosure quotes, or line breaks.
+ *
+ * @param array $fields
+ *   Field values for the row.
+ *
+ * @return string
+ *   The CSV-formatted row, including its trailing line ending.
+ */
+function fp_array_to_csv_row($fields) {
+  $handle = fopen('php://temp', 'r+');
+  fputcsv($handle, $fields);
+  rewind($handle);
+  $row = stream_get_contents($handle);
+  fclose($handle);
+
+  return $row;
+}
+
+/**
  * Simple function to left padd numbers with 0's.
  * 1 becomes 001
  * 20 becomes 020

@@ -67,6 +67,27 @@ function stats_menu() {
   );
 
 
+  $items["stats/reports/outdated-substitutions"] = array(
+    "title" => "Outdated Substitutions",
+    "description" => "Find active students whose substitutions no longer apply to their current degree plans.",
+    "page_callback" => "fp_render_form",
+    "page_arguments" => array("stats_report_outdated_substitutions_form"),
+    "access_arguments" => array("can_access_stats"),
+    "page_settings" => array(
+      "page_show_title" => TRUE,
+      "bool_print" => FALSE,
+      "menu_links" => array(
+        0 => array(
+          "text" => t("Analytics"),
+          "path" => "stats",
+        ),
+      ),
+    ),
+    "type" => MENU_TYPE_NORMAL_ITEM,
+    "weight" => 130,
+    "file" => menu_get_module_path("stats") . "/reports.outdated-substitutions.inc",
+  );
+
   $items["stats/reports/activity-audit"] = array(
     "title" => "Activity Audit",
     "description" => "Export to CSV a detailed history of user activity.",
