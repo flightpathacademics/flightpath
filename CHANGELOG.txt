@@ -4,6 +4,10 @@ FlightPath 7.x Changelog
 2026-11-10
   Added new "Outdated Substitutions" report to the core stats module.
 
+  Fixed potential bug in Engagements, where an incomming sms wasn't properly
+  given the "direction" of "inbound", which could cause problems with other
+  modules hooking in.
+
 
 2026-11-07
   Modified the Administrator's Toolbox's Courses tab, so that Name and Term are sortable
@@ -16,12 +20,12 @@ FlightPath 7.x Changelog
 2026-11-05
   Added default favicon.ico to the root of the project, for browsers and crawlers that are
   expecting it (and generating 404's if not found at the root).
-  
+
 
 2026-11-04
   Revised the watchdog screen (admin/config/watchdog) to use the FAPI as well as
   new filters for searching by date range.
-  
+
 
 2026-10-30
   Added global setting for Alerts to either enable or disable sending emails on new

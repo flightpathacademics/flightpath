@@ -1753,6 +1753,7 @@ function engagements_handle_incoming_sms($vars = array())
   if ($num_media > 0) {
     $price += 0.01;  // Contained at least one piece of media, so price increases.  This is SignalWire's price.
   }
+
   $direction = "inbound";
   $fp_price = engagements_get_fp_price($price, $direction, $num_segments);
 
@@ -1761,9 +1762,14 @@ function engagements_handle_incoming_sms($vars = array())
     $date_sent_ts = $vars['date_sent_ts'];
   }
 
-  if (isset($vars['direction'])) {
+  if (isset($vars['direction']) && ($vars['direction'] ?? '') != '') {
     $direction = $vars['direction'];
   }
+  else {
+    $vars['direction'] = 'inbound';  // Make sure this is set!
+    $direction = 'inbound';
+  }
+
 
   $content = NULL;
   $content_created = array();
