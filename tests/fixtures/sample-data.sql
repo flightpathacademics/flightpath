@@ -33,6 +33,7 @@ TRUNCATE TABLE transfer_courses;
 TRUNCATE TABLE transfer_institutions;
 TRUNCATE TABLE transfer_eqv_per_student;
 TRUNCATE TABLE menu_router;
+TRUNCATE TABLE roles;
 
 
 -- Create tables in case they don't exist 
@@ -45,6 +46,19 @@ INSERT INTO `users` VALUES (17, 'testsecondary', '', 0, 1, '', '9999997', 'Test'
 -- faculty (4 rows)
 INSERT INTO `faculty` VALUES ('1', '', '', '');
 INSERT INTO `faculty` VALUES ('55588992', '', '', ''), ('9999998', '', '', ''), ('9999997', '', '', '');
+
+-- roles
+INSERT INTO `roles` VALUES (1, 'anonymous user');
+INSERT INTO `roles` VALUES (2, 'authenticated user');
+INSERT INTO `roles` VALUES (3, 'advisor');
+
+
+-- user_roles
+INSERT INTO `user_roles` VALUES (16, 3);
+INSERT INTO `user_roles` VALUES (17, 3);
+
+
+
 
 -- students (11 rows)
 INSERT INTO `students` VALUES ('1003210', '122', '2.75', 'SR', 2020, 1);
