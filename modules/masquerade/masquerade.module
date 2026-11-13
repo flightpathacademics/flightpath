@@ -69,14 +69,12 @@ function masquerade_perform_masquerade() {
   $account = new stdClass();
 
   $account = fp_load_user($user_id);
-  // Okay, let's look for all the modules who have implimented hook_user_login
-  $modules = modules_implement_hook("user_login");
-  foreach ($modules as $module) {
-    call_user_func_array($module . '_user_login', array(&$account));
-  }
 
   // Set the $account to the SESSION.
   $_SESSION["fp_user_object"] = $account;
+
+  // Invoke our hook so other modules can act.
+  invoke_hook("user_login", array(&$account));
 
   watchdog("masquerade", "@user is now masquerading as @newuser. New CWID: @cwid", array("@user" => "$user->name ($user->id)", "@newuser" => "$account->name ($account->id)", "@cwid" => $account->cwid));
 

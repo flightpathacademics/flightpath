@@ -2780,7 +2780,7 @@ function system_handle_form_submit() {
   if ($callback !== 'admin_watchdog_filter_form') {
     watchdog('system', "handle_form_submit callback:$callback, form_type:$form_type", array());
   }
-  
+
   $form = array();
 
   $form_include = @$_REQUEST["form_include"];
@@ -3165,10 +3165,7 @@ function system_handle_logout() {
 
 
   // Check for hook_user_logout
-  $modules = modules_implement_hook("user_logout");
-  foreach($modules as $module) {
-    call_user_func($module . '_user_logout');
-  }
+  invoke_hook("user_logout");
 
 
   watchdog("logout", "@user has logged out", array("@user" => "$user_name ($uid)"));
@@ -3819,8 +3816,10 @@ function system_perform_user_login($user_id) {
   // Set the $account to the SESSION.
   $_SESSION["fp_user_object"] = $account;
 
-
   db_query("UPDATE users SET last_login = ? WHERE user_id = ?", array(time(), $user_id));
+
+  // Invoke our hook so other modules can act.
+  invoke_hook("user_login", array(&$account));
 
   return $account;
 

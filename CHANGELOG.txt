@@ -1,6 +1,11 @@
 FlightPath 7.x Changelog
 ========================
 
+2026-11-12
+  Added missing calls to invoke_hook for hook_user_login at appropriate points.  Same for
+  hook_user_logout.
+
+
 2026-11-10
   Added new "Outdated Substitutions" report to the core stats module.
 
